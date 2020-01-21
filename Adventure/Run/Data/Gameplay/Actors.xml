@@ -1,0 +1,19 @@
+<ActorDefinitions>
+
+  <ActorDefinition
+    name="Player"
+    spriteCoords="3,4"
+    spriteTint="255,255,255"
+    turnSpeed="180"
+    speed="1"
+    canWalk="true"
+    canFly="false"
+    canSwim="false"
+    minDrawBounds="-0.3,-0.3"
+    maxDrawBounds="0.3,0.3"
+    physicsRadius =" 0.2"
+	/>
+
+</ActorDefinitions>
+
+

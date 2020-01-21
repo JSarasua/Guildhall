@@ -1,0 +1,83 @@
+<ActorDefinitions>
+
+  <ActorDefinition
+    name="Player"
+    spriteCoords="3,4"
+    spriteTint="255,255,255"
+    spritePortraitCoords="4,0"
+    turnSpeed="180"
+    speed="1"
+    canWalk="true"
+    canFly="false"
+    canSwim="false"
+    minDrawBounds="-0.375,-0.5"
+    maxDrawBounds="0.375,0.5"
+    physicsRadius =" 0.2"
+  >
+    <SpriteAnimSet spriteSheet="KushnariovaCharacters_12x53.png" spriteLayout="12,53" fps="5">
+      <SpriteAnim name="MoveEast"		spriteIndexes="51,52,53"/>
+      <SpriteAnim name="MoveWest"		spriteIndexes="57,58,59"/>
+      <SpriteAnim name="MoveNorth"	spriteIndexes="48,49,50"/>
+      <SpriteAnim name="MoveSouth"	spriteIndexes="54,55,56"/>
+      <SpriteAnim name="Idle"				spriteIndexes="54,55,56" fps="3"/>
+    </SpriteAnimSet>
+    
+  </ActorDefinition>
+
+
+
+  <ActorDefinition
+    name="Mary"
+    spriteCoords="3,19"
+    spriteTint="255,255,255"
+    spritePortraitCoords="3,2"
+    turnSpeed="10"
+    speed="2"
+    canWalk="true"
+    canFly="false"
+    canSwim="false"
+    minDrawBounds="-0.375,-0.5"
+    maxDrawBounds="0.375,0.5"
+    physicsRadius =" 0.2"
+    waitingTime ="5~15"
+  >
+    <SpriteAnimSet spriteSheet="KushnariovaCharacters_12x53.png" spriteLayout="12,53" fps="5">
+      <SpriteAnim name="MoveEast"		spriteIndexes="231,232,233"/>
+      <SpriteAnim name="MoveWest"		spriteIndexes="237,238,239"/>
+      <SpriteAnim name="MoveNorth"	spriteIndexes="228,229,230"/>
+      <SpriteAnim name="MoveSouth"	spriteIndexes="234,235,236"/>
+      <SpriteAnim name="Idle"				spriteIndexes="234,235,236" fps="3"/>
+    </SpriteAnimSet>
+    
+  </ActorDefinition>
+
+
+
+  <ActorDefinition
+    name="Josen"
+    spriteCoords="3,7"
+    spriteTint="255,255,255"
+    spritePortraitCoords="7,0"
+    turnSpeed="360"
+    speed="0.25"
+    canWalk="true"
+    canFly="false"
+    canSwim="false"
+    minDrawBounds="-0.375,-0.5"
+    maxDrawBounds="0.375,0.5"
+    physicsRadius =" 0.2"
+    >
+
+    <SpriteAnimSet spriteSheet="KushnariovaCharacters_12x53.png" spriteLayout="12,53" fps="5">
+      <SpriteAnim name="MoveEast"		spriteIndexes="87,88,89"/>
+      <SpriteAnim name="MoveWest"		spriteIndexes="93,94,95"/>
+      <SpriteAnim name="MoveNorth"	spriteIndexes="84,85,86"/>
+      <SpriteAnim name="MoveSouth"	spriteIndexes="90,91,92"/>
+      <SpriteAnim name="Idle"				spriteIndexes="90,91,92" fps="3"/>
+    </SpriteAnimSet>
+    
+  </ActorDefinition>
+  
+</ActorDefinitions>
+
+

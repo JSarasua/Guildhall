@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TileDefinitions>
+  <TileDefinition
+    name="Grass"
+    spriteCoords="1,0"
+    spriteTint="255,255,255"
+    tileGlyphColor="0,255,0"
+    allowsSight="true"
+    allowsWalking="true"
+    allowsFlying="true"
+    allowsSwimming="false"
+	/>
+
+  <TileDefinition
+    name="Water"
+    spriteCoords="4,7"
+    spriteTint="0,180,180"
+    tileGlyphColor="0,0,255"
+    allowsSight="true"
+    allowsWalking="false"
+    allowsFlying="true"
+    allowsSwimming="true"
+	/>
+
+  <TileDefinition
+  name="Stone"
+  spriteCoords="1,3"
+  spriteTint="255,255,255"
+  tileGlyphColor="128,128,128"
+  allowsSight="true"
+  allowsWalking="true"
+  allowsFlying="true"
+  allowsSwimming="false"
+	/>
+
+  <TileDefinition
+  name="Lava"
+  spriteCoords="6,7"
+  spriteTint="255,255,255"
+  tileGlyphColor="255,0,0"
+  allowsSight="true"
+  allowsWalking="false"
+  allowsFlying="true"
+  allowsSwimming="false"
+	/>
+</TileDefinitions>
+
+

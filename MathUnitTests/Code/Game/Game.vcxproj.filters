@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="General">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_MP1A1.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_Custom.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_MP1A2.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_MP1A3.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_MP1A4.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests_MP1A5.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GameCommon.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_MP1A1.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_Custom.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_MP1A2.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_MP1A3.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_MP1A4.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests_MP1A5.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

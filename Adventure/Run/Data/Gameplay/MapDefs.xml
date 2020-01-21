@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<MapDefinitions>
+
+  <MapDefinition name="Island" width="20" height="30" fillTile="Grass" edgeTile="Water">
+  </MapDefinition>
+
+
+</MapDefinitions>
