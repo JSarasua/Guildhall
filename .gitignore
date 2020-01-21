@@ -1,3 +1,6 @@
+# Visual Studio User File
+*.user
+
 # Compiled Object files
 *.slo
 *.lo
