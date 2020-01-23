@@ -29,6 +29,9 @@
     <Filter Include="Console">
       <UniqueIdentifier>{097f76bc-a2bc-458e-a7a7-40148858658a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{0f68498c-9695-4041-9c48-8db1f59553c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -150,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="Core\Tags.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Window.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="Core\Tags.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Window.hpp">
+      <Filter>Platform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

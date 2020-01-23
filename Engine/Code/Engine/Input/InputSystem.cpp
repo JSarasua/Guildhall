@@ -2,8 +2,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/AABB2.hpp"
-
-extern HWND g_hWnd;
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 InputSystem::InputSystem()
 {
@@ -85,15 +84,16 @@ const KeyButtonState* InputSystem::GetAllKeyStates()
 
 void InputSystem::UpdateMouse()
 {
-	POINT mousePos;
-	GetCursorPos( &mousePos );
-	ScreenToClient( g_hWnd, &mousePos );
-	Vec2 mouseClientPos( (float)mousePos.x, (float)mousePos.y);
-
-	RECT clientRect;
-	GetClientRect( g_hWnd, &clientRect );
-	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom);
-
-	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint(mouseClientPos);
-	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
+// 	POINT mousePos;
+// 	GetCursorPos( &mousePos );
+// 	ScreenToClient( g_hWnd, &mousePos );
+// 	Vec2 mouseClientPos( (float)mousePos.x, (float)mousePos.y);
+// 
+// 	RECT clientRect;
+// 	GetClientRect( g_hWnd, &clientRect );
+// 	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom);
+// 
+// 	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint(mouseClientPos);
+// 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
+	UNIMPLEMENTED();
 }

@@ -1,24 +1,18 @@
-
-#define WIN32_LEAN_AND_MEAN		// Always #define this before #including <windows.h>
-#include <windows.h>			// #include this (massive, platform-specific) header in very few places
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include <gl/gl.h>	
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
-#pragma comment( lib, "opengl32" )
-
-extern HWND g_hWnd;
 
 
 void RenderContext::StartUp()
 {
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+// 	glEnable( GL_BLEND );
+// 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	UNIMPLEMENTED();
 }
 
 void RenderContext::BeginFrame()
@@ -38,21 +32,25 @@ void RenderContext::Shutdown()
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
-	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-	glClear( GL_COLOR_BUFFER_BIT );
+// 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+// 	glClear( GL_COLOR_BUFFER_BIT );
+
+	UNIMPLEMENTED();
 
 }
 
 void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes ) const
 {
-	glBegin( GL_TRIANGLES );
-	for( int beginVertexes = 0; beginVertexes < numVertexes; beginVertexes++ )
-	{
-		glTexCoord2f(vertexes[beginVertexes].uvTexCoords.x, vertexes[beginVertexes].uvTexCoords.y);
-		glColor4ub( vertexes[beginVertexes].tint.r, vertexes[beginVertexes].tint.g, vertexes[beginVertexes].tint.b, vertexes[beginVertexes].tint.a );
-		glVertex3f( vertexes[beginVertexes].position.x, vertexes[beginVertexes].position.y, vertexes[beginVertexes].position.z );
-	}
-	glEnd();
+// 	glBegin( GL_TRIANGLES );
+// 	for( int beginVertexes = 0; beginVertexes < numVertexes; beginVertexes++ )
+// 	{
+// 		glTexCoord2f(vertexes[beginVertexes].uvTexCoords.x, vertexes[beginVertexes].uvTexCoords.y);
+// 		glColor4ub( vertexes[beginVertexes].tint.r, vertexes[beginVertexes].tint.g, vertexes[beginVertexes].tint.b, vertexes[beginVertexes].tint.a );
+// 		glVertex3f( vertexes[beginVertexes].position.x, vertexes[beginVertexes].position.y, vertexes[beginVertexes].position.z );
+// 	}
+// 	glEnd();
+
+	UNIMPLEMENTED();
 }
 
 void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes ) const
@@ -104,46 +102,47 @@ Texture* RenderContext::CreateTextureFromFile(const char* filePath)
 	GUARANTEE_OR_DIE( numComponents >= 3 && numComponents <= 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
 
 
-	// Enable OpenGL texturing
-	glEnable( GL_TEXTURE_2D );
-
-	// Tell OpenGL that our pixel data is single-byte aligned
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-
-	// Ask OpenGL for an unused texName (ID number) to use for this texture
-	glGenTextures( 1, (GLuint*)&textureID );
-
-	// Tell OpenGL to bind (set) this as the currently active texture
-	glBindTexture( GL_TEXTURE_2D, textureID );
-
-	// Set texture clamp vs. wrap (repeat) default settings
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT ); // GL_CLAMP or GL_REPEAT
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT ); // GL_CLAMP or GL_REPEAT
-
-																	// Set magnification (texel > pixel) and minification (texel < pixel) filters
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST ); // one of: GL_NEAREST, GL_LINEAR
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ); // one of: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR
-
-	// Pick the appropriate OpenGL format (RGB or RGBA) for this texel data
-	GLenum bufferFormat = GL_RGBA; // the format our source pixel data is in; any of: GL_RGB, GL_RGBA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, ...
-	if( numComponents == 3 )
-	{
-		bufferFormat = GL_RGB;
-	}
-	GLenum internalFormat = bufferFormat; // the format we want the texture to be on the card; technically allows us to translate into a different texture format as we upload to OpenGL
-
-
-	// Upload the image texel data (raw pixels bytes) to OpenGL under this textureID
-	glTexImage2D(			// Upload this pixel data to our new OpenGL texture
-		GL_TEXTURE_2D,		// Creating this as a 2d texture
-		0,					// Which mipmap level to use as the "root" (0 = the highest-quality, full-res image), if mipmaps are enabled
-		internalFormat,		// Type of texel format we want OpenGL to use for this texture internally on the video card
-		imageTexelSizeX,	// Texel-width of image; for maximum compatibility, use 2^N + 2^B, where N is some integer in the range [3,11], and B is the border thickness [0,1]
-		imageTexelSizeY,	// Texel-height of image; for maximum compatibility, use 2^M + 2^B, where M is some integer in the range [3,11], and B is the border thickness [0,1]
-		0,					// Border size, in texels (must be 0 or 1, recommend 0)
-		bufferFormat,		// Pixel format describing the composition of the pixel data in buffer
-		GL_UNSIGNED_BYTE,	// Pixel color components are unsigned bytes (one byte per color channel/component)
-		imageData );		// Address of the actual pixel data bytes/buffer in system memory
+// 	// Enable OpenGL texturing
+// 	glEnable( GL_TEXTURE_2D );
+// 
+// 	// Tell OpenGL that our pixel data is single-byte aligned
+// 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+// 
+// 	// Ask OpenGL for an unused texName (ID number) to use for this texture
+// 	glGenTextures( 1, (GLuint*)&textureID );
+// 
+// 	// Tell OpenGL to bind (set) this as the currently active texture
+// 	glBindTexture( GL_TEXTURE_2D, textureID );
+// 
+// 	// Set texture clamp vs. wrap (repeat) default settings
+// 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT ); // GL_CLAMP or GL_REPEAT
+// 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT ); // GL_CLAMP or GL_REPEAT
+// 
+// 																	// Set magnification (texel > pixel) and minification (texel < pixel) filters
+// 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST ); // one of: GL_NEAREST, GL_LINEAR
+// 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ); // one of: GL_NEAREST, GL_LINEAR, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_LINEAR
+// 
+// 	// Pick the appropriate OpenGL format (RGB or RGBA) for this texel data
+// 	GLenum bufferFormat = GL_RGBA; // the format our source pixel data is in; any of: GL_RGB, GL_RGBA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, ...
+// 	if( numComponents == 3 )
+// 	{
+// 		bufferFormat = GL_RGB;
+// 	}
+// 	GLenum internalFormat = bufferFormat; // the format we want the texture to be on the card; technically allows us to translate into a different texture format as we upload to OpenGL
+// 
+// 
+// 	// Upload the image texel data (raw pixels bytes) to OpenGL under this textureID
+// 	glTexImage2D(			// Upload this pixel data to our new OpenGL texture
+// 		GL_TEXTURE_2D,		// Creating this as a 2d texture
+// 		0,					// Which mipmap level to use as the "root" (0 = the highest-quality, full-res image), if mipmaps are enabled
+// 		internalFormat,		// Type of texel format we want OpenGL to use for this texture internally on the video card
+// 		imageTexelSizeX,	// Texel-width of image; for maximum compatibility, use 2^N + 2^B, where N is some integer in the range [3,11], and B is the border thickness [0,1]
+// 		imageTexelSizeY,	// Texel-height of image; for maximum compatibility, use 2^M + 2^B, where M is some integer in the range [3,11], and B is the border thickness [0,1]
+// 		0,					// Border size, in texels (must be 0 or 1, recommend 0)
+// 		bufferFormat,		// Pixel format describing the composition of the pixel data in buffer
+// 		GL_UNSIGNED_BYTE,	// Pixel color components are unsigned bytes (one byte per color channel/component)
+// 		imageData );		// Address of the actual pixel data bytes/buffer in system memory
+	UNIMPLEMENTED();
 
 							// Free the raw image texel data now that we've sent a copy of it down to the GPU to be stored in video memory
 	stbi_image_free( imageData );
@@ -175,72 +174,79 @@ Texture* RenderContext::CreateOrGetTextureFromFile(const char* filePath)
 
 void RenderContext::BindTexture( const Texture* texture ) const
 {
-	if( texture )
-	{
-		glEnable( GL_TEXTURE_2D );
-		glBindTexture( GL_TEXTURE_2D, texture->GetTextureID() );
-	}
-	else
-	{
-		glDisable( GL_TEXTURE_2D );
-	}
+	UNIMPLEMENTED();
+// 	if( texture )
+// 	{
+// 		glEnable( GL_TEXTURE_2D );
+// 		glBindTexture( GL_TEXTURE_2D, texture->GetTextureID() );
+// 	}
+// 	else
+// 	{
+// 		glDisable( GL_TEXTURE_2D );
+// 	}
 }
 
 
 
 void RenderContext::SetBlendMode( BlendMode blendMode )
 {
-	if( blendMode == BlendMode::ALPHA )
-	{
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	}
-	else if( blendMode == BlendMode::ADDITIVE )
-	{
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-	}
-	else
-	{
-		ERROR_AND_DIE( Stringf( "Unknown/unsupported blend mode #%i", blendMode) );
-	}
+	UNIMPLEMENTED();
+// 	if( blendMode == BlendMode::ALPHA )
+// 	{
+// 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+// 	}
+// 	else if( blendMode == BlendMode::ADDITIVE )
+// 	{
+// 		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+// 	}
+// 	else
+// 	{
+// 		ERROR_AND_DIE( Stringf( "Unknown/unsupported blend mode #%i", blendMode) );
+// 	}
 }
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
-	glLoadIdentity();
-	//glViewport(0,0,800,400);
-	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+	UNUSED(camera);
+	UNIMPLEMENTED();
+// 	glLoadIdentity();
+// 	//glViewport(0,0,800,400);
+// 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
 }
 
 void RenderContext::BeginCamera( const Camera& camera, Viewport viewPort )
 {
-	RECT clientRect;
-	GetClientRect( g_hWnd, &clientRect );
-	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom );
-	AABB2 singleBox = clientBounds.GetTranslated(-clientBounds.mins);
-	singleBox.maxs /= 2.f;
-	
-	glLoadIdentity();
-	switch( viewPort )
-	{
-	case Viewport::TopLeft:
-		glViewport(0,(int)singleBox.maxs.y,(int)singleBox.maxs.x, (int)singleBox.maxs.y);
-		break;
-	case Viewport::TopRight:
-		glViewport( (int)singleBox.maxs.x, (int)singleBox.maxs.y, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-		break;
-	case Viewport::BottomLeft:
-		glViewport( 0, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-		break;
-	case Viewport::BottomRight:
-		glViewport( (int)singleBox.maxs.x, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-		break;
-	case Viewport::FullScreen:
-		glViewport( 0, 0, (int)clientBounds.maxs.x, (int)clientBounds.maxs.y );
-		break;
-	default:
-		break;
-	}
-	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+	UNUSED(camera);
+	UNUSED(viewPort);
+	UNIMPLEMENTED();
+// 	RECT clientRect;
+// 	GetClientRect( g_hWnd, &clientRect );
+// 	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom );
+// 	AABB2 singleBox = clientBounds.GetTranslated(-clientBounds.mins);
+// 	singleBox.maxs /= 2.f;
+// 	
+// 	glLoadIdentity();
+// 	switch( viewPort )
+// 	{
+// 	case Viewport::TopLeft:
+// 		glViewport(0,(int)singleBox.maxs.y,(int)singleBox.maxs.x, (int)singleBox.maxs.y);
+// 		break;
+// 	case Viewport::TopRight:
+// 		glViewport( (int)singleBox.maxs.x, (int)singleBox.maxs.y, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
+// 		break;
+// 	case Viewport::BottomLeft:
+// 		glViewport( 0, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
+// 		break;
+// 	case Viewport::BottomRight:
+// 		glViewport( (int)singleBox.maxs.x, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
+// 		break;
+// 	case Viewport::FullScreen:
+// 		glViewport( 0, 0, (int)clientBounds.maxs.x, (int)clientBounds.maxs.y );
+// 		break;
+// 	default:
+// 		break;
+// 	}
+// 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
 }
 
 void RenderContext::EndCamera( const Camera& camera )
