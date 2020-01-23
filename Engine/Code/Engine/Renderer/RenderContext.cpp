@@ -34,7 +34,7 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
 // 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 // 	glClear( GL_COLOR_BUFFER_BIT );
-
+	UNUSED(clearColor);
 	UNIMPLEMENTED();
 
 }
@@ -49,7 +49,8 @@ void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes 
 // 		glVertex3f( vertexes[beginVertexes].position.x, vertexes[beginVertexes].position.y, vertexes[beginVertexes].position.z );
 // 	}
 // 	glEnd();
-
+	UNUSED(numVertexes);
+	UNUSED(vertexes);
 	UNIMPLEMENTED();
 }
 
@@ -174,6 +175,7 @@ Texture* RenderContext::CreateOrGetTextureFromFile(const char* filePath)
 
 void RenderContext::BindTexture( const Texture* texture ) const
 {
+	UNUSED(texture);
 	UNIMPLEMENTED();
 // 	if( texture )
 // 	{
@@ -190,6 +192,7 @@ void RenderContext::BindTexture( const Texture* texture ) const
 
 void RenderContext::SetBlendMode( BlendMode blendMode )
 {
+	UNUSED(blendMode);
 	UNIMPLEMENTED();
 // 	if( blendMode == BlendMode::ALPHA )
 // 	{
