@@ -24,6 +24,8 @@
 
 #define RENDER_DEBUG
 
+#define DX_SAFE_RELEASE(ptr) if(nullptr != ptr) {ptr->Release(); ptr = nullptr;}
+
 void RenderContext::StartUp(Window* window)
 {
 	todo("Maybe make a D3DCommon.hpp");
@@ -70,6 +72,7 @@ void RenderContext::StartUp(Window* window)
 
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
+	DX_SAFE_RELEASE(swapchain);
 }
 
 void RenderContext::BeginFrame()
@@ -82,10 +85,14 @@ void RenderContext::EndFrame()
 
 }
 
+
+
 void RenderContext::Shutdown()
 {
-	
+	DX_SAFE_RELEASE(m_device);
+	DX_SAFE_RELEASE(m_context);
 }
+
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
