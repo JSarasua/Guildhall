@@ -115,6 +115,8 @@ bool Window::Open( std::string const& title, float clientAspect, float ratioOfHe
 		// Client window has a taller aspect than desktop; shrink client width to match its height
 		clientWidth = clientHeight * clientAspect;
 	}
+	m_clientHeight = (unsigned int)clientHeight;
+	m_clientWidth = (unsigned int)clientWidth;
 
 	// Calculate client rect bounds by centering the client area
 	float clientMarginX = 0.5f * (desktopWidth - clientWidth);
@@ -194,4 +196,14 @@ void Window::BeginFrame()
 		TranslateMessage( &queuedMessage );
 		DispatchMessage( &queuedMessage ); // This tells Windows to call our "WindowsMessageHandlingProcedure" (a.k.a. "WinProc") function
 	}
+}
+
+unsigned int Window::GetClientWidth()
+{
+	return m_clientWidth;
+}
+
+unsigned int Window::GetClientHeight()
+{
+	return m_clientHeight;
 }

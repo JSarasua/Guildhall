@@ -60,15 +60,15 @@ void Game::Update( float deltaSeconds )
 void Game::Render()
 {
 
-	g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
-	g_theRenderer->BeginCamera( m_camera );
-	RenderGame();
-	g_theRenderer->EndCamera( m_camera );
+	//g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
+	//g_theRenderer->BeginCamera( m_camera );
+	//RenderGame();
+	//g_theRenderer->EndCamera( m_camera );
 
 
-	g_theRenderer->BeginCamera( m_UICamera );
-	RenderUI();
-	g_theRenderer->EndCamera( m_UICamera );
+	//g_theRenderer->BeginCamera( m_UICamera );
+	//RenderUI();
+	//g_theRenderer->EndCamera( m_UICamera );
 
 }
 

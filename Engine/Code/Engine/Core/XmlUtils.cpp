@@ -7,8 +7,9 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/AABB2.hpp"
 
+todo("Fix to Xml instead of XML");
 
-const XMLElement& GetRootElement( XMLDocument& document, const char* xmlFilePath )
+const XMLElement& GetRootElement( XmlDocument& document, const char* xmlFilePath )
 {
 	XMLError errorFlag = document.LoadFile( xmlFilePath );
  	std::string errorMessage = "Xml Not Found: ";

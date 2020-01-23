@@ -16,7 +16,7 @@ public:
 	void Shutdown();
 	void RunFrame();
 
-	bool IsQuitting() const { return m_isQuitting; }
+	bool IsQuitting() const { return true; } //return m_isQuitting
 	bool HandleKeyPressed( unsigned char keyCode );
 	bool HandleKeyReleased( unsigned char keyCode );
 	bool HandleQuitRequested();

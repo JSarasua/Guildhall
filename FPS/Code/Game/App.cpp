@@ -18,7 +18,6 @@ App::App()
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
 	m_game =  new Game();
-
 }
 
 App::~App() {}
@@ -26,7 +25,7 @@ App::~App() {}
 void App::Startup()
 {
 	g_theInput->Startup();
-	g_theRenderer->StartUp();
+	g_theRenderer->StartUp(g_theWindow);
 	m_game->Startup();
 }
 

@@ -2,11 +2,16 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/Texture.hpp"
+
 #include <vector>
 #include <string>
 
 struct AABB2;
 class BitmapFont;
+class Window;
+
+struct ID3D11Device;
+struct ID3D11DeviceContext;
 
 enum class Viewport
 {
@@ -28,7 +33,7 @@ class RenderContext
 {
 public:
 
-	void StartUp();
+	void StartUp(Window* window);
 	void BeginFrame();
 	void EndFrame();
 	void Shutdown();
@@ -68,4 +73,9 @@ private:
 	std::vector<Texture*> m_Textures;
 	std::vector<BitmapFont*> m_fonts;
 
+public:
+	ID3D11Device* m_device;			//Our GPU
+	ID3D11DeviceContext* m_context; //How we issue commands (immediate context)
+
 };
+

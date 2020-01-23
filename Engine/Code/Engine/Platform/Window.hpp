@@ -14,4 +14,9 @@ public:
 	void* m_hwnd; //Used to not include a windows file
 
 
+	unsigned int GetClientWidth();
+	unsigned int GetClientHeight();
+
+	unsigned int m_clientWidth;
+	unsigned int m_clientHeight;
 };

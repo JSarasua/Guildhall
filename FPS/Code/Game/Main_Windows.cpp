@@ -23,7 +23,7 @@ const char* APP_NAME = "SD1-A4: Protogame2D";	// ...becomes ??? (Change this per
 extern App* g_theApp;
 extern InputSystem* g_theInput;
 
-Window* g_theWindow = nullptr;
+extern Window* g_theWindow;
 
 
 

@@ -22,7 +22,7 @@ void InputSystem::Startup()
 void InputSystem::BeginFrame()
 {
 	//UpdateMouse
-	UpdateMouse();
+	//UpdateMouse();
 	//UpdateController
 
 	for( int controllerIndex = 0; controllerIndex < MAX_XBOX_CONTROLLERS; controllerIndex++ )
