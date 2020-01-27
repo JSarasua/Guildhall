@@ -46,9 +46,21 @@ void Game::RunFrame(){}
 
 void Game::Update( float deltaSeconds )
 {
-	UNUSED(deltaSeconds);
+	m_currentTime += deltaSeconds;
+	if( m_currentTime > 255.f )
+	{
+		m_currentTime = 0.f;
+	}
+	Rgba8 color;
+	color.g = 0;
+	color.b = 0;
+	unsigned char colorVal = (unsigned char)m_currentTime * 10;
+	color.r = colorVal;
 
-	m_camera.SetClearMode( CLEAR_COLOR_BIT, Rgba8::RED, 0.f, 0 );
+	
+
+	//m_camera.m_clearColor = color;
+	m_camera.SetClearMode( CLEAR_COLOR_BIT, color, 0.f, 0 );
 }
 
 void Game::Render()

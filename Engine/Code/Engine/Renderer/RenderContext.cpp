@@ -4,7 +4,9 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/TextureView.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
 
@@ -13,25 +15,21 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#define INITGUID
-#include <d3d11.h>  // d3d11 specific objects
-#include <dxgi.h>   // shared library used across multiple dx graphical interfaces
-#include <dxgidebug.h>  // debug utility (mostly used for reporting and analytics)
-
+#include "Engine/Renderer/D3D11Common.hpp"
 #pragma comment( lib, "d3d11.lib" )         // needed a01
 #pragma comment( lib, "dxgi.lib" )          // needed a01
 #pragma comment( lib, "d3dcompiler.lib" )   // needed when we get to shaders
 
-#define RENDER_DEBUG
 
-#define DX_SAFE_RELEASE(ptr) if(nullptr != ptr) {ptr->Release(); ptr = nullptr;}
+
+
 
 void RenderContext::StartUp(Window* window)
 {
 	todo("Maybe make a D3DCommon.hpp");
 
 	//ID3D11Device
-	IDXGISwapChain* swapchain;
+
 
 	UINT flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 
@@ -43,7 +41,7 @@ void RenderContext::StartUp(Window* window)
 	memset( &swapchainDesc, 0, sizeof(swapchainDesc) );
 	swapchainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER;
 	swapchainDesc.BufferCount = 2;
-	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;	//on swap, the old buffer is discarded
+	swapchainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;	//on swap, the old buffer is discarded
 	swapchainDesc.Flags = 0;
 	
 	HWND hwnd = (HWND) window->m_hwnd;
@@ -56,6 +54,8 @@ void RenderContext::StartUp(Window* window)
 	swapchainDesc.BufferDesc.Height = window->GetClientHeight();
 
 	// create
+	IDXGISwapChain* swapchain;
+
 	HRESULT result = D3D11CreateDeviceAndSwapChain( nullptr, 
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -72,7 +72,7 @@ void RenderContext::StartUp(Window* window)
 
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
-	DX_SAFE_RELEASE(swapchain);
+	m_swapchain = new SwapChain( this, swapchain );
 }
 
 void RenderContext::BeginFrame()
@@ -82,24 +82,41 @@ void RenderContext::BeginFrame()
 
 void RenderContext::EndFrame()
 {
-
+	m_swapchain->Present();
 }
 
 
 
 void RenderContext::Shutdown()
 {
+	delete m_swapchain;
+	m_swapchain = nullptr;
+
 	DX_SAFE_RELEASE(m_device);
 	DX_SAFE_RELEASE(m_context);
+
+	for( int textureIndex = 0; textureIndex < m_Textures.size(); textureIndex++ )
+	{
+		delete m_Textures[textureIndex];
+		m_Textures[textureIndex] = nullptr;
+	}
+	m_Textures.clear();
 }
 
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
-// 	glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-// 	glClear( GL_COLOR_BUFFER_BIT );
-	UNUSED(clearColor);
-	UNIMPLEMENTED();
+	float clearFloats[4];
+	clearFloats[0] = clearColor.r / 255.f;
+	clearFloats[1] = clearColor.g / 255.f;
+	clearFloats[2] = clearColor.b / 255.f;
+	clearFloats[3] = clearColor.a / 255.f;
+	
+	Texture* backbuffer = m_swapchain->GetBackBuffer();
+ 	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+	
+	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+	m_context->ClearRenderTargetView( rtv, clearFloats);
 
 }
 
@@ -275,6 +292,9 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	UNUSED(camera);
+	ClearScreen( camera.m_clearColor );
+
+
 	//UNIMPLEMENTED();
 
 

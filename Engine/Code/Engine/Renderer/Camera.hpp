@@ -24,12 +24,12 @@ public:
 
 	void SetClearMode( unsigned int clearFlags, Rgba8 color, float depth = 0.f, unsigned int stencil = 0 );
 
+	Rgba8 m_clearColor;
 private:
 	Vec2 bLeft;
 	Vec2 tRight;
 
 	unsigned int m_clearMode = 0;
-	Rgba8 m_clearColor;
 
 public:
 	void Translate2D( const Vec2& cameraDisplacement );

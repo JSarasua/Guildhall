@@ -59,7 +59,8 @@ private:
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
 public:
-
+	Rgba8 m_clearColor = Rgba8::BLACK;
+	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
 
 };

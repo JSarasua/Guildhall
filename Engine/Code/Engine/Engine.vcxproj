@@ -195,7 +195,9 @@
     <ClCompile Include="Renderer\SpriteAnimSet.cpp" />
     <ClCompile Include="Renderer\SpriteDefinition.cpp" />
     <ClCompile Include="Renderer\SpriteSheet.cpp" />
+    <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="Renderer\Texture.cpp" />
+    <ClCompile Include="Renderer\TextureView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\fmod\fmod.h" />
@@ -242,12 +244,15 @@
     <ClInclude Include="Platform\Window.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
+    <ClInclude Include="Renderer\D3D11Common.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />
     <ClInclude Include="Renderer\SpriteAnimDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteAnimSet.hpp" />
     <ClInclude Include="Renderer\SpriteDefinition.hpp" />
     <ClInclude Include="Renderer\SpriteSheet.hpp" />
+    <ClInclude Include="Renderer\SwapChain.hpp" />
     <ClInclude Include="Renderer\Texture.hpp" />
+    <ClInclude Include="Renderer\TextureView.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

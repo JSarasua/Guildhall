@@ -6,9 +6,12 @@
 #include <vector>
 #include <string>
 
+
+
 struct AABB2;
 class BitmapFont;
 class Window;
+class SwapChain;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -76,6 +79,6 @@ private:
 public:
 	ID3D11Device* m_device;			//Our GPU
 	ID3D11DeviceContext* m_context; //How we issue commands (immediate context)
-
+	SwapChain*			m_swapchain = nullptr;
 };
 
