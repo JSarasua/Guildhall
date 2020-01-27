@@ -25,6 +25,7 @@ App::~App() {}
 void App::Startup()
 {
 	g_theInput->Startup();
+	g_theWindow->SetInputSystem(g_theInput);
 	g_theRenderer->StartUp(g_theWindow);
 	m_game->Startup();
 }

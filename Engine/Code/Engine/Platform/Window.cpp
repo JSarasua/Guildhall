@@ -1,3 +1,5 @@
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Platform/Window.hpp"
 
 
@@ -15,24 +17,22 @@ static TCHAR const* WND_CLASS_NAME = TEXT( "Simple Window Class" );
 //
 static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMessageCode, WPARAM wParam, LPARAM lParam )
 {
-	/*
+	Window* window = (Window*) ::GetWindowLongPtr(windowHandle, GWLP_USERDATA);
+
 	switch( wmMessageCode )
 	{
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 	case WM_CLOSE:
 	{
-		g_theApp->HandleQuitRequested();
+		TODO("Handle Quit Requested. Could have a local variable that App checks.");
+		//g_theApp->HandleQuitRequested();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
-
 	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)
 	case WM_KEYDOWN:
 	{
 		unsigned char asKey = (unsigned char)wParam;
-
-		// #SD1ToDo: Tell the App and InputSystem about this key-pressed event...
-		//g_theApp->HandleKeyPressed(asKey);
-		g_theInput->HandleKeyDown( asKey );
+		window->m_input->HandleKeyDown( asKey );
 
 		break;
 	}
@@ -41,13 +41,11 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 	case WM_KEYUP:
 	{
 		unsigned char asKey = (unsigned char)wParam;
-		//UNUSED(asKey);
-		//g_theApp->HandleKeyReleased(asKey);
-		g_theInput->HandleKeyUp( asKey );
+		window->m_input->HandleKeyUp( asKey );
 		break;
 	}
 	}
-	*/
+
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)
 	return ::DefWindowProc( windowHandle, wmMessageCode, wParam, lParam );
@@ -151,6 +149,8 @@ bool Window::Open( std::string const& title, float clientAspect, float ratioOfHe
 	SetForegroundWindow( hwnd );
 	SetFocus( hwnd );
 
+	::SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)this );
+
 	if( nullptr == hwnd )
 	{
 		return false;
@@ -196,6 +196,11 @@ void Window::BeginFrame()
 		TranslateMessage( &queuedMessage );
 		DispatchMessage( &queuedMessage ); // This tells Windows to call our "WindowsMessageHandlingProcedure" (a.k.a. "WinProc") function
 	}
+}
+
+void Window::SetInputSystem( InputSystem* input )
+{
+	m_input = input;
 }
 
 unsigned int Window::GetClientWidth()

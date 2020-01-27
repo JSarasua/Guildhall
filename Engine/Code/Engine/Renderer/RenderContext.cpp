@@ -275,7 +275,9 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	UNUSED(camera);
-	UNIMPLEMENTED();
+	//UNIMPLEMENTED();
+
+
 // 	glLoadIdentity();
 // 	//glViewport(0,0,800,400);
 // 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);

@@ -24,20 +24,20 @@ Game::Game()
 	m_camera = Camera();
 	m_UICamera = Camera();
 
-	m_world = new World(this);
+	//m_world = new World(this);
 }
 
 Game::~Game(){}
 
 void Game::Startup()
 {
-
-	m_world->Startup();
-	m_player = m_world->GetPlayer();
-	m_numTilesInViewVertically = GAME_CAMERA_Y;
-	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
-	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
-	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
+	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
+// 	m_world->Startup();
+// 	m_player = m_world->GetPlayer();
+// 	m_numTilesInViewVertically = GAME_CAMERA_Y;
+// 	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
+// 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
+// 	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
 }
 
 void Game::Shutdown(){}
@@ -46,30 +46,15 @@ void Game::RunFrame(){}
 
 void Game::Update( float deltaSeconds )
 {
-	m_world->Update(deltaSeconds);
+	UNUSED(deltaSeconds);
 
-	//CheckCollisions();
-	//UpdateEntities( deltaSeconds );
-	UpdateCamera( deltaSeconds );
-
-	CheckButtonPresses( deltaSeconds );
-
-
+	m_camera.SetClearMode( CLEAR_COLOR_BIT, Rgba8::RED, 0.f, 0 );
 }
 
 void Game::Render()
 {
-
-	//g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
-	//g_theRenderer->BeginCamera( m_camera );
-	//RenderGame();
-	//g_theRenderer->EndCamera( m_camera );
-
-
-	//g_theRenderer->BeginCamera( m_UICamera );
-	//RenderUI();
-	//g_theRenderer->EndCamera( m_UICamera );
-
+	g_theRenderer->BeginCamera(m_camera);
+	g_theRenderer->EndCamera(m_camera);
 }
 
 
@@ -84,35 +69,11 @@ void Game::UpdateEntities( float deltaSeconds )
 void Game::UpdateCamera( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	IntVec2 currentMapBounds = GetCurrentMapBounds();
-
-	if( g_theApp->GetDebugCameraMode() )
-	{
-		if( currentMapBounds.x > currentMapBounds.y * CLIENT_ASPECT )
-		{
-			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.x, (float)currentMapBounds.x/CLIENT_ASPECT ) );
-		}
-		else
-		{
-			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.y * CLIENT_ASPECT, (float)currentMapBounds.y ) );
-		}
-	}
-	else
-	{
-		//Using the map order, clamp to an imaginary smaller border including half the game camera size
-		m_cameraPosition = m_player->GetPosition();
-		m_cameraPosition.x = Clampf( m_cameraPosition.x, m_numTilesInViewHorizontally/2.f, currentMapBounds.x - m_numTilesInViewHorizontally/2.f );
-		m_cameraPosition.y = Clampf( m_cameraPosition.y, m_numTilesInViewVertically/2.f, currentMapBounds.y - m_numTilesInViewVertically/2.f );
-
-
-		m_camera.SetOrthoView( Vec2( m_cameraPosition.x - m_numTilesInViewHorizontally/2.f, m_cameraPosition.y - m_numTilesInViewVertically/2.f ), Vec2( m_cameraPosition.x + m_numTilesInViewHorizontally/2.f, m_cameraPosition.y + m_numTilesInViewVertically/2.f ) );
-	}
-
 }
 
 void Game::RenderGame()
 {
-	m_world->Render();
+	//m_world->Render();
 }
 
 void Game::RenderUI()

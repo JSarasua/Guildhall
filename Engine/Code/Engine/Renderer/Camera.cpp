@@ -1,3 +1,5 @@
+#include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/Camera.hpp"
 
 
@@ -18,6 +20,15 @@ Vec2 Camera::GetOrthoBottomLeft() const
 Vec2 Camera::GetOrthoTopRight() const
 {
 	return tRight;
+}
+
+void Camera::SetClearMode( unsigned int clearFlags, Rgba8 color, float depth /*= 0.f*/, unsigned int stencil /*= 0 */ )
+{
+	UNUSED(depth);
+	UNUSED(stencil);
+
+	m_clearMode = clearFlags;
+	m_clearColor = color;
 }
 
 void Camera::Translate2D( const Vec2& cameraDisplacement )
