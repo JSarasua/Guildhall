@@ -264,7 +264,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& rKey = g_theInput->GetKeyStates('R');
 	const KeyButtonState& tKey = g_theInput->GetKeyStates('T');
 	const KeyButtonState& yKey = g_theInput->GetKeyStates('Y');
-
+	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
+	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
 
 	if( rKey.WasJustPressed() )
 	{
@@ -284,6 +285,20 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_OBB2AtMouse.SetOrientationDegrees(newOrienation);
 	}
 
+	if( leftMouseButton.IsPressed() )
+	{
+		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
+		float orientationIncremented = orientation + 30.f;
+		float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
+		m_OBB2AtMouse.SetOrientationDegrees( newOrienation );
+	}
+	else if( rightMouseButton.IsPressed() )
+	{
+		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
+		float orientationIncremented = orientation - 30.f;
+		float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
+		m_OBB2AtMouse.SetOrientationDegrees( newOrienation );
+	}
 
 
 	UNUSED( deltaSeconds );

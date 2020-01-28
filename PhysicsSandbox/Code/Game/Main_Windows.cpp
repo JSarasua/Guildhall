@@ -63,6 +63,26 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			g_theInput->HandleKeyUp(asKey);
 			break;
 		}
+
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		{
+			bool leftButtonDown = wParam & MK_LBUTTON;
+			bool middleButtonDown = wParam & MK_MBUTTON;
+			bool rightButtonDown = wParam & MK_RBUTTON;
+
+			// tell input system - this should be similar to how you 
+			// handle keyboard input, but now for however many mouse buttons you want to 
+			// track;  For example, this one just tracks the 3. 
+			g_theInput->UpdateMouseButtonState( leftButtonDown, middleButtonDown, rightButtonDown );
+
+			// break, don't return - let windows still do its default thing even though we're intercepting the message
+			break;
+		}
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

@@ -39,7 +39,10 @@ void InputSystem::EndFrame()
 	{
 		m_keyStates[keyboardIndex].m_wasPressedLastFrame = m_keyStates[keyboardIndex].m_isPressed;
 	}
-	
+
+	m_mouseButtonStates[LeftMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[LeftMouseButton].m_isPressed;
+	m_mouseButtonStates[MiddleMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[MiddleMouseButton].m_isPressed;
+	m_mouseButtonStates[RightMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[RightMouseButton].m_isPressed;
 }
 
 void InputSystem::Shutdown()
@@ -56,6 +59,13 @@ void InputSystem::HandleKeyUp( unsigned char keyCode )
 {
 	m_keyStates[keyCode].m_isPressed = false;
 
+}
+
+void InputSystem::UpdateMouseButtonState( bool leftMouseButton, bool middleMouseButton, bool rightMouseButton )
+{
+	m_mouseButtonStates[LeftMouseButton].m_isPressed = leftMouseButton;
+	m_mouseButtonStates[MiddleMouseButton].m_isPressed = middleMouseButton;
+	m_mouseButtonStates[RightMouseButton].m_isPressed = rightMouseButton;
 }
 
 IntVec2 InputSystem::GetMouseDesktopRawPos() const
@@ -76,6 +86,11 @@ const XboxController& InputSystem::GetXboxController( int controllerID )
 const KeyButtonState& InputSystem::GetKeyStates( unsigned char keyCode )
 {
 	return m_keyStates[keyCode];
+}
+
+const KeyButtonState& InputSystem::GetMouseButton( MOUSEBUTTON mouseButton )
+{
+	return m_mouseButtonStates[mouseButton];
 }
 
 const KeyButtonState* InputSystem::GetAllKeyStates()
