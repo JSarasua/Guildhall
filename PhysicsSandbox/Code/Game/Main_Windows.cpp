@@ -83,6 +83,14 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 			// break, don't return - let windows still do its default thing even though we're intercepting the message
 			break;
 		}
+		case WM_MOUSEWHEEL:
+		{
+			short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			//DWORD scrollFixedPoint = (DWORD)wParam >> 16; // shift away low word part, leaving only the highword
+			float scrollAmount = (float)wheelDelta / 120.0f; // convert to a numeric value
+			g_theInput->AddMouseWheelScrollAmount( scrollAmount ); // let the input system know that the mouse wheel has moved - again, interface design is up to you - this is just a suggestion
+			break;
+		}
 	}
 
 	// Send back to Windows any unhandled/unconsumed messages we want other apps to see (e.g. play/pause in music apps, etc.)

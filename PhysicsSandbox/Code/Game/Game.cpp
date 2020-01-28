@@ -266,6 +266,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& yKey = g_theInput->GetKeyStates('Y');
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
+	float mouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
 
 	if( rKey.WasJustPressed() )
 	{
@@ -285,21 +286,23 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_OBB2AtMouse.SetOrientationDegrees(newOrienation);
 	}
 
-	if( leftMouseButton.IsPressed() )
+	if( leftMouseButton.WasJustPressed() )
 	{
-		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-		float orientationIncremented = orientation + 30.f;
-		float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
-		m_OBB2AtMouse.SetOrientationDegrees( newOrienation );
+		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
 	}
-	else if( rightMouseButton.IsPressed() )
+	else if( rightMouseButton.WasJustPressed() )
 	{
-		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-		float orientationIncremented = orientation - 30.f;
-		float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
-		m_OBB2AtMouse.SetOrientationDegrees( newOrienation );
+		SetShapePositionsAndColors();
 	}
 
+
+	if( mouseWheelScroll != 0.f )
+	{
+		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
+		float orientationIncremented = orientation + (mouseWheelScroll * 10.f);
+		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
+		m_OBB2AtMouse.SetOrientationDegrees( orientationIncremented );
+	}
 
 	UNUSED( deltaSeconds );
 	UNUSED( controller );

@@ -30,8 +30,11 @@ public:
 	void HandleKeyDown(unsigned char keyCode);
 	void HandleKeyUp(unsigned char keyCode);
 	void UpdateMouseButtonState(bool leftMouseButton, bool middleMouseButton, bool rightMouseButton );
+	void AddMouseWheelScrollAmount( float scrollAmount );
+
 	IntVec2 GetMouseDesktopRawPos() const;
 	Vec2 GetMouseNormalizedPos() const;
+	float GetDeltaMouseWheelScroll() const;
 
 	const XboxController& GetXboxController(int controllerID);
 	const KeyButtonState& GetKeyStates(unsigned char keyCode);
@@ -42,6 +45,7 @@ private:
 	void UpdateMouse();
 private:
 	Vec2 m_mouseNormalizedClientPos;
+	float m_deltaScrollAmount = 0.f;
 
 	KeyButtonState m_keyStates[ NUM_KEYCODES ]; //extern the Keycodes and put them in .cpp
 	KeyButtonState m_mouseButtonStates[ Num_MouseButtons ];
