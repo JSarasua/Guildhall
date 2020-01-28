@@ -18,6 +18,7 @@ App::App()
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
 	m_game =  new Game();
+	g_theEventSystem = new EventSystem();
 }
 
 App::~App() {}
@@ -26,8 +27,11 @@ void App::Startup()
 {
 	g_theInput->Startup();
 	g_theWindow->SetInputSystem(g_theInput);
+	g_theWindow->SetEventSystem(g_theEventSystem);
 	g_theRenderer->StartUp(g_theWindow);
 	m_game->Startup();
+
+	g_theEventSystem->SubscribeToEvent("QUIT", QuitRequested);
 }
 
 void App::Shutdown()
@@ -167,11 +171,19 @@ bool App::GetDebugCameraMode()
 	return m_debugCameraMode;
 }
 
+bool App::QuitRequested( const EventArgs* args )
+{
+	UNUSED( args );
+	g_theApp->HandleQuitRequested();
+	return true;
+}
+
 void App::CheckButtonPresses()
 {
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
-		HandleQuitRequested();
+		g_theEventSystem->FireEvent("QUIT", nullptr);
+		//HandleQuitRequested();
 	}
 
 	if( g_theInput->GetKeyStates( 0x70 ).WasJustPressed() ) //F1

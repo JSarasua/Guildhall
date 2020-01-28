@@ -1,7 +1,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Platform/Window.hpp"
-
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -24,6 +24,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 	case WM_CLOSE:
 	{
+		window->m_eventSystem->FireEvent("QUIT", nullptr);
 		TODO("Handle Quit Requested. Could have a local variable that App checks.");
 		//g_theApp->HandleQuitRequested();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
@@ -201,6 +202,11 @@ void Window::BeginFrame()
 void Window::SetInputSystem( InputSystem* input )
 {
 	m_input = input;
+}
+
+void Window::SetEventSystem( EventSystem* eventSystem )
+{
+	m_eventSystem = eventSystem;
 }
 
 unsigned int Window::GetClientWidth()

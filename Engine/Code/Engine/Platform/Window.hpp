@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+class EventSystem;
 class InputSystem;
 
 class Window
@@ -14,12 +15,14 @@ public:
 	void BeginFrame();
 
 	void SetInputSystem( InputSystem* input );
+	void SetEventSystem( EventSystem* eventSystem );
 	InputSystem* GetInputSystem() const { return m_input; }
 
 
 	void* m_hwnd = nullptr; //Used to not include a windows file
 
 	InputSystem* m_input = nullptr;
+	EventSystem* m_eventSystem = nullptr;
 	unsigned int GetClientWidth();
 	unsigned int GetClientHeight();
 

@@ -5,7 +5,11 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include "Game.hpp"
+
+
 
 class App
 {
@@ -38,6 +42,7 @@ public:
 	bool GetDebugGameMode();
 	bool GetDebugCameraMode();
 
+	static bool QuitRequested(const EventArgs* args);
 
 private:
 	void CheckButtonPresses();
