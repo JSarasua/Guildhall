@@ -24,7 +24,9 @@ public:
 
 	void SetClearMode( unsigned int clearFlags, Rgba8 color, float depth = 0.f, unsigned int stencil = 0 );
 
+public:
 	Rgba8 m_clearColor;
+
 private:
 	Vec2 bLeft;
 	Vec2 tRight;

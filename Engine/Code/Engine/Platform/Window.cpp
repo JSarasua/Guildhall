@@ -25,8 +25,6 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 	case WM_CLOSE:
 	{
 		window->m_eventSystem->FireEvent("QUIT", nullptr);
-		TODO("Handle Quit Requested. Could have a local variable that App checks.");
-		//g_theApp->HandleQuitRequested();
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)

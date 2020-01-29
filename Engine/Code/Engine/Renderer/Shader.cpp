@@ -1,6 +1,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 #include <stdio.h>
 
@@ -53,5 +54,11 @@ bool Shader::CreateFromFile( std::string const& filename )
 
 bool ShaderStage::Compile( RenderContext* context, std::string const& filename, void const* source, size_t const sourceByteLen, SHADERTYPE stage )
 {
+	UNUSED(context);
+	UNUSED(filename);
+	UNUSED(source);
+	UNUSED(sourceByteLen);
+	UNUSED(stage);
+
 	return false;
 }

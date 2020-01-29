@@ -27,8 +27,6 @@
 
 void RenderContext::StartUp(Window* window)
 {
-	todo("Maybe make a D3DCommon.hpp");
-
 	//ID3D11Device
 
 
