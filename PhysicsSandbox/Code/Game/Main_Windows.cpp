@@ -85,9 +85,9 @@ LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT wmMess
 		}
 		case WM_MOUSEWHEEL:
 		{
-			short wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+			short wheelDeltaAmount = GET_WHEEL_DELTA_WPARAM(wParam);
 			//DWORD scrollFixedPoint = (DWORD)wParam >> 16; // shift away low word part, leaving only the highword
-			float scrollAmount = (float)wheelDelta / 120.0f; // convert to a numeric value
+			float scrollAmount = (float)wheelDeltaAmount / WHEEL_DELTA; // convert to a numeric value
 			g_theInput->AddMouseWheelScrollAmount( scrollAmount ); // let the input system know that the mouse wheel has moved - again, interface design is up to you - this is just a suggestion
 			break;
 		}
