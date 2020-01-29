@@ -46,6 +46,11 @@ float Camera::GetAspectRatio() const
 	return aspectRatio;
 }
 
+void Camera::SetOutputSize( const Vec2& size )
+{
+	m_outputSize = size;
+}
+
 void Camera::SetPosition( const Vec3& position )
 {
 	Vec2 position2D(position.x, position.y);
