@@ -12,6 +12,7 @@ struct AABB2;
 class BitmapFont;
 class Window;
 class SwapChain;
+class Shader;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -45,6 +46,9 @@ public:
 	void BeginCamera( const Camera& camera );
 	void BeginCamera( const Camera& camera, Viewport viewPort );
 	void EndCamera( const Camera& camera );
+
+	void Draw( int numVertexes, int vertexOffset = 0 );
+
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes ) const;
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes) const;
 
@@ -80,5 +84,7 @@ public:
 	ID3D11Device* m_device;			//Our GPU
 	ID3D11DeviceContext* m_context; //How we issue commands (immediate context)
 	SwapChain*			m_swapchain = nullptr;
+
+	Shader* m_currentShader = nullptr;
 };
 

@@ -7,6 +7,7 @@
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
 
@@ -73,6 +74,8 @@ void RenderContext::StartUp(Window* window)
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
 	m_swapchain = new SwapChain( this, swapchain );
+	m_currentShader = new Shader();
+	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
 }
 
 void RenderContext::BeginFrame()
@@ -344,6 +347,11 @@ void RenderContext::EndCamera( const Camera& camera )
 }
 
 
+
+void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
+{
+	m_context->Draw( numVertexes, vertexOffset );
+}
 
 void RenderContext::DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness ) const
 {
