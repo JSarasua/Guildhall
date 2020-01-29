@@ -29,6 +29,9 @@
     <Filter Include="Console">
       <UniqueIdentifier>{097f76bc-a2bc-458e-a7a7-40148858658a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics2D">
+      <UniqueIdentifier>{57afa896-e0b5-454c-b75f-c58e98a9f813}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -150,6 +153,18 @@
     </ClCompile>
     <ClCompile Include="Core\Tags.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics2D\Physics2D.cpp">
+      <Filter>Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics2D\Rigidbody2D.cpp">
+      <Filter>Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics2D\Collider2D.cpp">
+      <Filter>Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics2D\DiscCollider2D.cpp">
+      <Filter>Physics2D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,6 +314,18 @@
     </ClInclude>
     <ClInclude Include="Core\Tags.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\Physics2D.hpp">
+      <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\Rigidbody2D.hpp">
+      <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\Collider2D.hpp">
+      <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\DiscCollider2D.hpp">
+      <Filter>Physics2D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
