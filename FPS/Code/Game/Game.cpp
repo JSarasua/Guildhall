@@ -54,12 +54,10 @@ void Game::Update( float deltaSeconds )
 	Rgba8 color;
 	color.g = 0;
 	color.b = 0;
-	unsigned char colorVal = (unsigned char)m_currentTime * 10;
-	color.r = colorVal;
+	float colorVal = m_currentTime * 45.f;
+	color.r = (unsigned char)colorVal;
+	color.b = (unsigned char)colorVal;
 
-	
-
-	//m_camera.m_clearColor = color;
 	m_camera.SetClearMode( CLEAR_COLOR_BIT, color, 0.f, 0 );
 }
 
