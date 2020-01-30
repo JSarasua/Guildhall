@@ -4,6 +4,10 @@
 
 extern RenderContext* g_theRenderer;
 
+
+
+
+
 void DrawLine( Vec2 startPoint, Vec2 endPoint, Rgba8 color, float thickness )
 {
 	Vec2 normalizedDisplacement = (endPoint - startPoint).GetNormalized();

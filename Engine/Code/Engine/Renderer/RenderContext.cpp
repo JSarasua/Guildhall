@@ -301,6 +301,24 @@ void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& col
 
 }
 
+void RenderContext::DrawDisc( Vec2 const& center, float radius, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const
+{
+	std::vector<Vertex_PCU> vertexArray;
+
+	float increment = 180.f/32.f;
+	for( float currentOrientation = 0.f; currentOrientation < 360.f; currentOrientation += increment )
+	{
+		Vec2 firstVertex = Vec2::MakeFromPolarDegrees( currentOrientation, radius ) + center;
+		Vec2 secondVertex = Vec2::MakeFromPolarDegrees( currentOrientation+increment, radius ) + center;
+
+		vertexArray.push_back( Vertex_PCU( Vec3( center ), fillColor, Vec2( 0.f, 0.f ) ) );
+		vertexArray.push_back( Vertex_PCU( Vec3( firstVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
+		vertexArray.push_back( Vertex_PCU( Vec3( secondVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
+	}
+	DrawVertexArray(vertexArray);
+	DrawRing( center, radius, borderColor, thickness );
+}
+
 void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness ) const
 {
 	DrawLine(aabb.mins, Vec2(aabb.mins.x, aabb.maxs.y), color, thickness);
