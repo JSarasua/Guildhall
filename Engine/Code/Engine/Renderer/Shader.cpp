@@ -2,7 +2,7 @@
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include <stdio.h>
 
 #include <d3dcompiler.h>
@@ -38,27 +38,138 @@ void* FileReadToNewBuffer( std::string const& filename, size_t* outSize = nullpt
 	return buffer;
 }
 
+Shader::Shader( RenderContext* context )
+	: m_owner(context)
+{
+}
+
 bool Shader::CreateFromFile( std::string const& filename )
 {
 	size_t fileSize = 0;
-	void * src = FileReadToNewBuffer( filename, &fileSize );
-	if( src == nullptr )
+	void * source = FileReadToNewBuffer( filename, &fileSize );
+	if( source == nullptr )
 	{
 		return false;
 	}
 
-	delete[] src;
+	m_vertexStage.Compile( m_owner, filename, source, fileSize, SHADER_TYPE_VERTEX );
+	m_fragmentStage.Compile( m_owner, filename, source, fileSize, SHADER_TYPE_FRAGMENT );
 
-	return true;
+	delete[] source;
+
+	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
+}
+
+static char const* GetDefaultEntryPointForStage( SHADERTYPE type )
+{
+	switch( type )
+	{
+	case SHADER_TYPE_VERTEX: return "VertexFunction";
+	case SHADER_TYPE_FRAGMENT: return "FragmentFunction";
+	default: ERROR_AND_DIE("Invalid Shader Type");
+	}
+
+}
+
+static char const* GetShaderModelForStage( SHADERTYPE type )
+{
+	switch( type )
+	{
+	case SHADER_TYPE_VERTEX: return "vs_5_0";
+	case SHADER_TYPE_FRAGMENT: return "ps_5_0";
+	default: ERROR_AND_DIE("Unknown Shader Stage");
+	}
+}
+
+ShaderStage::~ShaderStage()
+{
+	DX_SAFE_RELEASE(m_byteCode);
+	DX_SAFE_RELEASE(m_handle);
 }
 
 bool ShaderStage::Compile( RenderContext* context, std::string const& filename, void const* source, size_t const sourceByteLen, SHADERTYPE stage )
 {
-	UNUSED(context);
-	UNUSED(filename);
-	UNUSED(source);
-	UNUSED(sourceByteLen);
-	UNUSED(stage);
+	//HLSL - High Level Shading Language
+	//Compile: HLSL -> ByteCode
+	//Link ByteCode -> Device Assembly (what we need to get to) - This is device specific
 
-	return false;
+	char const* entrypoint = GetDefaultEntryPointForStage( stage );
+	char const* shaderModel = GetShaderModelForStage( stage );
+
+	DWORD compileFlags = 0U;
+	#if defined(DEBUG_SHADERS)
+	compileFlags |= D3DCOMPILE_DEBUG;
+	compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+	compileFlags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;   // cause, FIX YOUR WARNINGS
+	#else 
+		// compile_flags |= D3DCOMPILE_SKIP_VALIDATION;       // Only do this if you know for a fact this shader works with this device (so second run through of a game)
+	compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;   // Yay, fastness (default is level 1)
+	#endif
+
+	ID3DBlob* byteCode = nullptr;
+	ID3DBlob* errors = nullptr;
+
+
+	HRESULT hr = ::D3DCompile( source,
+		sourceByteLen,
+		filename.c_str(),
+		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entrypoint,
+		shaderModel,
+		compileFlags,
+		0,
+		&byteCode,
+		&errors );
+
+	if( FAILED( hr ) )
+	{
+		if( nullptr != errors )
+		{
+			char *errorString = (char*) errors->GetBufferPointer();
+			DebuggerPrintf( "Failed to compile [%s]. Compiler gave the following output;\n%s",
+				filename.c_str(),
+				errorString );
+
+			DEBUGBREAK();
+		}
+	}
+	else
+	{
+		ID3D11Device* device = context->m_device;
+		void const* byteCodePtr = byteCode->GetBufferPointer();
+		size_t byteCodeSize = byteCode->GetBufferSize();
+		switch( stage )
+		{
+
+			case SHADER_TYPE_VERTEX: 
+			{
+				hr = device->CreateVertexShader( byteCodePtr, byteCodeSize, nullptr, &m_vs );
+				GUARANTEE_OR_DIE( SUCCEEDED( hr ), "Failed to link shader stage" );
+			} break;
+
+			case SHADER_TYPE_FRAGMENT:
+			{
+				hr = device->CreatePixelShader( byteCodePtr, byteCodeSize, nullptr, &m_fs );
+				GUARANTEE_OR_DIE( SUCCEEDED( hr ), "Failed to link shader stage" );
+			} break;
+			default: ERROR_AND_DIE( "Unimplemented stage."); break;
+		}
+	}
+
+	DX_SAFE_RELEASE(errors);
+
+	if( stage == SHADER_TYPE_VERTEX )
+	{
+		m_byteCode = byteCode;
+	}
+	else
+	{
+		DX_SAFE_RELEASE(byteCode);
+		m_byteCode = nullptr;
+	}
+
+	m_type = stage;
+
+	return IsValid();
 }

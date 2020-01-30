@@ -26,12 +26,12 @@ public:
 
 public:
 	Rgba8 m_clearColor;
+	unsigned int m_clearMode = 0;
 
 private:
 	Vec2 bLeft;
 	Vec2 tRight;
 
-	unsigned int m_clearMode = 0;
 
 public:
 	void Translate2D( const Vec2& cameraDisplacement );

@@ -72,7 +72,7 @@ void RenderContext::StartUp(Window* window)
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
 	m_swapchain = new SwapChain( this, swapchain );
-	m_currentShader = new Shader();
+	m_currentShader = new Shader( this );
 	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
 }
 
@@ -90,6 +90,9 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
+	delete m_currentShader;
+	m_currentShader = nullptr;
+
 	delete m_swapchain;
 	m_swapchain = nullptr;
 
@@ -292,9 +295,19 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
-	UNUSED(camera);
-	ClearScreen( camera.m_clearColor );
-
+	if( camera.m_clearMode & CLEAR_COLOR_BIT )
+	{
+		ClearScreen( camera.m_clearColor );
+	}
+	//texture* output = cam.getcolortarget
+// 	if(output = NULL )
+// 		output = m_swapchain->getcolortarget();
+// }
+// 
+// 	if(cam.shouldclearcolor())
+// 	{
+// 
+// 	}
 
 	//UNIMPLEMENTED();
 
