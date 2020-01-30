@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/vec2.hpp"
+#include <vector>
 
 class Rigidbody2D;
 class DiscCollider2D;
@@ -20,4 +21,7 @@ public:
 	DiscCollider2D* CreateDiscCollider( Vec2 localPosition, float center );
 	void DestroyCollider( Collider2D* collider );
 
+private:
+	std::vector<Rigidbody2D*> m_rigidBodies;
+	std::vector<Collider2D*> m_colliders;
 };

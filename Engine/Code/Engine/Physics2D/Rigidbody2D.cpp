@@ -16,3 +16,8 @@ void Rigidbody2D::TakeCollider( Collider2D* collider )
 	m_collider = collider;
 }
 
+Rigidbody2D::~Rigidbody2D()
+{
+
+}
+

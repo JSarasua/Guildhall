@@ -34,4 +34,7 @@ public:
 	Collider2DType m_type;
 	Physics2D* m_system;
 	Rigidbody2D* m_rigidbody = nullptr;
+
+protected:
+	bool m_isGarbage = false;
 };

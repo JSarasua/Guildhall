@@ -10,35 +10,56 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update()
 {
-
 }
 
 void Physics2D::EndFrame()
 {
+	for( int colliderIndex = 0; colliderIndex < m_colliders.size(); colliderIndex++ )
+	{
+		bool isGarbage = m_colliders[colliderIndex]->m_isGarbage;
+		if( isGarbage )
+		{
+			delete m_colliders[colliderIndex];
+			m_colliders[colliderIndex] = nullptr;
+		}
+	}
 
+	for( int rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
+	{
+		bool isGarbage = m_rigidBodies[rigidBodyIndex]->m_isGarbage;
+		if( isGarbage )
+		{
+			delete m_rigidBodies[rigidBodyIndex];
+			m_rigidBodies[rigidBodyIndex] = nullptr;
+		}
+	}
 }
 
 Rigidbody2D* Physics2D::CreateRigidBody()
 {
 	Rigidbody2D* rb = new Rigidbody2D();
+	m_rigidBodies.push_back(rb);
 	return rb;
 }
 
 void Physics2D::DestroyRigidBody( Rigidbody2D* rb )
 {
-	delete rb;
-	rb = nullptr;
+	rb->m_isGarbage = true;
+
+	rb->m_collider->m_isGarbage = true;;
+	rb->m_collider = nullptr;
+	
 }
 
 DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition, float radius )
 {
 	DiscCollider2D* dc = new DiscCollider2D(localPosition, Vec2(0.f, 0.f), radius );
+	m_colliders.push_back(dc);
 	return dc;
 }
 
 void Physics2D::DestroyCollider( Collider2D* collider )
 {
-	//delete collider;
-	collider = nullptr;
+	collider->m_isGarbage = true;
 }
 

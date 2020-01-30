@@ -20,4 +20,7 @@ public:
 
 protected:
 	~Rigidbody2D(); //Destroys the collider
+
+protected:
+	bool m_isGarbage = false;
 };
