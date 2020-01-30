@@ -304,8 +304,11 @@ void RenderContext::BeginCamera( const Camera& camera )
 // 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
 }
 
+
+//-----DONT USE THIS BEGINCAMERA, ITS AN OLD METHOD FOR USING SPLIT SCREEN
 void RenderContext::BeginCamera( const Camera& camera, Viewport viewPort )
 {
+
 	UNUSED(camera);
 	UNUSED(viewPort);
 	UNIMPLEMENTED();

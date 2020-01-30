@@ -13,6 +13,7 @@ public:
 	bool Open( std::string const& title, float aspectRatio, float ratioOfHeight /*= 0.9f*/ );
 	void Close();
 	void BeginFrame();
+	void EndFrame();
 
 	void SetInputSystem( InputSystem* input );
 	void SetEventSystem( EventSystem* eventSystem );

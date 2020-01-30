@@ -197,6 +197,11 @@ void Window::BeginFrame()
 	}
 }
 
+void Window::EndFrame()
+{
+
+}
+
 void Window::SetInputSystem( InputSystem* input )
 {
 	m_input = input;

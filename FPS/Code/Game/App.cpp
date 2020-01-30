@@ -8,6 +8,8 @@ App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
 InputSystem* g_theInput = nullptr;
 
+const char* APP_NAME = "SD1-A4: Protogame2D";	// ...becomes ??? (Change this per project!)
+
 //Constants for calculation ship position change
 const float TIMEPERFRAME = 1.f/60.f;
 const float SLOWTIME = 1.f/600.f;
@@ -16,8 +18,7 @@ const float NOTIME = 0.f;
 App::App()
 {
 	g_theInput = new InputSystem();
-	g_theRenderer = new RenderContext();
-	m_game =  new Game();
+	m_game = new Game();
 	g_theEventSystem = new EventSystem();
 }
 
@@ -26,9 +27,15 @@ App::~App() {}
 void App::Startup()
 {
 	g_theInput->Startup();
+
+	g_theWindow = new Window();
+	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
 	g_theWindow->SetInputSystem(g_theInput);
 	g_theWindow->SetEventSystem(g_theEventSystem);
+
+	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp(g_theWindow);
+	
 	m_game->Startup();
 
 	g_theEventSystem->SubscribeToEvent("QUIT", QuitRequested);
@@ -125,8 +132,11 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
-	g_theInput->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
+
+
+	g_theInput->BeginFrame();
 }
 
 void App::Update(float deltaSeconds)
@@ -151,6 +161,7 @@ void App::EndFrame()
 {
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
+	g_theWindow->EndFrame();
 }
 
 void App::RestartGame()

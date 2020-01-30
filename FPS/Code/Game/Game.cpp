@@ -21,8 +21,7 @@ extern InputSystem* g_theInput;
 
 Game::Game()
 {
-	m_camera = Camera();
-	m_UICamera = Camera();
+
 
 	//m_world = new World(this);
 }
@@ -31,13 +30,10 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	m_camera = Camera();
+	m_UICamera = Camera();
+
 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
-// 	m_world->Startup();
-// 	m_player = m_world->GetPlayer();
-// 	m_numTilesInViewVertically = GAME_CAMERA_Y;
-// 	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
-// 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
-// 	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
 }
 
 void Game::Shutdown(){}
@@ -51,14 +47,14 @@ void Game::Update( float deltaSeconds )
 	{
 		m_currentTime = 0.f;
 	}
-	Rgba8 color;
-	color.g = 0;
-	color.b = 0;
+	Rgba8 clearColor;
+	clearColor.g = 0;
+	clearColor.b = 0;
 	float colorVal = m_currentTime * 45.f;
-	color.r = (unsigned char)colorVal;
-	color.b = (unsigned char)colorVal;
+	clearColor.r = (unsigned char)colorVal;
+	clearColor.b = (unsigned char)colorVal;
 
-	m_camera.SetClearMode( CLEAR_COLOR_BIT, color, 0.f, 0 );
+	m_camera.SetClearMode( CLEAR_COLOR_BIT, clearColor, 0.f, 0 );
 }
 
 void Game::Render()

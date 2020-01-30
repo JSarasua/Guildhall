@@ -18,7 +18,7 @@
 // #SD1ToDo: Move each of these items to its proper place, once that place is established
 // 
 
-const char* APP_NAME = "SD1-A4: Protogame2D";	// ...becomes ??? (Change this per project!)
+
 
 extern App* g_theApp;
 extern InputSystem* g_theInput;
@@ -79,15 +79,13 @@ int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE
 
 
 	g_theApp = new App();
-	g_theWindow = new Window();
-	g_theWindow->Open(APP_NAME, CLIENT_ASPECT, 0.90f);
 
 	g_theApp->Startup();
 	// Program main loop; keep running frames until it's time to quit
 	while( !g_theApp->IsQuitting() )
 	{
 		//Sleep( 16 );
-		g_theWindow->BeginFrame();
+
 		g_theApp->RunFrame();
 
 
