@@ -364,6 +364,29 @@ void RenderContext::EndCamera( const Camera& camera )
 
 void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 {
+	Texture* texture = m_swapchain->GetBackBuffer();
+	TextureView* view = texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	IntVec2 outputSize = texture->GetTexelSize();
+
+	D3D11_VIEWPORT viewport;
+	viewport.MinDepth = 0.f;
+	viewport.MaxDepth = 1.f;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = (float)outputSize.x;
+	viewport.Height = (float)outputSize.y; 
+
+	// TEMPORARY - this will be moved
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs, nullptr, 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState ); //use defaults
+	m_context->RSSetViewports( 1, &viewport );
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs, nullptr, 0 );
+	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
+
 	m_context->Draw( numVertexes, vertexOffset );
 }
 

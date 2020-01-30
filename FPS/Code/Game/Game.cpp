@@ -60,6 +60,7 @@ void Game::Update( float deltaSeconds )
 void Game::Render()
 {
 	g_theRenderer->BeginCamera(m_camera);
+	g_theRenderer->Draw(3, 0);
 	g_theRenderer->EndCamera(m_camera);
 }
 

@@ -41,6 +41,12 @@ void* FileReadToNewBuffer( std::string const& filename, size_t* outSize = nullpt
 Shader::Shader( RenderContext* context )
 	: m_owner(context)
 {
+	CreateRasterState();
+}
+
+Shader::~Shader()
+{
+	DX_SAFE_RELEASE(m_rasterState);
 }
 
 bool Shader::CreateFromFile( std::string const& filename )
@@ -58,6 +64,25 @@ bool Shader::CreateFromFile( std::string const& filename )
 	delete[] source;
 
 	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
+}
+
+void Shader::CreateRasterState()
+{
+	D3D11_RASTERIZER_DESC desc; //description
+
+	desc.FillMode = D3D11_FILL_SOLID; //full triangle
+	desc.CullMode = D3D11_CULL_NONE;
+	desc.FrontCounterClockwise = TRUE; //the only reason we're doing this;
+	desc.DepthBias = 0U;
+	desc.DepthBiasClamp = 0.f;
+	desc.SlopeScaledDepthBias = 0.f;
+	desc.DepthClipEnable = TRUE;
+	desc.ScissorEnable = FALSE;
+	desc.MultisampleEnable = FALSE;
+	desc.AntialiasedLineEnable = FALSE;
+
+	ID3D11Device* device = m_owner->m_device;
+	device->CreateRasterizerState( &desc, &m_rasterState );
 }
 
 static char const* GetDefaultEntryPointForStage( SHADERTYPE type )

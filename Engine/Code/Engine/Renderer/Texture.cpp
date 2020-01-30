@@ -20,7 +20,10 @@ Texture::Texture( RenderContext* context, ID3D11Texture2D* handle )
 	: m_owner( context ),
 	m_handle( handle )
 {
+	D3D11_TEXTURE2D_DESC desc; //description
+	handle->GetDesc(&desc);
 
+	m_texelSizeCoords = IntVec2( desc.Width, desc.Height );
 }
 
 int Texture::GetTextureID() const

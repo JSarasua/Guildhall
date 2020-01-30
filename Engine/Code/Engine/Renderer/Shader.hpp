@@ -6,6 +6,7 @@ struct ID3D11Resource;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D10Blob;
+struct ID3D11RasterizerState;
 
 enum SHADERTYPE
 {
@@ -43,10 +44,16 @@ class Shader
 {
 public:
 	Shader( RenderContext* context );
+	~Shader();
+
 	bool CreateFromFile( std::string const& filename );
+	void CreateRasterState();
+
 
 public:
 	RenderContext* m_owner;
 	ShaderStage m_vertexStage;
 	ShaderStage m_fragmentStage; //PixelStage
+
+	ID3D11RasterizerState* m_rasterState = nullptr;
 };

@@ -25,9 +25,9 @@ struct VertexToFragment_t
 // from a contsant buffer - which we'll get into later (if you remove static, you'll notice
 // this stops working). 
 static float3 SOME_POSITIONS[3] = {
-	float3(-.50f, -.50f, 0.0f), 
-	float3(-.25f,  .50f, 0.0f), 
-	float3( .50f, -.25f, 0.0f),
+	float3(-1.0f, -1.0f, 0.0f), 
+	float3(-1.f,  1.0f, 0.0f), 
+	float3( 1.0f, -1.0f, 0.0f),
 };
 
 //--------------------------------------------------------------------------------------
