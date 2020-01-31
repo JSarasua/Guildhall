@@ -180,7 +180,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num1Key.WasJustPressed() )
 	{
 		Rigidbody2D* rb = m_physics->CreateRigidBody();
-		DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), 10.f );
+		float randNum = m_rand.RollRandomFloatInRange(5.f, 15.f);
+		DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
 		rb->TakeCollider( dc );
 		rb->SetPosition(m_mousePositionOnMainCamera);
 		GameObject* gameObject = new GameObject( rb );
