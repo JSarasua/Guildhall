@@ -10,7 +10,7 @@ class DiscCollider2D : public Collider2D
 public:
 	DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius );
 
-	virtual void UpdateWorldShape() const override;
+	virtual void UpdateWorldShape() override;
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const override;
 	virtual bool Contains( Vec2 const& position ) const	override;

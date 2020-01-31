@@ -3,6 +3,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Physics2D/Rigidbody2D.hpp"
 
 DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius ) 
 	: m_localPosition(localPosition),
@@ -10,9 +11,9 @@ DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosi
 	m_radius(radius)
 {}
 
-void DiscCollider2D::UpdateWorldShape() const
+void DiscCollider2D::UpdateWorldShape()
 {
-
+	m_worldPosition = m_rigidbody->GetPosition();
 }
 
 Vec2 DiscCollider2D::GetClosestPoint( Vec2 const& position ) const

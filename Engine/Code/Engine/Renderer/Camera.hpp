@@ -10,11 +10,9 @@ public:
 	Camera() {}
 	~Camera() {}
 
-	void SetOrthoView( const Vec2& bottomLeft, const Vec2&topRight );
+	//void SetOrthoView( const Vec2& bottomLeft, const Vec2&topRight );
 	void SetProjectionOrthographic( float height, float nearZ = -1.f, float farZ = 1.f );
 	
-	Vec2 GetOrthoBottomLeft() const;
-	Vec2 GetOrthoTopRight() const;
 	Vec2 GetClientToWorldPosition( Vec2 clientPos ) const;
 
 	float GetAspectRatio() const;
@@ -22,12 +20,14 @@ public:
 	void SetOutputSize( const Vec2& size );
 	void SetPosition( const Vec3& position );
 
-private:
-	AABB2 m_cameraView;
+	void Translate2D( const Vec2& cameraDisplacement );
 
-	Vec2 m_outputSize;
-	Vec2 m_position;
+	Vec2 GetOrthoBottomLeft() const;
+	Vec2 GetOrthoTopRight() const;
+private:
+
 
 public:
-	void Translate2D( const Vec2& cameraDisplacement );
+	Vec2 m_outputSize;
+	Vec2 m_position;
 };

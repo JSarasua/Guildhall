@@ -17,7 +17,7 @@ class Collider2D
 	friend Physics2D;
 
 public:
-	virtual void UpdateWorldShape() const						= 0;
+	virtual void UpdateWorldShape()								= 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const	= 0;
 	virtual bool Contains( Vec2 const& position ) const			= 0;
@@ -26,13 +26,13 @@ public:
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor ) = 0;
 
 protected:
-	virtual ~Collider2D() = 0;
+	virtual ~Collider2D();
 
 public:
 
 public:
 	Collider2DType m_type;
-	Physics2D* m_system;
+	Physics2D* m_system = nullptr;
 	Rigidbody2D* m_rigidbody = nullptr;
 
 protected:

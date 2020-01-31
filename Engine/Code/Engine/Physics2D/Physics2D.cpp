@@ -35,6 +35,7 @@ void Physics2D::EndFrame()
 	}
 }
 
+
 Rigidbody2D* Physics2D::CreateRigidBody()
 {
 	Rigidbody2D* rb = new Rigidbody2D();

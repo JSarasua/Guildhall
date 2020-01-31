@@ -18,7 +18,7 @@ public:
 	Rigidbody2D* CreateRigidBody();
 	void DestroyRigidBody( Rigidbody2D* rb );
 
-	DiscCollider2D* CreateDiscCollider( Vec2 localPosition, float center );
+	DiscCollider2D* CreateDiscCollider( Vec2 localPosition, float radius );
 	void DestroyCollider( Collider2D* collider );
 
 private:

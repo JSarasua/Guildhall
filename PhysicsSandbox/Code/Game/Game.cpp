@@ -4,6 +4,8 @@
 #include "Game/World.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Player.hpp"
+#include "Game/GameObject.hpp"
+#include "Engine/Physics2D/Physics2D.hpp"
 #include "Engine/Math/FloatRange.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -12,6 +14,8 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Physics2D/Rigidbody2D.hpp"
+#include "Engine/Physics2D/DiscCollider2D.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -19,22 +23,23 @@ extern InputSystem* g_theInput;
 
 Game::Game()
 {
-	m_camera = Camera();
-	m_UICamera = Camera();
+
 }
 
 Game::~Game(){}
 
 void Game::Startup()
 {
-	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y * CLIENT_ASPECT, GAME_CAMERA_Y));
-	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y * CLIENT_ASPECT, GAME_CAMERA_Y));
+	m_camera = new Camera();
+	m_UICamera = new Camera();
 
-	m_OBB2AtMouse = OBB2(Vec2(0.f,0.f), Vec2(3.5f,7.4f), 0.f);
+	m_physics = new Physics2D();
 
-	SetShapePositionsAndColors();
-
-	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
+	m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
+	m_defaultCameraHeight = m_camera->m_outputSize.y;
+	m_camera->SetPosition( Vec2(0.f,0.f) );
+	
+	//g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 }
 
 void Game::Shutdown(){}
@@ -44,17 +49,17 @@ void Game::RunFrame(){}
 void Game::Update( float deltaSeconds )
 {
 	UpdateDebugMouse();
-	UpdateNearestPoints();
+	UpdateGameObjects(deltaSeconds);
 	CheckButtonPresses( deltaSeconds );
 }
 
 void Game::Render()
 {
 	g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
-	g_theRenderer->BeginCamera( m_camera );
-	RenderGame();
+	g_theRenderer->BeginCamera( *m_camera );
 	RenderDebugMouse();
-	g_theRenderer->EndCamera( m_camera );
+	RenderGameObjects();
+	g_theRenderer->EndCamera( *m_camera );
 
 
 // 	g_theRenderer->BeginCamera( m_UICamera );
@@ -67,189 +72,55 @@ void Game::Render()
 void Game::CheckCollisions()
 {}
 
-void Game::UpdateEntities( float deltaSeconds )
+void Game::UpdateGameObjects( float deltaSeconds )
 {
 	UNUSED(deltaSeconds);
+
+	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	{
+		if( nullptr == m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
+		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
+
+		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
+		{
+			if( nullptr == m_gameObjects[otherGameObjectIndex] )
+			{
+				continue;
+			}
+			if( gameObjectIndex != otherGameObjectIndex )
+			{
+				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
+				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
+
+				if( collider->Intersects( otherCollider ) )
+				{
+					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
+				}
+			}
+		}
+	}
+
 }
 
 void Game::UpdateDebugMouse()
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedPos();
-	AABB2 orthoBounds( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	Vec2 mouseDrawPosOnCamera = orthoBounds.GetPointAtUV( mouseNormalizedPos );
+	m_mousePositionOnMainCamera = m_camera->GetClientToWorldPosition(mouseNormalizedPos);
 
-	m_mousePositionOnMainCamera = mouseDrawPosOnCamera;
-
-	m_OBB2AtMouse.SetCenter(m_mousePositionOnMainCamera);
-
-}
-
-void Game::UpdateNearestPoints()
-{
-	m_aabbNearestPointToMouse			= m_aabb.GetNearestPoint(m_mousePositionOnMainCamera);
-	m_obbNearestPointToMouse			= m_obb.GetNearestPoint(m_mousePositionOnMainCamera);
-	m_capsuleNearestPointToMouse		= m_capsule.GetNearestPoint(m_mousePositionOnMainCamera);
-	m_lineSegmentNearestPointToMouse	= m_lineSegment.GetNearestPoint(m_mousePositionOnMainCamera);
-	m_discNearestPointToMouse			= GetNearestPointOnDisc2D(m_mousePositionOnMainCamera, m_discCenter, m_discRadius);
-}
-
-void Game::RenderGame()
-{
-	std::vector<Vertex_PCU> vertexList;
-
-	AppendShapes(vertexList);
-	AppendLines(vertexList);
-
-	g_theRenderer->DrawVertexArray(vertexList);
-
-	g_theRenderer->DrawRing(m_lineSegmentNearestPointToMouse, 0.2f, Rgba8::RED, 0.2f);
-	if( m_aabb.IsPointInside( m_mousePositionOnMainCamera ) )
+	if( m_draggingGameObject )
 	{
-		g_theRenderer->DrawRing(m_aabbNearestPointToMouse, 0.6f, Rgba8::WHITE, 0.6f);
+		Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+		Vec2 updatedDraggedPos = Vec2(m_mousePositionOnMainCamera + m_draggingOffset);
+		rb->SetPosition( updatedDraggedPos );
 	}
-	else
-	{
-		g_theRenderer->DrawRing(m_aabbNearestPointToMouse, 0.2f, Rgba8::RED, 0.2f);
-	}
-
-	if( m_capsule.IsPointInside( m_mousePositionOnMainCamera ) )
-	{
-		g_theRenderer->DrawRing(m_capsuleNearestPointToMouse, 0.6f, Rgba8::WHITE, 0.6f);
-	}
-	else
-	{
-		g_theRenderer->DrawRing(m_capsuleNearestPointToMouse, 0.2f, Rgba8::RED, 0.2f);
-	}
-
-	if( m_obb.IsPointInside( m_mousePositionOnMainCamera ) )
-	{
-		g_theRenderer->DrawRing(m_obbNearestPointToMouse, 0.6f, Rgba8::WHITE, 0.6f);
-	}
-	else
-	{
-		g_theRenderer->DrawRing(m_obbNearestPointToMouse, 0.2f, Rgba8::RED, 0.2f);
-	}
-
-	if( IsPointInsideDisc2D( m_mousePositionOnMainCamera, m_discCenter, m_discRadius ) )
-	{
-		g_theRenderer->DrawRing(m_discNearestPointToMouse, 0.6f, Rgba8::WHITE, 0.6f);
-	}
-	else
-	{
-		g_theRenderer->DrawRing(m_discNearestPointToMouse, 0.2f, Rgba8::RED, 0.2f);
-	}
-
-
-}
-
-void Game::AppendShapes(std::vector<Vertex_PCU>& masterVertexList)
-{
-	if( m_UseOBB2AtMouse && DoOBBAndCapsuleOverlap2D( m_OBB2AtMouse, m_capsule ) )
-	{
-		Rgba8 capsuleColor = m_capsuleColor;
-		capsuleColor.r += 50;
-		capsuleColor.g += 50;
-		capsuleColor.b += 50;
-		Vertex_PCU::AppendVertsCapsule2D( masterVertexList, m_capsule, capsuleColor );
-	}
-	else
-	{
-		Vertex_PCU::AppendVertsCapsule2D( masterVertexList, m_capsule, m_capsuleColor );
-	}
-
-
-	//#TODO FIX DOOBBANDLINESEGMENTOVERLAP2D
-	if( m_UseOBB2AtMouse && DoOBBAndLineSegmentOverlap2D( m_OBB2AtMouse, m_lineSegment ) )
-	{
-		Rgba8 lineSegmentColor = m_lineSegmentColor;
-		lineSegmentColor.r += 50;
-		lineSegmentColor.g += 50;
-		lineSegmentColor.b += 50;
-		Vertex_PCU::AppendVertsLine2D( masterVertexList, m_lineSegment, 0.5f, lineSegmentColor );
-	}
-	else
-	{
-		Vertex_PCU::AppendVertsLine2D( masterVertexList, m_lineSegment, 0.5f, m_lineSegmentColor );
-	}
-
-	if( m_UseOBB2AtMouse && DoOBBAndAABBOverlap2D( m_OBB2AtMouse, m_aabb ) )
-	{
-		Rgba8 abbColor = m_aabbColor;
-		abbColor.r += 50;
-		abbColor.g += 50;
-		abbColor.b += 50;
-		Vertex_PCU::AppendVertsAABB2D( masterVertexList, m_aabb, abbColor );
-	}
-	else
-	{
-		Vertex_PCU::AppendVertsAABB2D( masterVertexList, m_aabb, m_aabbColor );
-	}
-
-	if( m_UseOBB2AtMouse && DoOBBAndOBBOverlap2D( m_OBB2AtMouse, m_obb ) )
-	{
-		Rgba8 obbColor = m_obbColor;
-		obbColor.r += 50;
-		obbColor.g += 50;
-		obbColor.b += 50;
-		Vertex_PCU::AppendVertsOBB2D( masterVertexList, m_obb, obbColor );
-	}
-	else
-	{
-		Vertex_PCU::AppendVertsOBB2D( masterVertexList, m_obb, m_obbColor );
-	}
-
-	if( m_UseOBB2AtMouse && DoOBBAndDiscOverlap2D( m_OBB2AtMouse, m_discCenter, m_discRadius ) )
-	{
-		Rgba8 discColor = m_discColor;
-		discColor.r += 50;
-		discColor.g += 50;
-		discColor.b += 50;
-		Vertex_PCU::AppendVertsDisc2D( masterVertexList, m_discCenter, m_discRadius, discColor );
-	}
-	else
-	{
-		Vertex_PCU::AppendVertsDisc2D( masterVertexList, m_discCenter, m_discRadius, m_discColor );
-	}
-
-	//TODO ADD DISC
-}
-
-void Game::AppendLines( std::vector<Vertex_PCU>& masterVertexList )
-{
-	LineSegment2 lineToMouse	= LineSegment2( m_lineSegmentNearestPointToMouse, m_mousePositionOnMainCamera );
-	LineSegment2 aabbToMouse	= LineSegment2( m_aabbNearestPointToMouse, m_mousePositionOnMainCamera );
-	LineSegment2 capsuleToMouse = LineSegment2( m_capsuleNearestPointToMouse, m_mousePositionOnMainCamera );
-	LineSegment2 obbToMouse		= LineSegment2( m_obbNearestPointToMouse, m_mousePositionOnMainCamera );
-	LineSegment2 discToMouse	= LineSegment2( m_discNearestPointToMouse, m_mousePositionOnMainCamera );
-
-	Vertex_PCU::AppendVertsLine2D( masterVertexList, lineToMouse, 0.1f, Rgba8::GREY );
-	Vertex_PCU::AppendVertsLine2D( masterVertexList, aabbToMouse, 0.1f, Rgba8::GREY );
-	Vertex_PCU::AppendVertsLine2D( masterVertexList, capsuleToMouse, 0.1f, Rgba8::GREY );
-	Vertex_PCU::AppendVertsLine2D( masterVertexList, obbToMouse, 0.1f, Rgba8::GREY );
-	Vertex_PCU::AppendVertsLine2D( masterVertexList, discToMouse, 0.1f, Rgba8::GREY );
-
-	//TODO ADD DISC
 }
 
 void Game::RenderDebugMouse() const
 {
-	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedPos();
-
-	AABB2 orthoBounds( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-	//Should pass in camera
-	//Use UV because our value is between 0 to 1
-	Vec2 mouseDrawPos = orthoBounds.GetPointAtUV( mouseNormalizedPos );
-
-	if( m_UseOBB2AtMouse )
-	{
-		std::vector<Vertex_PCU> vertexList;
-		Vertex_PCU::AppendVertsOBB2D(vertexList, m_OBB2AtMouse, Rgba8::GREEN);
-		g_theRenderer->DrawVertexArray(vertexList);
-	}
-	else
-	{
-		g_theRenderer->DrawRing( mouseDrawPos, 0.1f, Rgba8::GREEN, 0.1f );
-	}
+	//m_mouseGameObject->DebugRender(g_theRenderer, Rgba8::BLUE, Rgba8(255,255,255,128) );
 
 }
 
@@ -261,146 +132,188 @@ void Game::CheckButtonPresses(float deltaSeconds)
 {
 	const XboxController& controller = g_theInput->GetXboxController(0);
 
-	const KeyButtonState& rKey = g_theInput->GetKeyStates('R');
-	const KeyButtonState& tKey = g_theInput->GetKeyStates('T');
-	const KeyButtonState& yKey = g_theInput->GetKeyStates('Y');
+	const KeyButtonState& num1Key = g_theInput->GetKeyStates('1');
+
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
-	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
+	//const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
 	float mouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
 
-	if( rKey.WasJustPressed() )
+
+	const KeyButtonState& wKey = g_theInput->GetKeyStates('W');
+	const KeyButtonState& aKey = g_theInput->GetKeyStates('A');
+	const KeyButtonState& sKey = g_theInput->GetKeyStates('S');
+	const KeyButtonState& dKey = g_theInput->GetKeyStates('D');
+	const KeyButtonState& oKey = g_theInput->GetKeyStates('O');
+	const KeyButtonState& delKey = g_theInput->GetKeyStates( 0x2E );
+	const KeyButtonState& bSpaceKey = g_theInput->GetKeyStates( 0x08 );
+
+	if( wKey.IsPressed() )
 	{
-		SetShapePositionsAndColors();
+		Vec2 upVector = Vec2( 0.f, 10.f );
+		m_camera->Translate2D( upVector * deltaSeconds );
 	}
 
-	if( tKey.WasJustPressed() )
+	if( sKey.IsPressed() )
 	{
-		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
+		Vec2 downVector = Vec2( 0.f, -10.f );
+		m_camera->Translate2D( downVector * deltaSeconds );
 	}
 
-	if( yKey.IsPressed() )
+	if( aKey.IsPressed() )
 	{
-		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-		float orientationIncremented = orientation + 30.f;
-		float newOrienation = GetTurnedToward(orientation, orientationIncremented, 2.f );
-		m_OBB2AtMouse.SetOrientationDegrees(newOrienation);
+		Vec2 leftVector = Vec2( 10.f, 0.f );
+		m_camera->Translate2D( leftVector * deltaSeconds );
+	}
+
+	if( dKey.IsPressed() )
+	{
+		Vec2 rightVector = Vec2( -10.f, 0.f );
+		m_camera->Translate2D( rightVector * deltaSeconds );
+	}
+
+	if( oKey.WasJustPressed() )
+	{
+		m_camera->m_position = Vec2( 0.f, 0.f );
+		m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
+	}
+
+	if( num1Key.WasJustPressed() )
+	{
+		Rigidbody2D* rb = m_physics->CreateRigidBody();
+		DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), 10.f );
+		rb->TakeCollider( dc );
+		rb->SetPosition(m_mousePositionOnMainCamera);
+		GameObject* gameObject = new GameObject( rb );
+
+		m_gameObjects.push_back( gameObject );
+	}
+
+	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
+	{
+		if( m_draggingGameObject )
+		{
+			int gameObjectsIndex = GetGameObjectIndex( m_draggingGameObject );
+
+			delete m_draggingGameObject;
+
+			m_draggingGameObject = nullptr;
+			m_gameObjects[gameObjectsIndex] = nullptr;
+		}
+
 	}
 
 	if( leftMouseButton.WasJustPressed() )
 	{
-		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
-	}
-	else if( rightMouseButton.WasJustPressed() )
-	{
-		SetShapePositionsAndColors();
+		GrabDiscIfOverlap();
 	}
 
+	if( leftMouseButton.WasJustReleased() )
+	{
+		ReleaseDisc();
+	}
 
 	if( mouseWheelScroll != 0.f )
 	{
-		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-		float orientationIncremented = orientation + (mouseWheelScroll * 10.f);
+		float cameraHeight = m_camera->m_outputSize.y;
+
+		cameraHeight  += (mouseWheelScroll * 10.f);
+		cameraHeight = Clampf(cameraHeight, 10.f, 1000.f);
 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
-		m_OBB2AtMouse.SetOrientationDegrees( orientationIncremented );
-	}
+		m_camera->SetProjectionOrthographic(cameraHeight);
+ 	}
+
+// 	if( rKey.WasJustPressed() )
+// 	{
+// 		SetShapePositionsAndColors();
+// 	}
+// 
+// 	if( tKey.WasJustPressed() )
+// 	{
+// 		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
+// 	}
+// 
+// 	if( yKey.IsPressed() )
+// 	{
+// 		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
+// 		float orientationIncremented = orientation + 30.f;
+// 		float newOrienation = GetTurnedToward(orientation, orientationIncremented, 2.f );
+// 		m_OBB2AtMouse.SetOrientationDegrees(newOrienation);
+// 	}
+// 
+// 	if( leftMouseButton.WasJustPressed() )
+// 	{
+// 		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
+// 	}
+// 	else if( rightMouseButton.WasJustPressed() )
+// 	{
+// 		SetShapePositionsAndColors();
+// 	}
+// 
+// 
+// 	if( mouseWheelScroll != 0.f )
+// 	{
+// 		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
+// 		float orientationIncremented = orientation + (mouseWheelScroll * 10.f);
+// 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
+// 		m_OBB2AtMouse.SetOrientationDegrees( orientationIncremented );
+// 	}
 
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 }
 
-void Game::SetShapePositionsAndColors()
+void Game::RenderGameObjects()
 {
-	SetLineSegment();
-	SetCapsule();
-	SetAABB2();
-	SetOBB2();
-	SetDisc();
+	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	{
+		if( nullptr != m_gameObjects[gameObjectIndex] )
+		{
+			m_gameObjects[gameObjectIndex]->DebugRender(g_theRenderer);
+		}
+
+	}
 }
 
-void Game::SetLineSegment()
+void Game::GrabDiscIfOverlap()
 {
-	AABB2 gameCameraAABB = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	FloatRange gameCameraXRange = FloatRange( gameCameraAABB.mins.x, gameCameraAABB.maxs.x );
-	FloatRange gameCameraYRange = FloatRange( gameCameraAABB.mins.y, gameCameraAABB.maxs.y );
-
-	Vec2 lineSegmentStart = Vec2( gameCameraXRange.GetRandomInRange( m_rand ), gameCameraYRange.GetRandomInRange( m_rand ) );
-	float lineSegmentAngle = m_rand.RollRandomFloatInRange(0.f, 360.f);
-	float lineSegmentLength = m_rand.RollRandomFloatInRange(GAME_CAMERA_Y/15.f, GAME_CAMERA_Y/10.f);
-	Vec2 lineSegmentEnd = Vec2::MakeFromPolarDegrees(lineSegmentAngle, lineSegmentLength) + lineSegmentStart;
-
-	m_lineSegment = LineSegment2(lineSegmentStart, lineSegmentEnd);
-
-	m_lineSegmentColor.r = (unsigned char)m_rand.RollRandomIntInRange(70,128);
-	m_lineSegmentColor.g = (unsigned char)m_rand.RollRandomIntInRange(70,128);
-	m_lineSegmentColor.b = (unsigned char)m_rand.RollRandomIntInRange(70,128);
+	for( int gameObjectIndex = (int)m_gameObjects.size() - 1; gameObjectIndex >= 0; gameObjectIndex-- )
+	{
+		if( nullptr == m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
+		Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
+		if( collider->Contains( m_mousePositionOnMainCamera ) )
+		{
+			Vec2 colliderPos = m_gameObjects[gameObjectIndex]->m_rigidbody->GetPosition();
+			m_draggingGameObject = m_gameObjects[gameObjectIndex];
+			m_draggingOffset = colliderPos - m_mousePositionOnMainCamera;
+			m_draggingGameObject->m_borderColor = Rgba8::GREEN;
+			break;
+		}
+	}
 }
 
-void Game::SetCapsule()
+void Game::ReleaseDisc()
 {
-	AABB2 gameCameraAABB = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	FloatRange gameCameraXRange = FloatRange( gameCameraAABB.mins.x, gameCameraAABB.maxs.x );
-	FloatRange gameCameraYRange = FloatRange( gameCameraAABB.mins.y, gameCameraAABB.maxs.y );
+	if( nullptr != m_draggingGameObject )
+	{
+		m_draggingGameObject->m_borderColor = Rgba8::BLUE;
+		m_draggingGameObject = nullptr;
+		m_draggingOffset = Vec2( 0.f, 0.f );
+	}
 
-	Vec2 lineSegmentStart = Vec2( gameCameraXRange.GetRandomInRange( m_rand ), gameCameraYRange.GetRandomInRange( m_rand ) );
-	float lineSegmentAngle = m_rand.RollRandomFloatInRange( 0.f, 360.f );
-	float lineSegmentLength = m_rand.RollRandomFloatInRange( GAME_CAMERA_Y/15.f, GAME_CAMERA_Y/10.f );
-	Vec2 lineSegmentEnd = Vec2::MakeFromPolarDegrees( lineSegmentAngle, lineSegmentLength ) + lineSegmentStart;
-	float lineSegmentRadius = m_rand.RollRandomFloatInRange(1.f, 15.f);
-
-	m_capsule = Capsule2(lineSegmentStart, lineSegmentEnd, lineSegmentRadius);
-
-	m_capsuleColor.r = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_capsuleColor.g = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_capsuleColor.b = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
 }
 
-void Game::SetAABB2()
+int Game::GetGameObjectIndex( GameObject* gameObject )
 {
-	AABB2 gameCameraAABB = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	FloatRange gameCameraXRange = FloatRange( gameCameraAABB.mins.x, gameCameraAABB.maxs.x );
-	FloatRange gameCameraYRange = FloatRange( gameCameraAABB.mins.y, gameCameraAABB.maxs.y );
+	for( int gameObjectsIndex = 0; gameObjectsIndex < m_gameObjects.size(); gameObjectsIndex++ )
+	{
+		if( gameObject == m_gameObjects[gameObjectsIndex] )
+		{
+			return gameObjectsIndex;
+		}
+	}
 
-	Vec2 aabbCenter = Vec2( gameCameraXRange.GetRandomInRange( m_rand ), gameCameraYRange.GetRandomInRange( m_rand ) );
-	Vec2 aabbMaxOffset = Vec2( m_rand.RollRandomFloatInRange(5.f, 15.f), m_rand.RollRandomFloatInRange(5.f, 15.f));
-	Vec2 aabbMinOffset = Vec2( m_rand.RollRandomFloatInRange(-15.f, -5.f), m_rand.RollRandomFloatInRange(-15.f, -5.f));
-	m_aabb.maxs = aabbMaxOffset;
-	m_aabb.mins = aabbMinOffset;
-	m_aabb.SetCenter( aabbCenter );
-
-	m_aabbColor.r = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_aabbColor.g = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_aabbColor.b = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-}
-
-void Game::SetOBB2()
-{
-	AABB2 gameCameraAABB = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	FloatRange gameCameraXRange = FloatRange( gameCameraAABB.mins.x, gameCameraAABB.maxs.x );
-	FloatRange gameCameraYRange = FloatRange( gameCameraAABB.mins.y, gameCameraAABB.maxs.y );
-
-	Vec2 aabbCenter = Vec2( gameCameraXRange.GetRandomInRange( m_rand ), gameCameraYRange.GetRandomInRange( m_rand ) );
-	Vec2 dimension = Vec2( m_rand.RollRandomFloatInRange(5.f, 15.f), m_rand.RollRandomFloatInRange(5.f, 15.f) );
-	float orientationDegrees = m_rand.RollRandomFloatInRange(0.f, 360.f);
-	//float orientationDegrees = 0.f;
-
-	m_obb = OBB2(aabbCenter, dimension, orientationDegrees);
-
-	m_obbColor.r = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_obbColor.g = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_obbColor.b = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-}
-
-void Game::SetDisc()
-{
-	AABB2 gameCameraAABB = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	FloatRange gameCameraXRange = FloatRange( gameCameraAABB.mins.x, gameCameraAABB.maxs.x );
-	FloatRange gameCameraYRange = FloatRange( gameCameraAABB.mins.y, gameCameraAABB.maxs.y );
-
-	m_discCenter = Vec2( gameCameraXRange.GetRandomInRange( m_rand ), gameCameraYRange.GetRandomInRange( m_rand ) );
-	m_discRadius = m_rand.RollRandomFloatInRange( 1.f, 15.f );
-
-
-	m_discColor.r = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_discColor.g = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
-	m_discColor.b = (unsigned char)m_rand.RollRandomIntInRange( 70, 128 );
+	return -1;
 }

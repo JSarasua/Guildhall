@@ -8,9 +8,12 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+
 #include <vector>
 
 
+class Physics2D;
+class GameObject;
 
 class Game
 {
@@ -29,53 +32,33 @@ public:
 
 private:
 	void CheckCollisions();
-	void UpdateEntities( float deltaSeconds );
+	void UpdateGameObjects( float deltaSeconds );
 	void UpdateDebugMouse();
-	void UpdateNearestPoints();
-	void RenderGame();
-	void AppendShapes( std::vector<Vertex_PCU>& masterVertexList );
-	void AppendLines( std::vector<Vertex_PCU>& masterVertexList );
+
 	void RenderDebugMouse() const;
 	void RenderUI() const;
 	void CheckButtonPresses( float deltaSeconds );
 
-	void SetShapePositionsAndColors();
-	void SetLineSegment();
-	void SetCapsule();
-	void SetAABB2();
-	void SetOBB2();
-	void SetDisc();
 
+
+	void RenderGameObjects();
+	void GrabDiscIfOverlap();
+	void ReleaseDisc();
+	int GetGameObjectIndex( GameObject* gameObject );
 private:
-	Camera m_UICamera;
-	Camera m_camera;
+	Camera* m_UICamera;
+	Camera* m_camera;
+
+	Physics2D* m_physics = nullptr;
+
 
 	Vec2 m_mousePositionOnMainCamera;
 
-	AABB2			m_aabb;
-	OBB2			m_obb;
-	Capsule2		m_capsule;
-	LineSegment2	m_lineSegment;
-	Vec2			m_discCenter;
-	float			m_discRadius;
 
-	Rgba8			m_aabbColor;
-	Rgba8			m_obbColor;
-	Rgba8			m_capsuleColor;
-	Rgba8			m_lineSegmentColor;
-	Rgba8			m_discColor;
 
-	Vec2			m_aabbNearestPointToMouse;
-	Vec2			m_obbNearestPointToMouse;
-	Vec2			m_capsuleNearestPointToMouse;
-	Vec2			m_lineSegmentNearestPointToMouse;
-	Vec2			m_discNearestPointToMouse;
 
-	bool			m_UseOBB2AtMouse = false;
-	OBB2			m_OBB2AtMouse;
-
-	// 	Vec2			m_OBB2NearestPointToAABB;
-	// 	Vec2			m_OBB2NearestPointToOBB;
-	// 	Vec2			m_OBB2NearestPointToCapsule;
-	// 	Vec2			m_OBB2NearestPointToLineSegment;
+	GameObject*	m_draggingGameObject = nullptr;
+	float m_defaultCameraHeight = 0.f;
+	Vec2 m_draggingOffset;
+	std::vector<GameObject*> m_gameObjects;
 };
