@@ -88,14 +88,14 @@ void Game::UpdateGameObjects( float deltaSeconds )
 			m_gameObjects[gameObjectIndex]->m_borderColor = Rgba8::BLUE;
 		}
 
-		if( m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider->Contains( m_mousePositionOnMainCamera ) )
+		if( m_draggingGameObject != m_gameObjects[gameObjectIndex] )
 		{
-			if( m_draggingGameObject != m_gameObjects[gameObjectIndex] )
+			if( m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider->Contains( m_mousePositionOnMainCamera ) )
 			{
-				m_gameObjects[gameObjectIndex]->m_borderColor = Rgba8::GREEN;
+					m_gameObjects[gameObjectIndex]->m_borderColor = Rgba8::GREEN;
 			}
-
 		}
+
 	}
 
 
@@ -312,7 +312,7 @@ void Game::GrabDiscIfOverlap()
 			Vec2 colliderPos = m_gameObjects[gameObjectIndex]->m_rigidbody->GetPosition();
 			m_draggingGameObject = m_gameObjects[gameObjectIndex];
 			m_draggingOffset = colliderPos - m_mousePositionOnMainCamera;
-			m_draggingGameObject->m_borderColor = Rgba8(0,128,0,255);
+			m_draggingGameObject->m_borderColor = Rgba8(0,100,0,255);
 			break;
 		}
 	}
