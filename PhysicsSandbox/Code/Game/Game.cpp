@@ -289,7 +289,7 @@ void Game::GrabDiscIfOverlap()
 			Vec2 colliderPos = m_gameObjects[gameObjectIndex]->m_rigidbody->GetPosition();
 			m_draggingGameObject = m_gameObjects[gameObjectIndex];
 			m_draggingOffset = colliderPos - m_mousePositionOnMainCamera;
-			m_draggingGameObject->m_borderColor = Rgba8::GREEN;
+			m_draggingGameObject->m_borderColor = Rgba8(0,128,0,255);
 			break;
 		}
 	}
