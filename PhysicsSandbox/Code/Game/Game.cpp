@@ -82,6 +82,29 @@ void Game::UpdateGameObjects( float deltaSeconds )
 		{
 			continue;
 		}
+
+		if( m_draggingGameObject != m_gameObjects[gameObjectIndex] )
+		{
+			m_gameObjects[gameObjectIndex]->m_borderColor = Rgba8::BLUE;
+		}
+
+		if( m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider->Contains( m_mousePositionOnMainCamera ) )
+		{
+			if( m_draggingGameObject != m_gameObjects[gameObjectIndex] )
+			{
+				m_gameObjects[gameObjectIndex]->m_borderColor = Rgba8::GREEN;
+			}
+
+		}
+	}
+
+
+	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	{
+		if( nullptr == m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
 		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
 
 		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
