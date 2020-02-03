@@ -60,7 +60,9 @@ void Game::Update( float deltaSeconds )
 void Game::Render()
 {
 	g_theRenderer->BeginCamera(m_camera);
-	g_theRenderer->Draw(3, 0);
+	//g_theRenderer->Draw(3, 0);
+
+	g_theRenderer->DrawAABB2(AABB2(Vec2(-1.f,-1.f), Vec2( 1.f, 1.f )), Rgba8::RED, 0.1f);
 	g_theRenderer->EndCamera(m_camera);
 }
 

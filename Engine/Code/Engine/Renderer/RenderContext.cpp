@@ -8,6 +8,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
 
@@ -72,8 +73,10 @@ void RenderContext::StartUp(Window* window)
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
 	m_swapchain = new SwapChain( this, swapchain );
-	m_currentShader = new Shader( this );
-	m_currentShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
+	m_defaultShader = new Shader( this );
+	m_defaultShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
+
+	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
 }
 
 void RenderContext::BeginFrame()
@@ -90,10 +93,13 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
-	delete m_currentShader;
-	m_currentShader = nullptr;
+	delete m_defaultShader;
+	m_defaultShader = nullptr;
 
 	delete m_swapchain;
+	m_swapchain = nullptr;
+
+	delete m_immediateVBO;
 	m_swapchain = nullptr;
 
 	DX_SAFE_RELEASE(m_device);
@@ -124,22 +130,23 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 
 }
 
-void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes ) const
+void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes )
 {
-// 	glBegin( GL_TRIANGLES );
-// 	for( int beginVertexes = 0; beginVertexes < numVertexes; beginVertexes++ )
-// 	{
-// 		glTexCoord2f(vertexes[beginVertexes].uvTexCoords.x, vertexes[beginVertexes].uvTexCoords.y);
-// 		glColor4ub( vertexes[beginVertexes].tint.r, vertexes[beginVertexes].tint.g, vertexes[beginVertexes].tint.b, vertexes[beginVertexes].tint.a );
-// 		glVertex3f( vertexes[beginVertexes].position.x, vertexes[beginVertexes].position.y, vertexes[beginVertexes].position.z );
-// 	}
-// 	glEnd();
-	UNUSED(numVertexes);
-	UNUSED(vertexes);
-	UNIMPLEMENTED();
+	//RenderBuffer is the gpu equivalent of a block of cpu memory
+	// RenderBuffer* m_immediateVBO; // VBO - Vertex Buffer Object
+	//Update a vertex buffer
+	size_t bufferTotalByteSize = numVertexes * sizeof( Vertex_PCU );
+	size_t elementSize = sizeof( Vertex_PCU );
+	m_immediateVBO->Update( vertexes, bufferTotalByteSize, elementSize );
+
+	// Bind
+	BindVertexInput( m_immediateVBO );
+
+	// Draw
+	Draw( numVertexes, 0 );
 }
 
-void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes ) const
+void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes )
 {
 	if( !vertexes.empty() )
 	{
@@ -166,6 +173,24 @@ void RenderContext::AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexL
 	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.maxs ),tint, uvMaxs ));
 	masterVertexList.push_back( Vertex_PCU( Vec3( Vec2( aabb.mins.x, aabb.maxs.y ) ),tint, Vec2( uvMins.x,uvMaxs.y ) ));
 	
+}
+
+void RenderContext::BindShader( Shader* shader )
+{
+	m_currentShader = shader;
+	if( nullptr == m_currentShader )
+	{
+		m_currentShader = m_defaultShader;
+	}
+}
+
+void RenderContext::BindVertexInput( VertexBuffer* vbo )
+{
+	ID3D11Buffer* vboHandle = vbo->m_handle;
+	uint stride = sizeof(Vertex_PCU); // how far from one vertex to next
+	uint offset = 0;	// how far into buffer we start
+
+	m_context->IASetVertexBuffers( 0, 1, &vboHandle, &stride, &offset );
 }
 
 Texture* RenderContext::CreateTextureFromFile(const char* filePath)
@@ -261,7 +286,7 @@ Texture* RenderContext::CreateOrGetTextureFromFile(const char* filePath)
 void RenderContext::BindTexture( const Texture* texture ) const
 {
 	UNUSED(texture);
-	UNIMPLEMENTED();
+	//UNIMPLEMENTED();
 // 	if( texture )
 // 	{
 // 		glEnable( GL_TEXTURE_2D );
@@ -315,6 +340,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 // 	glLoadIdentity();
 // 	//glViewport(0,0,800,400);
 // 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+
+	BindShader( nullptr );
 }
 
 
@@ -390,7 +417,7 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 	m_context->Draw( numVertexes, vertexOffset );
 }
 
-void RenderContext::DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness ) const
+void RenderContext::DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness )
 {
 	Vec2 normalizedDisplacement = (endPoint - startPoint).GetNormalized();
 	float radius = thickness * 0.5f;
@@ -416,7 +443,7 @@ void RenderContext::DrawLine( const Vec2& startPoint, const Vec2& endPoint, cons
 	DrawVertexArray( 6, vertexes );
 }
 
-void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness ) const
+void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness )
 {
 	Vec2 ringArray[64];
 	for( int thetaIndex = 0; thetaIndex < 64; thetaIndex++ )
@@ -441,7 +468,7 @@ void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& col
 
 }
 
-void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness ) const
+void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness )
 {
 	DrawLine(aabb.mins, Vec2(aabb.mins.x, aabb.maxs.y), color, thickness);
 	DrawLine(aabb.mins, Vec2(aabb.maxs.x, aabb.mins.y), color, thickness);
@@ -450,7 +477,7 @@ void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thic
 
 }
 
-void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color ) const
+void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color )
 {
 	Vertex_PCU vertexes[6] =
 	{
@@ -466,7 +493,7 @@ void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color ) con
 	DrawVertexArray( 6, vertexes );
 }
 
-void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax ) const
+void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax )
 {
 	Vertex_PCU vertexes[6] =
 	{
@@ -482,7 +509,7 @@ void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, cons
 	DrawVertexArray( 6, vertexes );
 }
 
-void RenderContext::DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees ) const
+void RenderContext::DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees )
 {
 
 	Vec2 center = aabb.GetCenter();
@@ -532,7 +559,7 @@ BitmapFont* RenderContext::CreateBitMapFontFromFile( const char* filePath )
 //DrawText is a macro don't call it that!
 
 
-void RenderContext::DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint /*= Rgba8::WHITE*/ ) const
+void RenderContext::DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint /*= Rgba8::WHITE*/ )
 {
 	std::vector<Vertex_PCU> vertexArray;
 
@@ -542,7 +569,7 @@ void RenderContext::DrawTextAtPosition( const char* textstring, const Vec2& text
 	DrawVertexArray(vertexArray);
 }
 
-void RenderContext::DrawAlignedTextAtPosition( const char* textstring, const AABB2& box, float fontHeight, const Vec2& alignment, const Rgba8& tint /*= Rgba8::WHITE */ ) const
+void RenderContext::DrawAlignedTextAtPosition( const char* textstring, const AABB2& box, float fontHeight, const Vec2& alignment, const Rgba8& tint /*= Rgba8::WHITE */ )
 {
 	std::vector<Vertex_PCU> vertexArray;
 
