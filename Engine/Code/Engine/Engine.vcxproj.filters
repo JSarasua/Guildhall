@@ -166,6 +166,12 @@
     <ClCompile Include="Physics2D\DiscCollider2D.cpp">
       <Filter>Physics2D</Filter>
     </ClCompile>
+    <ClCompile Include="Physics2D\PolygonCollider2D.cpp">
+      <Filter>Physics2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Polygon2D.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -326,6 +332,12 @@
     </ClInclude>
     <ClInclude Include="Physics2D\DiscCollider2D.hpp">
       <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\PolygonCollider2D.hpp">
+      <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Polygon2D.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
