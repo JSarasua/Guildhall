@@ -8,6 +8,7 @@ struct ID3D11PixelShader;
 struct ID3D10Blob;
 struct ID3D11RasterizerState;
 struct ID3D11InputLayout;
+struct BufferAttribute;
 
 enum SHADERTYPE
 {
@@ -53,7 +54,7 @@ public:
 	bool CreateFromFile( std::string const& filename );
 	void CreateRasterState();
 
-	ID3D11InputLayout* GetOrCreateInputLayout();
+	ID3D11InputLayout* GetOrCreateInputLayout( const BufferAttribute*  layout );
 
 public:
 	RenderContext* m_owner;

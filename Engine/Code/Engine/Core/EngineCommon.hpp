@@ -6,6 +6,8 @@
 
 
 #define UNUSED(x) (void)(x);
+typedef unsigned int uint;
+typedef unsigned char byte;
 
 const Vec2 ALIGN_BOTTOM_LEFT(0.f,0.f);
 const Vec2 ALIGN_BOTTOM_RIGHT(1.f,0.f);

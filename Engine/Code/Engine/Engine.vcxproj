@@ -189,6 +189,7 @@
     <ClCompile Include="Math\Vec4.cpp" />
     <ClCompile Include="Platform\Window.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
+    <ClCompile Include="Renderer\BufferAttribute.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="Math\Vec4.hpp" />
     <ClInclude Include="Platform\Window.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
+    <ClInclude Include="Renderer\BufferAttribute.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\D3D11Common.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />

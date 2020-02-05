@@ -418,7 +418,7 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 
 
 	// So at this point, I need to describe the Vertex Format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*VertexPCU::LAYOUT*/ );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes, vertexOffset );

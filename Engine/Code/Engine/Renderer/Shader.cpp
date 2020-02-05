@@ -1,6 +1,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/BufferAttribute.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include <stdio.h>
@@ -86,45 +87,59 @@ void Shader::CreateRasterState()
 	device->CreateRasterizerState( &desc, &m_rasterState );
 }
 
-ID3D11InputLayout* Shader::GetOrCreateInputLayout()
+ID3D11InputLayout* Shader::GetOrCreateInputLayout( const BufferAttribute*  layout )
 {
 	if( nullptr != m_inputLayout )
 	{
 		return m_inputLayout;
 	}
 
-	D3D11_INPUT_ELEMENT_DESC vertexDescription[3];
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vertexDescription;
+	size_t vertexDescIndex = 0;
+	while( true )
+	{
+		if( layout[vertexDescIndex].m_name.empty() )
+		{
+			break;
+		}
+		char const* name = layout[vertexDescIndex].m_name.c_str();
+		uint offset = layout[vertexDescIndex].m_offset;
+		
 
-	// position
-	vertexDescription[0].SemanticName			= "POSITION";
-	vertexDescription[0].SemanticIndex			= 0;	//Array Element if we had color[3] or something
-	vertexDescription[0].Format					= DXGI_FORMAT_R32G32B32_FLOAT;	// 3 32-bit floats
-	vertexDescription[0].InputSlot				= 0;
-	vertexDescription[0].AlignedByteOffset		= offsetof( Vertex_PCU, position );
-	vertexDescription[0].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
-	vertexDescription[0].InstanceDataStepRate	= 0;
+		DXGI_FORMAT format;
+		switch( layout[vertexDescIndex].m_type )
+		{
+		case BUFFER_FORMAT_VEC2:
+			format = DXGI_FORMAT_R32G32_FLOAT;
+			break;
+		case BUFFER_FORMAT_VEC3:
+			format = DXGI_FORMAT_R32G32B32_FLOAT;
+			break;
+		case BUFFER_FORMAT_R8G8B8A8_UNORM:
+			format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			break;
+		default:
+			ERROR_AND_DIE("Need a valid format");
+			break;
+		}
 
-	// position
-	vertexDescription[1].SemanticName			= "COLOR";
-	vertexDescription[1].SemanticIndex			= 0;	//Array Element if we had color[3] or something
-	vertexDescription[1].Format					= DXGI_FORMAT_R8G8B8A8_UNORM;	// 4 1 byte channel. unsigned normal value
-	vertexDescription[1].InputSlot				= 0;
-	vertexDescription[1].AlignedByteOffset		= offsetof( Vertex_PCU, tint );
-	vertexDescription[1].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
-	vertexDescription[1].InstanceDataStepRate	= 0;
+		D3D11_INPUT_ELEMENT_DESC desc;
+		desc.SemanticName				= name;
+		desc.SemanticIndex				= 0;								//Array Element if we had color[3] or something
+		desc.Format						= format;
+		desc.InputSlot					= 0;
+		desc.AlignedByteOffset			= offset;
+		desc.InputSlotClass				= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
+		desc.InstanceDataStepRate		= 0;
 
-	// position
-	vertexDescription[2].SemanticName			= "TEXCOORD";
-	vertexDescription[2].SemanticIndex			= 0;	//Array Element if we had color[3] or something
-	vertexDescription[2].Format					= DXGI_FORMAT_R32G32_FLOAT;	// 3 32-bit floats
-	vertexDescription[2].InputSlot				= 0;
-	vertexDescription[2].AlignedByteOffset		= offsetof( Vertex_PCU, uvTexCoords );
-	vertexDescription[2].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
-	vertexDescription[2].InstanceDataStepRate	= 0;
+		vertexDescription.push_back(desc);
+
+		vertexDescIndex++;
+	}
 
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateInputLayout( 
-		vertexDescription, 
+		&vertexDescription[0], 
 		3,
 		m_vertexStage.GetByteCode(),
 		m_vertexStage.GetByteCodeLength(),

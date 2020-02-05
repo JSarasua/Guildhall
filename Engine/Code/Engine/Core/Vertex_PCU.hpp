@@ -10,7 +10,7 @@ struct AABB2;
 struct OBB2;
 struct LineSegment2;
 struct Rgba8;
-
+struct BufferAttribute;
 
 //-----------------------------------------------------------------------------------------------
 struct Vertex_PCU
@@ -19,6 +19,9 @@ public: // NOTE: this is one of the few cases where we break both the "m_" namin
 	Vec3 position;
 	Rgba8 tint;
 	Vec2 uvTexCoords;
+	
+	static BufferAttribute const LAYOUT[]; 
+
 
 	static void TransformVertexArray(int NUM_SHIP_VERTS, Vertex_PCU* shipVerts, float scale, float orientationDegrees, Vec2 position);
 	static void TransformVertexArray(std::vector<Vertex_PCU*>& shipVerts, float scale, float orientationDegrees, Vec2 position);
@@ -38,5 +41,6 @@ public:
 	explicit Vertex_PCU( const Vec3& position, const Rgba8& tint, const Vec2& uvTextCoords );
 	//TODO ADD DEFAULT UV CONSTRUCTOR
 	//TODO ADD VEC2 CONSTRUCTOR
+
 
 };

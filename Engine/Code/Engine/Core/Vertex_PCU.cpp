@@ -3,9 +3,15 @@
 #include "Engine/Math/LineSegment2.hpp"
 #include "Engine/Math/Capsule2.hpp"
 #include "Engine/Math/OBB2.hpp"
+#include "Engine/Renderer/BufferAttribute.hpp"
 
 
-
+BufferAttribute const Vertex_PCU::LAYOUT[] ={
+	BufferAttribute( "POSITION",  BUFFER_FORMAT_VEC3,      		offsetof( Vertex_PCU, position ) ),
+	BufferAttribute( "COLOR",     BUFFER_FORMAT_R8G8B8A8_UNORM, 	offsetof( Vertex_PCU, tint ) ),
+	BufferAttribute( "TEXCOORD",        BUFFER_FORMAT_VEC2,      		offsetof( Vertex_PCU, uvTexCoords ) ),
+	BufferAttribute() // end - terminator element; 
+};
 
 void Vertex_PCU::TransformVertexArray( int NUM_SHIP_VERTS, Vertex_PCU* shipVerts, float scale, float orientationDegrees, Vec2 position )
 {
