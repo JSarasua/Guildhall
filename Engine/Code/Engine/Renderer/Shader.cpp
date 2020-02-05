@@ -47,6 +47,7 @@ Shader::Shader( RenderContext* context )
 Shader::~Shader()
 {
 	DX_SAFE_RELEASE(m_rasterState);
+	DX_SAFE_RELEASE(m_inputLayout);
 }
 
 bool Shader::CreateFromFile( std::string const& filename )
@@ -85,6 +86,53 @@ void Shader::CreateRasterState()
 	device->CreateRasterizerState( &desc, &m_rasterState );
 }
 
+ID3D11InputLayout* Shader::GetOrCreateInputLayout()
+{
+	if( nullptr != m_inputLayout )
+	{
+		return m_inputLayout;
+	}
+
+	D3D11_INPUT_ELEMENT_DESC vertexDescription[3];
+
+	// position
+	vertexDescription[0].SemanticName			= "POSITION";
+	vertexDescription[0].SemanticIndex			= 0;	//Array Element if we had color[3] or something
+	vertexDescription[0].Format					= DXGI_FORMAT_R32G32B32_FLOAT;	// 3 32-bit floats
+	vertexDescription[0].InputSlot				= 0;
+	vertexDescription[0].AlignedByteOffset		= offsetof( Vertex_PCU, position );
+	vertexDescription[0].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
+	vertexDescription[0].InstanceDataStepRate	= 0;
+
+	// position
+	vertexDescription[1].SemanticName			= "COLOR";
+	vertexDescription[1].SemanticIndex			= 0;	//Array Element if we had color[3] or something
+	vertexDescription[1].Format					= DXGI_FORMAT_R8G8B8A8_UNORM;	// 4 1 byte channel. unsigned normal value
+	vertexDescription[1].InputSlot				= 0;
+	vertexDescription[1].AlignedByteOffset		= offsetof( Vertex_PCU, tint );
+	vertexDescription[1].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
+	vertexDescription[1].InstanceDataStepRate	= 0;
+
+	// position
+	vertexDescription[2].SemanticName			= "TEXCOORD";
+	vertexDescription[2].SemanticIndex			= 0;	//Array Element if we had color[3] or something
+	vertexDescription[2].Format					= DXGI_FORMAT_R32G32_FLOAT;	// 3 32-bit floats
+	vertexDescription[2].InputSlot				= 0;
+	vertexDescription[2].AlignedByteOffset		= offsetof( Vertex_PCU, uvTexCoords );
+	vertexDescription[2].InputSlotClass			= D3D11_INPUT_PER_VERTEX_DATA;		//I'm drawing a tree, PER_INSTANCE_DATA is I'm drawing a million trees
+	vertexDescription[2].InstanceDataStepRate	= 0;
+
+	ID3D11Device* device = m_owner->m_device;
+	device->CreateInputLayout( 
+		vertexDescription, 
+		3,
+		m_vertexStage.GetByteCode(),
+		m_vertexStage.GetByteCodeLength(),
+		&m_inputLayout );
+
+	return m_inputLayout;
+}
+
 static char const* GetDefaultEntryPointForStage( SHADERTYPE type )
 {
 	switch( type )
@@ -110,6 +158,7 @@ ShaderStage::~ShaderStage()
 {
 	DX_SAFE_RELEASE(m_byteCode);
 	DX_SAFE_RELEASE(m_handle);
+
 }
 
 bool ShaderStage::Compile( RenderContext* context, std::string const& filename, void const* source, size_t const sourceByteLen, SHADERTYPE stage )
@@ -197,4 +246,14 @@ bool ShaderStage::Compile( RenderContext* context, std::string const& filename, 
 	m_type = stage;
 
 	return IsValid();
+}
+
+void const* ShaderStage::GetByteCode()
+{
+	return m_byteCode->GetBufferPointer();
+}
+
+size_t ShaderStage::GetByteCodeLength() const
+{
+	return m_byteCode->GetBufferSize();
 }

@@ -74,7 +74,7 @@ void RenderContext::StartUp(Window* window)
 
 	m_swapchain = new SwapChain( this, swapchain );
 	m_defaultShader = new Shader( this );
-	m_defaultShader->CreateFromFile( "Data/Shaders/Triangle.hlsl" );
+	m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
 }
@@ -397,6 +397,8 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 
 	IntVec2 outputSize = texture->GetTexelSize();
 
+
+	TODO("Move the viewport and context code below to begin camera");
 	D3D11_VIEWPORT viewport;
 	viewport.MinDepth = 0.f;
 	viewport.MaxDepth = 1.f;
@@ -413,6 +415,11 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 	m_context->RSSetViewports( 1, &viewport );
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs, nullptr, 0 );
 	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
+
+
+	// So at this point, I need to describe the Vertex Format to the shader
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( /*VertexPCU::LAYOUT*/ );
+	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes, vertexOffset );
 }

@@ -7,6 +7,7 @@ struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D10Blob;
 struct ID3D11RasterizerState;
+struct ID3D11InputLayout;
 
 enum SHADERTYPE
 {
@@ -27,6 +28,9 @@ public:
 		SHADERTYPE stage );
 
 	bool IsValid() const { return (nullptr != m_handle); };
+
+	void const* GetByteCode();
+	size_t GetByteCodeLength() const;
 
 public:
 	SHADERTYPE m_type;
@@ -49,6 +53,7 @@ public:
 	bool CreateFromFile( std::string const& filename );
 	void CreateRasterState();
 
+	ID3D11InputLayout* GetOrCreateInputLayout();
 
 public:
 	RenderContext* m_owner;
@@ -56,4 +61,5 @@ public:
 	ShaderStage m_fragmentStage; //PixelStage
 
 	ID3D11RasterizerState* m_rasterState = nullptr;
+	ID3D11InputLayout* m_inputLayout = nullptr;
 };
