@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
 
-
+class Texture;
 struct Rgba8;
 
 enum eCameraClearBitFlag : unsigned int
@@ -22,6 +22,8 @@ public:
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 
+	void SetColorTarget( Texture* texture );
+	Texture* GetColorTarget() const;
 	void SetClearMode( unsigned int clearFlags, Rgba8 color, float depth = 0.f, unsigned int stencil = 0 );
 
 public:
@@ -31,7 +33,7 @@ public:
 private:
 	Vec2 bLeft;
 	Vec2 tRight;
-
+	Texture* m_texture = nullptr;
 
 public:
 	void Translate2D( const Vec2& cameraDisplacement );
