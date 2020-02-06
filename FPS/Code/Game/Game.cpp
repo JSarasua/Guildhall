@@ -31,8 +31,8 @@ Game::~Game(){}
 void Game::Startup()
 {
 	m_camera = Camera();
-	m_UICamera = Camera();
 
+	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 }
 
