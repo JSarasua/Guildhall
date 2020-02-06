@@ -1,4 +1,6 @@
 #pragma once
+#include "Engine/Renderer/BufferAttribute.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
 
 struct ID3D11Buffer;
 class RenderContext;
@@ -55,6 +57,11 @@ class VertexBuffer : public RenderBuffer
 {
 public:
 	VertexBuffer( RenderContext* context, eRenderMemoryHint memHint )
-		: RenderBuffer( context, VERTEX_BUFFER_BIT, memHint )
+		: RenderBuffer( context, VERTEX_BUFFER_BIT, memHint ),
+		m_bufferAttribute(Vertex_PCU::LAYOUT)
 	{}
+
+public:
+	BufferAttribute const* m_bufferAttribute = nullptr;
+
 };
