@@ -179,8 +179,7 @@ void RenderContext::AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexL
 
 void RenderContext::BindShader( Shader* shader )
 {
-	TODO("Implement an IsDrawing()");
-	//GUARANTEE_OR_DIE( IsDrawing(), "You have started begin camera");
+	GUARANTEE_OR_DIE( IsDrawing(), "You haven't started begin camera");
 
 	m_currentShader = shader;
 	if( nullptr == m_currentShader )
@@ -374,6 +373,11 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 // 	}
 }
 
+bool RenderContext::IsDrawing() const
+{
+	return m_isDrawing;
+}
+
 void RenderContext::BeginCamera( const Camera& camera )
 {
 	#if defined(RENDER_DEBUG)
@@ -444,8 +448,10 @@ void RenderContext::BeginCamera( const Camera& camera )
 // 	glLoadIdentity();
 // 	//glViewport(0,0,800,400);
 // 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
+	m_isDrawing = true;
 
 	BindShader( (Shader*)nullptr );
+
 
 }
 
@@ -489,8 +495,10 @@ void RenderContext::BeginCamera( const Camera& camera, Viewport viewPort )
 
 void RenderContext::EndCamera( const Camera& camera )
 {
-	m_lastVBOHandle = nullptr;
 	UNUSED(camera);
+	
+	m_lastVBOHandle = nullptr;
+	m_isDrawing = false;
 }
 
 

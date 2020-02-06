@@ -66,7 +66,7 @@ public:
 	Shader*		GetOrCreateShader( char const* filename );
 	void BindTexture( const Texture* texture ) const;
 	void SetBlendMode( BlendMode blendMode );
-
+	bool IsDrawing() const;
 
 	void DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness );
@@ -87,6 +87,8 @@ protected:
 private:
 	std::vector<Texture*> m_Textures;
 	std::vector<BitmapFont*> m_fonts;
+
+	bool m_isDrawing = false;
 
 public:
 	ID3D11Device* m_device;			//Our GPU
