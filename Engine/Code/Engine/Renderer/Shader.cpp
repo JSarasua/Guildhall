@@ -87,7 +87,7 @@ void Shader::CreateRasterState()
 	device->CreateRasterizerState( &desc, &m_rasterState );
 }
 
-ID3D11InputLayout* Shader::GetOrCreateInputLayout( const BufferAttribute*  layout )
+ID3D11InputLayout* Shader::GetOrCreateInputLayout(  BufferAttribute const*  layout )
 {
 	if( layout == m_previousLayout )
 	{
