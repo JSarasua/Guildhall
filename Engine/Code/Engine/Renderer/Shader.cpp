@@ -89,10 +89,15 @@ void Shader::CreateRasterState()
 
 ID3D11InputLayout* Shader::GetOrCreateInputLayout( const BufferAttribute*  layout )
 {
-	if( nullptr != m_inputLayout )
+	if( layout == m_previousLayout )
 	{
 		return m_inputLayout;
 	}
+	else if( nullptr != m_inputLayout )
+	{
+		return m_inputLayout;
+	}
+	m_previousLayout = layout;
 
 	std::vector<D3D11_INPUT_ELEMENT_DESC> vertexDescription;
 	size_t vertexDescIndex = 0;
