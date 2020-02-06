@@ -18,6 +18,7 @@ class VertexBuffer;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+struct ID3D11Buffer;
 
 enum class Viewport
 {
@@ -58,9 +59,11 @@ public:
 	void AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexList, const AABB2& aabb, const Rgba8& tint, const Vec2& uvMins, const Vec2& uvMaxs );
 
 	void BindShader( Shader* shader );
-	void BindVertexInput( VertexBuffer* vbo );
+	void BindShader( char const* filename );
+	void BindVertexBuffer( VertexBuffer* vbo );
 
-	Texture* CreateOrGetTextureFromFile(const char* filePath);
+	Texture*	CreateOrGetTextureFromFile(const char* filePath);
+	Shader*		GetOrCreateShader( char const* filename );
 	void BindTexture( const Texture* texture ) const;
 	void SetBlendMode( BlendMode blendMode );
 
@@ -92,6 +95,8 @@ public:
 
 	Shader* m_currentShader = nullptr;
 	Shader* m_defaultShader = nullptr;
+	std::vector<Shader*> m_shaders;
 	VertexBuffer* m_immediateVBO;
+	ID3D11Buffer* m_lastVBOHandle = nullptr;
 };
 

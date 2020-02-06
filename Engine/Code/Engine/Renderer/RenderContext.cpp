@@ -73,8 +73,8 @@ void RenderContext::StartUp(Window* window)
 	GUARANTEE_OR_DIE( SUCCEEDED(result), "failed to create rendering device" );
 
 	m_swapchain = new SwapChain( this, swapchain );
-	m_defaultShader = new Shader( this );
-	m_defaultShader->CreateFromFile( "Data/Shaders/Default.hlsl" );
+	//m_defaultShader = new Shader( this );
+	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
 }
@@ -93,11 +93,23 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
-	delete m_defaultShader;
+	//delete m_defaultShader;
+
+	for( size_t shaderIndex = 0; shaderIndex < m_shaders.size(); shaderIndex++ )
+	{
+		if( nullptr == m_shaders[shaderIndex] )
+		{
+			continue;
+		}
+
+		delete m_shaders[shaderIndex];
+		m_shaders[shaderIndex] = nullptr;
+	}
 	m_defaultShader = nullptr;
 
 	delete m_swapchain;
 	m_swapchain = nullptr;
+
 
 	delete m_immediateVBO;
 	m_swapchain = nullptr;
@@ -116,17 +128,7 @@ void RenderContext::Shutdown()
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
-	float clearFloats[4];
-	clearFloats[0] = clearColor.r / 255.f;
-	clearFloats[1] = clearColor.g / 255.f;
-	clearFloats[2] = clearColor.b / 255.f;
-	clearFloats[3] = clearColor.a / 255.f;
-	
-	Texture* backbuffer = m_swapchain->GetBackBuffer();
- 	TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
-	
-	ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
-	m_context->ClearRenderTargetView( rtv, clearFloats);
+	UNUSED(clearColor);
 
 }
 
@@ -140,7 +142,7 @@ void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes 
 	m_immediateVBO->Update( vertexes, bufferTotalByteSize, elementSize );
 
 	// Bind
-	BindVertexInput( m_immediateVBO );
+	BindVertexBuffer( m_immediateVBO );
 
 	// Draw
 	Draw( numVertexes, 0 );
@@ -177,20 +179,51 @@ void RenderContext::AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexL
 
 void RenderContext::BindShader( Shader* shader )
 {
+	TODO("Implement an IsDrawing()");
+	//GUARANTEE_OR_DIE( IsDrawing(), "You have started begin camera");
+
 	m_currentShader = shader;
 	if( nullptr == m_currentShader )
 	{
 		m_currentShader = m_defaultShader;
 	}
+
+	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs, nullptr, 0 );
+	m_context->RSSetState( m_currentShader->m_rasterState ); //use defaults
+	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs, nullptr, 0 );
 }
 
-void RenderContext::BindVertexInput( VertexBuffer* vbo )
+void RenderContext::BindShader( char const* filename )
+{
+	for( size_t shaderIndex = 0; shaderIndex < m_shaders.size(); shaderIndex++ )
+	{
+		if( nullptr == m_shaders[shaderIndex] )
+		{
+			continue;
+		}
+
+		if( m_shaders[shaderIndex]->m_filename.compare( filename ) == 0 )
+		{
+			m_currentShader = m_shaders[shaderIndex];
+		}
+	}
+}
+
+void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 {
 	ID3D11Buffer* vboHandle = vbo->m_handle;
+	if( m_lastVBOHandle == vboHandle )
+	{
+		return;
+	}
+	m_lastVBOHandle = vboHandle;
+
 	uint stride = sizeof(Vertex_PCU); // how far from one vertex to next
 	uint offset = 0;	// how far into buffer we start
 
+
 	m_context->IASetVertexBuffers( 0, 1, &vboHandle, &stride, &offset );
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 }
 
 Texture* RenderContext::CreateTextureFromFile(const char* filePath)
@@ -281,6 +314,29 @@ Texture* RenderContext::CreateOrGetTextureFromFile(const char* filePath)
 }
 
 
+Shader* RenderContext::GetOrCreateShader( char const* filename )
+{
+	for( size_t shaderIndex = 0; shaderIndex < m_shaders.size(); shaderIndex++ )
+	{
+		if( nullptr == m_shaders[shaderIndex] )
+		{
+			continue;
+		}
+
+		if( m_shaders[shaderIndex]->m_filename.compare( filename ) == 0 )
+		{
+			return m_shaders[shaderIndex];
+		}
+	}
+
+	Shader* newShader = new Shader( this );
+	newShader->CreateFromFile( filename );
+
+	m_shaders.push_back( newShader );
+
+	return newShader;
+}
+
 //-----------------------------------------------------------------------------------------------
 
 void RenderContext::BindTexture( const Texture* texture ) const
@@ -320,10 +376,58 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 
 void RenderContext::BeginCamera( const Camera& camera )
 {
+	#if defined(RENDER_DEBUG)
+		m_context->ClearState();		//Can be slow but helps to find bugs
+	#endif
+
+
 	if( camera.m_clearMode & CLEAR_COLOR_BIT )
 	{
-		ClearScreen( camera.m_clearColor );
+		//ClearScreen( camera.m_clearColor );
+		Rgba8 clearColor = camera.m_clearColor;
+		float clearFloats[4];
+		clearFloats[0] = clearColor.r / 255.f;
+		clearFloats[1] = clearColor.g / 255.f;
+		clearFloats[2] = clearColor.b / 255.f;
+		clearFloats[3] = clearColor.a / 255.f;
+
+		Texture* backbuffer = nullptr;
+
+		if( nullptr == camera.GetColorTarget() )
+		{
+			backbuffer = m_swapchain->GetBackBuffer();
+		}
+		else
+		{
+			backbuffer = camera.GetColorTarget();
+		}
+		TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
+
+		ID3D11RenderTargetView* rtv = backbuffer_rtv->GetRTVHandle();
+		m_context->ClearRenderTargetView( rtv, clearFloats );
+
 	}
+
+	Texture* texture = m_swapchain->GetBackBuffer();
+	TextureView* view = texture->GetRenderTargetView();
+	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
+
+	IntVec2 outputSize = texture->GetTexelSize();
+	D3D11_VIEWPORT viewport;
+	viewport.MinDepth = 0.f;
+	viewport.MaxDepth = 1.f;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = (float)outputSize.x;
+	viewport.Height = (float)outputSize.y;
+
+	// TEMPORARY - this will be moved
+	//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+
+
+	m_context->RSSetViewports( 1, &viewport );
+	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
+
 	//texture* output = cam.getcolortarget
 // 	if(output = NULL )
 // 		output = m_swapchain->getcolortarget();
@@ -341,7 +445,8 @@ void RenderContext::BeginCamera( const Camera& camera )
 // 	//glViewport(0,0,800,400);
 // 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
 
-	BindShader( nullptr );
+	BindShader( (Shader*)nullptr );
+
 }
 
 
@@ -384,6 +489,7 @@ void RenderContext::BeginCamera( const Camera& camera, Viewport viewPort )
 
 void RenderContext::EndCamera( const Camera& camera )
 {
+	m_lastVBOHandle = nullptr;
 	UNUSED(camera);
 }
 
@@ -391,32 +497,6 @@ void RenderContext::EndCamera( const Camera& camera )
 
 void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 {
-	Texture* texture = m_swapchain->GetBackBuffer();
-	TextureView* view = texture->GetRenderTargetView();
-	ID3D11RenderTargetView* rtv = view->GetRTVHandle();
-
-	IntVec2 outputSize = texture->GetTexelSize();
-
-
-	TODO("Move the viewport and context code below to begin camera");
-	D3D11_VIEWPORT viewport;
-	viewport.MinDepth = 0.f;
-	viewport.MaxDepth = 1.f;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	viewport.Width = (float)outputSize.x;
-	viewport.Height = (float)outputSize.y; 
-
-	// TEMPORARY - this will be moved
-	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs, nullptr, 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState ); //use defaults
-	m_context->RSSetViewports( 1, &viewport );
-	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs, nullptr, 0 );
-	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
-
-
 	// So at this point, I need to describe the Vertex Format to the shader
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
 	m_context->IASetInputLayout( inputLayout );
