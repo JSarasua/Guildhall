@@ -58,10 +58,12 @@ bool RenderBuffer::Update( void const* data, size_t dataByteSize, size_t element
 	if( !IsCompatible( dataByteSize, elementByteSize ) )
 	{
 		Cleanup(); //destory the handle, reset things;
+
+		// 2. If no buffer, create one that is compatible
+		Create( dataByteSize, elementByteSize );
 	}
 
-	// 2. If no buffer, create one that is compatible
-	Create( dataByteSize, elementByteSize );
+
 	// 3. Updating the buffer
 	ID3D11DeviceContext* context = m_owner->m_context;
 	if( m_memHint == MEMORY_HINT_DYNAMIC )
@@ -92,7 +94,7 @@ bool RenderBuffer::Update( void const* data, size_t dataByteSize, size_t element
 	// CopySubresource (direct copy)
 	// This is only available to GPU buffers that have exactly the same size, and element size
 
-	return true;;
+	return true;
 }
 
 UINT ToDXUsage( eRenderBufferUsage usage )
@@ -152,6 +154,8 @@ bool RenderBuffer::Create( size_t dataByteSize, size_t elementByteSize )
 
 	if( nullptr != m_handle )
 	{
+		m_bufferByteSize = dataByteSize;
+		m_elementByteSize = elementByteSize;
 		return true;
 	}
 
