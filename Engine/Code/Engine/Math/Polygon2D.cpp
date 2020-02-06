@@ -11,6 +11,11 @@ Polygon2D::Polygon2D( Vec2 const* points, unsigned int pointCount )
 	}
 }
 
+Polygon2D::Polygon2D( std::vector<Vec2> points )
+{
+	m_points = points;
+}
+
 bool Polygon2D::IsValid() const
 {
 	if( m_points.size() < 3 )
@@ -126,6 +131,18 @@ Vec2 Polygon2D::GetClosestPoint( Vec2 const& point ) const
 	return closestPoint;
 }
 
+Vec2 Polygon2D::GetCenterOfMass() const
+{
+	Vec2 center;
+
+	for( size_t vertexIndex = 0; vertexIndex < m_points.size(); vertexIndex++ )
+	{
+		center += m_points[vertexIndex];
+	}
+	center *= 0.5f;
+	return center;
+}
+
 int Polygon2D::GetVertexCount() const
 {
 	return (int)m_points.size();
@@ -165,6 +182,26 @@ void Polygon2D::GetEdgeNormal( Vec2* edgeNormal, size_t edgeIndex ) const
 	fwdVec.Rotate90Degrees();
 	fwdVec.Normalize();
 	*edgeNormal = fwdVec;
+}
+
+void Polygon2D::GetTriangle( Vec2* outA, Vec2* outB, Vec2* outC, size_t triangleIndex ) const
+{
+	*outA = m_points[0];
+	*outB = m_points[triangleIndex + 1];
+	*outC = m_points[triangleIndex + 2];
+}
+
+size_t Polygon2D::GetTriangleCount() const
+{
+	return m_points.size() - 2;
+}
+
+void Polygon2D::Translate( Vec2 const& translator )
+{
+	for( size_t vertexIndex = 0; vertexIndex < m_points.size(); vertexIndex++ )
+	{
+		m_points[vertexIndex] += translator;
+	}
 }
 
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points, unsigned int pointCount )

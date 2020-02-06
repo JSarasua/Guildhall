@@ -61,4 +61,5 @@ private:
 	float m_defaultCameraHeight = 0.f;
 	Vec2 m_draggingOffset;
 	std::vector<GameObject*> m_gameObjects;
+	std::vector<Vec2> m_polygonPoints;
 };

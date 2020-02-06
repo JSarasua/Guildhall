@@ -3,6 +3,7 @@
 #include <windows.h>			// #include this (massive, platform-specific) header in very few places
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/Polygon2D.hpp"
 #include <gl/gl.h>	
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/StringUtils.hpp"
@@ -381,6 +382,39 @@ void RenderContext::DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& colo
 	
 	//BindTexture(nullptr);
 	DrawVertexArray( 6, vertexes );
+}
+
+void RenderContext::DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const
+{
+	std::vector<Vertex_PCU> vertexes;
+
+	for( size_t triangleIndex = 0; triangleIndex < polygon.GetTriangleCount(); triangleIndex++ )
+	{
+		Vec2 pointA;
+		Vec2 pointB;
+		Vec2 pointC;
+		polygon.GetTriangle( &pointA, &pointB, &pointC, triangleIndex );
+
+
+		Vertex_PCU vertexA(Vec3(pointA), fillColor, Vec2(0.f, 0.f));
+		Vertex_PCU vertexB(Vec3(pointB), fillColor, Vec2(0.f, 0.f));
+		Vertex_PCU vertexC(Vec3(pointC), fillColor, Vec2(0.f, 0.f));
+
+		vertexes.push_back(vertexA);
+		vertexes.push_back(vertexB);
+		vertexes.push_back(vertexC);
+	}
+
+	DrawVertexArray(vertexes);
+
+	for( size_t edgeIndex = 0; edgeIndex < polygon.GetEdgeCount(); edgeIndex++ )
+	{
+		Vec2 pointA;
+		Vec2 pointB;
+		polygon.GetEdge( &pointA, &pointB, edgeIndex );
+
+		DrawLine( pointA, pointB, borderColor, thickness );
+	}
 }
 
 BitmapFont* RenderContext::CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension )

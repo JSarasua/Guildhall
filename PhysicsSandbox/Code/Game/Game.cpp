@@ -16,6 +16,7 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Physics2D/DiscCollider2D.hpp"
+#include "Engine/Math/Polygon2D.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -156,8 +157,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const XboxController& controller = g_theInput->GetXboxController(0);
 
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates('1');
+	const KeyButtonState& num2Key = g_theInput->GetKeyStates('2');
 
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
+	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
 	//const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
 	float mouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
 
@@ -212,6 +215,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_gameObjects.push_back( gameObject );
 	}
 
+	if( num2Key.WasJustPressed() )
+	{
+		m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+	}
+
 	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
 	{
 		if( m_draggingGameObject )
@@ -234,6 +242,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( leftMouseButton.WasJustReleased() )
 	{
 		ReleaseDisc();
+	}
+
+	if( rightMouseButton.WasJustPressed() )
+	{
+		Polygon2D newPoly(m_polygonPoints);
 	}
 
 	if( mouseWheelScroll != 0.f )
