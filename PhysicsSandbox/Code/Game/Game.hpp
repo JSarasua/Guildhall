@@ -62,4 +62,6 @@ private:
 	Vec2 m_draggingOffset;
 	std::vector<GameObject*> m_gameObjects;
 	std::vector<Vec2> m_polygonPoints;
+	bool m_isPolyValid = false;
+	bool m_isPolyDrawing = false;
 };

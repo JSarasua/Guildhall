@@ -141,18 +141,27 @@ void Game::UpdateDebugMouse()
 		Vec2 updatedDraggedPos = Vec2(m_mousePositionOnMainCamera + m_draggingOffset);
 		rb->SetPosition( updatedDraggedPos );
 	}
+
+	std::vector<Vec2> polyPoints;
+	polyPoints = m_polygonPoints;
+	polyPoints.push_back( m_mousePositionOnMainCamera );
+	Polygon2D poly( polyPoints );
+
+	if( poly.IsConvex() || !poly.IsValid() )
+	{
+		m_isPolyValid = true;
+	}
+	else
+	{
+		m_isPolyValid = false;
+	}
 }
 
 void Game::RenderDebugMouse() const
 {
 	if( !m_polygonPoints.empty() )
 	{
-		std::vector<Vec2> polyPoints;
-		polyPoints = m_polygonPoints;
-		polyPoints.push_back( m_mousePositionOnMainCamera );
-		Polygon2D poly( polyPoints );
-		
-		if( poly.IsConvex() )
+		if( m_isPolyValid )
 		{
 			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::BLUE, 1.f );
 		}
@@ -191,7 +200,21 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& dKey = g_theInput->GetKeyStates('D');
 	const KeyButtonState& oKey = g_theInput->GetKeyStates('O');
 	const KeyButtonState& delKey = g_theInput->GetKeyStates( 0x2E );
-	const KeyButtonState& bSpaceKey = g_theInput->GetKeyStates( 0x08 );
+	const KeyButtonState& bSpaceKey = g_theInput->GetKeyStates( 0x08 ); //backspace
+	const KeyButtonState& escKey = g_theInput->GetKeyStates( 0x1B );	//ESC
+
+	if( escKey.WasJustPressed() )
+	{
+		if( m_isPolyDrawing )
+		{
+			m_isPolyDrawing = false;
+			m_polygonPoints.clear();
+		}
+		else
+		{
+			g_theApp->HandleQuitRequested();
+		}
+	}
 
 	if( wKey.IsPressed() )
 	{
@@ -237,7 +260,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num2Key.WasJustPressed() )
 	{
-		m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+		if( m_isPolyValid && !m_isPolyDrawing )
+		{
+			m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+			m_isPolyDrawing = true;
+		}
 	}
 
 	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
@@ -257,6 +284,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( leftMouseButton.WasJustPressed() )
 	{
 		GrabDiscIfOverlap();
+
+		if( m_isPolyDrawing )
+		{
+			m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+		}
 	}
 
 	if( leftMouseButton.WasJustReleased() )
@@ -277,6 +309,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			GameObject* gameObject = new GameObject( rb );
 			m_gameObjects.push_back( gameObject );
 
+			m_isPolyDrawing = false;
 			m_polygonPoints.clear();
 		}
 	}

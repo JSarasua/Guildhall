@@ -169,10 +169,10 @@ bool App::GetDebugCameraMode()
 
 void App::CheckButtonPresses()
 {
-	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
-	{
-		HandleQuitRequested();
-	}
+// 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
+// 	{
+// 		HandleQuitRequested();
+// 	}
 
 	if( g_theInput->GetKeyStates( 0x70 ).WasJustPressed() ) //F1
 	{
