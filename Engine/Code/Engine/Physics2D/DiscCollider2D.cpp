@@ -23,11 +23,22 @@ Vec2 DiscCollider2D::GetClosestPoint( Vec2 const& position ) const
 
 bool DiscCollider2D::Contains( Vec2 const& position ) const
 {
+	if( nullptr != m_rigidbody && !m_rigidbody->IsEnabled() )
+	{
+		return false;
+	}
+
 	return IsPointInsideDisc2D(position, m_worldPosition, m_radius);
 }
 
 bool DiscCollider2D::Intersects( Collider2D const* other ) const
 {
+	if( (nullptr!=m_rigidbody && !m_rigidbody->IsEnabled()) 
+		|| ((nullptr!=other->m_rigidbody) && (!other->m_rigidbody->IsEnabled())) )
+	{
+		return false;
+	}
+
 	switch( other->m_type )
 	{
 	case COLLIDER2D_DISC:

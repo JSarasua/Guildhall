@@ -34,6 +34,21 @@ void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor,
 	m_collider->DebugRender( context, borderColor, fillColor, 1.f );
 }
 
+void Rigidbody2D::EnableRigidbody()
+{
+	m_isEnabled = true;
+}
+
+void Rigidbody2D::DisableRigidbody()
+{
+	m_isEnabled = false;
+}
+
+bool Rigidbody2D::IsEnabled()
+{
+	return m_isEnabled;
+}
+
 Rigidbody2D::~Rigidbody2D()
 {
 	

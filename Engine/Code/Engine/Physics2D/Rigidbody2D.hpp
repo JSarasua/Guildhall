@@ -18,6 +18,9 @@ public:
 	Vec2 GetPosition();
 
 	void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor );
+	void EnableRigidbody();
+	void DisableRigidbody();
+	bool IsEnabled();
 
 public:
 	Physics2D* m_system;
@@ -30,4 +33,5 @@ protected:
 protected:
 	bool m_isGarbage = false;
 	Vec2 m_worldPosition;
+	bool m_isEnabled = true;
 };

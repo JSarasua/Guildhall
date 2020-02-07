@@ -28,11 +28,21 @@ Vec2 PolygonCollider2D::GetClosestPoint( Vec2 const& position ) const
 
 bool PolygonCollider2D::Contains( Vec2 const& position ) const
 {
+	if( nullptr != m_rigidbody && !m_rigidbody->IsEnabled() )
+	{
+		return false;
+	}
+
 	return m_polygon.Contains( position );
 }
 
 bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 {
+	if( nullptr != m_rigidbody && !m_rigidbody->IsEnabled() )
+	{
+		return false;
+	}
+
 	switch( other->m_type )
 	{
 	case COLLIDER2D_DISC:
