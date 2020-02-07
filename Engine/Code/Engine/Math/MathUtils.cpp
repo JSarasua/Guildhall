@@ -8,6 +8,7 @@
 #include "Engine/Math/OBB2.hpp"
 #include "Engine/Math/Capsule2.hpp"
 #include "Engine/Math/LineSegment2.hpp"
+#include "Engine/Math/Polygon2D.hpp"
 
 
 int absInt( int initialValue )
@@ -517,6 +518,13 @@ bool DoOBBAndDiscOverlap2D( const OBB2& obb, const Vec2& discCenter, float discR
 	}
 
 	return false;
+}
+
+bool DoPolygonAndDiscOverlap2D( const Polygon2D& poly, const Vec2& discCenter, float discRadius )
+{
+	Vec2 polyClosestPoint = poly.GetClosestPoint( discCenter );
+
+	return IsPointInsideDisc2D(polyClosestPoint, discCenter, discRadius );
 }
 
 bool IsPointInsideDisc2D( const Vec2& point, const Vec2& discCenter, float discRadius )

@@ -8,6 +8,7 @@ struct AABB2;
 struct OBB2;
 struct Capsule2;
 struct LineSegment2;
+class Polygon2D;
 
 int			absInt(int initialValue);
 float		absFloat(float initialValue);
@@ -64,6 +65,7 @@ bool DoOBBAndAABBOverlap2D( const OBB2& boxA, const AABB2& boxB );
 bool DoOBBAndLineSegmentOverlap2D( const OBB2& obb, const LineSegment2& line );
 bool DoOBBAndCapsuleOverlap2D( const OBB2& obb, const Capsule2& capsule );
 bool DoOBBAndDiscOverlap2D( const OBB2& obb, const Vec2& discCenter, float discRadius );
+bool DoPolygonAndDiscOverlap2D( const Polygon2D& poly, const Vec2& discCenter, float discRadius );
 FloatRange GetRangeOnProjectedAxis( int numPoints, const Vec2* points, const Vec2& relativeToPos, const Vec2& axisNormal );
 
 bool IsPointInsideDisc2D( const Vec2& point, const Vec2& discCenter, float discRadius );
