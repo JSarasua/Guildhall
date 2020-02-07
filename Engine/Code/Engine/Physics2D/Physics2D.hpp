@@ -12,7 +12,7 @@ class Physics2D
 {
 public:
 	void BeginFrame();
-	void Update();
+	void Update( float deltaSeconds );
 	void EndFrame();
 
 	//factory style create/destroy
@@ -24,8 +24,12 @@ public:
 	PolygonCollider2D* CreatePolygonCollider( Polygon2D const& poly, Vec2 localPosition );
 	void DestroyCollider( Collider2D* collider );
 
+	void SetSceneGravity( float newGravity );
+	float GetSceneGravity() const;
 
 private:
 	std::vector<Rigidbody2D*> m_rigidBodies;
 	std::vector<Collider2D*> m_colliders;
+
+	float m_gravity = 10.f;
 };

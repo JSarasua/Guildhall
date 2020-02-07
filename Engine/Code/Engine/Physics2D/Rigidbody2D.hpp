@@ -11,6 +11,9 @@ class Rigidbody2D
 	friend class Physics2D;
 
 public:
+	void Update( float deltaSeconds );
+	void AddForce( float deltaSeconds, Vec2 const& forceValue );
+
 	void Destroy();
 	void TakeCollider( Collider2D* collider );
 
@@ -34,4 +37,5 @@ protected:
 	bool m_isGarbage = false;
 	Vec2 m_worldPosition;
 	bool m_isEnabled = true;
+	Vec2 m_velocity;
 };

@@ -2,6 +2,24 @@
 #include "Engine/Physics2D/Physics2D.hpp"
 #include "Engine/Physics2D/Collider2D.hpp"
 
+
+void Rigidbody2D::Update( float deltaSeconds )
+{
+	m_worldPosition += m_velocity * deltaSeconds;
+	if( nullptr != m_collider )
+	{
+		m_collider->UpdateWorldShape();
+	}
+}
+
+void Rigidbody2D::AddForce( float deltaSeconds, Vec2 const& forceValue )
+{
+	if( m_isEnabled )
+	{
+		m_velocity += forceValue * deltaSeconds;
+	}
+}
+
 void Rigidbody2D::Destroy()
 {
 	m_system->DestroyRigidBody(this);

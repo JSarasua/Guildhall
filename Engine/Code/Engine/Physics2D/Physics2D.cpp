@@ -10,8 +10,15 @@ void Physics2D::BeginFrame()
 
 }
 
-void Physics2D::Update()
+void Physics2D::Update( float deltaSeconds )
 {
+	for( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
+	{
+		Vec2 gravity( 0.f, -1.f );
+		gravity *= m_gravity;
+		m_rigidBodies[rigidBodyIndex]->AddForce( deltaSeconds, gravity );
+		m_rigidBodies[rigidBodyIndex]->Update( deltaSeconds );
+	}
 }
 
 void Physics2D::EndFrame()
@@ -71,5 +78,15 @@ PolygonCollider2D* Physics2D::CreatePolygonCollider( Polygon2D const& poly, Vec2
 void Physics2D::DestroyCollider( Collider2D* collider )
 {
 	collider->m_isGarbage = true;
+}
+
+void Physics2D::SetSceneGravity( float newGravity )
+{
+	m_gravity = newGravity;
+}
+
+float Physics2D::GetSceneGravity() const
+{
+	return m_gravity;
 }
 
