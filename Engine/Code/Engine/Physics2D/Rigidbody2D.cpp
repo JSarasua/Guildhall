@@ -31,7 +31,7 @@ Vec2 Rigidbody2D::GetPosition()
 
 void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )
 {
-	m_collider->DebugRender( context, borderColor, fillColor );
+	m_collider->DebugRender( context, borderColor, fillColor, 1.f );
 }
 
 Rigidbody2D::~Rigidbody2D()

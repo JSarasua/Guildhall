@@ -40,8 +40,8 @@ bool DiscCollider2D::Intersects( Collider2D const* other ) const
 	}
 }
 
-void DiscCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )
+void DiscCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness )
 {
-	context->DrawDisc(m_worldPosition, m_radius, fillColor , borderColor, 1.f);
+	context->DrawDisc(m_worldPosition, m_radius, fillColor , borderColor, thickness );
 }
 

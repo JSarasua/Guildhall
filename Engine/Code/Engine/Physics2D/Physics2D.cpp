@@ -2,6 +2,8 @@
 #include "Engine/Physics2D/Collider2D.hpp"
 #include "Engine/Physics2D/DiscCollider2D.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
+#include "Engine/Math/Polygon2D.hpp"
+#include "Engine/Physics2D/PolygonCollider2D.hpp"
 
 void Physics2D::BeginFrame()
 {
@@ -57,6 +59,13 @@ DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition, float radius 
 	DiscCollider2D* dc = new DiscCollider2D(localPosition, Vec2(0.f, 0.f), radius );
 	m_colliders.push_back(dc);
 	return dc;
+}
+
+PolygonCollider2D* Physics2D::CreatePolygonCollider( Polygon2D const& poly, Vec2 localPosition )
+{
+	Vec2 worldPosition = poly.GetCenterOfMass();
+	PolygonCollider2D* pc = new PolygonCollider2D(localPosition, worldPosition, poly );
+	return pc;
 }
 
 void Physics2D::DestroyCollider( Collider2D* collider )

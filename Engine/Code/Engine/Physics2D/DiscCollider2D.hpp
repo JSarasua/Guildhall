@@ -16,7 +16,7 @@ public:
 	virtual bool Contains( Vec2 const& position ) const	override;
 	virtual bool Intersects( Collider2D const* other ) const override;
 
-	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor ) override;
+	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) override;
 
 public:
 	Vec2 m_localPosition;

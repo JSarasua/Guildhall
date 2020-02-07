@@ -23,7 +23,7 @@ public:
 	virtual bool Contains( Vec2 const& position ) const			= 0;
 	virtual bool Intersects( Collider2D const* other ) const	= 0;
 
-	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor ) = 0;
+	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
 
 protected:
 	virtual ~Collider2D();

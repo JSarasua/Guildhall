@@ -16,6 +16,7 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Physics2D/DiscCollider2D.hpp"
+#include "Engine/Physics2D/PolygonCollider2D.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 
 extern App* g_theApp;
@@ -247,6 +248,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( rightMouseButton.WasJustPressed() )
 	{
 		Polygon2D newPoly(m_polygonPoints);
+		if( newPoly.IsValid() )
+		{
+			Vec2 worldCenter = newPoly.GetCenterOfMass();
+			Rigidbody2D* rb = m_physics->CreateRigidBody();
+			PolygonCollider2D* pc = m_physics->CreatePolygonCollider( newPoly, Vec2(0.f, 0.f) );
+			rb->TakeCollider( pc );
+			rb->SetPosition( newPoly.GetCenterOfMass() );
+			GameObject* gameObject = new GameObject( rb );
+			m_gameObjects.push_back( gameObject );
+
+			m_polygonPoints.clear();
+		}
 	}
 
 	if( mouseWheelScroll != 0.f )
