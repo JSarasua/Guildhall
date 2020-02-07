@@ -50,6 +50,7 @@ void Game::RunFrame(){}
 
 void Game::Update( float deltaSeconds )
 {
+	m_physics->Update( deltaSeconds );
 	UpdateDebugMouse();
 	UpdateGameObjects(deltaSeconds);
 	CheckButtonPresses( deltaSeconds );
@@ -128,6 +129,19 @@ void Game::UpdateGameObjects( float deltaSeconds )
 		}
 	}
 
+	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	{
+		if( nullptr == m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
+
+		Vec2 bottomLeft = m_camera->GetOrthoBottomLeft();
+		Vec2 bottomRight = Vec2(m_camera->GetOrthoTopRight().x, m_camera->GetOrthoBottomLeft().y);
+		LineSegment2 bottomCameraLine( bottomLeft, bottomRight );
+
+	}
+
 }
 
 void Game::UpdateDebugMouse()
@@ -169,12 +183,7 @@ void Game::RenderDebugMouse() const
 		{
 			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::RED, 1.f );
 		}
-
-
 	}
-
-	//m_mouseGameObject->DebugRender(g_theRenderer, Rgba8::BLUE, Rgba8(255,255,255,128) );
-
 }
 
 void Game::RenderUI() const
@@ -202,6 +211,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& delKey = g_theInput->GetKeyStates( 0x2E );
 	const KeyButtonState& bSpaceKey = g_theInput->GetKeyStates( 0x08 ); //backspace
 	const KeyButtonState& escKey = g_theInput->GetKeyStates( 0x1B );	//ESC
+	const KeyButtonState& plusKey = g_theInput->GetKeyStates( 0xBB ); //+
+	const KeyButtonState& minusKey = g_theInput->GetKeyStates( 0xBD ); //-
 
 	if( escKey.WasJustPressed() )
 	{
@@ -324,41 +335,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_camera->SetProjectionOrthographic(cameraHeight);
  	}
 
-// 	if( rKey.WasJustPressed() )
-// 	{
-// 		SetShapePositionsAndColors();
-// 	}
-// 
-// 	if( tKey.WasJustPressed() )
-// 	{
-// 		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
-// 	}
-// 
-// 	if( yKey.IsPressed() )
-// 	{
-// 		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-// 		float orientationIncremented = orientation + 30.f;
-// 		float newOrienation = GetTurnedToward(orientation, orientationIncremented, 2.f );
-// 		m_OBB2AtMouse.SetOrientationDegrees(newOrienation);
-// 	}
-// 
-// 	if( leftMouseButton.WasJustPressed() )
-// 	{
-// 		m_UseOBB2AtMouse = !m_UseOBB2AtMouse;
-// 	}
-// 	else if( rightMouseButton.WasJustPressed() )
-// 	{
-// 		SetShapePositionsAndColors();
-// 	}
-// 
-// 
-// 	if( mouseWheelScroll != 0.f )
-// 	{
-// 		float orientation = m_OBB2AtMouse.GetOrientationDegrees();
-// 		float orientationIncremented = orientation + (mouseWheelScroll * 10.f);
-// 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
-// 		m_OBB2AtMouse.SetOrientationDegrees( orientationIncremented );
-// 	}
+	if( plusKey.IsPressed() )
+	{
+		float gravity = m_physics->GetSceneGravity();
+		gravity += 10.f * deltaSeconds;
+		m_physics->SetSceneGravity( gravity );
+	}
+
+	if( minusKey.IsPressed() )
+	{
+		float gravity = m_physics->GetSceneGravity();
+		gravity -= 10.f * deltaSeconds;
+		m_physics->SetSceneGravity( gravity );
+	}
 
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
