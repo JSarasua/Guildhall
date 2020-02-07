@@ -387,6 +387,8 @@ void Game::GrabDiscIfOverlap()
 		Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
 		if( collider->Contains( m_mousePositionOnMainCamera ) )
 		{
+			m_gameObjects[gameObjectIndex]->m_rigidbody->DisableRigidbody();
+
 			Vec2 colliderPos = m_gameObjects[gameObjectIndex]->m_rigidbody->GetPosition();
 			m_draggingGameObject = m_gameObjects[gameObjectIndex];
 			m_draggingOffset = colliderPos - m_mousePositionOnMainCamera;
@@ -400,6 +402,8 @@ void Game::ReleaseDisc()
 {
 	if( nullptr != m_draggingGameObject )
 	{
+		m_draggingGameObject->m_rigidbody->EnableRigidbody();
+
 		m_draggingGameObject->m_borderColor = Rgba8::BLUE;
 		m_draggingGameObject = nullptr;
 		m_draggingOffset = Vec2( 0.f, 0.f );
