@@ -28,6 +28,11 @@ bool Polygon2D::IsValid() const
 
 bool Polygon2D::IsConvex() const
 {
+	if( !IsValid() )
+	{
+		return false;
+	}
+
 	size_t edgeCount = GetEdgeCount();
 	for( size_t edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++ )
 	{
