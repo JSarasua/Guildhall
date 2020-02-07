@@ -145,6 +145,25 @@ void Game::UpdateDebugMouse()
 
 void Game::RenderDebugMouse() const
 {
+	if( !m_polygonPoints.empty() )
+	{
+		std::vector<Vec2> polyPoints;
+		polyPoints = m_polygonPoints;
+		polyPoints.push_back( m_mousePositionOnMainCamera );
+		Polygon2D poly( polyPoints );
+		
+		if( poly.IsConvex() )
+		{
+			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::BLUE, 1.f );
+		}
+		else
+		{
+			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::RED, 1.f );
+		}
+
+
+	}
+
 	//m_mouseGameObject->DebugRender(g_theRenderer, Rgba8::BLUE, Rgba8(255,255,255,128) );
 
 }
