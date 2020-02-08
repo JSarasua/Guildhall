@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/vec2.hpp"
+#include "Engine/Math/AABB2.hpp"
 #include <vector>
 
 class Polygon2D
@@ -26,6 +27,8 @@ public:
 	size_t GetTriangleCount() const;	//Gets number of triangles polygon is made of
 
 	void Translate( Vec2 const& translator );
+
+	AABB2 GetTightlyFixBox() const;
 
 public:
 	static Polygon2D MakeFromLineLoop( Vec2 const* points, unsigned int pointCount );

@@ -209,6 +209,20 @@ void Polygon2D::Translate( Vec2 const& translator )
 	}
 }
 
+AABB2 Polygon2D::GetTightlyFixBox() const
+{
+	AABB2 box(m_points[0], m_points[0] );
+
+	
+	for( size_t vertexIndex = 0; vertexIndex < m_points.size(); vertexIndex++ )
+	{
+		box.StretchToIncludePoint( m_points[vertexIndex] );
+
+	}
+
+	return box;
+}
+
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points, unsigned int pointCount )
 {
 	return Polygon2D( points, pointCount );
