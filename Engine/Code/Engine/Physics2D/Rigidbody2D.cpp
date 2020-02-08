@@ -5,16 +5,20 @@
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
-	m_worldPosition += m_velocity * deltaSeconds;
-	if( nullptr != m_collider )
+	if( m_simulationMode != STATIC )
 	{
-		m_collider->UpdateWorldShape();
+		m_worldPosition += m_velocity * deltaSeconds;
+		if( nullptr != m_collider )
+		{
+			m_collider->UpdateWorldShape();
+		}
 	}
+
 }
 
 void Rigidbody2D::AddForce( float deltaSeconds, Vec2 const& forceValue )
 {
-	if( m_isEnabled )
+	if( m_isEnabled && m_simulationMode == DYNAMIC )
 	{
 		m_velocity += forceValue * deltaSeconds;
 	}
@@ -40,6 +44,21 @@ void Rigidbody2D::SetPosition( Vec2 const& position )
 {
 	m_worldPosition = position;
 	m_collider->UpdateWorldShape();
+}
+
+void Rigidbody2D::SetVelocity( Vec2 const& newVelocity )
+{
+	m_velocity = newVelocity;
+}
+
+void Rigidbody2D::SetSimulationMode( eSimulationMode simulationMode )
+{
+	m_simulationMode = simulationMode;
+}
+
+Vec2 Rigidbody2D::GetVelocity()
+{
+	return m_velocity;
 }
 
 Vec2 Rigidbody2D::GetPosition()
