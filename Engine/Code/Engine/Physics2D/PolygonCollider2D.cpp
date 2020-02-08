@@ -10,7 +10,7 @@ PolygonCollider2D::PolygonCollider2D( Vec2 const& localPosition, Vec2 const& wor
 	m_worldPosition(worldPosition),
 	m_polygon(polygon)
 {
-
+	GUARANTEE_OR_DIE(m_polygon.IsConvex(), "Polygon is not convex");
 }
 
 void PolygonCollider2D::UpdateWorldShape()
@@ -55,8 +55,41 @@ bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 	}
 }
 
+bool PolygonCollider2D::IsCollidingWithWall( LineSegment2 const& wall ) const
+{
+	if( DoPolygonAndLineSegementOverlap2D( m_polygon, wall ) )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+eOffScreenDirection PolygonCollider2D::IsOffScreen( AABB2 const& bounds ) const
+{
+	AABB2 polyBounds = GetBounds();
+
+	if( DoAABBsOverlap2D( polyBounds, bounds ) )
+	{
+		return ONSCREEN;
+	}
+	else if( polyBounds.maxs.x < bounds.mins.x )
+	{
+		return LEFTOFSCREEN;
+	}
+	else
+	{
+		return RIGHTOFSCREEN;
+	}
+}
+
 void PolygonCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness )
 {
 	context->DrawPolygon2D( m_polygon, fillColor, borderColor, thickness );
+}
+
+AABB2 PolygonCollider2D::GetBounds() const
+{
+	return m_polygon.GetTightlyFixBox();
 }
 
