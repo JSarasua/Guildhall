@@ -9,6 +9,7 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 
+#include <queue>
 #include <vector>
 
 
@@ -33,7 +34,8 @@ public:
 private:
 	void CheckCollisions();
 	void UpdateGameObjects( float deltaSeconds );
-	void UpdateDebugMouse();
+	void UpdateDebugMouse(float deltaSeconds );
+	void UpdateCameraBounds();
 
 	void RenderDebugMouse() const;
 	void RenderUI() const;
@@ -45,6 +47,8 @@ private:
 	void GrabDiscIfOverlap();
 	void ReleaseDisc();
 	int GetGameObjectIndex( GameObject* gameObject );
+	void CheckBorderCollisions();
+	void SetCurrentMouseVelocity();
 private:
 	Camera* m_UICamera;
 	Camera* m_camera;
@@ -62,6 +66,17 @@ private:
 	Vec2 m_draggingOffset;
 	std::vector<GameObject*> m_gameObjects;
 	std::vector<Vec2> m_polygonPoints;
+
+	Vec2 m_currentMouseVelocity;
+	Vec2 m_mouseLastPosition;
+	std::vector<Vec2> m_mouseDeltaPositions;
+	std::vector<float> m_mouseDeltaTime;
+	size_t m_mouseDeltaIndex = 0;
+
 	bool m_isPolyValid = false;
 	bool m_isPolyDrawing = false;
+
+	LineSegment2 m_leftCameraBound;
+	LineSegment2 m_rightCameraBound;
+	LineSegment2 m_bottomCameraBound;
 };

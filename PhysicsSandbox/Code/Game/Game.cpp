@@ -40,6 +40,9 @@ void Game::Startup()
 	m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
 	m_defaultCameraHeight = m_camera->m_outputSize.y;
 	m_camera->SetPosition( Vec2(0.f,0.f) );
+
+	m_mouseDeltaPositions.resize( 5 );
+	m_mouseDeltaTime.resize( 5 );
 	
 	//g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 }
@@ -50,10 +53,14 @@ void Game::RunFrame(){}
 
 void Game::Update( float deltaSeconds )
 {
+	UpdateCameraBounds();
 	m_physics->Update( deltaSeconds );
-	UpdateDebugMouse();
+	UpdateDebugMouse( deltaSeconds );
+	CheckBorderCollisions();
 	UpdateGameObjects(deltaSeconds);
 	CheckButtonPresses( deltaSeconds );
+
+	m_mouseLastPosition = m_mousePositionOnMainCamera;
 }
 
 void Game::Render()
@@ -139,12 +146,11 @@ void Game::UpdateGameObjects( float deltaSeconds )
 		Vec2 bottomLeft = m_camera->GetOrthoBottomLeft();
 		Vec2 bottomRight = Vec2(m_camera->GetOrthoTopRight().x, m_camera->GetOrthoBottomLeft().y);
 		LineSegment2 bottomCameraLine( bottomLeft, bottomRight );
-
 	}
 
 }
 
-void Game::UpdateDebugMouse()
+void Game::UpdateDebugMouse( float deltaSeconds )
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedPos();
 	m_mousePositionOnMainCamera = m_camera->GetClientToWorldPosition(mouseNormalizedPos);
@@ -169,6 +175,20 @@ void Game::UpdateDebugMouse()
 	{
 		m_isPolyValid = false;
 	}
+
+	Vec2 mouseDeltaPosition = m_mousePositionOnMainCamera - m_mouseLastPosition;
+	m_mouseDeltaPositions[m_mouseDeltaIndex] = mouseDeltaPosition;
+	m_mouseDeltaTime[m_mouseDeltaIndex] = deltaSeconds;
+
+	m_mouseDeltaIndex++;
+	if( m_mouseDeltaIndex >= m_mouseDeltaPositions.size() )
+	{
+		m_mouseDeltaIndex = 0;
+	}
+
+	SetCurrentMouseVelocity();
+
+	
 }
 
 void Game::RenderDebugMouse() const
@@ -196,6 +216,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates('1');
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates('2');
+	const KeyButtonState& num3Key = g_theInput->GetKeyStates('3');
 
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
@@ -259,23 +280,52 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.WasJustPressed() )
 	{
-		Rigidbody2D* rb = m_physics->CreateRigidBody();
-		float randNum = m_rand.RollRandomFloatInRange(5.f, 15.f);
-		DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
-		rb->TakeCollider( dc );
-		rb->SetPosition(m_mousePositionOnMainCamera);
-		GameObject* gameObject = new GameObject( rb );
+		if( nullptr == m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_physics->CreateRigidBody();
+			float randNum = m_rand.RollRandomFloatInRange( 5.f, 15.f );
+			DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
+			rb->TakeCollider( dc );
+			rb->SetPosition( m_mousePositionOnMainCamera );
+			GameObject* gameObject = new GameObject( rb );
 
-		m_gameObjects.push_back( gameObject );
+			m_gameObjects.push_back( gameObject );
+		}
+		else
+		{
+			m_draggingGameObject->m_rigidbody->SetSimulationMode( STATIC );
+		}
+
 	}
 
 	if( num2Key.WasJustPressed() )
 	{
-		if( m_isPolyValid && !m_isPolyDrawing )
+		if( nullptr == m_draggingGameObject )
 		{
-			m_polygonPoints.push_back( m_mousePositionOnMainCamera );
-			m_isPolyDrawing = true;
+			if( m_isPolyValid && !m_isPolyDrawing )
+			{
+				m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+				m_isPolyDrawing = true;
+			}
 		}
+		else
+		{
+			m_draggingGameObject->m_rigidbody->SetSimulationMode( KINEMATIC );
+		}
+
+	}
+
+	if( num3Key.WasJustPressed() )
+	{
+		if( nullptr == m_draggingGameObject )
+		{
+
+		}
+		else
+		{
+			m_draggingGameObject->m_rigidbody->SetSimulationMode( DYNAMIC );
+		}
+
 	}
 
 	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
@@ -392,7 +442,7 @@ void Game::ReleaseDisc()
 	if( nullptr != m_draggingGameObject )
 	{
 		m_draggingGameObject->m_rigidbody->EnableRigidbody();
-
+		m_draggingGameObject->m_rigidbody->SetVelocity(m_currentMouseVelocity);
 		m_draggingGameObject->m_borderColor = Rgba8::BLUE;
 		m_draggingGameObject = nullptr;
 		m_draggingOffset = Vec2( 0.f, 0.f );
@@ -411,4 +461,82 @@ int Game::GetGameObjectIndex( GameObject* gameObject )
 	}
 
 	return -1;
+}
+
+void Game::CheckBorderCollisions()
+{
+	AABB2 cameraBounds( m_camera->GetOrthoBottomLeft(), m_camera->GetOrthoTopRight() );
+	Vec2 cameraIRange = Vec2( cameraBounds.maxs.x - cameraBounds.mins.x, 0.f );
+
+	for( size_t objectIndex = 0; objectIndex < m_gameObjects.size(); objectIndex++ )
+	{
+		GameObject& gameObject = *m_gameObjects[objectIndex];
+		Rigidbody2D& rigidbody = *gameObject.m_rigidbody;
+		Collider2D& collider = *rigidbody.m_collider;
+		if( nullptr == &gameObject )
+		{
+			continue;
+		}
+
+		Vec2 velocity = rigidbody.GetVelocity();
+
+		if( collider.IsCollidingWithWall( m_bottomCameraBound ) )
+		{
+
+			velocity = Vec2( velocity.x, absFloat(velocity.y ) );
+			rigidbody.SetVelocity( velocity );
+		}
+
+		eOffScreenDirection direction = gameObject.m_rigidbody->m_collider->IsOffScreen( cameraBounds );
+		Vec2 currentPosition = rigidbody.GetPosition();
+		AABB2 currentColliderBounds = collider.GetBounds();
+		Vec2 colliderIRange = Vec2( currentColliderBounds.maxs.x - currentColliderBounds.mins.x, 0.f );
+		Vec2 offset = cameraIRange + colliderIRange;
+
+		if( direction == LEFTOFSCREEN && velocity.x <= 0.f )
+		{
+			rigidbody.SetPosition( currentPosition + offset );
+		}
+		else if( direction == RIGHTOFSCREEN && velocity.x >= 0.f )
+		{
+			rigidbody.SetPosition( currentPosition - offset );
+		}
+	}
+}
+
+void Game::SetCurrentMouseVelocity()
+{
+	Vec2 sumOfDeltaPositions;
+	float sumOfDeltaTime = 0.f;
+	for( size_t deltaIndex = 0; deltaIndex < m_mouseDeltaPositions.size(); deltaIndex++ )
+	{
+		sumOfDeltaPositions += m_mouseDeltaPositions[deltaIndex];
+		sumOfDeltaTime += m_mouseDeltaTime[deltaIndex];
+	}
+
+	if( sumOfDeltaTime == 0.f )
+	{
+		m_currentMouseVelocity = Vec2(0.f, 0.f);
+	}
+	else
+	{
+		m_currentMouseVelocity = sumOfDeltaPositions/sumOfDeltaTime;
+	}
+}
+
+void Game::UpdateCameraBounds()
+{
+	Vec2 bLeft = m_camera->GetOrthoBottomLeft();
+	Vec2 tRight = m_camera->GetOrthoTopRight();
+	Vec2 bRight( tRight.x, bLeft.y );
+	Vec2 tLeft( bLeft.x, tRight.y );
+
+	m_leftCameraBound.startPosition = bLeft;
+	m_leftCameraBound.endPosition = tLeft;
+
+	m_rightCameraBound.startPosition = bRight;
+	m_rightCameraBound.endPosition = tRight;
+
+	m_bottomCameraBound.startPosition = bLeft;
+	m_bottomCameraBound.endPosition = bRight;
 }
