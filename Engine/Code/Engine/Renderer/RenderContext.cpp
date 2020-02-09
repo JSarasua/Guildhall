@@ -316,6 +316,8 @@ void RenderContext::DrawDisc( Vec2 const& center, float radius, Rgba8 const& fil
 		vertexArray.push_back( Vertex_PCU( Vec3( firstVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
 		vertexArray.push_back( Vertex_PCU( Vec3( secondVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
 	}
+	
+	BindTexture( nullptr );
 	DrawVertexArray(vertexArray);
 	DrawRing( center, radius, borderColor, thickness );
 }
@@ -405,6 +407,7 @@ void RenderContext::DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillCo
 		vertexes.push_back(vertexC);
 	}
 
+	BindTexture( nullptr );
 	DrawVertexArray(vertexes);
 
 	for( size_t edgeIndex = 0; edgeIndex < polygon.GetEdgeCount(); edgeIndex++ )
