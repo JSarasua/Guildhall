@@ -41,6 +41,10 @@ void Game::Startup()
 	m_defaultCameraHeight = m_camera->m_outputSize.y;
 	m_camera->SetPosition( Vec2(0.f,0.f) );
 
+	m_UICamera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
+	m_defaultCameraHeight = m_UICamera->m_outputSize.y;
+	m_UICamera->SetPosition( Vec2( 0.f, 0.f ) );
+
 	m_mouseDeltaPositions.resize( 5 );
 	m_mouseDeltaTime.resize( 5 );
 	
@@ -72,9 +76,9 @@ void Game::Render()
 	g_theRenderer->EndCamera( *m_camera );
 
 
-// 	g_theRenderer->BeginCamera( m_UICamera );
-// 	RenderUI();
-// 	g_theRenderer->EndCamera( m_UICamera );
+	g_theRenderer->BeginCamera( *m_UICamera );
+	RenderUI();
+	g_theRenderer->EndCamera( *m_UICamera );
 
 }
 
@@ -208,6 +212,10 @@ void Game::RenderDebugMouse() const
 
 void Game::RenderUI() const
 {
+	std::string gravityUIString = Stringf("Gravity: %f",m_physics->GetSceneGravity());
+
+	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(60.f, 43.f) , 1.f);
+	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(60.f, 42.f) , 1.f);
 }
 
 void Game::CheckButtonPresses(float deltaSeconds)
@@ -325,7 +333,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			m_draggingGameObject->m_rigidbody->SetSimulationMode( DYNAMIC );
 		}
-
 	}
 
 	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
@@ -346,7 +353,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		GrabDiscIfOverlap();
 
-		if( m_isPolyDrawing )
+		if( m_isPolyDrawing && m_isPolyValid )
 		{
 			m_polygonPoints.push_back( m_mousePositionOnMainCamera );
 		}
@@ -360,7 +367,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( rightMouseButton.WasJustPressed() )
 	{
 		Polygon2D newPoly(m_polygonPoints);
-		if( newPoly.IsValid() )
+		if( newPoly.IsValid() && newPoly.IsConvex() )
 		{
 			Vec2 worldCenter = newPoly.GetCenterOfMass();
 			Rigidbody2D* rb = m_physics->CreateRigidBody();
@@ -471,12 +478,12 @@ void Game::CheckBorderCollisions()
 	for( size_t objectIndex = 0; objectIndex < m_gameObjects.size(); objectIndex++ )
 	{
 		GameObject& gameObject = *m_gameObjects[objectIndex];
-		Rigidbody2D& rigidbody = *gameObject.m_rigidbody;
-		Collider2D& collider = *rigidbody.m_collider;
 		if( nullptr == &gameObject )
 		{
 			continue;
 		}
+		Rigidbody2D& rigidbody = *gameObject.m_rigidbody;
+		Collider2D& collider = *rigidbody.m_collider;
 
 		Vec2 velocity = rigidbody.GetVelocity();
 
