@@ -144,7 +144,7 @@ Vec2 Polygon2D::GetCenterOfMass() const
 	{
 		center += m_points[vertexIndex];
 	}
-	center *= 0.5f;
+	center /= m_points.size();
 	return center;
 }
 
