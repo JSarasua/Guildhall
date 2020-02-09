@@ -5,12 +5,15 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Math/FloatRange.hpp"
+#include "Engine/Physics2D/PolygonCollider2D.hpp"
 
 DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius ) 
 	: m_localPosition(localPosition),
 	m_worldPosition(worldPosition),
 	m_radius(radius)
-{}
+{
+	m_type = COLLIDER2D_DISC;
+}
 
 void DiscCollider2D::UpdateWorldShape()
 {
@@ -50,13 +53,22 @@ bool DiscCollider2D::Intersects( Collider2D const* other ) const
 
 	switch( other->m_type )
 	{
-	case COLLIDER2D_DISC:
-		//DiscCollider2D const* otherDisc = (DiscCollider2D const*)other;
-		return DoDiscsOverlap( m_worldPosition, m_radius, ((DiscCollider2D const*)other)->m_worldPosition, ((DiscCollider2D const*)other)->m_radius );
-		break;
-	default:
-		ERROR_AND_DIE("Invalid Collider Type");
-		break;
+		case COLLIDER2D_DISC:
+		{
+			//DiscCollider2D const* otherDisc = (DiscCollider2D const*)other;
+			return DoDiscsOverlap( m_worldPosition, m_radius, ((DiscCollider2D const*)other)->m_worldPosition, ((DiscCollider2D const*)other)->m_radius );
+			break;
+		}
+		case COLLIDER2D_POLYGON:
+		{
+			PolygonCollider2D const* polyCollider = ((PolygonCollider2D const*)other);
+			return DoPolygonAndDiscOverlap2D( polyCollider->GetPolygon(), m_worldPosition, m_radius );
+			break;
+		}
+
+		default:
+			ERROR_AND_DIE("Invalid Collider Type");
+			break;
 	}
 }
 

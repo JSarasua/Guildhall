@@ -10,6 +10,8 @@ PolygonCollider2D::PolygonCollider2D( Vec2 const& localPosition, Vec2 const& wor
 	m_worldPosition(worldPosition),
 	m_polygon(polygon)
 {
+	m_type = COLLIDER2D_POLYGON;
+
 	GUARANTEE_OR_DIE(m_polygon.IsConvex(), "Polygon is not convex");
 }
 
@@ -48,6 +50,9 @@ bool PolygonCollider2D::Intersects( Collider2D const* other ) const
 	case COLLIDER2D_DISC:
 		//DiscCollider2D const* otherDisc = (DiscCollider2D const*)other;
 		return DoPolygonAndDiscOverlap2D( m_polygon, ((DiscCollider2D const*)other)->m_worldPosition, ((DiscCollider2D const*)other)->m_radius );
+		break;
+	case COLLIDER2D_POLYGON:
+		return false;
 		break;
 	default:
 		ERROR_AND_DIE( "Invalid Collider Type" );
@@ -91,5 +96,10 @@ void PolygonCollider2D::DebugRender( RenderContext* context, Rgba8 const& border
 AABB2 PolygonCollider2D::GetBounds() const
 {
 	return m_polygon.GetTightlyFixBox();
+}
+
+Polygon2D PolygonCollider2D::GetPolygon() const
+{
+	return m_polygon;
 }
 

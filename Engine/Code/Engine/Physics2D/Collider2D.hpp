@@ -17,7 +17,8 @@ enum eOffScreenDirection
 
 enum Collider2DType
 {
-	COLLIDER2D_DISC
+	COLLIDER2D_DISC,
+	COLLIDER2D_POLYGON
 };
 
 class Collider2D
