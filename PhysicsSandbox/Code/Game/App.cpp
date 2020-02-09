@@ -27,6 +27,7 @@ void App::Startup()
 {
 	g_theInput->Startup();
 	g_theRenderer->StartUp();
+	g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 	m_game->Startup();
 }
 
