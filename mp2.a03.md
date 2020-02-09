@@ -1,14 +1,14 @@
 ## Checklist
 I may mark tasks as **CHALLENGE** if I believe them to be more difficult relative to the rest of the assignment.  This is just to hint to you that you may want to save those tasks for the end if you have time, or skip altogether if not.  
 
-- [-] *25pts*: Add a `PolygonCollider2D`
+- [x] *25pts*: Add a `PolygonCollider2D`
     - [x] *05pts*: Can construct from counter-clockwise list of points
         - [x] `GUARANTEE_OR_DIE` points represent a convex polygon
     - [ ] **CHALLENGE** - Can construct from a point cloud (gift wrapping algorithm)
     - [x] *05pts*: Implmeent `Contains`
     - [x] *05pts*: Implement `GetClosestPoint`
-    - [-] *05pts*: Implement `Intersects`, but only vs disc, return `false` if intersecting with another polygon for now.
-        - [-] Be sure disc now checks against both discs and polygons useing `GetType`
+    - [x] *05pts*: Implement `Intersects`, but only vs disc, return `false` if intersecting with another polygon for now.
+        - [x] Be sure disc now checks against both discs and polygons useing `GetType`
     - [x] *05pts*: Can render it - should work as before.
 - [x] *25pts*: Can construct `GameObject` with a `PolygonCollider`
     - [x] Press `2` to enter a polygon draw mode, place first point where cursor is when `2` was pressed
@@ -26,7 +26,7 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [ ] *If you did the giftwrapping algorithm, you can just add points and construct a polygon that would work for them*
 - [x] *05pts*: `Rigidbody2D` can `Enable` or `Disable` itself, taking it out of the simulation, but still rendering
     - [x] Objects being dragged should set themselves to disabled, and re-enable when unselected.
-- [-] *05pts*: When drawing, draw the location of the `Rigidbody` as an `X`, red if disabled, blue if enabled. 
+- [x] *05pts*: When drawing, draw the location of the `Rigidbody` as an `X`, red if disabled, blue if enabled. 
 - [x] *10pts*: `Physics2D::Update` loop implemented
     - [x] Apply all global forces
     - [x] Simulate all rigidbodies
@@ -38,10 +38,10 @@ I may mark tasks as **CHALLENGE** if I believe them to be more difficult relativ
     - [x] `KINEMATIC` objects do not apply forces, but will simulate.  
     - [x] `DYNAMIC` objects apply forces and simulate
     - [x] While selected, `1`, `2`, and `3` should switch the object to `STATIC`, `KINEMATIC`, or `DYNAMIC` respectively
-- [-] *05pts*: `Physics2D::SetSceneGravity` implemented
+- [x] *05pts*: `Physics2D::SetSceneGravity` implemented
     - [x] Applies a flat acceleration force to every dynamic rigidbody in the scene beginning of frame. 
     - [x] Use `+` and `-` keys to adjust gravity amount
-    - [-] Current gravity should be visible on the screen (hotkey hint here is nice)
+    - [x] Current gravity should be visible on the screen (hotkey hint here is nice)
 - [x] *05pts*: Objects that fully fall off the sides of the screen should appear on the opposite side, maintaining velocity
 - [x] *05pts*: Implement `Rigidbody2D::GetVelocity`
     - [x] Objects that falling off the bottom of the screen, reverse its velocity along Y (bounce it)
