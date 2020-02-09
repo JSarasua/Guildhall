@@ -350,6 +350,11 @@ bool DoAABBsOverlap2D( const AABB2& aabbA, const AABB2& aabbB ) //Slower than ch
 	float maxOfMinsY = Max( aabbA.mins.y, aabbB.mins.y );
 	float minOfMaxsY = Min( aabbA.maxs.y, aabbB.maxs.y );
 
+	if( aabbA.IsPointInside( aabbB.mins ) || aabbB.IsPointInside( aabbA.mins ) )
+	{
+		return true;
+	}
+
 	if( maxOfMinsX < minOfMaxsX && maxOfMinsY < minOfMaxsY )
 	{
 		return true;
