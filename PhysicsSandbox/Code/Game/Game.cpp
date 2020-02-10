@@ -212,7 +212,7 @@ void Game::RenderDebugMouse() const
 
 void Game::RenderUI() const
 {
-	std::string gravityUIString = Stringf("Gravity: %f",m_physics->GetSceneGravity());
+	std::string gravityUIString = Stringf("Gravity: %.2f",m_physics->GetSceneGravity());
 
 	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(60.f, 43.f) , 1.f);
 	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(60.f, 42.f) , 1.f);
