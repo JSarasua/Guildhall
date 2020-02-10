@@ -2,6 +2,7 @@
 #include "Engine/Math/Vec2.hpp"
 
 class Texture;
+class RenderBuffer;
 struct Rgba8;
 
 enum eCameraClearBitFlag : unsigned int
@@ -11,12 +12,18 @@ enum eCameraClearBitFlag : unsigned int
 	CLEAR_STENCIL_BIT		= (1 << 2 ),
 };
 
+struct CameraData
+{
+	Vec2 mins;
+	Vec2 maxs;
+};
+
 
 class Camera
 {
 public:
 	Camera() {}
-	~Camera() {}
+	~Camera();
 
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2&topRight );
 	Vec2 GetOrthoBottomLeft() const;
@@ -29,6 +36,8 @@ public:
 public:
 	Rgba8 m_clearColor;
 	unsigned int m_clearMode = 0;
+
+	RenderBuffer* m_cameraUBO = nullptr;
 
 private:
 	Vec2 bLeft;

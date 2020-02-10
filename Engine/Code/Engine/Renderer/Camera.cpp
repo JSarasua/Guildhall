@@ -2,9 +2,16 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
 
 
 
+
+Camera::~Camera()
+{
+	delete m_cameraUBO;
+	m_cameraUBO = nullptr;
+}
 
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {

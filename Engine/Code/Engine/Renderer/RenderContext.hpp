@@ -20,6 +20,15 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 
+
+struct FrameData
+{
+	float systemTime;
+	float systemDeltaTime;
+
+	float padding[2];
+};
+
 enum class Viewport
 {
 	TopLeft,
@@ -35,6 +44,12 @@ enum class BlendMode
 	ADDITIVE
 };
 
+enum class eBufferSlot
+{
+	UBO_FRAME_SLOT = 0,
+	UBO_CAMERA_SLOT = 1
+};
+
 #undef DrawText
 class RenderContext
 {
@@ -45,8 +60,10 @@ public:
 	void EndFrame();
 	void Shutdown();
 
+	void UpdateFrameTime( float deltaSeconds );
+
 	void ClearScreen( const Rgba8& clearColor );
-	void BeginCamera( const Camera& camera );
+	void BeginCamera( Camera& camera );
 	void BeginCamera( const Camera& camera, Viewport viewPort );
 	void EndCamera( const Camera& camera );
 
@@ -61,6 +78,8 @@ public:
 	void BindShader( Shader* shader );
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
+
+	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
 	Shader*		GetOrCreateShader( char const* filename );
@@ -100,5 +119,9 @@ public:
 	std::vector<Shader*> m_shaders;
 	VertexBuffer* m_immediateVBO;
 	ID3D11Buffer* m_lastVBOHandle = nullptr;
+
+	RenderBuffer* m_frameUBO = nullptr;
 };
+
+
 

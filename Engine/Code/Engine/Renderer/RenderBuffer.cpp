@@ -97,6 +97,11 @@ bool RenderBuffer::Update( void const* data, size_t dataByteSize, size_t element
 	return true;
 }
 
+ID3D11Buffer* RenderBuffer::GetHandle()
+{
+	return m_handle;
+}
+
 UINT ToDXUsage( eRenderBufferUsage usage )
 {
 	UINT ret = 0;

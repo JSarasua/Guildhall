@@ -36,6 +36,8 @@ public:
 	//dataByteSize = totalBufferByteSize
 	bool Update( void const* data, size_t dataByteSize, size_t elementByteSize );
 
+	ID3D11Buffer* GetHandle();
+
 private:
 	bool Create( size_t dataByteSize, size_t elementByteSize );
 	bool IsCompatible( size_t dataByteSize, size_t elementByteSize ) const;

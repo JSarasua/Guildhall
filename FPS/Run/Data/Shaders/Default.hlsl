@@ -21,6 +21,18 @@ struct vs_input_t
 	float2 uv            : TEXCOORD; 
 }; 
 
+static float SHIFT = 0.75f;
+cbuffer time_constants : register(b0)	//Index 0 is time
+{
+	float SYSTEM_TIME_SECONDS;
+	float SYSTEM_TIME_DELTA_SECONDS;
+};
+
+cbuffer camera_constants : register(b1)
+{
+	float2 orthoMin;
+	float2 orthoMax;
+};
 
 //--------------------------------------------------------------------------------------
 // Programmable Shader Stages
@@ -35,6 +47,13 @@ struct v2f_t
 	float2 uv : UV; 
 }; 
 
+float RangeMap( float val, float inMin, float inMax, float outMin, float outMax )
+{
+	float inRange = inMax - inMin;
+	float outRange = outMax - outMin;
+	return ((val - inMin) / inRange) * outRange + outMin;
+}
+
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 v2f_t VertexFunction( vs_input_t input )
@@ -45,6 +64,21 @@ v2f_t VertexFunction( vs_input_t input )
 	v2f.position = float4( input.position, 1.0f ); 
 	v2f.color = input.color; 
 	v2f.uv = input.uv; 
+
+	float4 worldPos = float4( input.position, 1);
+
+	worldPos.x += 6.f * cos(SYSTEM_TIME_SECONDS * 2.f);
+	worldPos.y += 12.f * sin(SYSTEM_TIME_SECONDS * 2.f);
+	worldPos.z += 0.5f * sin(SYSTEM_TIME_SECONDS);
+
+	float4 clipPos = worldPos;	// might have a w (usually 1 for now)
+	clipPos.x = RangeMap( worldPos.x, orthoMin.x, orthoMax.x, -1.f, 1.f );
+	clipPos.y = RangeMap( worldPos.y, orthoMin.y, orthoMax.y, -1.f, 1.f );
+	clipPos.z = 0.f;
+	clipPos.w = sin(SYSTEM_TIME_SECONDS * 2.f) + 2;
+
+	clipPos.xyz /= clipPos.w;
+	v2f.position = clipPos;
 
 	return v2f;
 }
@@ -63,5 +97,11 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
 	float4 finalColor = uvAsColor * input.color; 
 
+	float r = (sin( input.uv.y * 40.f + 4.f * SYSTEM_TIME_SECONDS));
+	float g = (cos( input.uv.x * 40.f + 8.f * SYSTEM_TIME_SECONDS));
+	float b = (cos( input.uv.y * 40.f + 16.f * SYSTEM_TIME_SECONDS));
+	finalColor.r = r;
+	finalColor.g = g;
+	finalColor.b = b;
 	return finalColor; 
 }

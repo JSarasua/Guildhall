@@ -31,7 +31,6 @@ Game::~Game(){}
 void Game::Startup()
 {
 	m_camera = Camera();
-
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 }
@@ -62,8 +61,8 @@ void Game::Render()
 	g_theRenderer->BeginCamera(m_camera);
 	//g_theRenderer->Draw(3, 0);
 
-	g_theRenderer->DrawAABB2(AABB2(Vec2(-0.5f,-0.5f), Vec2( 0.5f, 0.5f )), Rgba8::RED, 0.1f);
-	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(-0.3f,-0.3f), Vec2( 0.3f, 0.3f )), Rgba8(255,255,0));
+	g_theRenderer->DrawAABB2(AABB2(Vec2(0.25f,2.5f), Vec2( 6.5f, 9.5f )), Rgba8::RED, 0.25f);
+	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(1.f,3.25f), Vec2( 5.75f, 8.75f )), Rgba8(255,255,0));
 	g_theRenderer->EndCamera(m_camera);
 }
 

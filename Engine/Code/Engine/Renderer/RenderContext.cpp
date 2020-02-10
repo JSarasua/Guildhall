@@ -9,6 +9,7 @@
 #include "Engine/Renderer/TextureView.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Core/Time.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
 
@@ -77,6 +78,10 @@ void RenderContext::StartUp(Window* window)
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
+
+	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+
+	
 }
 
 void RenderContext::BeginFrame()
@@ -114,6 +119,9 @@ void RenderContext::Shutdown()
 	delete m_immediateVBO;
 	m_swapchain = nullptr;
 
+	delete m_frameUBO;
+	m_frameUBO = nullptr;
+
 	DX_SAFE_RELEASE(m_device);
 	DX_SAFE_RELEASE(m_context);
 
@@ -125,6 +133,15 @@ void RenderContext::Shutdown()
 	m_Textures.clear();
 }
 
+
+void RenderContext::UpdateFrameTime( float deltaSeconds )
+{
+	FrameData framedata;
+	framedata.systemTime = GetCurrentTimeSeconds();
+	framedata.systemDeltaTime = deltaSeconds;
+
+	m_frameUBO->Update( &framedata, sizeof(framedata), sizeof(framedata) );
+}
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
@@ -223,6 +240,14 @@ void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 
 	m_context->IASetVertexBuffers( 0, 1, &vboHandle, &stride, &offset );
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+}
+
+void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
+{
+	ID3D11Buffer* uboHandle = ubo->GetHandle();
+
+	m_context->VSSetConstantBuffers( slot, 1, &uboHandle );
+	m_context->PSSetConstantBuffers( slot, 1, &uboHandle );
 }
 
 Texture* RenderContext::CreateTextureFromFile(const char* filePath)
@@ -378,7 +403,7 @@ bool RenderContext::IsDrawing() const
 	return m_isDrawing;
 }
 
-void RenderContext::BeginCamera( const Camera& camera )
+void RenderContext::BeginCamera( Camera& camera )
 {
 	#if defined(RENDER_DEBUG)
 		m_context->ClearState();		//Can be slow but helps to find bugs
@@ -432,27 +457,27 @@ void RenderContext::BeginCamera( const Camera& camera )
 	m_context->RSSetViewports( 1, &viewport );
 	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
 
-	//texture* output = cam.getcolortarget
-// 	if(output = NULL )
-// 		output = m_swapchain->getcolortarget();
-// }
-// 
-// 	if(cam.shouldclearcolor())
-// 	{
-// 
-// 	}
-
-	//UNIMPLEMENTED();
-
-
-// 	glLoadIdentity();
-// 	//glViewport(0,0,800,400);
-// 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
 	m_isDrawing = true;
 
 	BindShader( (Shader*)nullptr );
 
+	BindUniformBuffer( 0, m_frameUBO );
 
+
+	if( nullptr == camera.m_cameraUBO )
+	{
+		camera.m_cameraUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+	}
+
+	//CameraData
+	CameraData camData;
+	camData.mins = camera.GetOrthoBottomLeft();
+	camData.maxs = camera.GetOrthoTopRight();
+
+	camera.m_cameraUBO->Update( & camData, sizeof( camData ), sizeof( camData ) );
+
+
+	BindUniformBuffer( 1, camera.m_cameraUBO );
 }
 
 
