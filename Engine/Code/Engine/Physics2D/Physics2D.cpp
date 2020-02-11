@@ -12,16 +12,34 @@ void Physics2D::BeginFrame()
 
 void Physics2D::Update( float deltaSeconds )
 {
+	ApplyEffectors();
+	MoveRigidbodies( deltaSeconds );
+
+	CleanupDestroyedObjects();
+}
+
+void Physics2D::ApplyEffectors()
+{
 	for( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
 	{
+		Rigidbody2D* rb = m_rigidBodies[rigidBodyIndex];
+		
 		Vec2 gravity( 0.f, -1.f );
 		gravity *= m_gravity;
-		m_rigidBodies[rigidBodyIndex]->AddForce( deltaSeconds, gravity );
+		gravity *= rb->GetMass();
+		rb->AddForce( gravity );
+	}
+}
+
+void Physics2D::MoveRigidbodies( float deltaSeconds )
+{
+	for( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
+	{
 		m_rigidBodies[rigidBodyIndex]->Update( deltaSeconds );
 	}
 }
 
-void Physics2D::EndFrame()
+void Physics2D::CleanupDestroyedObjects()
 {
 	for( int colliderIndex = 0; colliderIndex < m_colliders.size(); colliderIndex++ )
 	{
@@ -42,6 +60,10 @@ void Physics2D::EndFrame()
 			m_rigidBodies[rigidBodyIndex] = nullptr;
 		}
 	}
+}
+
+void Physics2D::EndFrame()
+{
 }
 
 

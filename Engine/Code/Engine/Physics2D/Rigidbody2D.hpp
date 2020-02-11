@@ -19,7 +19,8 @@ class Rigidbody2D
 
 public:
 	void Update( float deltaSeconds );
-	void AddForce( float deltaSeconds, Vec2 const& forceValue );
+	void AddForce( Vec2 const& forceValue );
+	float GetMass() const;
 
 	void Destroy();
 	void TakeCollider( Collider2D* collider );
@@ -49,5 +50,7 @@ protected:
 	Vec2 m_worldPosition;
 	bool m_isEnabled = true;
 	Vec2 m_velocity;
+	float m_mass = 1.f;
+	Vec2 m_forcePerFrame = Vec2(0.f,0.f);
 	eSimulationMode m_simulationMode = DYNAMIC;
 };

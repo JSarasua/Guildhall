@@ -6,6 +6,13 @@
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
+	if( m_isEnabled && m_simulationMode == DYNAMIC )
+	{
+		Vec2 acceleration = m_forcePerFrame/m_mass;
+		m_velocity += acceleration * deltaSeconds;
+	}
+
+
 	if( m_simulationMode != STATIC )
 	{
 		m_worldPosition += m_velocity * deltaSeconds;
@@ -15,14 +22,17 @@ void Rigidbody2D::Update( float deltaSeconds )
 		}
 	}
 
+	m_forcePerFrame = Vec2(0.f, 0.f);
 }
 
-void Rigidbody2D::AddForce( float deltaSeconds, Vec2 const& forceValue )
+void Rigidbody2D::AddForce( Vec2 const& forceValue )
 {
-	if( m_isEnabled && m_simulationMode == DYNAMIC )
-	{
-		m_velocity += forceValue * deltaSeconds;
-	}
+	m_forcePerFrame += forceValue;
+}
+
+float Rigidbody2D::GetMass() const
+{
+	return m_mass;
 }
 
 void Rigidbody2D::Destroy()

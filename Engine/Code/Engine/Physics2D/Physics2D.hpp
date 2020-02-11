@@ -13,6 +13,9 @@ class Physics2D
 public:
 	void BeginFrame();
 	void Update( float deltaSeconds );
+	void ApplyEffectors();
+	void MoveRigidbodies( float deltaSeconds );
+	void CleanupDestroyedObjects();
 	void EndFrame();
 
 	//factory style create/destroy
