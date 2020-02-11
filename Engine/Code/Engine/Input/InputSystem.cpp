@@ -36,7 +36,10 @@ void InputSystem::EndFrame()
 	
 	for( int keyboardIndex = 0; keyboardIndex < NUM_KEYCODES; keyboardIndex++ )
 	{
-		m_keyStates[keyboardIndex].m_wasPressedLastFrame = m_keyStates[keyboardIndex].m_isPressed;
+		if( m_keyStates[keyboardIndex].m_wasPressedLastFrame != m_keyStates[keyboardIndex].m_isPressed )
+		{
+			m_keyStates[keyboardIndex].m_wasPressedLastFrame = m_keyStates[keyboardIndex].m_isPressed;
+		}
 	}
 	
 }

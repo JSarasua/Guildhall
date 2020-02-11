@@ -72,6 +72,34 @@ void DevConsole::Shutdown()
 
 }
 
+void DevConsole::HandleKeyStroke( unsigned char keyStroke )
+{
+	if( !m_isOpen )
+	{
+		return;
+	}
+
+	if( keyStroke == 0x0D )		// Enter Key
+	{
+		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
+		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
+		m_currentColoredLine.m_devConsolePrintString = std::string( "" );
+	}
+	else if( keyStroke == 0x08 ) //Backspace
+	{
+		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
+		{
+			m_currentColoredLine.m_devConsolePrintString.pop_back();
+		}
+	}
+	else
+	{
+		m_currentColoredLine.m_devConsolePrintString += (const char)keyStroke;
+	}
+
+
+}
+
 void DevConsole::PringString( const Rgba8& textColor, const std::string& devConsolePrintString )
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));

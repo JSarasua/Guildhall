@@ -54,6 +54,13 @@ void Game::Update( float deltaSeconds )
 	clearColor.b = (unsigned char)colorVal;
 
 	m_camera.SetClearMode( CLEAR_COLOR_BIT, clearColor, 0.f, 0 );
+
+	if( !g_theConsole->IsOpen() )
+	{
+		CheckButtonPresses( deltaSeconds );
+	}
+
+	//g_theConsole->Update(g_theInput);
 }
 
 void Game::Render()
@@ -94,9 +101,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const XboxController& controller = g_theInput->GetXboxController(0);
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
-
-
-
 }
 
 IntVec2 Game::GetCurrentMapBounds() const

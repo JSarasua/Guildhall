@@ -19,6 +19,7 @@ App::App()
 {
 	g_theInput = new InputSystem();
 	m_game = new Game();
+	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
 }
 
@@ -37,8 +38,9 @@ void App::Startup()
 	g_theRenderer->StartUp(g_theWindow);
 	
 	m_game->Startup();
-
+	g_theConsole->Startup();
 	g_theEventSystem->SubscribeToEvent("QUIT", QuitRequested);
+	g_theEventSystem->SubscribeToEvent("quit", QuitRequested);
 }
 
 void App::Shutdown()
@@ -49,6 +51,8 @@ void App::Shutdown()
 	delete g_theRenderer;
 	g_theInput->Shutdown();
 	delete g_theInput;
+	g_theConsole->Shutdown();
+	delete g_theConsole;
 }
 
 
@@ -59,10 +63,14 @@ void App::RunFrame()
 	m_deltaTime = Clampf( m_currentTime - m_previousTime, 0.f, 0.1f );
 
 
+
+
+
+	BeginFrame(); //For all engine systems (Not the game)
 	if( m_isPaused )
 	{
-		Update(NOTIME);
-	} 
+		Update( NOTIME );
+	}
 	else if( m_isSlowed )
 	{
 		Update( m_deltaTime * 0.1f );
@@ -73,11 +81,8 @@ void App::RunFrame()
 	}
 	else
 	{
-		Update(m_deltaTime);
+		Update( m_deltaTime );
 	}
-
-
-	BeginFrame(); //For all engine systems (Not the game)
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
 
@@ -134,9 +139,8 @@ void App::BeginFrame()
 {
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
-
-
 	g_theInput->BeginFrame();
+	g_theConsole->BeginFrame();
 }
 
 void App::Update(float deltaSeconds)
@@ -145,8 +149,6 @@ void App::Update(float deltaSeconds)
 	
 	CheckButtonPresses();
 	CheckController();
-
-
 
 	m_game->Update(deltaSeconds);
 
@@ -161,6 +163,7 @@ void App::Render()
 void App::EndFrame()
 {
 	g_theRenderer->EndFrame();
+	g_theConsole->EndFrame();
 	g_theInput->EndFrame();
 	g_theWindow->EndFrame();
 }
@@ -192,6 +195,13 @@ bool App::QuitRequested( const EventArgs* args )
 
 void App::CheckButtonPresses()
 {
+	const KeyButtonState& tildeKey = g_theInput->GetKeyStates( 0xC0 );	//tilde: ~
+	if( tildeKey.WasJustPressed() )
+	{
+		g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
+	}
+
+
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
 		g_theEventSystem->FireEvent("QUIT", nullptr);

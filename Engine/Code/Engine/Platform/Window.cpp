@@ -2,6 +2,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Platform/Window.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -31,7 +32,17 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 	case WM_KEYDOWN:
 	{
 		unsigned char asKey = (unsigned char)wParam;
-		window->m_input->HandleKeyDown( asKey );
+		if( g_theConsole->IsOpen() )
+		{
+			if( asKey == VK_OEM_3 || asKey == VK_ESCAPE ) // tilde ~ or ESC
+			{
+				window->m_input->HandleKeyDown( asKey );
+			}
+		}
+		else
+		{
+			window->m_input->HandleKeyDown( asKey );
+		}
 
 		break;
 	}
@@ -42,6 +53,11 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		unsigned char asKey = (unsigned char)wParam;
 		window->m_input->HandleKeyUp( asKey );
 		break;
+	}
+	case WM_CHAR:
+	{
+		unsigned char asKey = (unsigned char)wParam;
+		g_theConsole->HandleKeyStroke( asKey );
 	}
 	}
 
