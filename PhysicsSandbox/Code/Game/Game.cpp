@@ -243,6 +243,68 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( 0xBB ); //+
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( 0xBD ); //-
 
+
+	if( !m_isPolyDrawing )
+	{
+		if( wKey.IsPressed() )
+		{
+			Vec2 upVector = Vec2( 0.f, 10.f );
+			m_camera->Translate2D( upVector * deltaSeconds );
+		}
+
+		if( sKey.IsPressed() )
+		{
+			Vec2 downVector = Vec2( 0.f, -10.f );
+			m_camera->Translate2D( downVector * deltaSeconds );
+		}
+
+		if( aKey.IsPressed() )
+		{
+			Vec2 leftVector = Vec2( 10.f, 0.f );
+			m_camera->Translate2D( leftVector * deltaSeconds );
+		}
+
+		if( dKey.IsPressed() )
+		{
+			Vec2 rightVector = Vec2( -10.f, 0.f );
+			m_camera->Translate2D( rightVector * deltaSeconds );
+		}
+
+		if( oKey.WasJustPressed() )
+		{
+			m_camera->m_position = Vec2( 0.f, 0.f );
+			m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
+		}
+
+		if( plusKey.IsPressed() )
+		{
+			float gravity = m_physics->GetSceneGravity();
+			gravity += 10.f * deltaSeconds;
+			m_physics->SetSceneGravity( gravity );
+		}
+
+		if( minusKey.IsPressed() )
+		{
+			float gravity = m_physics->GetSceneGravity();
+			gravity -= 10.f * deltaSeconds;
+			m_physics->SetSceneGravity( gravity );
+		}
+
+		if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
+		{
+			if( m_draggingGameObject )
+			{
+				int gameObjectsIndex = GetGameObjectIndex( m_draggingGameObject );
+
+				delete m_draggingGameObject;
+
+				m_draggingGameObject = nullptr;
+				m_gameObjects[gameObjectsIndex] = nullptr;
+			}
+
+		}
+	}
+	
 	if( escKey.WasJustPressed() )
 	{
 		if( m_isPolyDrawing )
@@ -256,54 +318,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		}
 	}
 
-	if( wKey.IsPressed() )
-	{
-		Vec2 upVector = Vec2( 0.f, 10.f );
-		m_camera->Translate2D( upVector * deltaSeconds );
-	}
-
-	if( sKey.IsPressed() )
-	{
-		Vec2 downVector = Vec2( 0.f, -10.f );
-		m_camera->Translate2D( downVector * deltaSeconds );
-	}
-
-	if( aKey.IsPressed() )
-	{
-		Vec2 leftVector = Vec2( 10.f, 0.f );
-		m_camera->Translate2D( leftVector * deltaSeconds );
-	}
-
-	if( dKey.IsPressed() )
-	{
-		Vec2 rightVector = Vec2( -10.f, 0.f );
-		m_camera->Translate2D( rightVector * deltaSeconds );
-	}
-
-	if( oKey.WasJustPressed() )
-	{
-		m_camera->m_position = Vec2( 0.f, 0.f );
-		m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
-	}
-
 	if( num1Key.WasJustPressed() )
 	{
-		if( nullptr == m_draggingGameObject )
+		if( !m_isPolyDrawing )
 		{
-			Rigidbody2D* rb = m_physics->CreateRigidBody();
-			float randNum = m_rand.RollRandomFloatInRange( 5.f, 15.f );
-			DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
-			rb->TakeCollider( dc );
-			rb->SetPosition( m_mousePositionOnMainCamera );
-			GameObject* gameObject = new GameObject( rb );
+			if( nullptr == m_draggingGameObject )
+			{
+				Rigidbody2D* rb = m_physics->CreateRigidBody();
+				float randNum = m_rand.RollRandomFloatInRange( 5.f, 15.f );
+				DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
+				rb->TakeCollider( dc );
+				rb->SetPosition( m_mousePositionOnMainCamera );
+				GameObject* gameObject = new GameObject( rb );
 
-			m_gameObjects.push_back( gameObject );
+				m_gameObjects.push_back( gameObject );
+			}
+			else
+			{
+				m_draggingGameObject->m_rigidbody->SetSimulationMode( STATIC );
+			}
 		}
-		else
-		{
-			m_draggingGameObject->m_rigidbody->SetSimulationMode( STATIC );
-		}
-
 	}
 
 	if( num2Key.WasJustPressed() )
@@ -335,27 +369,17 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		}
 	}
 
-	if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
-	{
-		if( m_draggingGameObject )
-		{
-			int gameObjectsIndex = GetGameObjectIndex( m_draggingGameObject );
-
-			delete m_draggingGameObject;
-
-			m_draggingGameObject = nullptr;
-			m_gameObjects[gameObjectsIndex] = nullptr;
-		}
-
-	}
-
 	if( leftMouseButton.WasJustPressed() )
 	{
-		GrabDiscIfOverlap();
+
 
 		if( m_isPolyDrawing && m_isPolyValid )
 		{
 			m_polygonPoints.push_back( m_mousePositionOnMainCamera );
+		}
+		else
+		{
+			GrabDiscIfOverlap();
 		}
 	}
 
@@ -392,19 +416,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_camera->SetProjectionOrthographic(cameraHeight);
  	}
 
-	if( plusKey.IsPressed() )
-	{
-		float gravity = m_physics->GetSceneGravity();
-		gravity += 10.f * deltaSeconds;
-		m_physics->SetSceneGravity( gravity );
-	}
 
-	if( minusKey.IsPressed() )
-	{
-		float gravity = m_physics->GetSceneGravity();
-		gravity -= 10.f * deltaSeconds;
-		m_physics->SetSceneGravity( gravity );
-	}
 
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
