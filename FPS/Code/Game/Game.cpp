@@ -60,6 +60,32 @@ void Game::Update( float deltaSeconds )
 		CheckButtonPresses( deltaSeconds );
 	}
 
+	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+
+	Vec2 movement;
+
+	if( leftArrow.WasJustPressed() )
+	{
+		movement.x -= 1.f;
+	}
+	if( rightArrow.WasJustPressed() )
+	{
+		movement.x += 1.f;
+	}
+	if( upArrow.WasJustPressed() )
+	{
+		movement.y += 1.f;
+	}
+	if( downArrow.WasJustPressed() )
+	{
+		movement.y -= 1.f;
+	}
+
+	m_camera.Translate(Vec3(movement, 0.f));
+
 	//g_theConsole->Update(g_theInput);
 }
 
@@ -68,8 +94,8 @@ void Game::Render()
 	g_theRenderer->BeginCamera(m_camera);
 	//g_theRenderer->Draw(3, 0);
 
-	g_theRenderer->DrawAABB2(AABB2(Vec2(0.25f,2.5f), Vec2( 6.5f, 9.5f )), Rgba8::RED, 0.25f);
-	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(1.f,3.25f), Vec2( 5.75f, 8.75f )), Rgba8(255,255,0));
+	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::RED, 0.25f);
+	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 8.75f, 5.75f )), Rgba8(255,255,0));
 	g_theRenderer->EndCamera(m_camera);
 }
 

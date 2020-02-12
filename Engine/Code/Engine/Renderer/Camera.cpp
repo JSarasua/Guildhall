@@ -13,11 +13,27 @@ Camera::~Camera()
 	m_cameraUBO = nullptr;
 }
 
+void Camera::SetPosition( const Vec3& position )
+{
+	m_position = position;
+}
+
+void Camera::Translate( const Vec3& translation )
+{
+	m_position += translation;
+}
+
+Vec3 Camera::GetPosition()
+{
+	return m_position;
+}
+
 void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 {
 	bLeft = bottomLeft;
 	tRight = topRight;
 
+	m_projection = Mat44::CreateOrthographicProjection( Vec3( bottomLeft, 0.f), Vec3(topRight, 1.f));
 }
 
 Vec2 Camera::GetOrthoBottomLeft() const
@@ -28,6 +44,11 @@ Vec2 Camera::GetOrthoBottomLeft() const
 Vec2 Camera::GetOrthoTopRight() const
 {
 	return tRight;
+}
+
+Mat44 Camera::GetProjection() const
+{
+	return m_projection;
 }
 
 void Camera::SetColorTarget( Texture* texture )

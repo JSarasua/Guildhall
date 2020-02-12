@@ -30,8 +30,10 @@ cbuffer time_constants : register(b0)	//Index 0 is time
 
 cbuffer camera_constants : register(b1)
 {
-	float2 orthoMin;
-	float2 orthoMax;
+//	float2 orthoMin;
+//	float2 orthoMax;
+	float4x4 PROJECTION; // CAMERA_TO_CLIP_TRANSFORM in the model view projection
+	float4x4 VIEW;
 };
 
 //--------------------------------------------------------------------------------------
@@ -45,6 +47,7 @@ struct v2f_t
 	float4 position : SV_POSITION; 
 	float4 color : COLOR; 
 	float2 uv : UV; 
+	float3 worldPosition : WORLDPOS;
 }; 
 
 float RangeMap( float val, float inMin, float inMax, float outMin, float outMax )
@@ -67,17 +70,11 @@ v2f_t VertexFunction( vs_input_t input )
 
 	float4 worldPos = float4( input.position, 1);
 
-	worldPos.x += 6.f * cos(SYSTEM_TIME_SECONDS * 2.f);
-	worldPos.y += 12.f * sin(SYSTEM_TIME_SECONDS * 2.f);
-	worldPos.z += 0.5f * sin(SYSTEM_TIME_SECONDS);
+	v2f.worldPosition = worldPos.xyz;
 
-	float4 clipPos = worldPos;	// might have a w (usually 1 for now)
-	clipPos.x = RangeMap( worldPos.x, orthoMin.x, orthoMax.x, -1.f, 1.f );
-	clipPos.y = RangeMap( worldPos.y, orthoMin.y, orthoMax.y, -1.f, 1.f );
-	clipPos.z = 0.f;
-	clipPos.w = sin(SYSTEM_TIME_SECONDS * 2.f) + 2;
+	float4 cameraPos = mul(VIEW, worldPos);
+	float4 clipPos = mul(PROJECTION, cameraPos);	// might have a w (usually 1 for now)
 
-	clipPos.xyz /= clipPos.w;
 	v2f.position = clipPos;
 
 	return v2f;
@@ -97,9 +94,12 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
 	float4 finalColor = uvAsColor * input.color; 
 
-	float r = (sin( input.uv.y * 40.f + 4.f * SYSTEM_TIME_SECONDS));
-	float g = (cos( input.uv.x * 40.f + 8.f * SYSTEM_TIME_SECONDS));
-	float b = (cos( input.uv.y * 40.f + 16.f * SYSTEM_TIME_SECONDS));
+	float3 zero = float3(0,0,0);
+	float distanceVar = distance(zero, input.worldPosition);
+
+	float r = (sin( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
+	float g = (cos( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
+	float b = (sin( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
 	finalColor.r = r;
 	finalColor.g = g;
 	finalColor.b = b;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/Vec2.hpp"
+#include "Engine/Math/Mat44.hpp"
 
 class Texture;
 class RenderBuffer;
@@ -14,8 +15,8 @@ enum eCameraClearBitFlag : unsigned int
 
 struct CameraData
 {
-	Vec2 mins;
-	Vec2 maxs;
+	Mat44 projection;
+	Mat44 view;
 };
 
 
@@ -25,9 +26,16 @@ public:
 	Camera() {}
 	~Camera();
 
+	void SetPosition( const Vec3& position );
+	void Translate( const Vec3& translation );
+
+	Vec3 GetPosition();
+
 	void SetOrthoView( const Vec2& bottomLeft, const Vec2&topRight );
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
+	Mat44 GetProjection() const;
+
 
 	void SetColorTarget( Texture* texture );
 	Texture* GetColorTarget() const;
@@ -43,6 +51,11 @@ private:
 	Vec2 bLeft;
 	Vec2 tRight;
 	Texture* m_texture = nullptr;
+
+	Vec3 m_position;
+
+	Mat44 m_view;
+	Mat44 m_projection;
 
 public:
 	void Translate2D( const Vec2& cameraDisplacement );

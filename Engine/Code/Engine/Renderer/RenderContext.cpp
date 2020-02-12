@@ -467,12 +467,15 @@ void RenderContext::BeginCamera( Camera& camera )
 	if( nullptr == camera.m_cameraUBO )
 	{
 		camera.m_cameraUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+
 	}
 
 	//CameraData
 	CameraData camData;
-	camData.mins = camera.GetOrthoBottomLeft();
-	camData.maxs = camera.GetOrthoTopRight();
+	camData.projection = camera.GetProjection();
+	camData.view = Mat44::CreateTranslation3D( -camera.GetPosition() );
+// 	camData.mins = camera.GetOrthoBottomLeft();
+// 	camData.maxs = camera.GetOrthoTopRight();
 
 	camera.m_cameraUBO->Update( & camData, sizeof( camData ), sizeof( camData ) );
 
