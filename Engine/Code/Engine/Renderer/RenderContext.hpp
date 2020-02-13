@@ -9,6 +9,7 @@
 
 
 struct AABB2;
+class Sampler;
 class BitmapFont;
 class Window;
 class SwapChain;
@@ -19,6 +20,8 @@ class VertexBuffer;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
+struct ID3D11BlendState;
+struct IDXGIDebug;
 
 
 struct FrameData
@@ -81,10 +84,14 @@ public:
 
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
+	Texture* CreateTextureFromColor( Rgba8 color );
+	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
 	Shader*		GetOrCreateShader( char const* filename );
-	void BindTexture( const Texture* texture ) const;
+	void BindTexture( const Texture* constTex  );
+	void BindSampler( Sampler const* constSampler );
 	void SetBlendMode( BlendMode blendMode );
+	void CreateBlendModes();
 	bool IsDrawing() const;
 
 	void DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness );
@@ -98,10 +105,15 @@ public:
 	void DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint = Rgba8::WHITE );
 	void DrawAlignedTextAtPosition( const char* textstring, const AABB2& box, float fontHeight, const Vec2& alignment, const Rgba8& tint = Rgba8::WHITE );
 
+	void CreateDebugModule();
+	void DestroyDebugModule();
+	void ReportLiveObjects();
+
 protected:
 
 	Texture* CreateTextureFromFile(const char* filePath);
 	BitmapFont* CreateBitMapFontFromFile( const char* filePath );
+	void CreateBlendStates();
 
 private:
 	std::vector<Texture*> m_Textures;
@@ -120,7 +132,16 @@ public:
 	VertexBuffer* m_immediateVBO;
 	ID3D11Buffer* m_lastVBOHandle = nullptr;
 
+	Sampler* m_sampPoint = nullptr;
+	Texture* m_texWhite = nullptr;
+
 	RenderBuffer* m_frameUBO = nullptr;
+
+	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
+	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;
+
+	void* m_debugModule        = nullptr;
+	IDXGIDebug* m_debug           = nullptr;
 };
 
 
