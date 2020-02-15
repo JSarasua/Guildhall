@@ -65,14 +65,7 @@ void InputSystem::Shutdown()
 
 void InputSystem::HandleKeyDown( unsigned char keyCode )
 {
-	if( g_theConsole->IsOpen() )
-	{
-
-	}
-	else
-	{
-		m_keyStates[keyCode].m_isPressed = true;
-	}
+	m_keyStates[keyCode].m_isPressed = true;
 }
 
 void InputSystem::HandleKeyUp( unsigned char keyCode )
