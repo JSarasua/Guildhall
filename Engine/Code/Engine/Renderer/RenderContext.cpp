@@ -545,7 +545,7 @@ void RenderContext::BeginCamera( Camera& camera )
 
 	m_isDrawing = true;
 
-	BindShader( (Shader*)nullptr );
+	BindShader( m_currentShader );
 
 	BindUniformBuffer( 0, m_frameUBO );
 

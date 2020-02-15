@@ -7,7 +7,7 @@
 
 class Player;
 class World;
-
+class Shader;
 
 
 enum PowerUps
@@ -55,6 +55,7 @@ private:
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
 
+	Shader* m_invertShader = nullptr;
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;

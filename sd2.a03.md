@@ -16,12 +16,12 @@ and remember you can submit extras from previous assignments.
     - [x] *03pts*: `RenderContext::GetOrCreateTexture` works again.
 - [x] *08pts*: Blend States supported by shader.
     - [x] *04pts*: Blend state is created/recreated and bound when shader is bound.
-    - [x] *04pts*: Only recreate blend state if changed since last binding
+    - [ ] *04pts*: Only recreate blend state if changed since last binding
 - [ ] *05pts*: Default Built-In Shader to use when `BindShader(nullptr)` is used
     - [ ] `Renderer::SetBlendState` should affect this shader; 
-- [ ] *05pts*: Render two textured quads on screen
-    - [ ] *04pts*: One using an invert color shader
-    - [ ] *01pts*: One default
+- [x] *05pts*: Render two textured quads on screen
+    - [x] *04pts*: One using an invert color shader
+    - [x] *01pts*: One default
 - [ ] *34pts*: Dev Console
     - [x] *02pts*: User can open the dev console using the **tilde** key '\~'.  
                    You may use a custom key if you make a note in your assignment readme.

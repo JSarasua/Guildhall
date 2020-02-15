@@ -34,7 +34,7 @@ void Game::Startup()
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
-
+	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 
 }
 
@@ -99,9 +99,14 @@ void Game::Render()
 	g_theRenderer->SetBlendMode(BlendMode::ALPHA);
 
 	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::RED, 0.25f);
+
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
 	g_theRenderer->BindTexture(tex);
-	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 8.75f, 5.75f )), Rgba8(255,255,255));
+	g_theRenderer->BindShader(m_invertShader);
+	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255,255,255));
+
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
 
 	RenderDevConsole();
 
