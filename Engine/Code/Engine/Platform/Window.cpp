@@ -38,6 +38,14 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 			{
 				window->m_input->HandleKeyDown( asKey );
 			}
+			else if( asKey == LEFT_KEY || asKey == RIGHT_KEY || asKey == UP_KEY || asKey == DOWN_KEY )
+			{
+				g_theConsole->HandleKeyStroke(asKey);
+			}
+			else if( asKey == DEL_KEY )
+			{
+				g_theConsole->HandleKeyStroke(asKey);
+			}
 		}
 		else
 		{

@@ -153,7 +153,8 @@ void App::BeginFrame()
 void App::Update(float deltaSeconds)
 {
 	g_theRenderer->UpdateFrameTime( deltaSeconds );
-	
+	g_theConsole->Update( deltaSeconds );
+
 	CheckButtonPresses();
 	CheckController();
 

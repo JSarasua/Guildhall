@@ -26,7 +26,7 @@ public:
 
 	void Startup();
 	void BeginFrame();
-	void Update(InputSystem* input);
+	void Update( float deltaSeconds );
 	void EndFrame();
 	void Shutdown();
 
@@ -42,6 +42,9 @@ private:
 	std::vector<ColoredLine> m_coloredLines;
 	ColoredLine m_currentColoredLine;
 	ColoredLine m_caret;
+	bool m_isCaretRendering = true;
+	float m_caretTimer = 0.f;
 	bool m_isOpen = false;
-	int m_currentIndex = 0;
+	int m_currentCharIndex = 0;
+	int m_currentPreviousLineIndex = 0;
 };
