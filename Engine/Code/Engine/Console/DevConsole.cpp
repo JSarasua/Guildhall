@@ -4,9 +4,10 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Input/InputSystem.hpp"
-#include "Engine/Core/EventSystem.hpp"
+//#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/NamedStrings.hpp"
 
 
 ColoredLine::ColoredLine( const Rgba8& textColor, const std::string& devConsolePrintString ):
@@ -25,7 +26,7 @@ DevConsole::DevConsole():
 
 void DevConsole::Startup()
 {
-
+	g_theEventSystem->SubscribeToEvent("NoCall", InvalidCommand);
 }
 
 void DevConsole::BeginFrame()
@@ -69,9 +70,17 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
 		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
+		m_commandHistory.push_back(m_currentColoredLine);
+		if( !m_isCommandValid )
+		{
+			std::string command("Invalid Command:" + m_currentColoredLine.m_devConsolePrintString);
+			PringString( Rgba8::WHITE, command);
+			m_isCommandValid = true;
+
+		}
 		m_currentColoredLine.m_devConsolePrintString = std::string( "" );
 		m_currentCharIndex = 0;
-		m_currentPreviousLineIndex = (int)m_coloredLines.size();
+		m_currentPreviousLineIndex = (int)m_commandHistory.size();
 	}
 	else if( keyStroke == 0x08 ) //Backspace
 	{
@@ -120,22 +129,22 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		}
 		else if( keyStroke == UP_KEY )
 		{
-			if( !m_coloredLines.empty() )
+			if( !m_commandHistory.empty() )
 			{
 				m_currentPreviousLineIndex--;
-				m_currentPreviousLineIndex = ClampInt( m_currentPreviousLineIndex, 0, (int)m_coloredLines.size() );
+				m_currentPreviousLineIndex = ClampInt( m_currentPreviousLineIndex, 0, (int)m_commandHistory.size() );
 
-				m_currentColoredLine = m_coloredLines[m_currentPreviousLineIndex];
+				m_currentColoredLine = m_commandHistory[m_currentPreviousLineIndex];
 				m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 			}
 		}
 		else if( keyStroke == DOWN_KEY )
 		{
 			m_currentPreviousLineIndex++;
-			m_currentPreviousLineIndex = ClampInt( m_currentPreviousLineIndex, 0, (int)m_coloredLines.size() );
-			if( m_currentPreviousLineIndex < (int)m_coloredLines.size() )
+			m_currentPreviousLineIndex = ClampInt( m_currentPreviousLineIndex, 0, (int)m_commandHistory.size() );
+			if( m_currentPreviousLineIndex < (int)m_commandHistory.size() )
 			{
-				m_currentColoredLine = m_coloredLines[m_currentPreviousLineIndex];
+				m_currentColoredLine = m_commandHistory[m_currentPreviousLineIndex];
 				m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 			}
 		}
@@ -202,6 +211,11 @@ void DevConsole::SetIsOpen( bool isOpen )
 	}
 }
 
+bool DevConsole::InvalidCommand( const EventArgs* args )
+{
+	g_theConsole->m_isCommandValid = false;
+	return true;
+}
 
 
 

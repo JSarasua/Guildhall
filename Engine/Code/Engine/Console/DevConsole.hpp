@@ -2,10 +2,12 @@
 #include <vector>
 #include <string>
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 class RenderContext;
 class Camera;
 class InputSystem;
+
 
 struct ColoredLine
 {
@@ -38,8 +40,11 @@ public:
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const {return m_isOpen;}
 
+	static bool InvalidCommand(const EventArgs* args);
+
 private:
 	std::vector<ColoredLine> m_coloredLines;
+	std::vector<ColoredLine> m_commandHistory;
 	ColoredLine m_currentColoredLine;
 	ColoredLine m_caret;
 	bool m_isCaretRendering = true;
@@ -47,4 +52,6 @@ private:
 	bool m_isOpen = false;
 	int m_currentCharIndex = 0;
 	int m_currentPreviousLineIndex = 0;
+
+	bool m_isCommandValid = true;
 };

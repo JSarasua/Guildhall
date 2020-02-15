@@ -30,6 +30,7 @@ void EventSystem::UnsubscribeToEvent( const std::string& eventName )
 
 void EventSystem::FireEvent( const std::string& stringToCall, const EventArgs* args )
 {
+	bool wasAnEventCalled = false;
 	for( int eventSystemIndex = 0; eventSystemIndex < m_eventSubscriptions.size(); eventSystemIndex++ )
 	{
 		if( !m_eventSubscriptions[eventSystemIndex] )
@@ -41,12 +42,24 @@ void EventSystem::FireEvent( const std::string& stringToCall, const EventArgs* a
 		{
 			EventCallbackFunctionPtrType functionToCall = m_eventSubscriptions[eventSystemIndex]->m_callbackfunctionPtr;
 			bool isEventUsed = functionToCall(args);
-			
+			wasAnEventCalled = true;
 			if( isEventUsed )
 			{
 				return;
 			}
 		}
 	}
+
+	if( !wasAnEventCalled )
+	{
+		EventArgs args;
+		args.SetValue("stringToCall", stringToCall);
+		FireEvent( "NoCall", &args );
+	}
+}
+
+void EventSystem::ListEventSubscriptions( const EventArgs* args )
+{
+	
 }
 
