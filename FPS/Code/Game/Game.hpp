@@ -63,4 +63,6 @@ public:
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
 
+private:
+	void RenderDevConsole();
 };

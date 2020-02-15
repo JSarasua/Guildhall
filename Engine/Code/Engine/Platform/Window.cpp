@@ -34,7 +34,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		unsigned char asKey = (unsigned char)wParam;
 		if( g_theConsole->IsOpen() )
 		{
-			if( asKey == VK_OEM_3 || asKey == VK_ESCAPE ) // tilde ~ or ESC
+			if( asKey == VK_OEM_3 ) // tilde
 			{
 				window->m_input->HandleKeyDown( asKey );
 			}

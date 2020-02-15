@@ -92,6 +92,14 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			m_currentColoredLine.m_devConsolePrintString.pop_back();
 		}
 	}
+	else if( keyStroke == 0x60 ||keyStroke == 0xC0 )	//tilde
+	{
+		//m_isOpen = false;
+	}
+	else if( keyStroke == 0x1B )	//ESC key
+	{
+		m_isOpen = false;
+	}
 	else
 	{
 		m_currentColoredLine.m_devConsolePrintString += (const char)keyStroke;

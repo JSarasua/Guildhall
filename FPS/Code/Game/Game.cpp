@@ -7,6 +7,7 @@
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Game/World.hpp"
 #include "Game/GameCommon.hpp"
@@ -33,6 +34,8 @@ void Game::Startup()
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
+
+
 }
 
 void Game::Shutdown(){}
@@ -99,8 +102,12 @@ void Game::Render()
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
 	g_theRenderer->BindTexture(tex);
 	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 8.75f, 5.75f )), Rgba8(255,255,255));
+
+	RenderDevConsole();
+
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
+
 }
 
 
@@ -136,4 +143,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 IntVec2 Game::GetCurrentMapBounds() const
 {
 	return m_world->getCurrentMapBounds();
+}
+
+void Game::RenderDevConsole()
+{
+	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);
 }

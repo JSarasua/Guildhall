@@ -68,5 +68,6 @@ private:
 	bool m_debugCameraMode = false;
 	bool m_noClip = false;
 	bool m_isSpedUp = false;
+	Camera m_devConsoleCamera;
 
 };
