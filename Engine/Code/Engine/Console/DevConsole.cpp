@@ -6,6 +6,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 
 ColoredLine::ColoredLine( const Rgba8& textColor, const std::string& devConsolePrintString ):
@@ -16,7 +17,8 @@ ColoredLine::ColoredLine( const Rgba8& textColor, const std::string& devConsoleP
 
 
 DevConsole::DevConsole():
-	m_currentColoredLine(Rgba8::WHITE,std::string(""))
+	m_currentColoredLine(Rgba8::WHITE,std::string("")),
+	m_caret(Rgba8::WHITE, std::string("^"))
 {
 
 }
@@ -84,12 +86,15 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
 		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
 		m_currentColoredLine.m_devConsolePrintString = std::string( "" );
+		m_currentIndex = 0;
 	}
 	else if( keyStroke == 0x08 ) //Backspace
 	{
 		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
 			m_currentColoredLine.m_devConsolePrintString.pop_back();
+			m_currentIndex--;
+			ClampInt(m_currentIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 		}
 	}
 	else if( keyStroke == 0x60 ||keyStroke == 0xC0 )	//tilde
@@ -99,10 +104,13 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	else if( keyStroke == 0x1B )	//ESC key
 	{
 		m_isOpen = false;
+		m_currentIndex = 0;
 	}
 	else
 	{
 		m_currentColoredLine.m_devConsolePrintString += (const char)keyStroke;
+		m_currentIndex++;
+		ClampInt(m_currentIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 	}
 
 
@@ -111,6 +119,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 void DevConsole::PringString( const Rgba8& textColor, const std::string& devConsolePrintString )
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));
+	m_currentIndex = 0;
 }
 
 void DevConsole::Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const
@@ -124,6 +133,10 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 	renderer.DrawAABB2Filled(cameraAABB,Rgba8(0,0,0,128));
 
 	Vec2 currentDrawPosition = camera.GetOrthoBottomLeft();
+	Vec2 caretDrawPosition = currentDrawPosition;
+	caretDrawPosition.x = lineHeight * m_currentIndex;
+	renderer.DrawTextAtPosition(m_caret.m_devConsolePrintString.c_str(), caretDrawPosition, lineHeight, m_caret.m_textColor);
+	currentDrawPosition.y += lineHeight;
 	renderer.DrawTextAtPosition(m_currentColoredLine.m_devConsolePrintString.c_str(), currentDrawPosition, lineHeight, m_currentColoredLine.m_textColor);
 	currentDrawPosition.y += lineHeight;
 
@@ -140,6 +153,12 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 void DevConsole::SetIsOpen( bool isOpen )
 {
 	m_isOpen = isOpen;
+
+	if( !m_isOpen )
+	{
+		m_currentColoredLine.m_devConsolePrintString.clear();
+		m_currentIndex = 0;
+	}
 }
 
 

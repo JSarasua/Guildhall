@@ -41,5 +41,7 @@ public:
 private:
 	std::vector<ColoredLine> m_coloredLines;
 	ColoredLine m_currentColoredLine;
+	ColoredLine m_caret;
 	bool m_isOpen = false;
+	int m_currentIndex = 0;
 };
