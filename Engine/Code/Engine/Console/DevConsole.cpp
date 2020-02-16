@@ -27,6 +27,7 @@ DevConsole::DevConsole():
 void DevConsole::Startup()
 {
 	g_theEventSystem->SubscribeToEvent("NoCall", InvalidCommand);
+	g_theEventSystem->SubscribeToEvent("help",ListCommands);
 }
 
 void DevConsole::BeginFrame()
@@ -213,9 +214,25 @@ void DevConsole::SetIsOpen( bool isOpen )
 
 bool DevConsole::InvalidCommand( const EventArgs* args )
 {
+	UNUSED(args);
+
 	g_theConsole->m_isCommandValid = false;
 	return true;
 }
 
+bool DevConsole::ListCommands( const EventArgs* args )
+{
+	UNUSED(args);
+
+	std::vector<EventSubscription*> events = g_theEventSystem->m_eventSubscriptions;
+
+	for( size_t commandIndex = 0; commandIndex < events.size(); commandIndex++ )
+	{
+		std::string& commandString = events[commandIndex]->m_eventName;
+		g_theConsole->PringString(Rgba8::WHITE, commandString);
+	}
+
+	return true;
+}
 
 

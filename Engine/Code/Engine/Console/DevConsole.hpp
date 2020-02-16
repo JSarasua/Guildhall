@@ -40,7 +40,10 @@ public:
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const {return m_isOpen;}
 
-	static bool InvalidCommand(const EventArgs* args);
+	static bool InvalidCommand( const EventArgs* args );
+	static bool ListCommands( const EventArgs* args );
+
+
 
 private:
 	std::vector<ColoredLine> m_coloredLines;

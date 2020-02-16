@@ -130,3 +130,14 @@ IntVec2 NamedStrings::GetValue( const std::string& keyName, const IntVec2& defau
 
 	return value;
 }
+
+std::vector<std::string> NamedStrings::GetAllValues() const
+{
+	std::vector<std::string> allNamedStrings;
+
+	for( MapStringConstIterator keyValueIterator = m_keyValuePairs.begin(); keyValueIterator != m_keyValuePairs.end(); keyValueIterator++ )
+	{
+		allNamedStrings.push_back(keyValueIterator->second);
+	}
+	return allNamedStrings;
+}

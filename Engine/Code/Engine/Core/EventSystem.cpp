@@ -1,4 +1,5 @@
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 
@@ -52,14 +53,20 @@ void EventSystem::FireEvent( const std::string& stringToCall, const EventArgs* a
 
 	if( !wasAnEventCalled )
 	{
-		EventArgs args;
-		args.SetValue("stringToCall", stringToCall);
-		FireEvent( "NoCall", &args );
+		EventArgs NoCallArgs;
+		NoCallArgs.SetValue("stringToCall", stringToCall);
+		FireEvent( "NoCall", &NoCallArgs );
 	}
 }
 
-void EventSystem::ListEventSubscriptions( const EventArgs* args )
+EventArgs EventSystem::GetEvents()
 {
-	
+	EventArgs args;
+	for( size_t eventIndex = 0; eventIndex < m_eventSubscriptions.size(); eventIndex++ )
+	{
+		std::string eventName = m_eventSubscriptions[eventIndex]->m_eventName;
+		args.SetValue(eventName, eventName);
+	}
+	return args;
 }
 

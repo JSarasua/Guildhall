@@ -21,10 +21,11 @@ public:
 	void UnsubscribeToEvent(const std::string& eventName);
 	void FireEvent(const std::string& stringToCall, const EventArgs* args );
 
-	static void ListEventSubscriptions( const EventArgs* args );
-
+private:
+	EventArgs GetEvents();
 
 
 public:
 	std::vector<EventSubscription*> m_eventSubscriptions;
+
 };
