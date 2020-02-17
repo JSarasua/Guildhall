@@ -43,7 +43,8 @@ public:
 	static bool InvalidCommand( const EventArgs* args );
 	static bool ListCommands( const EventArgs* args );
 
-
+private:
+	void ClampScrollIndex();
 
 private:
 	std::vector<ColoredLine> m_coloredLines;
@@ -55,6 +56,7 @@ private:
 	bool m_isOpen = false;
 	int m_currentCharIndex = 0;
 	int m_currentPreviousLineIndex = 0;
+	int m_currentScrollIndex = 0;
 
 	bool m_isCommandValid = true;
 };

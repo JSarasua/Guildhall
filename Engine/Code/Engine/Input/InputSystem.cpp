@@ -15,6 +15,8 @@ const unsigned char SPACE_KEY	= VK_SPACE;
 const unsigned char DEL_KEY		= VK_DELETE;
 const unsigned char TILDE_KEY	= VK_OEM_3;
 const unsigned char ENTER_KEY	= VK_RETURN;
+const unsigned char PGUP_KEY	= VK_PRIOR;
+const unsigned char PGDOWN_KEY	= VK_NEXT;
 
 
 

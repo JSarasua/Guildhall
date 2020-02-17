@@ -67,7 +67,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	m_isCaretRendering = true;
 	m_caretTimer = 0.f;
 
-	if( keyStroke == 0x0D )		// Enter Key
+	if( keyStroke == ENTER_KEY )		// Enter Key
 	{
 		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
 		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
@@ -150,6 +150,16 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			}
 		}
 	}
+	else if( keyStroke == PGUP_KEY )
+	{
+		m_currentScrollIndex--;
+		ClampScrollIndex();
+	}
+	else if( keyStroke == PGDOWN_KEY )
+	{
+		m_currentScrollIndex++;
+		ClampScrollIndex();
+	}
 	else
 	{
 		m_currentColoredLine.m_devConsolePrintString.insert(m_currentCharIndex, 1, keyStroke);
@@ -164,6 +174,7 @@ void DevConsole::PringString( const Rgba8& textColor, const std::string& devCons
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));
 	m_currentCharIndex = 0;
+	m_currentScrollIndex++;
 }
 
 void DevConsole::Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const
@@ -190,7 +201,8 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 	renderer.DrawTextAtPosition(currentLine.c_str(), currentDrawPosition, lineHeight, m_currentColoredLine.m_textColor);
 	currentDrawPosition.y += lineHeight;
 
-	int textIndex = (int)m_coloredLines.size() - 1;
+	//int textIndex = (int)m_coloredLines.size() - 1;
+	int textIndex = m_currentScrollIndex;
 	while( (currentDrawPosition.y < camera.GetOrthoTopRight().y) && (textIndex >= 0) )
 	{
 		currentLine = std::string(">") + m_coloredLines[textIndex].m_devConsolePrintString;
@@ -209,6 +221,10 @@ void DevConsole::SetIsOpen( bool isOpen )
 	{
 		m_currentColoredLine.m_devConsolePrintString.clear();
 		m_currentCharIndex = 0;
+	}
+	else if( m_isOpen )
+	{
+		m_currentScrollIndex = (int)m_coloredLines.size() - 1;
 	}
 }
 
@@ -235,4 +251,8 @@ bool DevConsole::ListCommands( const EventArgs* args )
 	return true;
 }
 
+void DevConsole::ClampScrollIndex()
+{
+	m_currentScrollIndex = ClampInt(m_currentScrollIndex, 0, (int)m_coloredLines.size() - 1);
+}
 

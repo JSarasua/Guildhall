@@ -13,6 +13,8 @@ extern const unsigned char SPACE_KEY;
 extern const unsigned char DEL_KEY;
 extern const unsigned char TILDE_KEY;
 extern const unsigned char ENTER_KEY;
+extern const unsigned char PGUP_KEY;
+extern const unsigned char PGDOWN_KEY;
 
 struct IntVec2;
 constexpr int NUM_KEYCODES = 256;
