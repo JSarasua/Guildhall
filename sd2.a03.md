@@ -31,14 +31,14 @@ and remember you can submit extras from previous assignments.
         - [x] *03pts*: Clear input if there is any text currently there
         - [x] *03pts*: Close the console if console is open.
         - [x] *03pts*: Normal game behaviour otherwise (for example, for now it will quit your application)
-    - [ ] *14pts*: User can type commands **only** while console is open.
+    - [x] *14pts*: User can type commands **only** while console is open.
         - [x] *02pts*: Typing should insert characters at the carot
         - [x] *02pts*: The carot blinks (every quarter to half second usually looks okay)
         - [x] *02pts*; Left & Right arrow keys should move carot forward and back along string 
         - [x] *02pts*: Delete should delete the character after the carot
         - [x] *02pts*: Backspace should delete the character before the carot
         - [x] *02pts*: Pressing `Enter` submits the command
-        - [ ] *02pts* If it is an invalid command (it has not handler), print an error message
+        - [x] *02pts* If it is an invalid command (it has not handler), print an error message
     - [ ] *02pts* Game input is ignored while dev console is open.
     - [x] *03pts*: Support a `quit` command that quits the game.
     - [ ] *03pts*: Support a `help` command that lists all exposed commands
@@ -50,7 +50,7 @@ and remember you can submit extras from previous assignments.
 - [ ] *X03.01 : 03pts*: Built-in error shader to use when a shader fails to compile.   
 - [ ] *X03.02 : 04pts*: AutoComplete
 - [ ] *X03.03 : 04pts*: Context Sensitive Auto Complete
-- [ ] *X03.04 : 04pts*: Command History
+- [x] *X03.04 : 04pts*: Command History
 - [ ] *X03.05 : 03pts*: Persistant Command History (requires X03.02)
 - [ ] *X03.06 : 05pts*: Text Selection 
 - [ ] *X03.10 : 04pts*: Cut, Copy & Paste from Window's Clipboard (Requires X03.04)

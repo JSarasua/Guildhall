@@ -113,7 +113,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	}
 	else if( keyStroke == 0x1B )	//ESC key
 	{
-		m_isOpen = false;
+		SetIsOpen(false);
 		m_currentCharIndex = 0;
 	}
 	else if( keyStroke == LEFT_KEY || keyStroke == RIGHT_KEY || keyStroke == UP_KEY || keyStroke == DOWN_KEY )
