@@ -244,8 +244,6 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		m_selectedChars = 0;
 		m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 	}
-
-
 }
 
 void DevConsole::PringString( const Rgba8& textColor, const std::string& devConsolePrintString )
