@@ -6,7 +6,7 @@
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
-InputSystem* g_theInput = nullptr;
+//InputSystem* g_theInput = nullptr;
 
 const char* APP_NAME = "SD1-A4: Protogame2D";	// ...becomes ??? (Change this per project!)
 

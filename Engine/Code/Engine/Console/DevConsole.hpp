@@ -45,7 +45,11 @@ public:
 
 private:
 	void ClampScrollIndex();
+	void EraseSelectedChars();
+	void ClampCurrentLine();
+	void ResetSelection();
 
+	void RenderSelection( Vec2 currentDrawPosition, float lineHeight ) const;
 private:
 	std::vector<ColoredLine> m_coloredLines;
 	std::vector<ColoredLine> m_commandHistory;
@@ -55,6 +59,9 @@ private:
 	float m_caretTimer = 0.f;
 	bool m_isOpen = false;
 	int m_currentCharIndex = 0;
+	int m_selectedChars = 0;
+	int m_beginSelect = 0;
+	int m_endSelect = 0;
 	int m_currentPreviousLineIndex = 0;
 	int m_currentScrollIndex = 0;
 

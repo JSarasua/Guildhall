@@ -64,6 +64,11 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		return;
 	}
+	KeyButtonState const& lctrlKey = g_theInput->GetKeyStates(LCTRL_KEY);
+	KeyButtonState const& rctrlKey = g_theInput->GetKeyStates(RCTRL_KEY);
+	KeyButtonState const& ctrlKey = g_theInput->GetKeyStates(CTRL_KEY);
+
+
 	m_isCaretRendering = true;
 	m_caretTimer = 0.f;
 
@@ -82,16 +87,23 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		m_currentColoredLine.m_devConsolePrintString = std::string( "" );
 		m_currentCharIndex = 0;
 		m_currentPreviousLineIndex = (int)m_commandHistory.size();
+
+		ResetSelection();
 	}
 	else if( keyStroke == 0x08 ) //Backspace
 	{
 		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
-			if( m_currentCharIndex > 0 )
+			if( m_beginSelect != m_endSelect )
+			{
+				EraseSelectedChars();
+			}
+			else if( m_currentCharIndex > 0 )
 			{
 				m_currentColoredLine.m_devConsolePrintString.erase(m_currentCharIndex-1,1);
 				m_currentCharIndex--;
-				m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
+				ClampCurrentLine();
+				//m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
 			}
 
 		}
@@ -100,7 +112,11 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
-			if( m_currentCharIndex < m_currentColoredLine.m_devConsolePrintString.size() )
+			if( m_beginSelect != m_endSelect )
+			{
+				EraseSelectedChars();
+			}
+			else if( m_currentCharIndex < m_currentColoredLine.m_devConsolePrintString.size() )
 			{
 				m_currentColoredLine.m_devConsolePrintString.erase( m_currentCharIndex, 1 );
 			}
@@ -120,13 +136,49 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( keyStroke == LEFT_KEY )
 		{
+			if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+			{
+				if( m_beginSelect == 0 && m_endSelect == 0 )
+				{
+					m_beginSelect = m_currentCharIndex;
+					m_endSelect = m_beginSelect - 1;
+				}
+				else
+				{
+					m_endSelect--;
+				}
+
+			}
+			else
+			{
+				ResetSelection();
+			}
 			m_currentCharIndex--;
-			m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
+			ClampCurrentLine();
+			//m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 		}
 		else if( keyStroke == RIGHT_KEY )
 		{
+			if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+			{
+				if( m_beginSelect == 0 && m_endSelect == 0 )
+				{
+					m_beginSelect = m_currentCharIndex;
+					m_endSelect = m_beginSelect + 1;
+				}
+				else
+				{
+					m_endSelect++;
+				}
+
+			}
+			else
+			{
+				ResetSelection();
+			}
 			m_currentCharIndex++;
-			m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
+			ClampCurrentLine();
+			//m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
 		}
 		else if( keyStroke == UP_KEY )
 		{
@@ -160,10 +212,31 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		m_currentScrollIndex++;
 		ClampScrollIndex();
 	}
+	else if( keyStroke == HOME_KEY )
+	{
+		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+		{
+			m_endSelect = 0;
+		}
+		m_currentCharIndex = 0;
+	}
+	else if( keyStroke == END_KEY )
+	{
+		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+		{
+			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size() - 1;
+		}
+		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size() - 1;
+	}
 	else
 	{
+
+		//m_currentColoredLine.m_devConsolePrintString.erase( m_beginSelect, m_selectedChars );
+		EraseSelectedChars();
+
 		m_currentColoredLine.m_devConsolePrintString.insert(m_currentCharIndex, 1, keyStroke);
 		m_currentCharIndex++;
+		m_selectedChars = 0;
 		m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 	}
 
@@ -196,6 +269,13 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 		renderer.DrawTextAtPosition( m_caret.m_devConsolePrintString.c_str(), caretDrawPosition, lineHeight, m_caret.m_textColor );
 	}
 	currentDrawPosition.y += lineHeight;
+
+	//RenderSelection( currentDrawPosition, lineHeight );
+	AABB2 selectionBox;
+	selectionBox.mins = Vec2( m_beginSelect*lineHeight + lineHeight, currentDrawPosition.y );
+	selectionBox.maxs = Vec2(m_endSelect*lineHeight + lineHeight, currentDrawPosition.y + lineHeight );
+	renderer.BindTexture(nullptr);
+	renderer.DrawAABB2Filled( selectionBox, Rgba8(255,255,255,128) );
 
 	std::string currentLine = std::string(">") + m_currentColoredLine.m_devConsolePrintString;
 	renderer.DrawTextAtPosition(currentLine.c_str(), currentDrawPosition, lineHeight, m_currentColoredLine.m_textColor);
@@ -254,5 +334,45 @@ bool DevConsole::ListCommands( const EventArgs* args )
 void DevConsole::ClampScrollIndex()
 {
 	m_currentScrollIndex = ClampInt(m_currentScrollIndex, 0, (int)m_coloredLines.size() - 1);
+}
+
+void DevConsole::EraseSelectedChars()
+{
+	if( m_beginSelect < m_endSelect )
+	{
+		int range = m_endSelect - m_beginSelect;
+		m_currentColoredLine.m_devConsolePrintString.erase(m_beginSelect, range);
+		m_currentCharIndex = m_beginSelect;
+	}
+	else if( m_endSelect < m_beginSelect )
+	{
+		int range = m_beginSelect - m_endSelect;
+		m_currentColoredLine.m_devConsolePrintString.erase( m_endSelect, range );
+		m_currentCharIndex = m_endSelect;
+	}
+
+	ResetSelection();
+	
+	return;
+}
+
+void DevConsole::ClampCurrentLine()
+{
+	int currentLineSize = (int)m_currentColoredLine.m_devConsolePrintString.size();
+	
+	m_currentCharIndex = ClampInt( m_currentCharIndex, 0, currentLineSize );
+	m_beginSelect = ClampInt( m_beginSelect, 0, currentLineSize );
+	m_endSelect = ClampInt( m_endSelect, 0, currentLineSize );
+}
+
+void DevConsole::ResetSelection()
+{
+	m_beginSelect = 0;
+	m_endSelect = 0;
+}
+
+void DevConsole::RenderSelection( Vec2 currentDrawPosition, float lineHeight ) const
+{
+	//ren
 }
 

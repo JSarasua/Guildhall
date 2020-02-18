@@ -17,7 +17,11 @@ const unsigned char TILDE_KEY	= VK_OEM_3;
 const unsigned char ENTER_KEY	= VK_RETURN;
 const unsigned char PGUP_KEY	= VK_PRIOR;
 const unsigned char PGDOWN_KEY	= VK_NEXT;
-
+const unsigned char LCTRL_KEY	= VK_LCONTROL;
+const unsigned char RCTRL_KEY	= VK_RCONTROL;
+const unsigned char CTRL_KEY	= VK_CONTROL;
+const unsigned char HOME_KEY	= VK_HOME;
+const unsigned char END_KEY		= VK_END;
 
 
 InputSystem::InputSystem()
