@@ -6,23 +6,23 @@
 #include "Engine/Console/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
-const unsigned char ESC_KEY		= VK_ESCAPE;
-const unsigned char UP_KEY		= VK_UP;
-const unsigned char LEFT_KEY	= VK_LEFT;
-const unsigned char RIGHT_KEY	= VK_RIGHT;
-const unsigned char DOWN_KEY	= VK_DOWN;
-const unsigned char SPACE_KEY	= VK_SPACE;
-const unsigned char DEL_KEY		= VK_DELETE;
-const unsigned char TILDE_KEY	= VK_OEM_3;
-const unsigned char ENTER_KEY	= VK_RETURN;
-const unsigned char PGUP_KEY	= VK_PRIOR;
-const unsigned char PGDOWN_KEY	= VK_NEXT;
-const unsigned char LCTRL_KEY	= VK_LCONTROL;
-const unsigned char RCTRL_KEY	= VK_RCONTROL;
-const unsigned char CTRL_KEY	= VK_CONTROL;
-const unsigned char HOME_KEY	= VK_HOME;
-const unsigned char END_KEY		= VK_END;
-
+const unsigned char ESC_KEY			= VK_ESCAPE;
+const unsigned char UP_KEY			= VK_UP;
+const unsigned char LEFT_KEY		= VK_LEFT;
+const unsigned char RIGHT_KEY		= VK_RIGHT;
+const unsigned char DOWN_KEY		= VK_DOWN;
+const unsigned char SPACE_KEY		= VK_SPACE;
+const unsigned char DEL_KEY			= VK_DELETE;
+const unsigned char TILDE_KEY		= VK_OEM_3;
+const unsigned char ENTER_KEY		= VK_RETURN;
+const unsigned char PGUP_KEY		= VK_PRIOR;
+const unsigned char PGDOWN_KEY		= VK_NEXT;
+const unsigned char LCTRL_KEY		= VK_LCONTROL;
+const unsigned char RCTRL_KEY		= VK_RCONTROL;
+const unsigned char CTRL_KEY		= VK_CONTROL;
+const unsigned char HOME_KEY		= VK_HOME;
+const unsigned char END_KEY			= VK_END;
+const unsigned char BACKSPACE_KEY	= VK_BACK;
 
 InputSystem::InputSystem()
 {

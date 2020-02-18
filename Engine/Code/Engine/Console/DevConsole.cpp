@@ -72,7 +72,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	m_isCaretRendering = true;
 	m_caretTimer = 0.f;
 
-	if( keyStroke == ENTER_KEY )		// Enter Key
+	if( keyStroke == ENTER_KEY )
 	{
 		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
 		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
@@ -90,7 +90,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 
 		ResetSelection();
 	}
-	else if( keyStroke == 0x08 ) //Backspace
+	else if( keyStroke == BACKSPACE_KEY )
 	{
 		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
@@ -103,12 +103,11 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 				m_currentColoredLine.m_devConsolePrintString.erase(m_currentCharIndex-1,1);
 				m_currentCharIndex--;
 				ClampCurrentLine();
-				//m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
 			}
 
 		}
 	}
-	else if( keyStroke == DEL_KEY ) //Delete
+	else if( keyStroke == DEL_KEY )
 	{
 		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
@@ -123,11 +122,11 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 
 		}
 	}
-	else if( keyStroke == 0x60 ||keyStroke == 0xC0 )	//tilde
+	else if( keyStroke == 0x60 ||keyStroke == TILDE_KEY )	//tilde
 	{
 		//m_isOpen = false;
 	}
-	else if( keyStroke == 0x1B )	//ESC key
+	else if( keyStroke == ESC_KEY )	//ESC key
 	{
 		SetIsOpen(false);
 		m_currentCharIndex = 0;
@@ -147,15 +146,14 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 				{
 					m_endSelect--;
 				}
-
 			}
 			else
 			{
 				ResetSelection();
 			}
+
 			m_currentCharIndex--;
 			ClampCurrentLine();
-			//m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
 		}
 		else if( keyStroke == RIGHT_KEY )
 		{
@@ -170,15 +168,14 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 				{
 					m_endSelect++;
 				}
-
 			}
 			else
 			{
 				ResetSelection();
 			}
+
 			m_currentCharIndex++;
 			ClampCurrentLine();
-			//m_currentCharIndex = ClampInt( m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size() );
 		}
 		else if( keyStroke == UP_KEY )
 		{
@@ -216,7 +213,12 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
 		{
+			m_beginSelect = m_currentCharIndex;
 			m_endSelect = 0;
+		}
+		else
+		{
+			ResetSelection();
 		}
 		m_currentCharIndex = 0;
 	}
@@ -224,14 +226,17 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
 		{
-			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size() - 1;
+			m_beginSelect = m_currentCharIndex;
+			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
 		}
-		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size() - 1;
+		else
+		{
+			ResetSelection();
+		}
+		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 	}
 	else
 	{
-
-		//m_currentColoredLine.m_devConsolePrintString.erase( m_beginSelect, m_selectedChars );
 		EraseSelectedChars();
 
 		m_currentColoredLine.m_devConsolePrintString.insert(m_currentCharIndex, 1, keyStroke);
@@ -262,6 +267,9 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 
 	Vec2 currentDrawPosition = camera.GetOrthoBottomLeft();
 
+	/************************************************************************/
+	/* Render Caret                                                         */
+	/************************************************************************/
 	if( m_isCaretRendering )
 	{
 		Vec2 caretDrawPosition = currentDrawPosition;
@@ -270,18 +278,22 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 	}
 	currentDrawPosition.y += lineHeight;
 
-	//RenderSelection( currentDrawPosition, lineHeight );
+	/************************************************************************/
+	/* Render Selected text box                                             */
+	/************************************************************************/
 	AABB2 selectionBox;
 	selectionBox.mins = Vec2( m_beginSelect*lineHeight + lineHeight, currentDrawPosition.y );
 	selectionBox.maxs = Vec2(m_endSelect*lineHeight + lineHeight, currentDrawPosition.y + lineHeight );
 	renderer.BindTexture(nullptr);
 	renderer.DrawAABB2Filled( selectionBox, Rgba8(255,255,255,128) );
 
+	/************************************************************************/
+	/* Render Command lines                                                 */
+	/************************************************************************/
 	std::string currentLine = std::string(">") + m_currentColoredLine.m_devConsolePrintString;
 	renderer.DrawTextAtPosition(currentLine.c_str(), currentDrawPosition, lineHeight, m_currentColoredLine.m_textColor);
 	currentDrawPosition.y += lineHeight;
 
-	//int textIndex = (int)m_coloredLines.size() - 1;
 	int textIndex = m_currentScrollIndex;
 	while( (currentDrawPosition.y < camera.GetOrthoTopRight().y) && (textIndex >= 0) )
 	{
@@ -369,10 +381,5 @@ void DevConsole::ResetSelection()
 {
 	m_beginSelect = 0;
 	m_endSelect = 0;
-}
-
-void DevConsole::RenderSelection( Vec2 currentDrawPosition, float lineHeight ) const
-{
-	//ren
 }
 

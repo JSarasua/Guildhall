@@ -42,7 +42,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 			{
 				g_theConsole->HandleKeyStroke(asKey);
 			}
-			else if( asKey == DEL_KEY || asKey == PGUP_KEY || asKey == PGDOWN_KEY )
+			else if( asKey == DEL_KEY || asKey == PGUP_KEY || asKey == PGDOWN_KEY || asKey == HOME_KEY || asKey == END_KEY )
 			{
 				g_theConsole->HandleKeyStroke(asKey);
 			}

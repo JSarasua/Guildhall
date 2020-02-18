@@ -49,7 +49,6 @@ private:
 	void ClampCurrentLine();
 	void ResetSelection();
 
-	void RenderSelection( Vec2 currentDrawPosition, float lineHeight ) const;
 private:
 	std::vector<ColoredLine> m_coloredLines;
 	std::vector<ColoredLine> m_commandHistory;
