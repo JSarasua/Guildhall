@@ -3,10 +3,11 @@
 
 
 
-void EventSystem::SubscribeToEvent( const std::string& eventName, EventCallbackFunctionPtrType functionToCall )
+void EventSystem::SubscribeToEvent( const std::string& eventName, eEventType eventType, EventCallbackFunctionPtrType functionToCall )
 {
 	EventSubscription* newSubscription = new EventSubscription();
 	newSubscription->m_eventName = eventName;
+	newSubscription->m_eventType = eventType;
 	newSubscription->m_callbackfunctionPtr = functionToCall;
 
 	m_eventSubscriptions.push_back(newSubscription);
@@ -29,12 +30,16 @@ void EventSystem::UnsubscribeToEvent( const std::string& eventName )
 	}
 }
 
-void EventSystem::FireEvent( const std::string& stringToCall, const EventArgs* args )
+void EventSystem::FireEvent( const std::string& stringToCall, eEventType eventType, const EventArgs* args )
 {
 	bool wasAnEventCalled = false;
 	for( int eventSystemIndex = 0; eventSystemIndex < m_eventSubscriptions.size(); eventSystemIndex++ )
 	{
 		if( !m_eventSubscriptions[eventSystemIndex] )
+		{
+			continue;
+		}
+		if( m_eventSubscriptions[eventSystemIndex]->m_eventType != eventType )
 		{
 			continue;
 		}
@@ -55,7 +60,7 @@ void EventSystem::FireEvent( const std::string& stringToCall, const EventArgs* a
 	{
 		EventArgs NoCallArgs;
 		NoCallArgs.SetValue("stringToCall", stringToCall);
-		FireEvent( "NoCall", &NoCallArgs );
+		FireEvent( "NoCall", NOCONSOLECOMMAND, &NoCallArgs );
 	}
 }
 

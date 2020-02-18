@@ -34,7 +34,7 @@ public:
 
 	void HandleKeyStroke( unsigned char keyStroke );
 
-	void PringString( const Rgba8& textColor, const std::string& devConsolePrintString );
+	void PrintString( const Rgba8& textColor, const std::string& devConsolePrintString );
 	void Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const;
 
 	void SetIsOpen( bool isOpen );

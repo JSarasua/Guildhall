@@ -25,7 +25,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		// App close requested via "X" button, or right-click "Close Window" on task bar, or "Close" from system menu, or Alt-F4
 	case WM_CLOSE:
 	{
-		window->m_eventSystem->FireEvent("QUIT", nullptr);
+		window->m_eventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
 		return 0; // "Consumes" this message (tells Windows "okay, we handled it")
 	}
 	// Raw physical keyboard "key-was-just-depressed" event (case-insensitive, not translated)

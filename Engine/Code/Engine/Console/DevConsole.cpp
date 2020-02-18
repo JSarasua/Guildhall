@@ -26,8 +26,8 @@ DevConsole::DevConsole():
 
 void DevConsole::Startup()
 {
-	g_theEventSystem->SubscribeToEvent("NoCall", InvalidCommand);
-	g_theEventSystem->SubscribeToEvent("help",ListCommands);
+	g_theEventSystem->SubscribeToEvent("NoCall", NOCONSOLECOMMAND, InvalidCommand);
+	g_theEventSystem->SubscribeToEvent("help", CONSOLECOMMAND, ListCommands);
 }
 
 void DevConsole::BeginFrame()
@@ -74,21 +74,30 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 
 	if( keyStroke == ENTER_KEY )
 	{
-		PringString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
-		g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, nullptr );
-		m_commandHistory.push_back(m_currentColoredLine);
-		if( !m_isCommandValid )
+		if( m_currentColoredLine.m_devConsolePrintString.empty() )
 		{
-			std::string command("Invalid Command:" + m_currentColoredLine.m_devConsolePrintString);
-			PringString( Rgba8::WHITE, command);
-			m_isCommandValid = true;
-
+			PrintString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
 		}
-		m_currentColoredLine.m_devConsolePrintString = std::string( "" );
-		m_currentCharIndex = 0;
-		m_currentPreviousLineIndex = (int)m_commandHistory.size();
+		else
+		{
+			PrintString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
+			g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, CONSOLECOMMAND, nullptr );
+			m_commandHistory.push_back( m_currentColoredLine );
+			if( !m_isCommandValid )
+			{
+				std::string command( "Invalid Command:" + m_currentColoredLine.m_devConsolePrintString );
+				PrintString( Rgba8::WHITE, command );
+				m_isCommandValid = true;
 
-		ResetSelection();
+			}
+			m_currentColoredLine.m_devConsolePrintString = std::string( "" );
+			m_currentCharIndex = 0;
+			m_currentPreviousLineIndex = (int)m_commandHistory.size();
+
+			ResetSelection();
+		}
+
+
 	}
 	else if( keyStroke == BACKSPACE_KEY )
 	{
@@ -246,7 +255,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	}
 }
 
-void DevConsole::PringString( const Rgba8& textColor, const std::string& devConsolePrintString )
+void DevConsole::PrintString( const Rgba8& textColor, const std::string& devConsolePrintString )
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));
 	m_currentCharIndex = 0;
@@ -330,12 +339,19 @@ bool DevConsole::ListCommands( const EventArgs* args )
 {
 	UNUSED(args);
 
+	g_theConsole->PrintString(Rgba8::WHITE, std::string());
+
 	std::vector<EventSubscription*> events = g_theEventSystem->m_eventSubscriptions;
 
 	for( size_t commandIndex = 0; commandIndex < events.size(); commandIndex++ )
 	{
+		if( events[commandIndex]->m_eventType != CONSOLECOMMAND )
+		{
+			continue;
+		}
+
 		std::string& commandString = events[commandIndex]->m_eventName;
-		g_theConsole->PringString(Rgba8::WHITE, commandString);
+		g_theConsole->PrintString(Rgba8::WHITE, commandString);
 	}
 
 	return true;
