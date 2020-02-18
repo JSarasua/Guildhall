@@ -23,7 +23,7 @@ public:
 class EventSystem
 {
 public:
-	void SubscribeToEvent( const std::string& eventName, eEventType eventType, EventCallbackFunctionPtrType functionToCall);
+	void SubscribeToEvent( const std::string& eventName, eEventType eventType, EventCallbackFunctionPtrType functionToCall );
 	void UnsubscribeToEvent(const std::string& eventName);
 	void FireEvent(const std::string& stringToCall, eEventType eventType, const EventArgs* args );
 

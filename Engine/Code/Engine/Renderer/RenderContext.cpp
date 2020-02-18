@@ -138,6 +138,7 @@ void RenderContext::Shutdown()
 
 	DX_SAFE_RELEASE( m_alphaBlendStateHandle );
 	DX_SAFE_RELEASE( m_additiveBlendStateHandle );
+	DX_SAFE_RELEASE( m_solidBlendStateHandle );
 
 	for( int textureIndex = 0; textureIndex < m_Textures.size(); textureIndex++ )
 	{
@@ -445,6 +446,8 @@ void RenderContext::SetBlendMode( BlendMode blendMode )
 		break;
 	case BlendMode::ADDITIVE: 	m_context->OMSetBlendState( m_additiveBlendStateHandle, zeroes, ~(uint)0 );
 		break;
+	case BlendMode::SOLID: 	m_context->OMSetBlendState( m_solidBlendStateHandle, zeroes, ~(uint)0 );
+		break;
 	default:
 		break;
 	}
@@ -468,6 +471,7 @@ void RenderContext::CreateBlendModes()
 
 	m_device->CreateBlendState( &alphaDesc, &m_alphaBlendStateHandle );
 
+
 	D3D11_BLEND_DESC additiveDesc;
 	additiveDesc.AlphaToCoverageEnable = false;
 	additiveDesc.IndependentBlendEnable = false;
@@ -482,6 +486,22 @@ void RenderContext::CreateBlendModes()
 	additiveDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
 	m_device->CreateBlendState( &additiveDesc, &m_additiveBlendStateHandle );
+
+
+	D3D11_BLEND_DESC solidDesc;
+	solidDesc.AlphaToCoverageEnable = false;
+	solidDesc.IndependentBlendEnable = false;
+	solidDesc.RenderTarget[0].BlendEnable = false;
+	solidDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	solidDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	solidDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+
+	solidDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	solidDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	solidDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	solidDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	m_device->CreateBlendState( &solidDesc, &m_solidBlendStateHandle );
 }
 
 bool RenderContext::IsDrawing() const

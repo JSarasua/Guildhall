@@ -44,7 +44,8 @@ enum class Viewport
 enum class BlendMode
 {
 	ALPHA,
-	ADDITIVE
+	ADDITIVE,
+	SOLID
 };
 
 enum class eBufferSlot
@@ -139,6 +140,7 @@ public:
 
 	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
 	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;
+	ID3D11BlendState* m_solidBlendStateHandle = nullptr;
 
 	void* m_debugModule        = nullptr;
 	IDXGIDebug* m_debug           = nullptr;
