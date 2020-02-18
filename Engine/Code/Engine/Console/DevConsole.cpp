@@ -96,8 +96,6 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 
 			ResetSelection();
 		}
-
-
 	}
 	else if( keyStroke == BACKSPACE_KEY )
 	{
@@ -113,7 +111,6 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 				m_currentCharIndex--;
 				ClampCurrentLine();
 			}
-
 		}
 	}
 	else if( keyStroke == DEL_KEY )
@@ -131,9 +128,9 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 
 		}
 	}
-	else if( keyStroke == 0x60 ||keyStroke == TILDE_KEY )	//tilde
+	else if( keyStroke == '`' ||keyStroke == TILDE_KEY )	//tilde
 	{
-		//m_isOpen = false;
+		
 	}
 	else if( keyStroke == ESC_KEY )	//ESC key
 	{
@@ -244,6 +241,16 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		}
 		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 	}
+	else if( keyStroke =='\t' )	//TAB
+	{
+		if( m_isAutoCompleting )
+		{
+			m_isAutoCompleting = false;
+			m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
+			m_beginSelect = 0;
+			m_endSelect = 0;
+		}
+	}
 	else
 	{
 		EraseSelectedChars();
@@ -252,6 +259,8 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		m_currentCharIndex++;
 		m_selectedChars = 0;
 		m_currentCharIndex = ClampInt(m_currentCharIndex, 0, (int)m_currentColoredLine.m_devConsolePrintString.size());
+
+		AutoCompleteCommand();
 	}
 }
 
@@ -327,6 +336,24 @@ void DevConsole::SetIsOpen( bool isOpen )
 	}
 }
 
+void DevConsole::AutoCompleteCommand()
+{
+	std::string currentCommand = m_currentColoredLine.m_devConsolePrintString;
+	std::string autoCompletedCommand = g_theEventSystem->GetFirstEventStartingWith(currentCommand, CONSOLECOMMAND);
+	if( autoCompletedCommand.empty() )
+	{
+		m_isAutoCompleting = false;
+		return;
+	}
+
+	m_beginSelect = m_currentCharIndex;
+	m_currentColoredLine.m_devConsolePrintString = autoCompletedCommand;
+	m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
+
+	m_isAutoCompleting = true;
+	ClampCurrentLine();
+}
+
 bool DevConsole::InvalidCommand( const EventArgs* args )
 {
 	UNUSED(args);
@@ -395,5 +422,6 @@ void DevConsole::ResetSelection()
 {
 	m_beginSelect = 0;
 	m_endSelect = 0;
+	m_isAutoCompleting = false;
 }
 

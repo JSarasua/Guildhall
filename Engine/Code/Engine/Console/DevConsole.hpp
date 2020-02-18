@@ -40,6 +40,8 @@ public:
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const {return m_isOpen;}
 
+	void AutoCompleteCommand();
+
 	static bool InvalidCommand( const EventArgs* args );
 	static bool ListCommands( const EventArgs* args );
 
@@ -65,4 +67,5 @@ private:
 	int m_currentScrollIndex = 0;
 
 	bool m_isCommandValid = true;
+	bool m_isAutoCompleting = false;
 };

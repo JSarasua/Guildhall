@@ -96,15 +96,17 @@ void Game::Render()
 {
 	g_theRenderer->BeginCamera(m_camera);
 	//g_theRenderer->Draw(3, 0);
-	g_theRenderer->SetBlendMode(BlendMode::ALPHA);
+	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
-	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::RED, 0.25f);
+	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);
 
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
+	g_theRenderer->SetBlendMode(BlendMode::SOLID);
 	g_theRenderer->BindTexture(tex);
 	g_theRenderer->BindShader(m_invertShader);
-	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255,255,255));
+	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255, 255, 255, 128 ));
 
+	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	g_theRenderer->BindShader( (Shader*)nullptr );
 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
 

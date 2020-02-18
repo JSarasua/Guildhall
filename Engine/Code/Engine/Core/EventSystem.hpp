@@ -27,6 +27,8 @@ public:
 	void UnsubscribeToEvent(const std::string& eventName);
 	void FireEvent(const std::string& stringToCall, eEventType eventType, const EventArgs* args );
 
+
+	std::string GetFirstEventStartingWith( const std::string& subString, eEventType eventType );
 private:
 	EventArgs GetEvents();
 

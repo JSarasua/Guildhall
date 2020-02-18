@@ -64,6 +64,25 @@ void EventSystem::FireEvent( const std::string& stringToCall, eEventType eventTy
 	}
 }
 
+std::string EventSystem::GetFirstEventStartingWith( const std::string& subString, eEventType eventType )
+{
+	for( size_t eventIndex = 0; eventIndex < m_eventSubscriptions.size(); eventIndex++ )
+	{
+		EventSubscription* eventSub = m_eventSubscriptions[eventIndex];
+		if( eventSub->m_eventType != eventType )
+		{
+			continue;
+		}
+
+		std::string eventName = eventSub->m_eventName;
+		if( 0 == eventName.compare( 0, subString.length(), subString ) )
+		{
+			return eventName;
+		}
+	}
+	return std::string();
+}
+
 EventArgs EventSystem::GetEvents()
 {
 	EventArgs args;
