@@ -278,6 +278,27 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		m_currentColoredLine.m_devConsolePrintString.append(stringFromClipboard);
 		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 	}
+	else if( keyStroke == 0x18 )
+	{
+		if( m_beginSelect == m_endSelect )
+		{
+			return;
+		}
+		else if( m_beginSelect < m_endSelect )
+		{
+			int range = m_endSelect - m_beginSelect;
+			std::string stringToCopy = m_currentColoredLine.m_devConsolePrintString.substr( m_beginSelect, range );
+			g_theInput->CopyStringToClipboard( stringToCopy );
+		}
+		else
+		{
+			int range = m_beginSelect - m_endSelect;
+			std::string stringToCopy = m_currentColoredLine.m_devConsolePrintString.substr( m_endSelect, range );
+			g_theInput->CopyStringToClipboard( stringToCopy );
+		}
+	
+		EraseSelectedChars();
+	}
 	else
 	{
 		EraseSelectedChars();
