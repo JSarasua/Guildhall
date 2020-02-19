@@ -67,6 +67,11 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		unsigned char asKey = (unsigned char)wParam;
 		g_theConsole->HandleKeyStroke( asKey );
 	}
+// 	case WM_COMMAND:
+// 	{
+// 		unsigned char asKey = (unsigned char)wParam;
+// 		g_theConsole->HandleKeyStroke( asKey );
+// 	}
 	}
 
 

@@ -50,6 +50,9 @@ public:
 	const KeyButtonState& GetKeyStates(unsigned char keyCode);
 	const KeyButtonState* GetAllKeyStates();
 
+	void CopyStringToClipboard( std::string stringToCopy );
+	std::string GetClipboardString();
+
 private:
 
 	void UpdateMouse();
@@ -67,6 +70,4 @@ private:
 		XboxController(2),
 		XboxController(3)
 	};
-
-
 };

@@ -125,3 +125,31 @@ void InputSystem::UpdateMouse()
 // 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
 	UNIMPLEMENTED();
 }
+
+void InputSystem::CopyStringToClipboard( std::string stringToCopy )
+{
+	const char* copyString = stringToCopy.c_str();
+	const size_t len = stringToCopy.length() + 1;
+	HGLOBAL hMem = GlobalAlloc( GMEM_MOVEABLE, len );
+	memcpy(GlobalLock(hMem), copyString, len);
+	GlobalUnlock(hMem);
+	OpenClipboard(nullptr);
+	EmptyClipboard();
+	SetClipboardData(CF_TEXT, hMem );
+	CloseClipboard();
+}
+
+std::string InputSystem::GetClipboardString()
+{
+	HANDLE handle;
+	if( !OpenClipboard( nullptr ) )
+	{
+		return std::string();
+	}
+
+	handle = GetClipboardData( CF_TEXT );
+	std::string copiedText = std::string((char*)handle);
+
+	CloseClipboard();
+	return copiedText;
+}

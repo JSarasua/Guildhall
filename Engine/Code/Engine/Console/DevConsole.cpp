@@ -251,6 +251,33 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			m_endSelect = 0;
 		}
 	}
+	else if( keyStroke == 0x03 )
+	{
+		if( m_beginSelect == m_endSelect )
+		{
+			return;
+		}
+		else if( m_beginSelect < m_endSelect )
+		{
+			int range = m_endSelect - m_beginSelect;
+			std::string stringToCopy = m_currentColoredLine.m_devConsolePrintString.substr( m_beginSelect, range );
+			g_theInput->CopyStringToClipboard( stringToCopy );
+		}
+		else
+		{
+			int range = m_beginSelect - m_endSelect;
+			std::string stringToCopy = m_currentColoredLine.m_devConsolePrintString.substr( m_endSelect, range );
+			g_theInput->CopyStringToClipboard( stringToCopy );
+		}
+
+	}
+	else if( keyStroke == 0x16 )
+	{
+		EraseSelectedChars();
+		std::string stringFromClipboard = g_theInput->GetClipboardString();
+		m_currentColoredLine.m_devConsolePrintString.append(stringFromClipboard);
+		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
+	}
 	else
 	{
 		EraseSelectedChars();
