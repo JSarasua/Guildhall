@@ -14,9 +14,9 @@ and remember you can submit extras from previous assignments.
     - [x] *04pts*: Make a `Sampler` class
     - [x] *03pts*: Default Samplers (Linear+Wrap, Point+Wrap)
     - [x] *03pts*: `RenderContext::GetOrCreateTexture` works again.
-- [ ] *08pts*: Blend States
+- [x] *08pts*: Blend States
     - [x] *04pts*: Blend states created when renderer starts up.
-    - [ ] *04pts*: `ADDITIVE`, `OPAQUE`, and `ALPHA` blend modes supported
+    - [x] *04pts*: `ADDITIVE`, `OPAQUE`, and `ALPHA` blend modes supported
 - [x] *05pts*: Default Built-In Shader to use when `BindShader(nullptr)` is used
 - [x] *05pts*: Render two textured quads on screen
     - [x] *04pts*: One using an invert color shader
@@ -46,22 +46,11 @@ and remember you can submit extras from previous assignments.
 
 ## Extras
 
-- [ ] *X03.01 : 03pts*: Built-in error shader to use when a shader fails to compile.   
 - [x] *X03.02 : 04pts*: AutoComplete
-- [ ] *X03.03 : 04pts*: Context Sensitive Auto Complete (Requies X03.02)
 - [x] *X03.04 : 04pts*: Command History
-- [ ] *X03.05 : 03pts*: Persistant Command History (requires X03.02)
 - [x] *X03.06 : 05pts*: Text Selection 
 - [x] *X03.10 : 04pts*: Cut, Copy & Paste from Window's Clipboard (Requires X03.04)
 - [x] *X03.11 : 02pts*: Text Scrolling
-- [ ] *X03.12 : 02pts*: Vertical Scroll Bar (Requires X03.11)
-- [ ] *X03.20 : 04pts*: Text Color Markup
-- [ ] *X03.21 : 02pts*: Command Scripts
-- [ ] *X03.22 : 02pts*: Mouse Input on Dev Console (scroll wheel to scroll, click to set carrot)
-- [ ] *X03.23 : 04pts*: Mouse Selection (Requires X03.05 and X03.22)
-- [x] *X03.24 : 02pts*: Navigation Hotkeys, Home, End, Ctrl + Arrows
-- [ ] *X03.25 : 02pts*: Audio Cues (Sound for Good Command, Bad Command, Console Open, and maybe keypress... though may get annoying)
-- [ ] *X03.26 : 02pts*: Open & Close Animations (Slides Open for Example)
-- [ ] *X03.27 : 04pts*: Undo/Redo History (Ctrl+Z, Ctrl+Y)
+- [-] *X03.24 : 02pts*: Navigation Hotkeys, Home, End, Ctrl + Arrows
 
 ------

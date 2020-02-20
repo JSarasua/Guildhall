@@ -67,7 +67,10 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	KeyButtonState const& lctrlKey = g_theInput->GetKeyStates(LCTRL_KEY);
 	KeyButtonState const& rctrlKey = g_theInput->GetKeyStates(RCTRL_KEY);
 	KeyButtonState const& ctrlKey = g_theInput->GetKeyStates(CTRL_KEY);
-
+	KeyButtonState const& shiftKey = g_theInput->GetKeyStates(SHIFT_KEY);
+	UNUSED(lctrlKey);
+	UNUSED(rctrlKey);
+	UNUSED(ctrlKey);
 
 	m_isCaretRendering = true;
 	m_caretTimer = 0.f;
@@ -107,7 +110,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			}
 			else if( m_currentCharIndex > 0 )
 			{
-				m_currentColoredLine.m_devConsolePrintString.erase(m_currentCharIndex-1,1);
+				m_currentColoredLine.m_devConsolePrintString.erase(m_currentCharIndex - 1,1);
 				m_currentCharIndex--;
 				ClampCurrentLine();
 			}
@@ -141,7 +144,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( keyStroke == LEFT_KEY )
 		{
-			if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+			if( shiftKey.IsPressed() )
 			{
 				if( m_beginSelect == 0 && m_endSelect == 0 )
 				{
@@ -163,7 +166,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		}
 		else if( keyStroke == RIGHT_KEY )
 		{
-			if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+			if( shiftKey.IsPressed() )
 			{
 				if( m_beginSelect == 0 && m_endSelect == 0 )
 				{
@@ -217,7 +220,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	}
 	else if( keyStroke == HOME_KEY )
 	{
-		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+		if( shiftKey.IsPressed() )
 		{
 			m_beginSelect = m_currentCharIndex;
 			m_endSelect = 0;
@@ -230,7 +233,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	}
 	else if( keyStroke == END_KEY )
 	{
-		if( lctrlKey.IsPressed() || rctrlKey.IsPressed() || ctrlKey.IsPressed() )
+		if( shiftKey.IsPressed() )
 		{
 			m_beginSelect = m_currentCharIndex;
 			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
@@ -251,7 +254,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			m_endSelect = 0;
 		}
 	}
-	else if( keyStroke == 0x03 )
+	else if( keyStroke == CTRL_C_KEY )
 	{
 		if( m_beginSelect == m_endSelect )
 		{
@@ -271,14 +274,14 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		}
 
 	}
-	else if( keyStroke == 0x16 )
+	else if( keyStroke == CTRL_V_KEY )
 	{
 		EraseSelectedChars();
 		std::string stringFromClipboard = g_theInput->GetClipboardString();
 		m_currentColoredLine.m_devConsolePrintString.append(stringFromClipboard);
 		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
 	}
-	else if( keyStroke == 0x18 )
+	else if( keyStroke == CTRL_X_KEY )
 	{
 		if( m_beginSelect == m_endSelect )
 		{

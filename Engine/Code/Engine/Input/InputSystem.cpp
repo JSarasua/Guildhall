@@ -23,6 +23,10 @@ const unsigned char CTRL_KEY		= VK_CONTROL;
 const unsigned char HOME_KEY		= VK_HOME;
 const unsigned char END_KEY			= VK_END;
 const unsigned char BACKSPACE_KEY	= VK_BACK;
+const unsigned char SHIFT_KEY		= VK_SHIFT;
+const unsigned char CTRL_C_KEY		= 0x03;
+const unsigned char CTRL_V_KEY		= 0x16;
+const unsigned char CTRL_X_KEY		= 0x18;
 
 InputSystem::InputSystem()
 {
@@ -130,12 +134,15 @@ void InputSystem::CopyStringToClipboard( std::string stringToCopy )
 {
 	const char* copyString = stringToCopy.c_str();
 	const size_t len = stringToCopy.length() + 1;
-	HGLOBAL hMem = GlobalAlloc( GMEM_MOVEABLE, len );
-	memcpy(GlobalLock(hMem), copyString, len);
+	HGLOBAL hMem = GlobalAlloc( GMEM_MOVEABLE, len ); //change to gmem_fixed
+	memcpy( GlobalLock(hMem), copyString, len );
 	GlobalUnlock(hMem);
 	OpenClipboard(nullptr);
 	EmptyClipboard();
-	SetClipboardData(CF_TEXT, hMem );
+	if( NULL == SetClipboardData( CF_TEXT, hMem ) )
+	{
+		GlobalFree( hMem );
+	}
 	CloseClipboard();
 }
 

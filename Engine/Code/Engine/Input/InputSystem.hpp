@@ -21,6 +21,10 @@ extern const unsigned char CTRL_KEY;
 extern const unsigned char HOME_KEY;
 extern const unsigned char END_KEY;
 extern const unsigned char BACKSPACE_KEY;
+extern const unsigned char SHIFT_KEY;
+extern const unsigned char CTRL_C_KEY;
+extern const unsigned char CTRL_V_KEY;
+extern const unsigned char CTRL_X_KEY;
 
 struct IntVec2;
 constexpr int NUM_KEYCODES = 256;
