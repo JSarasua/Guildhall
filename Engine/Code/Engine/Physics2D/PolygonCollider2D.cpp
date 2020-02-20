@@ -38,28 +38,6 @@ bool PolygonCollider2D::Contains( Vec2 const& position ) const
 	return m_polygon.Contains( position );
 }
 
-bool PolygonCollider2D::Intersects( Collider2D const* other ) const
-{
-	if( nullptr != m_rigidbody && !m_rigidbody->IsEnabled() )
-	{
-		return false;
-	}
-
-	switch( other->m_type )
-	{
-	case COLLIDER2D_DISC:
-		//DiscCollider2D const* otherDisc = (DiscCollider2D const*)other;
-		return DoPolygonAndDiscOverlap2D( m_polygon, ((DiscCollider2D const*)other)->m_worldPosition, ((DiscCollider2D const*)other)->m_radius );
-		break;
-	case COLLIDER2D_POLYGON:
-		return false;
-		break;
-	default:
-		ERROR_AND_DIE( "Invalid Collider Type" );
-		break;
-	}
-}
-
 bool PolygonCollider2D::IsCollidingWithWall( LineSegment2 const& wall ) const
 {
 	if( DoPolygonAndLineSegementOverlap2D( m_polygon, wall ) )

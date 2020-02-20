@@ -8,6 +8,8 @@ class Rigidbody2D;
 class RenderContext;
 struct AABB2;
 
+
+
 enum eOffScreenDirection
 {
 	ONSCREEN = -1,
@@ -15,10 +17,12 @@ enum eOffScreenDirection
 	RIGHTOFSCREEN
 };
 
-enum Collider2DType
+enum eCollider2DType
 {
 	COLLIDER2D_DISC,
-	COLLIDER2D_POLYGON
+	COLLIDER2D_POLYGON,
+
+	NUM_COLLIDER_TYPE
 };
 
 class Collider2D
@@ -31,7 +35,7 @@ public:
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const	= 0;
 	virtual AABB2 GetBounds() const								= 0;
 	virtual bool Contains( Vec2 const& position ) const			= 0;
-	virtual bool Intersects( Collider2D const* other ) const	= 0;
+	bool Intersects( Collider2D const* other ) const;
 
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
 
@@ -44,10 +48,11 @@ protected:
 public:
 
 public:
-	Collider2DType m_type;
+	eCollider2DType m_type;
 	Physics2D* m_system = nullptr;
 	Rigidbody2D* m_rigidbody = nullptr;
 
 protected:
 	bool m_isGarbage = false;
 };
+

@@ -213,7 +213,6 @@ AABB2 Polygon2D::GetTightlyFixBox() const
 {
 	AABB2 box(m_points[0], m_points[0] );
 
-	
 	for( size_t vertexIndex = 0; vertexIndex < m_points.size(); vertexIndex++ )
 	{
 		box.StretchToIncludePoint( m_points[vertexIndex] );

@@ -15,7 +15,6 @@ public:
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const override;
 	virtual bool Contains( Vec2 const& position ) const	override;
-	virtual bool Intersects( Collider2D const* other ) const override;
 	virtual bool IsCollidingWithWall( LineSegment2 const& wall ) const override;
 	virtual eOffScreenDirection IsOffScreen(AABB2 const& bounds ) const override;
 

@@ -43,35 +43,6 @@ bool DiscCollider2D::Contains( Vec2 const& position ) const
 	return IsPointInsideDisc2D(position, m_worldPosition, m_radius);
 }
 
-bool DiscCollider2D::Intersects( Collider2D const* other ) const
-{
-	if( (nullptr!=m_rigidbody && !m_rigidbody->IsEnabled()) 
-		|| ((nullptr!=other->m_rigidbody) && (!other->m_rigidbody->IsEnabled())) )
-	{
-		return false;
-	}
-
-	switch( other->m_type )
-	{
-		case COLLIDER2D_DISC:
-		{
-			//DiscCollider2D const* otherDisc = (DiscCollider2D const*)other;
-			return DoDiscsOverlap( m_worldPosition, m_radius, ((DiscCollider2D const*)other)->m_worldPosition, ((DiscCollider2D const*)other)->m_radius );
-			break;
-		}
-		case COLLIDER2D_POLYGON:
-		{
-			PolygonCollider2D const* polyCollider = ((PolygonCollider2D const*)other);
-			return DoPolygonAndDiscOverlap2D( polyCollider->GetPolygon(), m_worldPosition, m_radius );
-			break;
-		}
-
-		default:
-			ERROR_AND_DIE("Invalid Collider Type");
-			break;
-	}
-}
-
 bool DiscCollider2D::IsCollidingWithWall( LineSegment2 const& wall ) const
 {
 	if( DoDiscAndLineSegmentOverlap2D( m_worldPosition, m_radius, wall ) )
