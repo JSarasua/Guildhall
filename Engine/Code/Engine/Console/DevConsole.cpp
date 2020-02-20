@@ -222,7 +222,10 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( shiftKey.IsPressed() )
 		{
-			m_beginSelect = m_currentCharIndex;
+			if( m_beginSelect == 0 )
+			{
+				m_beginSelect = m_currentCharIndex;
+			}
 			m_endSelect = 0;
 		}
 		else
@@ -235,7 +238,10 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	{
 		if( shiftKey.IsPressed() )
 		{
-			m_beginSelect = m_currentCharIndex;
+			if( m_beginSelect == 0 )
+			{
+				m_beginSelect = m_currentCharIndex;
+			}
 			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
 		}
 		else
@@ -380,6 +386,7 @@ void DevConsole::SetIsOpen( bool isOpen )
 	{
 		m_currentColoredLine.m_devConsolePrintString.clear();
 		m_currentCharIndex = 0;
+		ResetSelection();
 	}
 	else if( m_isOpen )
 	{
