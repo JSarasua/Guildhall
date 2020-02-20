@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/vec2.hpp"
 #include <vector>
+#include "Engine/Physics2D/Collision2D.hpp"
 
 class Rigidbody2D;
 class DiscCollider2D;
@@ -15,8 +16,13 @@ public:
 	void Update( float deltaSeconds );
 	void ApplyEffectors();
 	void MoveRigidbodies( float deltaSeconds );
+	void DetectCollisions();
+	void ResolveCollisions();
+	void ResolveCollision( Collision2D const& collision );
 	void CleanupDestroyedObjects();
 	void EndFrame();
+
+	float GetMassRatio( Rigidbody2D* me, Rigidbody2D* them ) const;
 
 	//factory style create/destroy
 
@@ -33,6 +39,7 @@ public:
 private:
 	std::vector<Rigidbody2D*> m_rigidBodies;
 	std::vector<Collider2D*> m_colliders;
+	std::vector<Collision2D> m_collisions;
 
 	float m_gravity = 10.f;
 };

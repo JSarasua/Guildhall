@@ -1,6 +1,5 @@
 #pragma once
-
-struct Manifold2D;
+#include "Engine/Physics2D/Manifold2D.hpp"
 
 class Collider2D;
 
@@ -8,6 +7,6 @@ struct Collision2D
 {
 public:
 	Collider2D* me;
-	Collision2D* them;
-	Manifold2D* manifold;
+	Collider2D* them;
+	Manifold2D manifold;
 };

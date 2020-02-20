@@ -1,14 +1,13 @@
 #pragma once
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Physics2D/Manifold2D.hpp"
+#include "Engine/Physics2D/Rigidbody2D.hpp"
 
 struct Rgba8;
 struct LineSegment2;
 class Physics2D;
-class Rigidbody2D;
 class RenderContext;
 struct AABB2;
-
 
 
 
@@ -39,6 +38,9 @@ public:
 	virtual bool Contains( Vec2 const& position ) const			= 0;
 	Manifold2D GetManifold( Collider2D const* other ) const;
 	bool Intersects( Collider2D const* other ) const;
+	float GetMass();
+	eSimulationMode GetSimulationMode() const;
+	void Move( Vec2 const& translator );
 
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
 

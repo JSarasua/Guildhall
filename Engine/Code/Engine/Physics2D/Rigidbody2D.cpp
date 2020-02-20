@@ -60,6 +60,11 @@ void Rigidbody2D::SetPosition( Vec2 const& position )
 	}
 }
 
+void Rigidbody2D::Translate( Vec2 const& translator )
+{
+	m_worldPosition += translator;
+}
+
 void Rigidbody2D::SetVelocity( Vec2 const& newVelocity )
 {
 	m_velocity = newVelocity;
@@ -68,6 +73,22 @@ void Rigidbody2D::SetVelocity( Vec2 const& newVelocity )
 void Rigidbody2D::SetSimulationMode( eSimulationMode simulationMode )
 {
 	m_simulationMode = simulationMode;
+}
+
+eSimulationMode Rigidbody2D::GetSimulationMode() const
+{
+	return m_simulationMode;
+}
+
+void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
+{
+	if( m_simulationMode != STATIC )
+	{
+		float inverseMass = 1.f/m_mass;
+		Vec2 deltaVelocity = impulse * inverseMass;
+
+		m_velocity += deltaVelocity;
+	}
 }
 
 Vec2 Rigidbody2D::GetVelocity()

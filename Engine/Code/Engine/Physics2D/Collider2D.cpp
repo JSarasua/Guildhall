@@ -1,6 +1,7 @@
 #include "Engine/Physics2D/Collider2D.hpp"
 #include "Engine/Physics2D/DiscCollider2D.hpp"
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
+#include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -62,6 +63,33 @@ bool Collider2D::Intersects( Collider2D const* other ) const
 		collision_check_cb check = gCollisionChecks[idx];
 		return check( other, this );
 	}
+}
+
+float Collider2D::GetMass()
+{
+	if( nullptr == m_rigidbody )
+	{
+		return 1.f;
+	}
+	else
+	{
+		return m_rigidbody->GetMass();
+	}
+}
+
+eSimulationMode Collider2D::GetSimulationMode() const
+{
+	return m_rigidbody->GetSimulationMode();
+}
+
+void Collider2D::Move( Vec2 const& translator )
+{
+	if( nullptr == m_rigidbody )
+	{
+		return;
+	}
+
+	m_rigidbody->Translate( translator );
 }
 
 Collider2D::~Collider2D()

@@ -26,8 +26,13 @@ public:
 	void TakeCollider( Collider2D* collider );
 
 	void SetPosition( Vec2 const& position );
+	void Translate( Vec2 const& translator );
 	void SetVelocity( Vec2 const& newVelocity );
 	void SetSimulationMode( eSimulationMode simulationMode );
+
+	eSimulationMode GetSimulationMode() const;
+
+	void ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse );
 
 	Vec2 GetVelocity();
 	Vec2 GetPosition();
