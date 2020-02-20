@@ -54,3 +54,4 @@ and remember you can submit extras from previous assignments.
 - [-] *X03.24 : 02pts*: Navigation Hotkeys, Home, End, Ctrl + Arrows
 
 ------
+Ctrl+Arrows does not do anything but Shift+Home/End selects text to the beginning/end of the line
