@@ -189,7 +189,9 @@
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
     <ClCompile Include="Physics2D\Collider2D.cpp" />
+    <ClCompile Include="Physics2D\Collision2D.cpp" />
     <ClCompile Include="Physics2D\DiscCollider2D.cpp" />
+    <ClCompile Include="Physics2D\Manifold2D.cpp" />
     <ClCompile Include="Physics2D\Physics2D.cpp" />
     <ClCompile Include="Physics2D\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics2D\Rigidbody2D.cpp" />
@@ -246,7 +248,9 @@
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
     <ClInclude Include="Physics2D\Collider2D.hpp" />
+    <ClInclude Include="Physics2D\Collision2D.hpp" />
     <ClInclude Include="Physics2D\DiscCollider2D.hpp" />
+    <ClInclude Include="Physics2D\Manifold2D.hpp" />
     <ClInclude Include="Physics2D\Physics2D.hpp" />
     <ClInclude Include="Physics2D\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics2D\Rigidbody2D.hpp" />
