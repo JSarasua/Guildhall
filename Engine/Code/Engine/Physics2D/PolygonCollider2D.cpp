@@ -5,10 +5,11 @@
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
-PolygonCollider2D::PolygonCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, Polygon2D const& polygon )
+PolygonCollider2D::PolygonCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, Polygon2D const& polygon, float restitution )
 	:m_localPosition(localPosition),
 	m_worldPosition(worldPosition),
-	m_polygon(polygon)
+	m_polygon(polygon),
+	Collider2D( restitution )
 {
 	m_type = COLLIDER2D_POLYGON;
 

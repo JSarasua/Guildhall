@@ -2,6 +2,7 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Physics2D/Manifold2D.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
+#include "Engine/Physics2D/PhysicsMaterial.hpp"
 
 struct Rgba8;
 struct LineSegment2;
@@ -31,16 +32,22 @@ class Collider2D
 	friend Physics2D;
 
 public:
+	Collider2D( float restitution = 1.f );
+
 	virtual void UpdateWorldShape()								= 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const	= 0;
 	virtual AABB2 GetBounds() const								= 0;
 	virtual bool Contains( Vec2 const& position ) const			= 0;
-	Manifold2D GetManifold( Collider2D const* other ) const;
+	
+	void Move( Vec2 const& translator );
+	
 	bool Intersects( Collider2D const* other ) const;
+	Manifold2D GetManifold( Collider2D const* other ) const;
 	float GetMass();
 	eSimulationMode GetSimulationMode() const;
-	void Move( Vec2 const& translator );
+	PhysicsMaterial GetPhysicsMaterial() const;
+	void SetRestitution( float newRestitution );
 
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
 
@@ -56,7 +63,7 @@ public:
 	eCollider2DType m_type;
 	Physics2D* m_system = nullptr;
 	Rigidbody2D* m_rigidbody = nullptr;
-
+	PhysicsMaterial m_physicsMaterial;
 protected:
 	bool m_isGarbage = false;
 };

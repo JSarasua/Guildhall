@@ -9,7 +9,7 @@ class RenderContext;
 class DiscCollider2D : public Collider2D
 {
 public:
-	DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius );
+	DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius, float restitution = 1.f );
 
 	virtual void UpdateWorldShape() override;
 

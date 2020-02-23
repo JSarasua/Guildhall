@@ -82,6 +82,22 @@ eSimulationMode Collider2D::GetSimulationMode() const
 	return m_rigidbody->GetSimulationMode();
 }
 
+PhysicsMaterial Collider2D::GetPhysicsMaterial() const
+{
+	return m_physicsMaterial;
+}
+
+void Collider2D::SetRestitution( float newRestitution )
+{
+	float restitution = Clampf( newRestitution, 0.f, 1.f );
+	m_physicsMaterial.m_restitution = restitution;
+}
+
+Collider2D::Collider2D( float restitution /*= 1.f */ )
+{
+	m_physicsMaterial.m_restitution = restitution;
+}
+
 void Collider2D::Move( Vec2 const& translator )
 {
 	if( nullptr == m_rigidbody )
@@ -125,9 +141,16 @@ static bool DiscVPolygonCollisionCheck( Collider2D const* col0, Collider2D const
 	float discRadius = disc->m_radius;
 	Polygon2D const& polygon = poly->m_polygon;
 
-	bool isColliding = DoPolygonAndDiscOverlap2D( polygon, discCenter, discRadius );
+	if( DoDiscAndAABBOverlap2D( discCenter, discRadius, poly->GetBounds() ) )
+	{
+		bool isColliding = DoPolygonAndDiscOverlap2D( polygon, discCenter, discRadius );
+		return isColliding;
+	}
+	else
+	{
+		return false;
+	}
 
-	return isColliding;
 }
 
 

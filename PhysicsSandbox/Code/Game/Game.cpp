@@ -113,32 +113,32 @@ void Game::UpdateGameObjects( float deltaSeconds )
 	}
 
 
-	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-	{
-		if( nullptr == m_gameObjects[gameObjectIndex] )
-		{
-			continue;
-		}
-		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
-
-		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
-		{
-			if( nullptr == m_gameObjects[otherGameObjectIndex] )
-			{
-				continue;
-			}
-			if( gameObjectIndex != otherGameObjectIndex )
-			{
-				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
-				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
-
-				if( collider->Intersects( otherCollider ) )
-				{
-					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
-				}
-			}
-		}
-	}
+// 	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+// 	{
+// 		if( nullptr == m_gameObjects[gameObjectIndex] )
+// 		{
+// 			continue;
+// 		}
+// 		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
+// 
+// 		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
+// 		{
+// 			if( nullptr == m_gameObjects[otherGameObjectIndex] )
+// 			{
+// 				continue;
+// 			}
+// 			if( gameObjectIndex != otherGameObjectIndex )
+// 			{
+// 				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
+// 				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
+// 
+// 				if( collider->Intersects( otherCollider ) )
+// 				{
+// 					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
+// 				}
+// 			}
+// 		}
+// 	}
 
 	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 	{
@@ -164,6 +164,7 @@ void Game::UpdateDebugMouse( float deltaSeconds )
 		Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 		Vec2 updatedDraggedPos = Vec2(m_mousePositionOnMainCamera + m_draggingOffset);
 		rb->SetPosition( updatedDraggedPos );
+		rb->SetVelocity( m_currentMouseVelocity );
 	}
 
 	std::vector<Vec2> polyPoints;
@@ -278,16 +279,41 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 		if( plusKey.IsPressed() )
 		{
-			float gravity = m_physics->GetSceneGravity();
-			gravity += 10.f * deltaSeconds;
-			m_physics->SetSceneGravity( gravity );
+			if( nullptr == m_draggingGameObject )
+			{
+				float gravity = m_physics->GetSceneGravity();
+				gravity += 10.f * deltaSeconds;
+				m_physics->SetSceneGravity( gravity );
+			}
+			else
+			{
+				Collider2D* draggingCollider = m_draggingGameObject->m_rigidbody->m_collider;
+				float restitution = draggingCollider->m_physicsMaterial.m_restitution;
+				restitution += deltaSeconds;
+				draggingCollider->SetRestitution( restitution );
+				float currentRestitution = draggingCollider->GetPhysicsMaterial().m_restitution;
+				m_draggingGameObject->m_fillColor.a = (unsigned char)Interpolate( 0, 128, currentRestitution );
+			}
 		}
 
 		if( minusKey.IsPressed() )
 		{
-			float gravity = m_physics->GetSceneGravity();
-			gravity -= 10.f * deltaSeconds;
-			m_physics->SetSceneGravity( gravity );
+
+			if( nullptr == m_draggingGameObject )
+			{
+				float gravity = m_physics->GetSceneGravity();
+				gravity -= 10.f * deltaSeconds;
+				m_physics->SetSceneGravity( gravity );
+			}
+			else
+			{
+				Collider2D* draggingCollider = m_draggingGameObject->m_rigidbody->m_collider;
+				float restitution = draggingCollider->m_physicsMaterial.m_restitution;
+				restitution -= deltaSeconds;
+				draggingCollider->SetRestitution( restitution );
+				float currentRestitution = draggingCollider->GetPhysicsMaterial().m_restitution;
+				m_draggingGameObject->m_fillColor.a = (unsigned char)Interpolate(0, 128, currentRestitution );
+			}
 		}
 
 		if( bSpaceKey.WasJustPressed() || delKey.WasJustPressed() )
@@ -329,6 +355,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 				DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
 				rb->TakeCollider( dc );
 				rb->SetPosition( m_mousePositionOnMainCamera );
+				rb->SetSimulationMode( DYNAMIC );
 				GameObject* gameObject = new GameObject( rb );
 
 				m_gameObjects.push_back( gameObject );
@@ -398,6 +425,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			PolygonCollider2D* pc = m_physics->CreatePolygonCollider( newPoly, Vec2(0.f, 0.f) );
 			rb->TakeCollider( pc );
 			rb->SetPosition( newPoly.GetCenterOfMass() );
+			rb->SetSimulationMode( STATIC );
 			GameObject* gameObject = new GameObject( rb );
 			m_gameObjects.push_back( gameObject );
 
@@ -446,7 +474,7 @@ void Game::GrabDiscIfOverlap()
 		if( collider->Contains( m_mousePositionOnMainCamera ) )
 		{
 			m_gameObjects[gameObjectIndex]->m_rigidbody->DisableRigidbody();
-
+			
 			Vec2 colliderPos = m_gameObjects[gameObjectIndex]->m_rigidbody->GetPosition();
 			m_draggingGameObject = m_gameObjects[gameObjectIndex];
 			m_draggingOffset = colliderPos - m_mousePositionOnMainCamera;

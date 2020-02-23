@@ -178,6 +178,9 @@
     <ClCompile Include="Physics2D\Manifold2D.cpp">
       <Filter>Physics2D</Filter>
     </ClCompile>
+    <ClCompile Include="Physics2D\PhysicsMaterial.cpp">
+      <Filter>Physics2D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -349,6 +352,9 @@
       <Filter>Physics2D</Filter>
     </ClInclude>
     <ClInclude Include="Physics2D\Manifold2D.hpp">
+      <Filter>Physics2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics2D\PhysicsMaterial.hpp">
       <Filter>Physics2D</Filter>
     </ClInclude>
   </ItemGroup>

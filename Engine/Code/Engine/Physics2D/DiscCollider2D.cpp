@@ -7,10 +7,11 @@
 #include "Engine/Math/FloatRange.hpp"
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
 
-DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius ) 
+DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, float radius, float restitution ) 
 	: m_localPosition(localPosition),
 	m_worldPosition(worldPosition),
-	m_radius(radius)
+	m_radius(radius),
+	Collider2D( restitution )
 {
 	m_type = COLLIDER2D_DISC;
 }

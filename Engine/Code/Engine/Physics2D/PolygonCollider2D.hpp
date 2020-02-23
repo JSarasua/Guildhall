@@ -9,7 +9,7 @@ class RenderContext;
 class PolygonCollider2D : public Collider2D
 {
 public:
-	PolygonCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, Polygon2D const& polygon );
+	PolygonCollider2D( Vec2 const& localPosition, Vec2 const& worldPosition, Polygon2D const& polygon, float restitution = 1.f );
 
 	virtual void UpdateWorldShape() override;
 

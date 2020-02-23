@@ -193,6 +193,7 @@
     <ClCompile Include="Physics2D\DiscCollider2D.cpp" />
     <ClCompile Include="Physics2D\Manifold2D.cpp" />
     <ClCompile Include="Physics2D\Physics2D.cpp" />
+    <ClCompile Include="Physics2D\PhysicsMaterial.cpp" />
     <ClCompile Include="Physics2D\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics2D\Rigidbody2D.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="Physics2D\DiscCollider2D.hpp" />
     <ClInclude Include="Physics2D\Manifold2D.hpp" />
     <ClInclude Include="Physics2D\Physics2D.hpp" />
+    <ClInclude Include="Physics2D\PhysicsMaterial.hpp" />
     <ClInclude Include="Physics2D\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics2D\Rigidbody2D.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />

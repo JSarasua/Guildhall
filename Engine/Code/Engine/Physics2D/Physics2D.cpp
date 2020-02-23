@@ -27,6 +27,11 @@ void Physics2D::ApplyEffectors()
 	{
 		Rigidbody2D* rb = m_rigidBodies[rigidBodyIndex];
 		
+		if( nullptr == rb )
+		{
+			continue;
+		}
+
 		Vec2 gravity( 0.f, -1.f );
 		gravity *= m_gravity;
 		gravity *= rb->GetMass();
@@ -135,6 +140,11 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	float theirMass = theirRigidbody->GetMass();
 	Vec2 myVelocity = myRigidbody->GetVelocity();
 	Vec2 theirVelocity = theirRigidbody->GetVelocity();
+	float myRestitution = collision.me->GetPhysicsMaterial().m_restitution;
+	float theirRestitution = collision.them->GetPhysicsMaterial().m_restitution;
+
+	float combinedRestituion = myRestitution * theirRestitution;
+
 	//Get Impulse direction
 
 
@@ -144,19 +154,19 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 
 	if( mySimMode == DYNAMIC && (theirSimMode == KINEMATIC || theirSimMode == STATIC) )
 	{
-		Vec2 impulse = myMass * (2.f) * (theirVelocity - myVelocity);
+		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
 		impulse = GetProjectedOnto2D( impulse, normal );
 		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), impulse);
 	}
 	else if( (mySimMode == KINEMATIC || mySimMode == STATIC) && theirSimMode == DYNAMIC )
 	{
-		Vec2 impulse = theirMass * (2.f) * (theirVelocity - myVelocity);
+		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
 		impulse = GetProjectedOnto2D( impulse, normal );
 		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -impulse );
 	}
 	else
 	{
-		Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (2.f) * (theirVelocity - myVelocity);
+		Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
 		impulse = GetProjectedOnto2D( impulse, normal );
 		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), impulse );
 		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -impulse );
