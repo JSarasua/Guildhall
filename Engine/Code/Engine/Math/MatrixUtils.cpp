@@ -41,8 +41,8 @@ Mat44 MakePerspectiveProjectMatrixD3D( float fovDegrees, float aspectRatio, floa
 	{
 		height / aspectRatio,	0.f,	0.f,		0.f,
 		0.f,					height, 0.f,		0.f,
-		0.f,					0.f,	farZ* q,	-nearZ * farZ * q,
-		0.f,					0.f,	1.f,		0.f
+		0.f,					0.f,	-farZ* q,	nearZ * farZ * q,
+		0.f,					0.f,	-1.f,		0.f
 	};
 	Mat44 proj( sixteenValuesBasisMajor	);
 	return proj;
