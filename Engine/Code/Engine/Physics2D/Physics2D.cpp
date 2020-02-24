@@ -85,6 +85,7 @@ void Physics2D::DetectCollisions()
 				continue;
 			}
 
+			//Change to just GetManifold
 			if( myCollider->Intersects( otherCollider ) )
 			{
 
