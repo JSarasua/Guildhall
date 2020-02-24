@@ -38,6 +38,12 @@ float SinDegrees( float orientationDegrees )
 {
 	return sinf( ConvertDegreesToRadians( orientationDegrees ) );
 }
+
+float TanDegrees( float orientationDegrees )
+{
+	return tanf( ConvertDegreesToRadians( orientationDegrees ) );
+}
+
 float Atan2Degrees( float y, float x )
 {
 	return ConvertRadiansToDegrees( atan2f( y, x ) );
