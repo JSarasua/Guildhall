@@ -59,9 +59,17 @@ void Physics2D::DetectCollisions()
 		{
 			continue;
 		}
+		if( !m_colliders[colliderIndex]->m_rigidbody->IsEnabled() )
+		{
+			continue;
+		}
 		for( size_t otherColliderIndex = colliderIndex + 1; otherColliderIndex < m_colliders.size(); otherColliderIndex++ )
 		{
 			if( nullptr == m_colliders[otherColliderIndex] )
+			{
+				continue;
+			}
+			if( !m_colliders[otherColliderIndex]->m_rigidbody->IsEnabled() )
 			{
 				continue;
 			}
@@ -184,6 +192,11 @@ void Physics2D::CleanupDestroyedObjects()
 {
 	for( int colliderIndex = 0; colliderIndex < m_colliders.size(); colliderIndex++ )
 	{
+		if( nullptr == m_colliders[colliderIndex] )
+		{
+			continue;
+		}
+
 		bool isGarbage = m_colliders[colliderIndex]->m_isGarbage;
 		if( isGarbage )
 		{
@@ -194,6 +207,11 @@ void Physics2D::CleanupDestroyedObjects()
 
 	for( int rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
 	{
+		if( nullptr == m_colliders[rigidBodyIndex] )
+		{
+			continue;
+		}
+
 		bool isGarbage = m_rigidBodies[rigidBodyIndex]->m_isGarbage;
 		if( isGarbage )
 		{
