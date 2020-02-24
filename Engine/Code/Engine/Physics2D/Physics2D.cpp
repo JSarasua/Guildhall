@@ -43,6 +43,10 @@ void Physics2D::MoveRigidbodies( float deltaSeconds )
 {
 	for( size_t rigidBodyIndex = 0; rigidBodyIndex < m_rigidBodies.size(); rigidBodyIndex++ )
 	{
+		if( nullptr == m_rigidBodies[rigidBodyIndex] )
+		{
+			continue;
+		}
 		m_rigidBodies[rigidBodyIndex]->Update( deltaSeconds );
 	}
 }
