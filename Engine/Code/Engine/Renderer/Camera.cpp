@@ -55,6 +55,29 @@ Vec2 Camera::GetOrthoTopRight() const
 	return tRight;
 }
 
+Vec3 Camera::GetOrthoMin() const
+{
+// 	Vec4 ndc( -1.f, -1.f, 0.f, 1.f );
+// 	Mat44 viewProjection = m_projection * m_view;
+// 	Mat44 clipToWorld = viewProjection;
+// 	MatrixInvert( clipToWorld );
+// 
+// 	Vec4 world = clipToWorld * ndc;
+// 	world.x /= world.w;
+// 	world.y /= world.w;
+// 	world.z /= world.w;
+// 	Vec3 world3D(world.x, world.y, world.z);
+// 	return world3D;
+// 	
+
+	return Vec3();
+}
+
+Vec3 Camera::GetOrthoMax() const
+{
+	return Vec3();
+}
+
 Mat44 Camera::GetProjection() const
 {
 	return m_projection;

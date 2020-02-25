@@ -32,7 +32,7 @@ Mat44 MakePerspectiveProjectMatrixD3D( float fovDegrees, float aspectRatio, floa
 	//   -> ((z - nz) / (fz - nz)) * fz + 0
 	//   -> fz / (fz - nz) * z      + (-fz * nz) / (fz - nz)
 
-	float height = 1.0f / tanf( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line. 
+	float height = 1.0f / TanDegrees( fovDegrees * .5f ); // how far away are we for the perspective point to be "one up" from our forward line. 
 	float zrange = farZ - nearZ;
 	float q = 1.0f / zrange;
 
