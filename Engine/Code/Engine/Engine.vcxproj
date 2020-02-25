@@ -185,6 +185,7 @@
     <ClCompile Include="Math\OBB2.cpp" />
     <ClCompile Include="Math\RandomNumberGenerator.cpp" />
     <ClCompile Include="Math\RawNoise.cpp" />
+    <ClCompile Include="Math\Transform.cpp" />
     <ClCompile Include="Math\vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="Math\OBB2.hpp" />
     <ClInclude Include="Math\RandomNumberGenerator.hpp" />
     <ClInclude Include="Math\RawNoise.hpp" />
+    <ClInclude Include="Math\Transform.hpp" />
     <ClInclude Include="Math\vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
