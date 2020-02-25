@@ -181,6 +181,9 @@
     <ClCompile Include="Math\Transform.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\GPUMesh.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -359,6 +362,9 @@
     </ClInclude>
     <ClInclude Include="Math\Transform.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\GPUMesh.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

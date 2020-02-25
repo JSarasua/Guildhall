@@ -16,6 +16,7 @@ class SwapChain;
 class Shader;
 class RenderBuffer;
 class VertexBuffer;
+class GPUMesh;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -76,6 +77,8 @@ public:
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
 
+	void DrawMesh( GPUMesh* mesh );
+
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
 	void AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexList, const AABB2& aabb, const Rgba8& tint, const Vec2& uvMins, const Vec2& uvMaxs );
 
@@ -98,7 +101,8 @@ public:
 	void DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness );
 	void DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness );
-	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color);
+	//void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color);
+	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, float z = 0.f );
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax);
 	void DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees);
 

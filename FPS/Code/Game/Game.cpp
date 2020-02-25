@@ -33,7 +33,8 @@ void Game::Startup()
 {
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
-	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
+	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
+	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 
 }
@@ -68,26 +69,29 @@ void Game::Update( float deltaSeconds )
 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
 	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
-	Vec2 movement;
 
-	if( leftArrow.WasJustPressed() )
-	{
-		movement.x -= 1.f;
-	}
-	if( rightArrow.WasJustPressed() )
-	{
-		movement.x += 1.f;
-	}
-	if( upArrow.WasJustPressed() )
-	{
-		movement.y += 1.f;
-	}
-	if( downArrow.WasJustPressed() )
-	{
-		movement.y -= 1.f;
-	}
 
-	m_camera.Translate(Vec3(movement, 0.f));
+
+// 	Vec2 movement;
+// 
+// 	if( leftArrow.WasJustPressed() )
+// 	{
+// 		movement.x -= 1.f;
+// 	}
+// 	if( rightArrow.WasJustPressed() )
+// 	{
+// 		movement.x += 1.f;
+// 	}
+// 	if( upArrow.WasJustPressed() )
+// 	{
+// 		movement.y += 1.f;
+// 	}
+// 	if( downArrow.WasJustPressed() )
+// 	{
+// 		movement.y -= 1.f;
+// 	}
+// 
+// 	m_camera.Translate(Vec3(movement, 0.f));
 
 	//g_theConsole->Update(g_theInput);
 }
@@ -109,6 +113,17 @@ void Game::Render()
 	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	g_theRenderer->BindShader( (Shader*)nullptr );
 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
+
+
+	tex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PlayerTankBase.png" );
+	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->BindTexture( tex );
+	g_theRenderer->BindShader( m_invertShader );
+	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -2.f, -2.f ), Vec2( 2.f, 2.f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
+
+	std::vector<Vertex_PCU> verts;
+	Vertex_PCU::AppendVertsCube(verts, Transform(), 0.f );
+	g_theRenderer->DrawVertexArray(verts);
 
 	RenderDevConsole();
 
@@ -145,6 +160,46 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const XboxController& controller = g_theInput->GetXboxController(0);
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
+
+
+	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
+	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
+	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
+	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+
+	Vec3 translator;
+
+	if( wKey.WasJustPressed() )
+	{
+		translator.z += 1.f;
+	}
+	if( sKey.WasJustPressed() )
+	{
+		translator.z -= 1.f;
+	}
+	if( aKey.WasJustPressed() )
+	{
+		translator.x -= 1.f;
+	}
+	if( dKey.WasJustPressed() )
+	{
+		translator.x += 1.f;
+	}
+	if( cKey.WasJustPressed() )
+	{
+		translator.y += 1.f;
+	}
+	if( spaceKey.WasJustPressed() )
+	{
+		translator.y -= 1.f;
+	}
+
+	m_camera.Translate( translator );
+
+
+
 }
 
 IntVec2 Game::GetCurrentMapBounds() const

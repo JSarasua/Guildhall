@@ -1,13 +1,22 @@
 #include "Engine/Math/Transform.hpp"
-
+#include "Engine/Math/MathUtils.hpp"
 
 void Transform::SetPosition( Vec3 const& pos )
 {
 	m_position = pos;
 }
 
+void Transform::Translate( Vec3 const& translator )
+{
+	m_position += translator;
+}
+
 void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw )
 {
+	pitch = Clampf( pitch, -90.f, 90.f );
+	roll = Clampf( roll, -180.f, 180.f );
+	yaw = Clampf( yaw, -180.f, 180.f );
+
 	m_rotationPitchRollYawDegrees.x = pitch;
 	m_rotationPitchRollYawDegrees.y = roll;
 	m_rotationPitchRollYawDegrees.z = yaw;

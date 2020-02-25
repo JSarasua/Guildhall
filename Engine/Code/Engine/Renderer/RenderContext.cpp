@@ -11,6 +11,8 @@
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Core/Time.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
 
@@ -191,6 +193,15 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes )
 	{
 	DrawVertexArray( static_cast<int>(vertexes.size()), &vertexes[0] );
 	}
+}
+
+void RenderContext::DrawMesh( GPUMesh* mesh )
+{
+	m_immediateVBO = mesh->m_vertices;
+
+	BindVertexBuffer( m_immediateVBO );
+
+	Draw( mesh->m_vertexCount, 0 );
 }
 
 void RenderContext::AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend )
@@ -711,17 +722,33 @@ void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thic
 
 }
 
-void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color )
+// void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color )
+// {
+// 	Vertex_PCU vertexes[6] =
+// 	{
+// 		Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
+// 		Vertex_PCU( Vec3( aabb.maxs.x, aabb.mins.y,0.f ),color,Vec2( 1.f,0.f ) ),
+// 		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
+// 
+// 		Vertex_PCU( Vec3( aabb.mins.x,aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
+// 		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
+// 		Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y,0.f ),color,Vec2( 0.f,1.f ) )
+// 	};
+// 	//BindTexture(nullptr);
+// 	DrawVertexArray( 6, vertexes );
+// }
+
+void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, float z )
 {
 	Vertex_PCU vertexes[6] =
 	{
-		Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
-		Vertex_PCU( Vec3( aabb.maxs.x, aabb.mins.y,0.f ),color,Vec2( 1.f,0.f ) ),
-		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
+		Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y, z ),color,Vec2( 0.f,0.f ) ),
+		Vertex_PCU( Vec3( aabb.maxs.x, aabb.mins.y, z ),color,Vec2( 1.f,0.f ) ),
+		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y, z ),color,Vec2( 1.f,1.f ) ),
 
-		Vertex_PCU( Vec3( aabb.mins.x,aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
-		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
-		Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y,0.f ),color,Vec2( 0.f,1.f ) )
+		Vertex_PCU( Vec3( aabb.mins.x,aabb.mins.y, z ),color,Vec2( 0.f,0.f ) ),
+		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y, z ),color,Vec2( 1.f,1.f ) ),
+		Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y, z ),color,Vec2( 0.f,1.f ) )
 	};
 	//BindTexture(nullptr);
 	DrawVertexArray( 6, vertexes );

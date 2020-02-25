@@ -67,3 +67,11 @@ public:
 	BufferAttribute const* m_bufferAttribute = nullptr;
 
 };
+
+class IndexBuffer : public RenderBuffer
+{
+public:
+	void Update( uint indexCount, uint const* indices );
+	void Update( std::vector<uint> const& indices );
+
+};
