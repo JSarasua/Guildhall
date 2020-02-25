@@ -64,10 +64,7 @@ void Game::Update( float deltaSeconds )
 		CheckButtonPresses( deltaSeconds );
 	}
 
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+
 
 
 
@@ -161,6 +158,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 
+	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
 	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
@@ -171,34 +172,52 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	Vec3 translator;
 
-	if( wKey.WasJustPressed() )
+	if( wKey.IsPressed() )
 	{
-		translator.z += 1.f;
+		translator.z +=  10.f * deltaSeconds;
 	}
-	if( sKey.WasJustPressed() )
+	if( sKey.IsPressed() )
 	{
-		translator.z -= 1.f;
+		translator.z -=  10.f * deltaSeconds;
 	}
-	if( aKey.WasJustPressed() )
+	if( aKey.IsPressed() )
 	{
-		translator.x -= 1.f;
+		translator.x -=  10.f * deltaSeconds;
 	}
-	if( dKey.WasJustPressed() )
+	if( dKey.IsPressed() )
 	{
-		translator.x += 1.f;
+		translator.x +=  10.f * deltaSeconds;
 	}
-	if( cKey.WasJustPressed() )
+	if( cKey.IsPressed() )
 	{
-		translator.y += 1.f;
+		translator.y +=  10.f * deltaSeconds;
 	}
-	if( spaceKey.WasJustPressed() )
+	if( spaceKey.IsPressed() )
 	{
-		translator.y -= 1.f;
+		translator.y -=  10.f * deltaSeconds;
 	}
 
 	m_camera.Translate( translator );
 
+	Vec3 rotator;
+	if( upArrow.IsPressed() )
+	{
+		rotator.x += 10.f * deltaSeconds;
+	}
+	if( downArrow.IsPressed() )
+	{
+		rotator.x -= 10.f * deltaSeconds;
+	}
+	if( leftArrow.IsPressed() )
+	{
+		rotator.y += 10.f * deltaSeconds;
+	}
+	if( rightArrow.IsPressed() )
+	{
+		rotator.y -= 10.f * deltaSeconds;
+	}
 
+	m_camera.RotatePitchRollYawDegrees( rotator );
 
 }
 

@@ -25,6 +25,11 @@ void Camera::Translate( const Vec3& translation )
 	m_position += translation;
 }
 
+void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
+{
+	m_transform.RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
+}
+
 Vec3 Camera::GetPosition()
 {
 	return m_transform.m_position;
@@ -147,4 +152,20 @@ void Camera::Translate2D( const Vec2& cameraDisplacement )
 {
 	bLeft += cameraDisplacement;
 	tRight += cameraDisplacement;
+}
+
+void Camera::UpdateCameraUBO()
+{
+	Mat44 cameraModel = m_transform.ToMatrix();
+	m_view = cameraModel;
+	MatrixInvertOrthoNormal( m_view );
+
+
+	//CameraData
+	CameraData camData;
+	camData.projection = GetProjection();
+	camData.view = GetViewMatrix();
+	//camData.view = Mat44::CreateTranslation3D( -GetPosition() );
+
+	m_cameraUBO->Update( &camData, sizeof( camData ), sizeof( camData ) );
 }

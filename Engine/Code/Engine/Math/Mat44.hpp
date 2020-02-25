@@ -88,6 +88,7 @@ public:
 	static const Mat44	CreateNonUniformScaleXY( const Vec2& scaleFactorsXY );
 	static const Mat44	CreateUniformScale3D( float uniformScale3D );
 	static const Mat44	CreateNonUniformScale3D( const Vec3& scaleFactorsXYZ);
+	static const Mat44	CreateFromScaleRotationTranslation( Vec3 const& scale, Vec3 const& rotation, Vec3 const& translation );
 
 	// projection
 	static const Mat44 CreateOrthographicProjection( const Vec3& min, const Vec3& max );

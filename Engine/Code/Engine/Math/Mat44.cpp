@@ -586,6 +586,18 @@ const Mat44 Mat44::CreateNonUniformScale3D( const Vec3& scaleFactorsXYZ )
 	return matrix;
 }
 
+const Mat44 Mat44::CreateFromScaleRotationTranslation( Vec3 const& scale, Vec3 const& rotation, Vec3 const& translation )
+{
+	Mat44 mat;
+	mat.CreateNonUniformScale3D( scale );
+	mat.RotateXDegrees( rotation.x );
+	mat.RotateYDegrees( rotation.y );
+	mat.RotateZDegrees( rotation.z );
+	mat.Translate3D( translation );
+
+	return mat;
+}
+
 const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min, const Vec3& max )
 {
 	// think of x

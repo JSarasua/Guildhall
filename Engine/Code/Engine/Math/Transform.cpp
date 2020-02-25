@@ -11,6 +11,15 @@ void Transform::Translate( Vec3 const& translator )
 	m_position += translator;
 }
 
+void Transform::RotatePitchRollYawDegrees( float pitch, float roll, float yaw )
+{
+	float newPitch = m_rotationPitchRollYawDegrees.x + pitch;
+	float newRoll = m_rotationPitchRollYawDegrees.y + roll;
+	float newYaw = m_rotationPitchRollYawDegrees.z + yaw;
+
+	SetRotationFromPitchRollYawDegrees( newPitch, newRoll, newYaw );
+}
+
 void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw )
 {
 	pitch = Clampf( pitch, -90.f, 90.f );

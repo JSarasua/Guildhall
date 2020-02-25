@@ -7,6 +7,7 @@ class Transform
 public:
 	void SetPosition( Vec3 const& pos );
 	void Translate( Vec3 const& translator );
+	void RotatePitchRollYawDegrees( float pitch, float roll, float yaw );
 	void SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw );
 
 	Mat44 ToMatrix() const;

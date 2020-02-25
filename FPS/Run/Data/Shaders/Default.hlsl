@@ -79,6 +79,7 @@ v2f_t VertexFunction( vs_input_t input )
 	v2f.worldPosition = worldPos.xyz;
 
 	float4 cameraPos = mul(VIEW, worldPos);
+	//modelPos
 	float4 clipPos = mul(PROJECTION, cameraPos);	// might have a w (usually 1 for now)
 
 	v2f.position = clipPos;
