@@ -281,6 +281,13 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 	m_context->PSSetConstantBuffers( slot, 1, &uboHandle );
 }
 
+void RenderContext::SetModelMatrix( Mat44 const& model )
+{
+	ModelData modelData;
+	modelData.model = model;
+	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
 Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 {
 	// make a 1x1 texture of that color, and return it;
@@ -593,6 +600,8 @@ void RenderContext::BeginCamera( Camera& camera )
 	}
 
 	camera.UpdateCameraUBO();
+
+
 // 	//CameraData
 // 	CameraData camData;
 // 	camData.projection = camera.GetProjection();
@@ -604,6 +613,17 @@ void RenderContext::BeginCamera( Camera& camera )
 
 
 	BindUniformBuffer( 1, camera.m_cameraUBO );
+
+
+	if( nullptr == m_modelUBO )
+	{
+		m_modelUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+
+	}
+
+	Mat44 identity;
+	SetModelMatrix(identity);
+	BindUniformBuffer( 2, m_modelUBO );
 }
 
 

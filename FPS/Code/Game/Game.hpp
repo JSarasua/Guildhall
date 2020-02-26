@@ -44,6 +44,7 @@ private:
 	IntVec2 GetCurrentMapBounds() const;
 
 private:
+	Mat44 m_modelMatrix;
 
 	Camera m_UICamera;
 	float m_maxCameraShake = 0.f;

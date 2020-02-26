@@ -26,6 +26,7 @@ extern const unsigned char CTRL_C_KEY;
 extern const unsigned char CTRL_V_KEY;
 extern const unsigned char CTRL_X_KEY;
 
+class Window;
 struct IntVec2;
 constexpr int NUM_KEYCODES = 256;
 
@@ -38,7 +39,7 @@ public:
 	InputSystem();
 	~InputSystem();
 
-	void Startup();
+	void Startup( Window* window );
 	void BeginFrame();
 	void EndFrame();
 	void Shutdown();
@@ -61,6 +62,7 @@ private:
 
 	void UpdateMouse();
 private:
+	Window* m_window = nullptr;
 	Vec2 m_mouseNormalizedClientPos;
 
 	std::string m_consoleKeyBuffer;

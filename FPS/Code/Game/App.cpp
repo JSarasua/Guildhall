@@ -27,12 +27,13 @@ App::~App() {}
 
 void App::Startup()
 {
-	g_theInput->Startup();
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
 	g_theWindow->SetInputSystem(g_theInput);
 	g_theWindow->SetEventSystem(g_theEventSystem);
+	
+	g_theInput->Startup( g_theWindow );
 
 	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp(g_theWindow);

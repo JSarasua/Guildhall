@@ -34,11 +34,11 @@ void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, flo
 Mat44 Transform::ToMatrix() const
 {
 	Mat44 mat;
-	mat.CreateNonUniformScale3D(m_scale);
-	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
-	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
-	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
 	mat.Translate3D( m_position );
+	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
+	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
+	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
+	mat.CreateNonUniformScale3D(m_scale);
 
 	return mat;
 

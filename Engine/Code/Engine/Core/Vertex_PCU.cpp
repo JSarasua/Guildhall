@@ -148,58 +148,58 @@ void Vertex_PCU::AppendVertsCube( std::vector<Vertex_PCU>& masterVertexList, Tra
 	Vertex_PCU cubeVerts[36] =
 	{
 		//Front Quad
-		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::RED,		bLeft),
-		Vertex_PCU(Vec3( 1.f, -1.f, 1.f ), Rgba8::RED,		bRight),
-		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::RED,		tRight),
+		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft),
+		Vertex_PCU(Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bRight),
+		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight),
 
-		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::RED,		bLeft),
-		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::RED,		tRight),
-		Vertex_PCU(Vec3( -1.f, 1.f, 1.f ), Rgba8::RED,		tLeft),
+		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft),
+		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight),
+		Vertex_PCU(Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		tLeft),
 
 		//Right Quad
-		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::RED,		bLeft ),
-		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::RED,	bRight ),
-		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::RED,		tRight ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
 
-		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::RED,		bLeft ),
-		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::RED,		tRight ),
-		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::RED,		tLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tLeft ),
 
 		//Back Quad
-		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::RED,	bRight ),
-		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::RED,	tRight ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tRight ),
 
-		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::RED,	tRight ),
-		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::RED,		tLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tLeft ),
 
 		//Left Quad
-		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::RED,	bRight ),
-		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::RED,	tRight ),
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,	tRight ),
 
-		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::RED,		tRight ),
-		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::RED,	tLeft ),
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tLeft ),
 
 		//Top Quad
-		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::RED,		bLeft ),
-		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::RED,		bRight ),
-		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::RED,		tRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		bRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
 
-		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::RED,		bLeft ),
-		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::RED,		tRight ),
-		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::RED,	tLeft ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tLeft ),
 
 		//Bottom Quad
-		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::RED,	bRight ),
-		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::RED,		tRight ),
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		tRight ),
 
-		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::RED,	bLeft ),
-		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::RED,		tRight ),
-		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::RED,	tLeft )
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,	tLeft )
 	};
 
 	for( int vertexIndex = 0; vertexIndex < 36; vertexIndex++ )

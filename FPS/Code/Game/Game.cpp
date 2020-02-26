@@ -36,7 +36,7 @@ void Game::Startup()
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
-
+	m_modelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -2.f ) );
 }
 
 void Game::Shutdown(){}
@@ -65,6 +65,7 @@ void Game::Update( float deltaSeconds )
 	}
 
 
+	m_modelMatrix.RotateYDegrees( 45.f * deltaSeconds );
 
 
 
@@ -118,6 +119,9 @@ void Game::Render()
 	g_theRenderer->BindShader( m_invertShader );
 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -2.f, -2.f ), Vec2( 2.f, 2.f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
 
+
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theRenderer->SetModelMatrix( m_modelMatrix );
 	std::vector<Vertex_PCU> verts;
 	Vertex_PCU::AppendVertsCube(verts, Transform(), 0.f );
 	g_theRenderer->DrawVertexArray(verts);

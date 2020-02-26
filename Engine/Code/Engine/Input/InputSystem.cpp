@@ -5,6 +5,8 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Console/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Platform/Window.hpp"
+
 
 const unsigned char ESC_KEY			= VK_ESCAPE;
 const unsigned char UP_KEY			= VK_UP;
@@ -38,15 +40,16 @@ InputSystem::~InputSystem()
 
 }
 
-void InputSystem::Startup()
+void InputSystem::Startup( Window* window )
 {
-
+	m_window = window;
 }
 
 void InputSystem::BeginFrame()
 {
 	//UpdateMouse
-	//UpdateMouse();
+	UpdateMouse();
+
 	//UpdateController
 
 	for( int controllerIndex = 0; controllerIndex < MAX_XBOX_CONTROLLERS; controllerIndex++ )
@@ -116,18 +119,17 @@ const KeyButtonState* InputSystem::GetAllKeyStates()
 
 void InputSystem::UpdateMouse()
 {
-// 	POINT mousePos;
-// 	GetCursorPos( &mousePos );
-// 	ScreenToClient( g_hWnd, &mousePos );
-// 	Vec2 mouseClientPos( (float)mousePos.x, (float)mousePos.y);
-// 
-// 	RECT clientRect;
-// 	GetClientRect( g_hWnd, &clientRect );
-// 	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom);
-// 
-// 	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint(mouseClientPos);
-// 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
-	UNIMPLEMENTED();
+	POINT mousePos;
+	GetCursorPos( &mousePos );
+	ScreenToClient( (HWND)m_window->m_hwnd, &mousePos );
+	Vec2 mouseClientPos( (float)mousePos.x, (float)mousePos.y);
+
+	RECT clientRect;
+	GetClientRect( (HWND)m_window->m_hwnd, &clientRect );
+	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom);
+
+	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint(mouseClientPos);
+	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
 }
 
 void InputSystem::CopyStringToClipboard( std::string stringToCopy )

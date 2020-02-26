@@ -36,6 +36,11 @@ cbuffer camera_constants : register(b1)
 	float4x4 VIEW;
 };
 
+cbuffer model : register(b2)
+{
+	float4x4 MODEL;
+};
+
 // Textures & Samplers are also a form of constant
 // data - unform/constant across the entire call
 // tSlots are for big things
@@ -78,8 +83,9 @@ v2f_t VertexFunction( vs_input_t input )
 
 	v2f.worldPosition = worldPos.xyz;
 
-	float4 cameraPos = mul(VIEW, worldPos);
-	//modelPos
+	float4 modelPos = mul(MODEL, worldPos);
+	float4 cameraPos = mul(VIEW, modelPos);
+	//float4 cameraPos = mul(VIEW, worldPos);
 	float4 clipPos = mul(PROJECTION, cameraPos);	// might have a w (usually 1 for now)
 
 	v2f.position = clipPos;

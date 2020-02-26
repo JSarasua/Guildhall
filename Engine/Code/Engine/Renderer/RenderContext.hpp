@@ -33,6 +33,11 @@ struct FrameData
 	float padding[2];
 };
 
+struct ModelData
+{
+	Mat44 model;
+};
+
 enum class Viewport
 {
 	TopLeft,
@@ -88,6 +93,8 @@ public:
 
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
+	void SetModelMatrix( Mat44 const& model );
+
 	Texture* CreateTextureFromColor( Rgba8 color );
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
@@ -141,6 +148,7 @@ public:
 	Texture* m_texWhite = nullptr;
 
 	RenderBuffer* m_frameUBO = nullptr;
+	RenderBuffer* m_modelUBO = nullptr;
 
 	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
 	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;
