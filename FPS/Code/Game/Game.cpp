@@ -221,6 +221,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		rotator.y -= 10.f * deltaSeconds;
 	}
 
+	Vec2 mousePos = g_theInput->GetMouseNormalizedPos();
+	mousePos.x -= 0.5f;
+	mousePos.y -= 0.5f;
+
+	rotator.x += mousePos.y * 30.f * deltaSeconds;
+	rotator.y -= mousePos.x * 30.f * deltaSeconds;
 	m_camera.RotatePitchRollYawDegrees( rotator );
 
 }
