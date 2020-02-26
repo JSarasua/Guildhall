@@ -8,14 +8,14 @@
 
 
 typedef bool (*collision_check_cb)( Collider2D const*, Collider2D const* );
-typedef Manifold2D (*manifold_cb)( Collider2D const*, Collider2D const* );
+typedef bool (*manifold_cb)( Collider2D const*, Collider2D const*, Manifold2D* );
 
 static bool DiscVDiscCollisionCheck( Collider2D const* col0, Collider2D const* col1 );
 static bool DiscVPolygonCollisionCheck( Collider2D const* col0, Collider2D const* col1 );
 static bool PolygonVPolygonCollisionCheck( Collider2D const* col0, Collider2D const* col1 );
-static Manifold2D DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1 );
-static Manifold2D DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1 );
-static Manifold2D PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1 );
+static bool DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold );
+static bool DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold );
+static bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold );
 
 static collision_check_cb gCollisionChecks[NUM_COLLIDER_TYPE * NUM_COLLIDER_TYPE] ={
 	/*             disc,                         polygon, */
@@ -29,21 +29,28 @@ static manifold_cb gManifoldChecks[NUM_COLLIDER_TYPE * NUM_COLLIDER_TYPE] ={
 	/* polygon */  DiscVPolygonManifold,   PolygonVPolygonManifold
 };
 
-Manifold2D Collider2D::GetManifold( Collider2D const* other ) const
+bool Collider2D::GetManifold( Collider2D const* other, Manifold2D* manifold ) const
 {
 	eCollider2DType myType = m_type;
 	eCollider2DType otherType = other->m_type;
 
+	AABB2 const& myBounds = GetBounds();
+	AABB2 const& theirBounds = other->GetBounds();
+	if( !DoAABBsOverlap2D( myBounds, theirBounds ) )
+	{
+		return false;
+	}
+
 	if( myType <= otherType ) {
 		int idx = otherType * NUM_COLLIDER_TYPE + myType;
 		manifold_cb check = gManifoldChecks[idx];
-		return check( this, other );
+		return check( this, other, manifold );
 	}
 	else {
 		// flip the types when looking into the index.
 		int idx = myType * NUM_COLLIDER_TYPE + otherType;
 		manifold_cb check = gManifoldChecks[idx];
-		return check( other, this );
+		return check( other, this, manifold );
 	}
 }
 
@@ -186,7 +193,7 @@ static bool PolygonVPolygonCollisionCheck( Collider2D const* col0, Collider2D co
 }
 
 
-Manifold2D DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1 )
+bool DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold )
 {
 	DiscCollider2D const* disc0 = (DiscCollider2D const*)col0;
 	DiscCollider2D const* disc1 = (DiscCollider2D const*)col1;
@@ -198,17 +205,22 @@ Manifold2D DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1 )
 
 	Vec2 normal = disc0Center - disc1Center;
 	float penetration = (disc0Radius + disc1Radius) - GetDistance2D(disc0Center, disc1Center);
+
+	if( penetration < 0.f )
+	{
+		return false;
+	}
+	
 	normal.Normalize();
 	Vec2 contact = disc0Center - normal*(disc0Radius - 0.5f*penetration);
 
-	Manifold2D manifold;
-	manifold.normal = normal;
-	manifold.penetration = penetration;
-	manifold.contactPoint = contact;
+	manifold->normal = normal;
+	manifold->penetration = penetration;
+	manifold->contactPoint = contact;
 
 	return manifold;
 }
-Manifold2D DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1 )
+bool DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold )
 {
 	DiscCollider2D const* disc = (DiscCollider2D const*)col0;
 	PolygonCollider2D const* poly = (PolygonCollider2D const*)col1;
@@ -223,6 +235,11 @@ Manifold2D DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1 
 	float distanceToCollision = GetDistance2D(discCenter, closestPoint);
 	float penetration = discRadius - distanceToCollision;
 
+	if( penetration < 0.f )
+	{
+		return false;
+	}
+
 	if( polygon.Contains( discCenter ) )
 	{
 		normal *= -1.f;
@@ -230,19 +247,19 @@ Manifold2D DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1 
 	}
 	Vec2 contactPoint = discCenter - normal*( discRadius - 0.5f*penetration );
 
-	Manifold2D manifold;
-	manifold.contactPoint = contactPoint;
-	manifold.normal = normal;
-	manifold.penetration = penetration;
 
-	return manifold;
+	manifold->contactPoint = contactPoint;
+	manifold->normal = normal;
+	manifold->penetration = penetration;
+
+	return true;
 	//TODO if on edge of polygon
 }
-Manifold2D PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1 )
+bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold )
 {
 	UNUSED(col0);
 	UNUSED(col1);
+	UNUSED(manifold);
 
-	Manifold2D manifold;
-	return manifold;
+	return false;
 }

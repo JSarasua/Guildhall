@@ -44,7 +44,7 @@ public:
 	void Move( Vec2 const& translator );
 	
 	bool Intersects( Collider2D const* other ) const;
-	Manifold2D GetManifold( Collider2D const* other ) const;
+	bool GetManifold( Collider2D const* other, Manifold2D* manifold ) const;
 	float GetMass();
 	eSimulationMode GetSimulationMode() const;
 	PhysicsMaterial GetPhysicsMaterial() const;

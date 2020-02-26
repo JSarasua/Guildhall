@@ -85,30 +85,30 @@ void Physics2D::DetectCollisions()
 				continue;
 			}
 
-			//Change to just GetManifold
-			if( myCollider->Intersects( otherCollider ) )
+			Manifold2D manifold;
+			bool intersects = myCollider->GetManifold(otherCollider, &manifold );
+			if( !intersects )
 			{
+				continue;
+			}
+			Collision2D collision;
 
-				Manifold2D manifold = myCollider->GetManifold(otherCollider);
-				Collision2D collision;
-
-				if( myCollider->m_type == COLLIDER2D_POLYGON && otherCollider->m_type == COLLIDER2D_DISC )
-				{
-					collision.me = otherCollider;
-					collision.them = myCollider;
-				}
-				else
-				{
-					collision.me = myCollider;
-					collision.them = otherCollider;
-				}
+			if( myCollider->m_type == COLLIDER2D_POLYGON && otherCollider->m_type == COLLIDER2D_DISC )
+			{
+				collision.me = otherCollider;
+				collision.them = myCollider;
+			}
+			else
+			{
+				collision.me = myCollider;
+				collision.them = otherCollider;
+			}
 // 				collision.me = myCollider;
 // 				collision.them = otherCollider;
-				collision.manifold = manifold;
+			collision.manifold = manifold;
 
 
-				m_collisions.push_back(collision);
-			}
+			m_collisions.push_back(collision);
 		}
 	}
 }
