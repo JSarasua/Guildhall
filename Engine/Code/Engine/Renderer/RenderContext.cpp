@@ -129,6 +129,9 @@ void RenderContext::Shutdown()
 	delete m_frameUBO;
 	m_frameUBO = nullptr;
 
+	delete m_modelUBO;
+	m_frameUBO = nullptr;
+
 	delete m_sampPoint;
 	m_sampPoint = nullptr;
 
