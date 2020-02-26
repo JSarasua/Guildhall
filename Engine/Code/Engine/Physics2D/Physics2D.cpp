@@ -153,10 +153,8 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	float theirMass = theirRigidbody->GetMass();
 	Vec2 myVelocity = myRigidbody->GetVelocity();
 	Vec2 theirVelocity = theirRigidbody->GetVelocity();
-	float myRestitution = collision.me->GetPhysicsMaterial().m_restitution;
-	float theirRestitution = collision.them->GetPhysicsMaterial().m_restitution;
 
-	float combinedRestituion = myRestitution * theirRestitution;
+	float combinedRestituion = collision.me->GetBounceWith( collision.them );
 
 	//Get Impulse direction
 

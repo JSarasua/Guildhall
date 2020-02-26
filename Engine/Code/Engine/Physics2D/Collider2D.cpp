@@ -52,6 +52,13 @@ bool Collider2D::Intersects( Collider2D const* other ) const
 	eCollider2DType myType = m_type;
 	eCollider2DType otherType = other->m_type;
 
+	AABB2 myBounds = GetBounds();
+	AABB2 theirBounds = other->GetBounds();
+	if( !DoAABBsOverlap2D( myBounds, theirBounds ) )
+	{
+		return false;
+	}
+
 	if( myType <= otherType ) {
 		int idx = otherType * NUM_COLLIDER_TYPE + myType;
 		collision_check_cb check = gCollisionChecks[idx];
@@ -87,6 +94,15 @@ PhysicsMaterial Collider2D::GetPhysicsMaterial() const
 	return m_physicsMaterial;
 }
 
+float Collider2D::GetBounceWith( Collider2D const* other ) const
+{
+	float myRestitution = m_physicsMaterial.m_restitution;
+	float theirResitution = other->m_physicsMaterial.m_restitution;
+
+	//Calculating Restitution by the produce. May want to change to allow for Min, Max, etc.
+	return myRestitution * theirResitution;
+}
+
 void Collider2D::SetRestitution( float newRestitution )
 {
 	float restitution = Clampf( newRestitution, 0.f, 1.f );
@@ -96,6 +112,11 @@ void Collider2D::SetRestitution( float newRestitution )
 Collider2D::Collider2D( float restitution /*= 1.f */ )
 {
 	m_physicsMaterial.m_restitution = restitution;
+}
+
+AABB2 Collider2D::GetBounds() const
+{
+	return m_bounds;
 }
 
 void Collider2D::Move( Vec2 const& translator )

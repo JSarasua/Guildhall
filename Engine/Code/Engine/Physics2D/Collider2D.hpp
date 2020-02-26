@@ -3,12 +3,13 @@
 #include "Engine/Physics2D/Manifold2D.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Physics2D/PhysicsMaterial.hpp"
+#include "Engine/Math/AABB2.hpp"
 
 struct Rgba8;
 struct LineSegment2;
 class Physics2D;
 class RenderContext;
-struct AABB2;
+
 
 
 
@@ -37,7 +38,7 @@ public:
 	virtual void UpdateWorldShape()								= 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const	= 0;
-	virtual AABB2 GetBounds() const								= 0;
+	AABB2 GetBounds() const;
 	virtual bool Contains( Vec2 const& position ) const			= 0;
 	
 	void Move( Vec2 const& translator );
@@ -47,6 +48,8 @@ public:
 	float GetMass();
 	eSimulationMode GetSimulationMode() const;
 	PhysicsMaterial GetPhysicsMaterial() const;
+	float GetBounceWith( Collider2D const* other ) const;
+
 	void SetRestitution( float newRestitution );
 
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
@@ -64,6 +67,7 @@ public:
 	Physics2D* m_system = nullptr;
 	Rigidbody2D* m_rigidbody = nullptr;
 	PhysicsMaterial m_physicsMaterial;
+	AABB2 m_bounds;
 protected:
 	bool m_isGarbage = false;
 };

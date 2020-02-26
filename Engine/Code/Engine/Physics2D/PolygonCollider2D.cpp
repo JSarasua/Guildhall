@@ -22,6 +22,8 @@ void PolygonCollider2D::UpdateWorldShape()
 
 	m_polygon.Translate( translator );
 	m_worldPosition = m_rigidbody->GetPosition();
+
+	m_bounds = m_polygon.GetTightlyFixBox();
 }
 
 Vec2 PolygonCollider2D::GetClosestPoint( Vec2 const& position ) const
@@ -70,11 +72,6 @@ eOffScreenDirection PolygonCollider2D::IsOffScreen( AABB2 const& bounds ) const
 void PolygonCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness )
 {
 	context->DrawPolygon2D( m_polygon, fillColor, borderColor, thickness );
-}
-
-AABB2 PolygonCollider2D::GetBounds() const
-{
-	return m_polygon.GetTightlyFixBox();
 }
 
 Polygon2D PolygonCollider2D::GetPolygon() const

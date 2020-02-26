@@ -19,19 +19,15 @@ DiscCollider2D::DiscCollider2D( Vec2 const& localPosition, Vec2 const& worldPosi
 void DiscCollider2D::UpdateWorldShape()
 {
 	m_worldPosition = m_rigidbody->GetPosition();
+
+	Vec2 offSet( m_radius, m_radius );
+	AABB2 bounds( m_worldPosition - offSet, m_worldPosition + offSet );
+	m_bounds = bounds;
 }
 
 Vec2 DiscCollider2D::GetClosestPoint( Vec2 const& position ) const
 {
 	return GetNearestPointOnDisc2D( position, m_worldPosition, m_radius );
-}
-
-AABB2 DiscCollider2D::GetBounds() const
-{
-	Vec2 offSet( m_radius, m_radius );
-	AABB2 bounds( m_worldPosition - offSet, m_worldPosition + offSet );
-
-	return bounds;
 }
 
 bool DiscCollider2D::Contains( Vec2 const& position ) const
