@@ -2,6 +2,7 @@
 #include "Engine/Physics2D/Physics2D.hpp"
 #include "Engine/Physics2D/Collider2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 void Rigidbody2D::Update( float deltaSeconds )
@@ -82,6 +83,8 @@ eSimulationMode Rigidbody2D::GetSimulationMode() const
 
 void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
 {
+	UNUSED( worldPos );
+
 	if( m_simulationMode != STATIC )
 	{
 		float inverseMass = 1.f/m_mass;
