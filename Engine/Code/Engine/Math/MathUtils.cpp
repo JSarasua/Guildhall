@@ -344,7 +344,7 @@ bool DoAABBsOverlap2D( const AABB2& aabbA, const AABB2& aabbB ) //Slower than ch
 {
 	//X
 	float maxOfMinsX = Max( aabbA.mins.x, aabbB.mins.x );
-	float minOfMaxsX = Min( aabbA.maxs.x, aabbB.maxs.y );
+	float minOfMaxsX = Min( aabbA.maxs.x, aabbB.maxs.x );
 
 	//Y
 	float maxOfMinsY = Max( aabbA.mins.y, aabbB.mins.y );
