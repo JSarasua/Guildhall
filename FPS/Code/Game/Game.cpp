@@ -178,11 +178,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( wKey.IsPressed() )
 	{
-		translator.z +=  10.f * deltaSeconds;
+		translator.z -=  10.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.z -=  10.f * deltaSeconds;
+		translator.z +=  10.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
@@ -201,7 +201,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		translator.y -=  10.f * deltaSeconds;
 	}
 
-	m_camera.Translate( translator );
+	m_camera.TranslateRelativeToView( translator );
 
 	Vec3 rotator;
 	if( upArrow.IsPressed() )

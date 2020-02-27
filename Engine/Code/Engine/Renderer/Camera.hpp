@@ -32,9 +32,11 @@ public:
 
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
+	void TranslateRelativeToView( Vec3 const& translation );
 	void RotatePitchRollYawDegrees( Vec3 const& rotator );
 	void Translate2D( const Vec2& cameraDisplacement ); //Should be replaced soon
 	void UpdateCameraUBO();
+
 
 
 	Vec3 GetPosition();

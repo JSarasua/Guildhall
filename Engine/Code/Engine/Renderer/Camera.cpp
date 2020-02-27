@@ -25,6 +25,17 @@ void Camera::Translate( const Vec3& translation )
 	m_position += translation;
 }
 
+void Camera::TranslateRelativeToView( Vec3 const& translation )
+{
+	Mat44 translationMatrix;
+	translationMatrix.RotateZDegrees( m_transform.m_rotationPitchRollYawDegrees.z );
+	translationMatrix.RotateYDegrees( m_transform.m_rotationPitchRollYawDegrees.y );
+	translationMatrix.RotateXDegrees( m_transform.m_rotationPitchRollYawDegrees.x );
+
+	Vec3 absoluteTranslation = translationMatrix.TransformPosition3D( translation );
+	Translate( absoluteTranslation );
+}
+
 void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 {
 	m_transform.RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
