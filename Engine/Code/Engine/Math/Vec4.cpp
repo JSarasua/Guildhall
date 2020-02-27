@@ -22,6 +22,17 @@ Vec4::Vec4( float initialX, float initialY, float initialZ, float initialW )
 }
 
 
+const Vec4 Vec4::operator/( float inverseScale ) const
+{
+	Vec4 newVec;
+	newVec.x = x / inverseScale;
+	newVec.y = y / inverseScale;
+	newVec.z = z / inverseScale;
+	newVec.w = w / inverseScale;
+
+	return newVec;
+}
+
 void Vec4::SetFromText( const char* text )
 {
 	std::string strText = text;

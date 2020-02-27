@@ -24,6 +24,7 @@ public:
 	Rgba8		GetValue( const std::string& keyName, const Rgba8& defaultValue ) const;
 	Vec2		GetValue( const std::string& keyName, const Vec2& defaultValue ) const;
 	IntVec2		GetValue( const std::string& keyName, const IntVec2& defaultValue ) const;
+	std::vector<std::string> GetAllValues() const;
 
 private:
 	std::map< std::string, std::string> m_keyValuePairs;

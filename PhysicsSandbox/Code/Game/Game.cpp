@@ -35,13 +35,17 @@ void Game::Startup()
 	m_camera = new Camera();
 	m_UICamera = new Camera();
 
+	m_camera->SetColorTarget( nullptr );
+	m_UICamera->SetColorTarget( nullptr );
+
 	m_physics = new Physics2D();
 
-	m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
+	//m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
+	m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
 	m_defaultCameraHeight = m_camera->m_outputSize.y;
 	m_camera->SetPosition( Vec2(0.f,0.f) );
 
-	m_UICamera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
+	m_UICamera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
 	m_defaultCameraHeight = m_UICamera->m_outputSize.y;
 	m_UICamera->SetPosition( Vec2( 0.f, 0.f ) );
 
@@ -51,7 +55,11 @@ void Game::Startup()
 	//g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 }
 
-void Game::Shutdown(){}
+void Game::Shutdown()
+{
+	delete m_camera;
+	delete m_UICamera;
+}
 
 void Game::RunFrame(){}
 
@@ -69,13 +77,16 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render()
 {
-	g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
+	//g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
+	m_camera->SetClearMode( CLEAR_COLOR_BIT, Rgba8( 0, 0, 0, 255 ), 0.f, 0 );
 	g_theRenderer->BeginCamera( *m_camera );
+	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
 	RenderDebugMouse();
 	RenderGameObjects();
 	g_theRenderer->EndCamera( *m_camera );
 
 
+/*	m_UICamera->SetClearMode( CLEAR_COLOR_BIT, Rgba8( 0, 0, 0, 255 ), 0.f, 0 );*/
 	g_theRenderer->BeginCamera( *m_UICamera );
 	RenderUI();
 	g_theRenderer->EndCamera( *m_UICamera );
@@ -157,7 +168,9 @@ void Game::UpdateGameObjects( float deltaSeconds )
 void Game::UpdateDebugMouse( float deltaSeconds )
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedPos();
-	m_mousePositionOnMainCamera = m_camera->GetClientToWorldPosition(mouseNormalizedPos);
+	//m_mousePositionOnMainCamera = m_camera->GetClientToWorldPosition(mouseNormalizedPos);
+	Vec3 clientToWorld = m_camera->ClientToWorld( mouseNormalizedPos, 0.f );
+	m_mousePositionOnMainCamera = Vec2( clientToWorld.x, clientToWorld.y );
 
 	if( m_draggingGameObject )
 	{
@@ -273,8 +286,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 		if( oKey.WasJustPressed() )
 		{
-			m_camera->m_position = Vec2( 0.f, 0.f );
-			m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
+			m_camera->SetPosition( Vec3(0.f, 0.f, 0.f ) );
+			//m_camera->m_position = Vec2( 0.f, 0.f );
+			m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
+			//m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
 		}
 
 		if( plusKey.IsPressed() )
@@ -441,7 +456,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		cameraHeight  += (mouseWheelScroll * 10.f);
 		cameraHeight = Clampf(cameraHeight, 10.f, 1000.f);
 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
-		m_camera->SetProjectionOrthographic(cameraHeight);
+		//m_camera->SetProjectionOrthographic(cameraHeight);
+		Vec2 outputSize = Vec2( cameraHeight * m_camera->GetAspectRatio(), cameraHeight );
+		m_camera->SetProjectionOrthographic( outputSize, 0.f, 1.f );
  	}
 
 

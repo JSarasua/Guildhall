@@ -15,6 +15,7 @@ public:
 	Vec3() {}												// default constructor (do nothing)
 	Vec3( const Vec3& copyFrom );							// copy constructor (from another Vec3)
 	Vec3( const Vec2& copyFrom );
+	Vec3( const Vec2& copyFrom, float z );
 	explicit Vec3( float initialX, float initialY, float initialZ );		// explicit constructor (from x, y, z)
 
 															// Operators (const)

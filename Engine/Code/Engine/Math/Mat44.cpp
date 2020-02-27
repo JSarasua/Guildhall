@@ -586,3 +586,45 @@ const Mat44 Mat44::CreateNonUniformScale3D( const Vec3& scaleFactorsXYZ )
 	return matrix;
 }
 
+const Mat44 Mat44::CreateFromScaleRotationTranslation( Vec3 const& scale, Vec3 const& rotation, Vec3 const& translation )
+{
+	Mat44 mat;
+	mat.CreateNonUniformScale3D( scale );
+	mat.RotateXDegrees( rotation.x );
+	mat.RotateYDegrees( rotation.y );
+	mat.RotateZDegrees( rotation.z );
+	mat.Translate3D( translation );
+
+	return mat;
+}
+
+const Mat44 Mat44::CreateOrthographicProjection( const Vec3& min, const Vec3& max )
+{
+	// think of x
+	// min.x, max.x -> (-1, 1)
+	//ndc.x = (x - min.x) / (max.x - min.x) * (1.f - (-1.f)) + (-1.f)
+	//ndc.x = x / (max.x - min.x) - (min.x / (max.x - min.x)) * 2.f + -1.f
+	//a = 1.f/(max.x - min.x)
+	//b = (-2.f * min.x - max.x + min.x) / (max.x - min.x)
+	//	= -(max.x + min.x) / (max.x - min.x)
+
+	// min.x, max.x -> (-1, 1)
+	//ndc.x = (x - min.x) / (max.x - min.x) * (1.f - (0.f)) + (0.f)
+	//ndc.x = x / (max.x - min.x) - (min.x / (max.x - min.x)) * 1.f
+	//a = 1.f/(max.x - min.x)
+	//b = -min.x / (max.x - min.x)
+
+	Vec3 diff	= max - min;
+	Vec3 sum	= max + min;
+
+	float mat[] =
+	{
+		2.f / diff.x,		0.f,				0.f,				0.f,
+		0.f,				2.f / diff.y,		0.f,				0.f,
+		0.f,				0.f,				2.f / diff.z,		0.f,
+		-sum.x / diff.x,	-sum.y / diff.y,	-min.z / diff.z,	1.f
+	};
+
+	return Mat44(mat);
+}
+

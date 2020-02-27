@@ -2,7 +2,7 @@
 #include <string>
 #include "ThirdParty/TinyXML2/tinyxml2.h"
 #include "Engine/Core/StringUtils.hpp"
-
+#include "Engine/Core/ErrorWarningAssert.hpp"
 struct Rgba8;
 struct Vec2;
 struct IntVec2;
@@ -12,10 +12,12 @@ struct AABB2;
 
 typedef tinyxml2::XMLElement XMLElement;
 typedef tinyxml2::XMLAttribute XMLAttribute;
-typedef tinyxml2::XMLDocument XMLDocument;
+
+
+typedef tinyxml2::XMLDocument XmlDocument;
 typedef tinyxml2::XMLError XMLError;
 
-const XMLElement& GetRootElement( XMLDocument& document, const char* xmlFilePath );
+const XMLElement& GetRootElement( XmlDocument& document, const char* xmlFilePath );
 
 std::string ParseXMLAttribute( const XMLElement& element, const char* attributeName, const std::string& defaultValue );
 std::string ParseXMLAttribute( const XMLElement& element, const char* attributeName, const char* defaultValue );

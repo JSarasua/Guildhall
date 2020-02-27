@@ -3,9 +3,15 @@
 #include "Engine/Math/LineSegment2.hpp"
 #include "Engine/Math/Capsule2.hpp"
 #include "Engine/Math/OBB2.hpp"
+#include "Engine/Renderer/BufferAttribute.hpp"
 
 
-
+BufferAttribute const Vertex_PCU::LAYOUT[] ={
+	BufferAttribute( "POSITION",  BUFFER_FORMAT_VEC3,      		offsetof( Vertex_PCU, position ) ),
+	BufferAttribute( "COLOR",     BUFFER_FORMAT_R8G8B8A8_UNORM, 	offsetof( Vertex_PCU, tint ) ),
+	BufferAttribute( "TEXCOORD",        BUFFER_FORMAT_VEC2,      		offsetof( Vertex_PCU, uvTexCoords ) ),
+	BufferAttribute() // end - terminator element; 
+};
 
 void Vertex_PCU::TransformVertexArray( int NUM_SHIP_VERTS, Vertex_PCU* shipVerts, float scale, float orientationDegrees, Vec2 position )
 {
@@ -129,6 +135,80 @@ void Vertex_PCU::AppendVertsDisc2D( std::vector<Vertex_PCU>& masterVertexList, c
 		masterVertexList.push_back( Vertex_PCU( Vec3( firstVertex ), color, Vec2( 0.f, 0.f ) ) );
 		masterVertexList.push_back( Vertex_PCU( Vec3( secondVertex ), color, Vec2( 0.f, 0.f ) ) );
 	}
+}
+
+void Vertex_PCU::AppendVertsCube( std::vector<Vertex_PCU>& masterVertexList, Transform cubeTransform, float cubeHalfHeight )
+{
+	UNUSED( cubeHalfHeight );
+
+	Vec2 bLeft(0.f, 0.f);
+	Vec2 tRight(1.f, 1.f);
+	Vec2 tLeft(0.f, 1.f);
+	Vec2 bRight(1.f, 0.f);
+
+
+	Vertex_PCU cubeVerts[36] =
+	{
+		//Front Quad
+		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft),
+		Vertex_PCU(Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bRight),
+		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight),
+
+		Vertex_PCU(Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft),
+		Vertex_PCU(Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight),
+		Vertex_PCU(Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		tLeft),
+
+		//Right Quad
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		tLeft ),
+
+		//Back Quad
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tRight ),
+
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tLeft ),
+
+		//Left Quad
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,	tRight ),
+
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tLeft ),
+
+		//Top Quad
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, 1.f ), Rgba8::WHITE,		bRight ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+
+		Vertex_PCU( Vec3( -1.f, 1.f, 1.f ), Rgba8::WHITE,		bLeft ),
+		Vertex_PCU( Vec3( 1.f, 1.f, -1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, 1.f, -1.f ), Rgba8::WHITE,	tLeft ),
+
+		//Bottom Quad
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, -1.f ), Rgba8::WHITE,	bRight ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		tRight ),
+
+		Vertex_PCU( Vec3( -1.f, -1.f, -1.f ), Rgba8::WHITE,	bLeft ),
+		Vertex_PCU( Vec3( 1.f, -1.f, 1.f ), Rgba8::WHITE,		tRight ),
+		Vertex_PCU( Vec3( -1.f, -1.f, 1.f ), Rgba8::WHITE,	tLeft )
+	};
+
+	for( int vertexIndex = 0; vertexIndex < 36; vertexIndex++ )
+	{
+		masterVertexList.push_back( cubeVerts[vertexIndex] );
+	}
+
 }
 
 Vertex_PCU::Vertex_PCU( const Vertex_PCU& copy )

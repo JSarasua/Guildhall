@@ -3,7 +3,7 @@
 #include "App.hpp"
 
 extern RenderContext* g_theRenderer;
-
+Window* g_theWindow = nullptr;
 
 
 

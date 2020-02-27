@@ -22,6 +22,7 @@ float		ConvertDegreesToRadians(float orientationDegrees);
 float		ConvertRadiansToDegrees(float orientationRadians);
 float		CosDegrees(float orientationDegrees);
 float		SinDegrees(float orientationDegrees);
+float		TanDegrees(float orientationDegrees);
 float		Atan2Degrees(float y, float x);
 
 

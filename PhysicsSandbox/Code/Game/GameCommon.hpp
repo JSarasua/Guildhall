@@ -1,8 +1,10 @@
 #pragma once
+#include "Engine/Platform/Window.hpp"
 
 struct Vec2;
 struct Rgba8;
 
+extern Window* g_theWindow;
 
 constexpr float CLIENT_ASPECT = 16.f/9.f;
 

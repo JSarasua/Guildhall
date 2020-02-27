@@ -31,6 +31,14 @@ Vec3::Vec3( const Vec2& copyFrom )
 {}
 
 
+Vec3::Vec3( const Vec2& copyFrom, float z )
+	: x(copyFrom.x),
+	y(copyFrom.y),
+	z(z)
+{
+
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec3 Vec3::operator + ( const Vec3& vecToAdd ) const
 {
