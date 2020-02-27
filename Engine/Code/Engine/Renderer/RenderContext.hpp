@@ -7,6 +7,7 @@
 
 struct AABB2;
 class BitmapFont;
+class Polygon2D;
 
 enum class Viewport
 {
@@ -50,10 +51,12 @@ public:
 
 	void DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness ) const;
 	void DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness ) const;
+	void DrawDisc( Vec2 const& center, float radius, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const;
 	void DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness ) const;
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color) const;
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax) const;
 	void DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees) const;
+	void DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const;
 
 	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
 	void DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint = Rgba8::WHITE ) const;

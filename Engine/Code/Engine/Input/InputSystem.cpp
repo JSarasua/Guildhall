@@ -39,7 +39,12 @@ void InputSystem::EndFrame()
 	{
 		m_keyStates[keyboardIndex].m_wasPressedLastFrame = m_keyStates[keyboardIndex].m_isPressed;
 	}
-	
+
+	m_mouseButtonStates[LeftMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[LeftMouseButton].m_isPressed;
+	m_mouseButtonStates[MiddleMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[MiddleMouseButton].m_isPressed;
+	m_mouseButtonStates[RightMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[RightMouseButton].m_isPressed;
+
+	m_deltaScrollAmount = 0.f;
 }
 
 void InputSystem::Shutdown()
@@ -58,6 +63,18 @@ void InputSystem::HandleKeyUp( unsigned char keyCode )
 
 }
 
+void InputSystem::UpdateMouseButtonState( bool leftMouseButton, bool middleMouseButton, bool rightMouseButton )
+{
+	m_mouseButtonStates[LeftMouseButton].m_isPressed = leftMouseButton;
+	m_mouseButtonStates[MiddleMouseButton].m_isPressed = middleMouseButton;
+	m_mouseButtonStates[RightMouseButton].m_isPressed = rightMouseButton;
+}
+
+void InputSystem::AddMouseWheelScrollAmount( float scrollAmount )
+{
+	m_deltaScrollAmount += scrollAmount;
+}
+
 IntVec2 InputSystem::GetMouseDesktopRawPos() const
 {
 	return IntVec2(0,0);
@@ -68,6 +85,11 @@ Vec2 InputSystem::GetMouseNormalizedPos() const
 	return m_mouseNormalizedClientPos;
 }
 
+float InputSystem::GetDeltaMouseWheelScroll() const
+{
+	return m_deltaScrollAmount;
+}
+
 const XboxController& InputSystem::GetXboxController( int controllerID )
 {
 	return m_controllers[controllerID];
@@ -76,6 +98,11 @@ const XboxController& InputSystem::GetXboxController( int controllerID )
 const KeyButtonState& InputSystem::GetKeyStates( unsigned char keyCode )
 {
 	return m_keyStates[keyCode];
+}
+
+const KeyButtonState& InputSystem::GetMouseButton( MOUSEBUTTON mouseButton )
+{
+	return m_mouseButtonStates[mouseButton];
 }
 
 const KeyButtonState* InputSystem::GetAllKeyStates()

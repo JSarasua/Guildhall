@@ -3,6 +3,7 @@
 #include <windows.h>			// #include this (massive, platform-specific) header in very few places
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/Polygon2D.hpp"
 #include <gl/gl.h>	
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/StringUtils.hpp"
@@ -301,6 +302,26 @@ void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& col
 
 }
 
+void RenderContext::DrawDisc( Vec2 const& center, float radius, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const
+{
+	std::vector<Vertex_PCU> vertexArray;
+
+	float increment = 180.f/32.f;
+	for( float currentOrientation = 0.f; currentOrientation < 360.f; currentOrientation += increment )
+	{
+		Vec2 firstVertex = Vec2::MakeFromPolarDegrees( currentOrientation, radius ) + center;
+		Vec2 secondVertex = Vec2::MakeFromPolarDegrees( currentOrientation+increment, radius ) + center;
+
+		vertexArray.push_back( Vertex_PCU( Vec3( center ), fillColor, Vec2( 0.f, 0.f ) ) );
+		vertexArray.push_back( Vertex_PCU( Vec3( firstVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
+		vertexArray.push_back( Vertex_PCU( Vec3( secondVertex ), fillColor, Vec2( 0.f, 0.f ) ) );
+	}
+	
+	BindTexture( nullptr );
+	DrawVertexArray(vertexArray);
+	DrawRing( center, radius, borderColor, thickness );
+}
+
 void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness ) const
 {
 	DrawLine(aabb.mins, Vec2(aabb.mins.x, aabb.maxs.y), color, thickness);
@@ -363,6 +384,40 @@ void RenderContext::DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& colo
 	
 	//BindTexture(nullptr);
 	DrawVertexArray( 6, vertexes );
+}
+
+void RenderContext::DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness ) const
+{
+	std::vector<Vertex_PCU> vertexes;
+
+	for( size_t triangleIndex = 0; triangleIndex < polygon.GetTriangleCount(); triangleIndex++ )
+	{
+		Vec2 pointA;
+		Vec2 pointB;
+		Vec2 pointC;
+		polygon.GetTriangle( &pointA, &pointB, &pointC, triangleIndex );
+
+
+		Vertex_PCU vertexA(Vec3(pointA), fillColor, Vec2(0.f, 0.f));
+		Vertex_PCU vertexB(Vec3(pointB), fillColor, Vec2(0.f, 0.f));
+		Vertex_PCU vertexC(Vec3(pointC), fillColor, Vec2(0.f, 0.f));
+
+		vertexes.push_back(vertexA);
+		vertexes.push_back(vertexB);
+		vertexes.push_back(vertexC);
+	}
+
+	BindTexture( nullptr );
+	DrawVertexArray(vertexes);
+
+	for( size_t edgeIndex = 0; edgeIndex < polygon.GetEdgeCount(); edgeIndex++ )
+	{
+		Vec2 pointA;
+		Vec2 pointB;
+		polygon.GetEdge( &pointA, &pointB, edgeIndex );
+
+		DrawLine( pointA, pointB, borderColor, thickness );
+	}
 }
 
 BitmapFont* RenderContext::CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension )

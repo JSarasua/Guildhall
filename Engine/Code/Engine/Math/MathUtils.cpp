@@ -8,7 +8,9 @@
 #include "Engine/Math/OBB2.hpp"
 #include "Engine/Math/Capsule2.hpp"
 #include "Engine/Math/LineSegment2.hpp"
-
+#include "Engine/Math/Polygon2D.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 int absInt( int initialValue )
 {
@@ -342,11 +344,16 @@ bool DoAABBsOverlap2D( const AABB2& aabbA, const AABB2& aabbB ) //Slower than ch
 {
 	//X
 	float maxOfMinsX = Max( aabbA.mins.x, aabbB.mins.x );
-	float minOfMaxsX = Min( aabbA.maxs.x, aabbB.maxs.y );
+	float minOfMaxsX = Min( aabbA.maxs.x, aabbB.maxs.x );
 
 	//Y
 	float maxOfMinsY = Max( aabbA.mins.y, aabbB.mins.y );
 	float minOfMaxsY = Min( aabbA.maxs.y, aabbB.maxs.y );
+
+	if( aabbA.IsPointInside( aabbB.mins ) || aabbB.IsPointInside( aabbA.mins ) )
+	{
+		return true;
+	}
 
 	if( maxOfMinsX < minOfMaxsX && maxOfMinsY < minOfMaxsY )
 	{
@@ -368,6 +375,57 @@ bool DoDiscAndAABBOverlap2D( const Vec2& discPosition, float discRadius, const A
 	}
 
 	return false;
+}
+
+bool DoDiscAndLineSegmentOverlap2D( Vec2 const& discPosition, float discRadius, LineSegment2 const& line )
+{
+	Vec2 nearestPoint = GetNearestPointOnLineSegment2D( discPosition, line.startPosition, line.endPosition );
+	return IsPointInsideDisc2D( nearestPoint, discPosition, discRadius );
+}
+
+bool DoLineSegmentsOverlap2D( LineSegment2 const& lineA, LineSegment2 const& lineB )
+{
+	Vec2 lineAStartAndEndPositions[2];
+	Vec2 lineBStartAndEndPositions[2];
+
+	//obb.GetCornerPositions( OBBCornerPositions );
+	lineAStartAndEndPositions[0] = lineA.startPosition;
+	lineAStartAndEndPositions[1] = lineA.endPosition;
+
+	lineBStartAndEndPositions[0] = lineB.startPosition;
+	lineBStartAndEndPositions[1] = lineB.endPosition;
+
+	float lineAHalfLength = lineA.GetLength()*0.5f;
+	FloatRange lineAIBasisRange = FloatRange( -lineAHalfLength, lineAHalfLength );
+	FloatRange lineBOnLineAIRange = GetRangeOnProjectedAxis( 2, lineBStartAndEndPositions, lineA.GetCenter(), lineA.GetIBasisNormal() );
+	if( !lineAIBasisRange.DoesOverlap( lineBOnLineAIRange ) )
+	{
+		return false;
+	}
+
+	FloatRange lineAJBasisRange = FloatRange( 0.f, 0.f );
+	FloatRange LineBOnLineAJRange = GetRangeOnProjectedAxis( 2, lineBStartAndEndPositions, lineA.GetCenter(), lineA.GetJBasisNormal() );
+	if( !lineAJBasisRange.DoesOverlap( LineBOnLineAJRange ) )
+	{
+		return false;
+	}
+
+	float lineBHalfLength = lineB.GetLength()*0.5f;
+	FloatRange lineBIBasisRange = FloatRange( -lineBHalfLength, lineBHalfLength );
+	FloatRange lineAOnLineBIRange = GetRangeOnProjectedAxis( 2, lineAStartAndEndPositions, lineB.GetCenter(), lineB.GetIBasisNormal() );
+	if( !lineBIBasisRange.DoesOverlap( lineAOnLineBIRange ) )
+	{
+		return false;
+	}
+
+	FloatRange lineBJBasisRange = FloatRange( 0.f, 0.f );
+	FloatRange lineAOnLineBJRange = GetRangeOnProjectedAxis( 2, lineAStartAndEndPositions, lineB.GetCenter(), lineB.GetJBasisNormal() );
+	if( !lineBJBasisRange.DoesOverlap( lineAOnLineBJRange ) )
+	{
+		return false;
+	}
+
+	return true;
 }
 
 FloatRange GetRangeOnProjectedAxis( int numPoints, const Vec2* points, const Vec2& relativeToPos, const Vec2& axisNormal )
@@ -517,6 +575,38 @@ bool DoOBBAndDiscOverlap2D( const OBB2& obb, const Vec2& discCenter, float discR
 	}
 
 	return false;
+}
+
+bool DoPolygonAndDiscOverlap2D( const Polygon2D& poly, const Vec2& discCenter, float discRadius )
+{
+	Vec2 polyClosestPoint = poly.GetClosestPoint( discCenter );
+
+	return IsPointInsideDisc2D(polyClosestPoint, discCenter, discRadius );
+}
+
+bool DoPolygonAndLineSegementOverlap2D( const Polygon2D& poly, const LineSegment2& line )
+{
+	size_t polyEdgeCount = poly.GetEdgeCount();
+
+	for( size_t polyEdgeIndex = 0; polyEdgeIndex < polyEdgeCount; polyEdgeIndex++ )
+	{
+		LineSegment2 edgeLine;
+		poly.GetEdge( &edgeLine.startPosition, &edgeLine.endPosition, polyEdgeIndex );
+		if( DoLineSegmentsOverlap2D( edgeLine, line ) )
+		{
+			return true;
+		}
+	}
+
+	if( poly.Contains( line.startPosition ) )
+	{
+		return true;
+	}
+
+	return false;
+
+	UNUSED( poly );
+	UNUSED( line );
 }
 
 bool IsPointInsideDisc2D( const Vec2& point, const Vec2& discCenter, float discRadius )

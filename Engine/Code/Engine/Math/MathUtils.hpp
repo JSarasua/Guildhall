@@ -8,6 +8,7 @@ struct AABB2;
 struct OBB2;
 struct Capsule2;
 struct LineSegment2;
+class Polygon2D;
 
 int			absInt(int initialValue);
 float		absFloat(float initialValue);
@@ -59,11 +60,15 @@ const Vec2 GetNearestPointOnOBB2D( const Vec2& refPos, const OBB2& box );
 
 bool DoAABBsOverlap2D(const AABB2& aabbA, const AABB2& aabbB);
 bool DoDiscAndAABBOverlap2D(const Vec2& discPosition, float discRadius, const AABB2& aabb);
+bool DoDiscAndLineSegmentOverlap2D( Vec2 const& discPosition, float discRadius, LineSegment2 const& line );
+bool DoLineSegmentsOverlap2D( LineSegment2 const& lineA, LineSegment2 const& lineB );
 bool DoOBBAndOBBOverlap2D( const OBB2& boxA, const OBB2& boxB );
 bool DoOBBAndAABBOverlap2D( const OBB2& boxA, const AABB2& boxB );
 bool DoOBBAndLineSegmentOverlap2D( const OBB2& obb, const LineSegment2& line );
 bool DoOBBAndCapsuleOverlap2D( const OBB2& obb, const Capsule2& capsule );
 bool DoOBBAndDiscOverlap2D( const OBB2& obb, const Vec2& discCenter, float discRadius );
+bool DoPolygonAndDiscOverlap2D( const Polygon2D& poly, const Vec2& discCenter, float discRadius );
+bool DoPolygonAndLineSegementOverlap2D( const Polygon2D& poly, const LineSegment2& line );
 FloatRange GetRangeOnProjectedAxis( int numPoints, const Vec2* points, const Vec2& relativeToPos, const Vec2& axisNormal );
 
 bool IsPointInsideDisc2D( const Vec2& point, const Vec2& discCenter, float discRadius );
