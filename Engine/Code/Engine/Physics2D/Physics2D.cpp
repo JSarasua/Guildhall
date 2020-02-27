@@ -175,6 +175,18 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		impulse = GetProjectedOnto2D( impulse, normal );
 		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -impulse );
 	}
+	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
+	{
+		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
+		impulse = GetProjectedOnto2D( impulse, normal );
+		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -impulse );
+	}
+	else if( mySimMode == KINEMATIC && theirSimMode == STATIC )
+	{
+		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
+		impulse = GetProjectedOnto2D( impulse, normal );
+		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), impulse );
+	}
 	else
 	{
 		Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
