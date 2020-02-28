@@ -12,6 +12,7 @@
 #include "Game/World.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Player.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -37,9 +38,20 @@ void Game::Startup()
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 	m_modelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -2.f ) );
+
+
+	m_cubeMesh = new GPUMesh( g_theRenderer );
+
+	std::vector<Vertex_PCU> verts;
+	Vertex_PCU::AppendVertsCube( verts, 1.f );
+	m_cubeMesh->UpdateVertices(verts);
 }
 
-void Game::Shutdown(){}
+void Game::Shutdown()
+{
+	delete m_cubeMesh;
+	m_cubeMesh = nullptr;
+}
 
 void Game::RunFrame(){}
 
@@ -122,9 +134,10 @@ void Game::Render()
 
 	g_theRenderer->BindShader( (Shader*)nullptr );
 	g_theRenderer->SetModelMatrix( m_modelMatrix );
-	std::vector<Vertex_PCU> verts;
-	Vertex_PCU::AppendVertsCube(verts, Transform(), 0.f );
-	g_theRenderer->DrawVertexArray(verts);
+// 	std::vector<Vertex_PCU> verts;
+// 	Vertex_PCU::AppendVertsCube(verts, Transform(), 0.f );
+// 	g_theRenderer->DrawVertexArray(verts);
+	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	RenderDevConsole();
 

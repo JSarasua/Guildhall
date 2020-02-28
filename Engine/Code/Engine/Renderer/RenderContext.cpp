@@ -201,9 +201,12 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes )
 
 void RenderContext::DrawMesh( GPUMesh* mesh )
 {
-	m_immediateVBO = mesh->m_vertices;
+	//m_immediateVBO = mesh->m_vertices;
 
-	BindVertexBuffer( m_immediateVBO );
+	BindVertexBuffer( mesh->GetVertexBuffer() );
+	//BindIndexBuffer( mesh->GetIndexBuffer() );
+	//UpdateLayoutIfNeeded()
+
 
 	Draw( mesh->m_vertexCount, 0 );
 }

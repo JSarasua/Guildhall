@@ -8,6 +8,7 @@
 class Player;
 class World;
 class Shader;
+class GPUMesh;
 
 
 enum PowerUps
@@ -55,6 +56,7 @@ private:
 
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
+	GPUMesh* m_cubeMesh = nullptr;
 
 	Shader* m_invertShader = nullptr;
 
