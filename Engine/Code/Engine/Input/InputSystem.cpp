@@ -73,6 +73,15 @@ void InputSystem::EndFrame()
 	m_mouseButtonStates[MiddleMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[MiddleMouseButton].m_isPressed;
 	m_mouseButtonStates[RightMouseButton].m_wasPressedLastFrame = m_mouseButtonStates[RightMouseButton].m_isPressed;
 
+	if( m_currentMouseMode == MOUSE_MODE_RELATIVE )
+	{
+		m_mousePreviousNormalizedClientPos = Vec2(0.5f, 0.5f);
+	}
+	else
+	{
+		m_mousePreviousNormalizedClientPos = m_mouseNormalizedClientPos;
+	}
+
 	m_deltaScrollAmount = 0.f;
 }
 
@@ -109,6 +118,8 @@ void InputSystem::HandleDevConsoleInput( unsigned char keyCode )
 	m_consoleKeyBuffer.push_back(keyCode);
 }
 
+
+
 IntVec2 InputSystem::GetMouseDesktopRawPos() const
 {
 	return IntVec2(0,0);
@@ -117,6 +128,18 @@ IntVec2 InputSystem::GetMouseDesktopRawPos() const
 Vec2 InputSystem::GetMouseNormalizedPos() const
 {
 	return m_mouseNormalizedClientPos;
+}
+
+Vec2 InputSystem::GetMouseDeltaPos() const
+{
+	if( m_currentMouseMode == MOUSE_MODE_RELATIVE )
+	{
+		return m_relativeMovement;
+	}
+	else
+	{
+		return m_mouseNormalizedClientPos - m_mousePreviousNormalizedClientPos;
+	}
 }
 
 float InputSystem::GetDeltaMouseWheelScroll() const
@@ -143,7 +166,6 @@ const KeyButtonState* InputSystem::GetAllKeyStates()
 {
 	return m_keyStates;
 }
-
 void InputSystem::UpdateMouse()
 {
 	POINT mousePos;
@@ -157,6 +179,75 @@ void InputSystem::UpdateMouse()
 
 	m_mouseNormalizedClientPos = clientBounds.GetUVForPoint(mouseClientPos);
 	m_mouseNormalizedClientPos.y = 1.f - m_mouseNormalizedClientPos.y; //Flip y
+
+	if( m_mousePreviousNormalizedClientPos == Vec2( 0.f, 0.f ) )
+	{
+		m_mousePreviousNormalizedClientPos = m_mouseNormalizedClientPos;
+	}
+
+	if( m_currentMouseMode == MOUSE_MODE_RELATIVE )
+	{
+		UpdateRelativeMode();
+	}
+}
+
+void InputSystem::SetCursorMode( eMousePositionMode mode )
+{
+	m_currentMouseMode = mode;
+
+	if( mode == MOUSE_MODE_RELATIVE )
+	{
+		ShowCursor( false );
+		UpdateRelativeMode();
+		m_relativeMovement = Vec2(0.f, 0.f);
+	}
+}
+
+void InputSystem::UpdateRelativeMode()
+{
+// 	Vec2 currentMousePosition;
+// 
+// 
+// 	RECT clientRect;
+// 	GetClientRect( (HWND)m_window->m_hwnd, &clientRect );
+// 	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom);
+// 	Vec2 windowCenter = clientBounds.GetCenter();
+// 
+// 	SetCursorPos( (int)windowCenter.x, (int)windowCenter.y );
+// 
+// 
+// 	if( m_mousePreviousNormalizedClientPos == Vec2( 0.f, 0.f ) )
+// 	{
+// 		m_mousePreviousNormalizedClientPos = Vec2(0.5f, 0.5f);
+// 	}
+	POINT currentPosition;
+	GetCursorPos( &currentPosition );
+	ScreenToClient( (HWND)m_window->m_hwnd, &currentPosition );
+	Vec2 mouseClientPos( (float)currentPosition.x, (float)currentPosition.y );
+
+	if( m_positionLastFrame == Vec2( 0.f, 0.f ) )
+	{
+		m_relativeMovement = Vec2( 0.f, 0.f );
+	}
+	else
+	{
+		m_relativeMovement = mouseClientPos - m_positionLastFrame;
+	}
+
+	RECT clientRect;
+	GetClientRect( (HWND)m_window->m_hwnd, &clientRect );
+	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom );
+	Vec2 windowCenter = clientBounds.GetCenter();
+	SetCursorPos( (int)windowCenter.x, (int)windowCenter.y );
+
+	GetCursorPos( &currentPosition );
+	ScreenToClient( (HWND)m_window->m_hwnd, &currentPosition );
+	windowCenter = Vec2( (float)currentPosition.x, (float)currentPosition.y );
+
+	m_positionLastFrame = windowCenter;
+
+
+
 }
 
 void InputSystem::CopyStringToClipboard( std::string stringToCopy )

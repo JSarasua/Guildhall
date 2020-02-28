@@ -40,6 +40,12 @@ enum MOUSEBUTTON
 	Num_MouseButtons
 };
 
+enum eMousePositionMode
+{
+	MOUSE_MODE_ABSOLUTE,
+	MOUSE_MODE_RELATIVE
+};
+
 class InputSystem
 {
 public:
@@ -57,8 +63,10 @@ public:
 	void AddMouseWheelScrollAmount( float scrollAmount );
 	void HandleDevConsoleInput( unsigned char keyCode );
 
+
 	IntVec2 GetMouseDesktopRawPos() const;
 	Vec2 GetMouseNormalizedPos() const;
+	Vec2 GetMouseDeltaPos() const;
 	float GetDeltaMouseWheelScroll() const;
 
 	const XboxController& GetXboxController(int controllerID);
@@ -68,13 +76,22 @@ public:
 	void CopyStringToClipboard( std::string stringToCopy );
 	std::string GetClipboardString();
 
+	void SetCursorMode( eMousePositionMode mode );
 private:
 
 	void UpdateMouse();
+	void UpdateRelativeMode();
 private:
 	Window* m_window = nullptr;
 	Vec2 m_mouseNormalizedClientPos;
+	Vec2 m_mousePreviousNormalizedClientPos;
+
+	Vec2 m_relativeMovement;
+	Vec2 m_positionLastFrame;
+
+
 	float m_deltaScrollAmount = 0.f;
+	eMousePositionMode m_currentMouseMode = MOUSE_MODE_ABSOLUTE;
 
 	std::string m_consoleKeyBuffer;
 	std::string m_consoleSpecialKeys;
