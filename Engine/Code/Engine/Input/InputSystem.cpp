@@ -43,6 +43,8 @@ InputSystem::~InputSystem()
 void InputSystem::Startup( Window* window )
 {
 	m_window = window;
+	g_theEventSystem->SubscribeToEvent( "relative mode", CONSOLECOMMAND, SetCursorModeToRelative );
+	g_theEventSystem->SubscribeToEvent( "absolute mode", CONSOLECOMMAND, SetCursorModeToAbsolute );
 }
 
 void InputSystem::BeginFrame()
@@ -119,6 +121,22 @@ void InputSystem::HandleDevConsoleInput( unsigned char keyCode )
 }
 
 
+
+bool InputSystem::SetCursorModeToRelative( const EventArgs* args )
+{
+	UNUSED( args );
+	g_theInput->SetCursorMode( MOUSE_MODE_RELATIVE );
+
+	return true;
+}
+
+bool InputSystem::SetCursorModeToAbsolute( const EventArgs* args )
+{
+	UNUSED( args );
+	g_theInput->SetCursorMode( MOUSE_MODE_ABSOLUTE );
+
+	return true;
+}
 
 IntVec2 InputSystem::GetMouseDesktopRawPos() const
 {
@@ -200,6 +218,10 @@ void InputSystem::SetCursorMode( eMousePositionMode mode )
 		ShowCursor( false );
 		UpdateRelativeMode();
 		m_relativeMovement = Vec2(0.f, 0.f);
+	}
+	else if( mode == MOUSE_MODE_ABSOLUTE )
+	{
+		ShowCursor( true );
 	}
 }
 

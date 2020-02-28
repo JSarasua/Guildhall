@@ -2,6 +2,8 @@
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Math/vec2.hpp"
 #include <string>
+#include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/NamedStrings.hpp"
 //#include "Engine/Core/EngineCommon.hpp"
 
 extern const unsigned char ESC_KEY;
@@ -63,6 +65,8 @@ public:
 	void AddMouseWheelScrollAmount( float scrollAmount );
 	void HandleDevConsoleInput( unsigned char keyCode );
 
+	static bool SetCursorModeToRelative( const EventArgs* args );
+	static bool SetCursorModeToAbsolute( const EventArgs* args );
 
 	IntVec2 GetMouseDesktopRawPos() const;
 	Vec2 GetMouseNormalizedPos() const;
