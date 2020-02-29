@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 
 struct BufferAttribute;
@@ -14,6 +15,7 @@ public:
 
 	void UpdateVertices( unsigned int vertexCount, void const* vertexData, unsigned int vertexStride, BufferAttribute const* layout );
 	void UpdateIndices( unsigned int indexCount, unsigned int const* indices );
+	void UpdateIndices( std::vector<uint>& indices );
 
 
 	VertexBuffer* GetVertexBuffer() const;
@@ -35,8 +37,10 @@ public:
 		UpdateVertices( (unsigned int)vertices.size(), &vertices[0], sizeof( VERTEX_TYPE ), VERTEX_TYPE::LAYOUT );
 	}
 
+
 public:
 	unsigned int m_vertexCount = 0;
+	unsigned int m_indexCount = 0;
 	VertexBuffer* m_vertices = nullptr;
 	IndexBuffer* m_indices = nullptr;
 };

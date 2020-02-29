@@ -71,6 +71,10 @@ public:
 class IndexBuffer : public RenderBuffer
 {
 public:
+	IndexBuffer( RenderContext* context, eRenderMemoryHint memHint )
+		: RenderBuffer( context, INDEX_BUFFER_BIT, memHint )
+	{}
+
 	void Update( uint indexCount, uint const* indices );
 	void Update( std::vector<uint> const& indices );
 

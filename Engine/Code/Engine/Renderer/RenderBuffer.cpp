@@ -169,11 +169,10 @@ bool RenderBuffer::Create( size_t dataByteSize, size_t elementByteSize )
 
 void IndexBuffer::Update( uint indexCount, uint const* indices )
 {
-	UNUSED( indexCount );
-	UNUSED( indices );
+	RenderBuffer::Update( indices, indexCount * sizeof(uint), sizeof(uint));
 }
 
 void IndexBuffer::Update( std::vector<uint> const& indices )
 {
-	UNUSED( indices );
+	Update( (uint)indices.size(), &indices[0] );
 }

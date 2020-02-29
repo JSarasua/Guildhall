@@ -17,6 +17,7 @@ class SwapChain;
 class Shader;
 class RenderBuffer;
 class VertexBuffer;
+class IndexBuffer;
 class GPUMesh;
 
 struct ID3D11Device;
@@ -79,6 +80,7 @@ public:
 	void EndCamera( const Camera& camera );
 
 	void Draw( int numVertexes, int vertexOffset = 0 );
+	void DrawIndexed( int numIndices, int indexOffset = 0, int vertexOffset = 0 );
 
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
@@ -91,6 +93,7 @@ public:
 	void BindShader( Shader* shader );
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
+	void BindIndexBuffer( IndexBuffer* ibo );
 
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 

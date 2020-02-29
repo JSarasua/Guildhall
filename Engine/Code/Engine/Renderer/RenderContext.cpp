@@ -204,11 +204,17 @@ void RenderContext::DrawMesh( GPUMesh* mesh )
 	//m_immediateVBO = mesh->m_vertices;
 
 	BindVertexBuffer( mesh->GetVertexBuffer() );
-	//BindIndexBuffer( mesh->GetIndexBuffer() );
-	//UpdateLayoutIfNeeded()
 
+	if( nullptr != mesh->GetIndexBuffer() )
+	{
+		BindIndexBuffer( mesh->GetIndexBuffer() );
+		DrawIndexed( mesh->GetIndexCount() );
+	}
+	else
+	{
+		Draw( mesh->m_vertexCount, 0 );
+	}
 
-	Draw( mesh->m_vertexCount, 0 );
 }
 
 void RenderContext::AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend )
@@ -278,6 +284,19 @@ void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 
 	m_context->IASetVertexBuffers( 0, 1, &vboHandle, &stride, &offset );
 	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+}
+
+void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
+{
+	ID3D11Buffer* iboHandle = ibo->m_handle;
+// 	if( m_lastVBOHandle == iboHandle )
+// 	{
+// 		return;
+// 	}
+// 	m_lastIBOHandle = iboHandle;
+
+	m_context->IASetIndexBuffer( iboHandle, DXGI_FORMAT_R32_UINT, 0);
+
 }
 
 void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
@@ -688,6 +707,14 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes, vertexOffset );
+}
+
+void RenderContext::DrawIndexed( int numIndices, int indexOffset, int vertexOffset /*= 0 */ )
+{
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	m_context->IASetInputLayout( inputLayout );
+
+	m_context->DrawIndexed( numIndices, indexOffset, vertexOffset );
 }
 
 void RenderContext::DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness )

@@ -43,8 +43,11 @@ void Game::Startup()
 	m_cubeMesh = new GPUMesh( g_theRenderer );
 
 	std::vector<Vertex_PCU> verts;
-	Vertex_PCU::AppendVertsCube( verts, 1.f );
+	std::vector<uint> indices;
+	Vertex_PCU::AppendIndexedVertsCube( verts, indices, 1.f );
+	//Vertex_PCU::AppendVertsCube( verts, 1.f );
 	m_cubeMesh->UpdateVertices(verts);
+	m_cubeMesh->UpdateIndices(indices);
 }
 
 void Game::Shutdown()

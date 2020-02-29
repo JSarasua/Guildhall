@@ -211,6 +211,143 @@ void Vertex_PCU::AppendVertsCube( std::vector<Vertex_PCU>& masterVertexList, flo
 
 }
 
+void Vertex_PCU::AppendIndexedVertsCube( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float cubeHalfHeight /*= 1.f */ )
+{
+
+	float c = cubeHalfHeight;
+
+	Vec2 bLeft( 0.f, 0.f );
+	Vec2 tRight( 1.f, 1.f );
+	Vec2 tLeft( 0.f, 1.f );
+	Vec2 bRight( 1.f, 0.f );
+
+	Vertex_PCU cubeVerts[24] =
+	{
+		//Front Quad
+		Vertex_PCU( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft ),	//0
+		Vertex_PCU( Vec3( c, -c, c ), Rgba8::WHITE,		bRight ),		//1
+		Vertex_PCU( Vec3( c, c, c ), Rgba8::WHITE,		tRight ),		//2
+
+		//Vertex_PCU( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft ),	//0
+		//Vertex_PCU( Vec3( c, c, c ), Rgba8::WHITE,		tRight ),	//2
+		Vertex_PCU( Vec3( -c, c, c ), Rgba8::WHITE,		tLeft ),		//3
+
+		//Right Quad
+		Vertex_PCU( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft ),		//4
+		Vertex_PCU( Vec3( c, -c, -c ), Rgba8::WHITE,	bRight ),		//5
+		Vertex_PCU( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),		//6
+
+		//Vertex_PCU( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft ),	//4
+		//Vertex_PCU( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//6
+		Vertex_PCU( Vec3( c, c, c ), Rgba8::WHITE,		tLeft ),		//7
+
+		//Back Quad
+		Vertex_PCU( Vec3( c, -c, -c ), Rgba8::WHITE,	bLeft ),		//8
+		Vertex_PCU( Vec3( -c, -c, -c ), Rgba8::WHITE,	bRight ),		//9
+		Vertex_PCU( Vec3( -c, c, -c ), Rgba8::WHITE,	tRight ),		//10
+
+		//Vertex_PCU( Vec3( c, -c, -c ), Rgba8::WHITE,	bLeft ),		//8
+		//Vertex_PCU( Vec3( -c, c, -c ), Rgba8::WHITE,	tRight ),		//10
+		Vertex_PCU( Vec3( c, c, -c ), Rgba8::WHITE,		tLeft ),		//11
+
+		//Left Quad
+		Vertex_PCU( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//12
+		Vertex_PCU( Vec3( -c, -c, c ), Rgba8::WHITE,	bRight ),		//13
+		Vertex_PCU( Vec3( -c, c, c ), Rgba8::WHITE,	tRight ),			//14
+
+		//Vertex_PCU( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//12
+		//Vertex_PCU( Vec3( -c, c, c ), Rgba8::WHITE,		tRight ),	//14
+		Vertex_PCU( Vec3( -c, c, -c ), Rgba8::WHITE,	tLeft ),		//15
+
+		//Top Quad
+		Vertex_PCU( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft ),		//16
+		Vertex_PCU( Vec3( c, c, c ), Rgba8::WHITE,		bRight ),		//17
+		Vertex_PCU( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),		//18
+
+		//Vertex_PCU( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft ),	//16
+		//Vertex_PCU( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//18
+		Vertex_PCU( Vec3( -c, c, -c ), Rgba8::WHITE,	tLeft ),		//19
+
+		//Bottom Quad
+		Vertex_PCU( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//20
+		Vertex_PCU( Vec3( c, -c, -c ), Rgba8::WHITE,	bRight ),		//21
+		Vertex_PCU( Vec3( c, -c, c ), Rgba8::WHITE,		tRight ),		//22
+
+		//Vertex_PCU( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//20
+		//Vertex_PCU( Vec3( c, -c, c ), Rgba8::WHITE,		tRight ),	//22
+		Vertex_PCU( Vec3( -c, -c, c ), Rgba8::WHITE,	tLeft )			//23
+	};
+
+	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+	{
+		masterVertexList.push_back( cubeVerts[vertexIndex] );
+	}
+
+	uint cubeIndices[36] =
+	{
+		//Front Quad
+		0,
+		1,
+		2,
+		 
+		0,
+		2,
+		3,
+		 
+		//Right Quad
+		4,
+		5,
+		6,
+		 
+		4,
+		6,
+		7,
+		 
+		//Back Quad
+		8,
+		9,
+		10,
+		  
+		8 ,
+		10,
+		11,
+		  
+		//Left Quad
+		12,
+		13,
+		14,
+		  
+		12,
+		14,
+		15,
+		  
+		//Top Quad
+		16,
+		17,
+		18,
+		  
+		16,
+		18,
+		19,
+		  
+		//Bottom Quad
+		20,
+		21,
+		22,
+		  
+		20,
+		22,
+		23
+	};
+
+	for( int indicesIndex = 0; indicesIndex < 36; indicesIndex++ )
+	{
+		masterIndexList.push_back( cubeIndices[indicesIndex] );
+	}
+}
+
+
+
 Vertex_PCU::Vertex_PCU( const Vertex_PCU& copy )
 	: position( copy.position )
 	, tint( copy.tint )
