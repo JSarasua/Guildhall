@@ -36,6 +36,7 @@ public: // NOTE: this is one of the few cases where we break both the "m_" namin
 	static void AppendVertsDisc2D( std::vector<Vertex_PCU>& masterVertexList, const Vec2& discCenter, const float discRadius, const Rgba8& color );
 	static void AppendVertsCube( std::vector<Vertex_PCU>& masterVertexList, float cubeHalfHeight = 1.f);
 	static void AppendIndexedVertsCube( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float cubeHalfHeight = 1.f );
+	static void AppendIndexedVertsSphere( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float sphereRadius = 1.f );
 
 public:
 	// Construction/Destruction

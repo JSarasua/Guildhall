@@ -32,6 +32,7 @@ public:
 
 	void Update(float deltaSeconds);
 	void Render();
+	void RenderCircleOfCubes();
 
 private:
 
@@ -45,7 +46,9 @@ private:
 	IntVec2 GetCurrentMapBounds() const;
 
 private:
-	Mat44 m_modelMatrix;
+	Mat44 m_cubeModelMatrix;
+	Mat44 m_circleOfCubesModelMatrix;
+	int m_numberOfCirclingCubes = 0;
 
 	Camera m_UICamera;
 	float m_maxCameraShake = 0.f;
@@ -57,6 +60,7 @@ private:
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
 	GPUMesh* m_cubeMesh = nullptr;
+	
 
 	Shader* m_invertShader = nullptr;
 

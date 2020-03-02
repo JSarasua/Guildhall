@@ -96,6 +96,15 @@ Vec3 const Vec3::MakeFromPolarDegrees( float orientationDegrees, float radius /*
 }
 
 
+Vec3 const Vec3::MakeFromSphericalDegrees( float thetaDegrees, float phiDegrees, float radius /*= 1.f */ )
+{
+	Vec3 newVec;
+	newVec.x = radius * SinDegrees( phiDegrees ) * CosDegrees( thetaDegrees );
+	newVec.y = radius * SinDegrees( phiDegrees ) * SinDegrees( thetaDegrees );
+	newVec.z = radius * CosDegrees( phiDegrees );
+	return newVec;
+}
+
 //-----------------------------------------------------------------------------------------------
 const Vec3 Vec3::operator/( float inverseScale ) const
 {

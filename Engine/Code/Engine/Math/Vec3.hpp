@@ -42,6 +42,7 @@ public:
 
 	Vec3 static const	MakeFromPolarRadians( float orientationRadians, float radius = 1.f );
 	Vec3 static const	MakeFromPolarDegrees( float orientationDegrees, float radius = 1.f );
+	Vec3 static const	MakeFromSphericalDegrees( float thetaDegrees, float phiDegrees, float radius = 1.f );
 
 
 	float	GetLength() const;

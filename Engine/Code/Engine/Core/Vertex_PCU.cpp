@@ -348,6 +348,42 @@ void Vertex_PCU::AppendIndexedVertsCube( std::vector<Vertex_PCU>& masterVertexLi
 
 
 
+void Vertex_PCU::AppendIndexedVertsSphere( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float sphereRadius /*= 1.f */ )
+{
+	//first point is top
+	//last point is bottom
+	//rotating counter clockwise
+	//top piece is triangles
+	//Afterwards is quads
+
+	int numOfVerticalSlices = 18;		//like an orange slice, change based on theta
+	int numOfHorizontalSlices = 18;		//like latitude lines, change based on phi
+	float thetaIncrements = 360.f / (float)numOfVerticalSlices;
+	float phiIncrements = 360.f / (float)numOfHorizontalSlices;
+
+	Vec3 topPoint = Vec3::MakeFromSphericalDegrees( 0.f, 0.f, 1.f );
+	Vec3 bottomPoint = Vec3::MakeFromSphericalDegrees( 0.f, 180.f, 1.f );
+
+	std::vector<Vec3> vertexList;
+	vertexList.push_back( topPoint );
+
+	for( float latitudeDegrees = phiIncrements; latitudeDegrees < 180.f; latitudeDegrees += phiIncrements )
+	{
+
+		for( float longitudeDegrees = 0.f; longitudeDegrees < 180.f; longitudeDegrees += thetaIncrements )
+		{
+			Vec3 currentPoint = Vec3::MakeFromSphericalDegrees( longitudeDegrees, latitudeDegrees, 1.f );
+			vertexList.push_back( currentPoint );
+		}
+	}
+	vertexList.push_back( bottomPoint );
+
+
+	//Indexes
+	//			0
+	//
+}
+
 Vertex_PCU::Vertex_PCU( const Vertex_PCU& copy )
 	: position( copy.position )
 	, tint( copy.tint )
