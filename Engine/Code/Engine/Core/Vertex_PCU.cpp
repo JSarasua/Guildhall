@@ -382,6 +382,74 @@ void Vertex_PCU::AppendIndexedVertsSphere( std::vector<Vertex_PCU>& masterVertex
 	//Indexes
 	//			0
 	//
+	std::vector<int> indicesList;
+	//Top of sphere
+	for( int topIndices = 1; topIndices < numOfVerticalSlices + 1; topIndices++ )
+	{
+		if( topIndices == numOfVerticalSlices )
+		{
+			indicesList.push_back( 0 );
+			indicesList.push_back( topIndices );
+			indicesList.push_back( 1 );
+		}
+		else
+		{
+			indicesList.push_back( 0 );
+			indicesList.push_back( topIndices );
+			indicesList.push_back( topIndices + 1 );
+		}
+
+	}
+
+	//Body of Sphere
+	//reduce by 2 the number of vertical slices for the top and bottom of the sphere
+	for( int bodyIndex = 1; bodyIndex < (numOfHorizontalSlices - 2) * (numOfVerticalSlices); bodyIndex += 2 )
+	{
+		if( bodyIndex % numOfVerticalSlices == 0 )
+		{
+			//left quad triangle
+			indicesList.push_back( bodyIndex );
+			indicesList.push_back( bodyIndex + numOfVerticalSlices );
+			indicesList.push_back( bodyIndex - numOfVerticalSlices );
+
+			//right quad triangle
+			indicesList.push_back( bodyIndex - numOfVerticalSlices );
+			indicesList.push_back( bodyIndex + numOfVerticalSlices );
+			indicesList.push_back( bodyIndex + 1 ); //Should be the next rows first index
+		}
+		else
+		{
+			//left quad triangle
+			indicesList.push_back( bodyIndex );
+			indicesList.push_back( bodyIndex + numOfVerticalSlices );
+			indicesList.push_back( bodyIndex + 1 );
+
+			//right quad triangle
+			indicesList.push_back( bodyIndex + 1 );
+			indicesList.push_back( bodyIndex + numOfVerticalSlices );
+			indicesList.push_back( bodyIndex + numOfVerticalSlices + 1 );
+		}
+
+	}
+
+	//Bottom of Sphere
+	for( int bottomIndices = (numOfHorizontalSlices - 3) * numOfVerticalSlices + 1; bottomIndices < (numOfHorizontalSlices - 2) * (numOfVerticalSlices) + 1; bottomIndices++ )
+	{
+		if( bottomIndices == (numOfHorizontalSlices - 2) * (numOfVerticalSlices) )
+		{
+			indicesList.push_back( (int)vertexList.size() - 1 );
+			indicesList.push_back( bottomIndices );
+			indicesList.push_back( bottomIndices - numOfVerticalSlices );
+		}
+		else
+		{
+			indicesList.push_back( (int)vertexList.size() - 1 );
+			indicesList.push_back( bottomIndices );
+			indicesList.push_back( bottomIndices + 1 );
+		}
+
+	}
+	
 }
 
 Vertex_PCU::Vertex_PCU( const Vertex_PCU& copy )

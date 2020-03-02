@@ -73,7 +73,7 @@ void Shader::CreateRasterState()
 	D3D11_RASTERIZER_DESC desc; //description
 
 	desc.FillMode = D3D11_FILL_SOLID; //full triangle
-	desc.CullMode = D3D11_CULL_NONE;
+	desc.CullMode = D3D11_CULL_BACK;
 	desc.FrontCounterClockwise = TRUE; //the only reason we're doing this;
 	desc.DepthBias = 0U;
 	desc.DepthBiasClamp = 0.f;
