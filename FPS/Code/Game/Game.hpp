@@ -9,6 +9,7 @@ class Player;
 class World;
 class Shader;
 class GPUMesh;
+class Clock;
 
 
 enum PowerUps
@@ -30,7 +31,7 @@ public:
 	void Shutdown();
 	void RunFrame();
 
-	void Update(float deltaSeconds);
+	void Update();
 	void Render();
 	void RenderCircleOfSpheres();
 
@@ -49,6 +50,8 @@ private:
 	Mat44 m_cubeModelMatrix;
 	Mat44 m_circleOfSpheresModelMatrix;
 	int m_numberOfCirclingCubes = 0;
+
+	Clock* m_gameClock = nullptr;
 
 	Camera m_UICamera;
 	float m_maxCameraShake = 0.f;

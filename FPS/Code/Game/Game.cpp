@@ -13,6 +13,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Player.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Time/Clock.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -57,6 +58,11 @@ void Game::Startup()
 	Vertex_PCU::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
 	m_sphereMesh->UpdateVertices( sphereVerts );
 	m_sphereMesh->UpdateIndices( sphereIndices );
+
+	m_gameClock = new Clock();
+	m_gameClock->SetParent( Clock::GetMaster() );
+
+	g_theRenderer->Setup( m_gameClock );
 }
 
 void Game::Shutdown()
@@ -70,9 +76,11 @@ void Game::Shutdown()
 
 void Game::RunFrame(){}
 
-void Game::Update( float deltaSeconds )
+void Game::Update()
 {
-	m_currentTime += deltaSeconds;
+	float dt = (float)m_gameClock->GetLastDeltaSeconds();
+
+	m_currentTime += dt;
 	if( m_currentTime > 255.f )
 	{
 		m_currentTime = 0.f;
@@ -88,43 +96,17 @@ void Game::Update( float deltaSeconds )
 
 	if( !g_theConsole->IsOpen() )
 	{
-		CheckButtonPresses( deltaSeconds );
+		CheckButtonPresses( dt );
 	}
 
 
-	m_cubeModelMatrix.RotateYDegrees( 45.f * deltaSeconds );
+	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
 
 	Mat44 newCircleOfSpheresRotation;
-	newCircleOfSpheresRotation.RotateYDegrees( 5.f * deltaSeconds );
-	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * deltaSeconds );
+	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
+	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
 	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
-
-
-
-
-// 	Vec2 movement;
-// 
-// 	if( leftArrow.WasJustPressed() )
-// 	{
-// 		movement.x -= 1.f;
-// 	}
-// 	if( rightArrow.WasJustPressed() )
-// 	{
-// 		movement.x += 1.f;
-// 	}
-// 	if( upArrow.WasJustPressed() )
-// 	{
-// 		movement.y += 1.f;
-// 	}
-// 	if( downArrow.WasJustPressed() )
-// 	{
-// 		movement.y -= 1.f;
-// 	}
-// 
-// 	m_camera.Translate(Vec3(movement, 0.f));
-
-	//g_theConsole->Update(g_theInput);
 }
 
 void Game::Render()

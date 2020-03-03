@@ -34,7 +34,6 @@ App::~App() {}
 void App::Startup()
 {
 	Clock::SystemStartup();
-	m_AppClock = Clock::GetMaster();
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
@@ -140,7 +139,6 @@ void App::BeginFrame()
 
 void App::Update()
 {
-/*	float dt = (float)m_AppClock->GetLastDeltaSeconds();*/
 	g_theConsole->Update();
 
 	CheckButtonPresses();

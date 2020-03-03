@@ -33,7 +33,7 @@ public:
 	bool IsNoClipping();
 
 	void BeginFrame();
-	void Update(float deltaSeconds);
+	void Update();
 	void Render();
 	void EndFrame();
 

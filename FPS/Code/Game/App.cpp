@@ -3,17 +3,13 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Time/Clock.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
 //InputSystem* g_theInput = nullptr;
 
 const char* APP_NAME = "SD1-A4: Protogame2D";	// ...becomes ??? (Change this per project!)
-
-//Constants for calculation ship position change
-const float TIMEPERFRAME = 1.f/60.f;
-const float SLOWTIME = 1.f/600.f;
-const float NOTIME = 0.f;
 
 App::App()
 {
@@ -27,6 +23,8 @@ App::~App() {}
 
 void App::Startup()
 {
+
+	Clock::SystemStartup();
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
@@ -67,34 +65,10 @@ void App::Shutdown()
 
 void App::RunFrame()
 {
-	m_previousTime = m_currentTime;
-	m_currentTime = (float)GetCurrentTimeSeconds();
-	m_deltaTime = Clampf( m_currentTime - m_previousTime, 0.f, 0.1f );
-
-
-
-
-
 	BeginFrame(); //For all engine systems (Not the game)
-	if( m_isPaused )
-	{
-		Update( NOTIME );
-	}
-	else if( m_isSlowed )
-	{
-		Update( m_deltaTime * 0.1f );
-	}
-	else if( m_isSpedUp )
-	{
-		Update( m_deltaTime * 4.f );
-	}
-	else
-	{
-		Update( m_deltaTime );
-	}
+	Update();
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
-
 }
 
 
@@ -116,8 +90,6 @@ bool App::HandleQuitRequested()
 	m_isQuitting = true;
 	return true;
 }
-
-
 
 bool App::IsUpArrowPressed()
 {
@@ -146,21 +118,22 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
+	Clock::BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theConsole->BeginFrame();
 }
 
-void App::Update(float deltaSeconds)
+void App::Update()
 {
-	g_theRenderer->UpdateFrameTime( deltaSeconds );
-	g_theConsole->Update( deltaSeconds );
+	g_theRenderer->UpdateFrameTime();
+	g_theConsole->Update();
 
 	CheckButtonPresses();
 	CheckController();
 
-	m_game->Update(deltaSeconds);
+	m_game->Update();
 
 }
 
