@@ -19,6 +19,7 @@ class RenderBuffer;
 class VertexBuffer;
 class IndexBuffer;
 class GPUMesh;
+class Clock;
 
 struct ID3D11Device;
 struct ID3D11DeviceContext;
@@ -79,7 +80,8 @@ public:
 	void EndFrame();
 	void Shutdown();
 
-	void UpdateFrameTime( float deltaSeconds );
+	void Setup( Clock* gameClock );
+	void UpdateFrameTime();
 
 	void ClearScreen( const Rgba8& clearColor );
 	void ClearDepth( Texture* depthStencilTarget, float depth = 1.f, float stencil = 0.f );
@@ -154,6 +156,8 @@ private:
 	bool m_isDrawing = false;
 
 public:
+	Clock* m_gameClock = nullptr;
+
 	ID3D11Device* m_device;			//Our GPU
 	ID3D11DeviceContext* m_context; //How we issue commands (immediate context)
 	SwapChain*			m_swapchain = nullptr;

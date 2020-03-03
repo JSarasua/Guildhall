@@ -8,6 +8,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Time/Clock.hpp"
 
 
 ColoredLine::ColoredLine( const Rgba8& textColor, const std::string& devConsolePrintString ):
@@ -26,6 +27,7 @@ DevConsole::DevConsole():
 
 void DevConsole::Startup()
 {
+	m_devConsoleClock = new Clock( Clock::GetMaster() );
 	g_theEventSystem->SubscribeToEvent("NoCall", NOCONSOLECOMMAND, InvalidCommand);
 	g_theEventSystem->SubscribeToEvent("help", CONSOLECOMMAND, ListCommands);
 }
@@ -35,11 +37,12 @@ void DevConsole::BeginFrame()
 
 }
 
-void DevConsole::Update(  float deltaSeconds  )
+void DevConsole::Update()
 {
+	float dt = (float)m_devConsoleClock->GetLastDeltaSeconds();
 	if( m_isOpen )
 	{
-		m_caretTimer += deltaSeconds;
+		m_caretTimer += dt;
 		if( m_caretTimer > 0.5f )
 		{
 			m_caretTimer = 0.f;

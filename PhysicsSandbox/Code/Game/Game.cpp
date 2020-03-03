@@ -18,6 +18,7 @@
 #include "Engine/Physics2D/DiscCollider2D.hpp"
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
 #include "Engine/Math/Polygon2D.hpp"
+#include "Engine/Time/Clock.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -52,7 +53,10 @@ void Game::Startup()
 	m_mouseDeltaPositions.resize( 5 );
 	m_mouseDeltaTime.resize( 5 );
 	
-	//g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
+	m_gameClock = new Clock();
+	m_gameClock->SetParent( Clock::GetMaster() );
+
+	g_theRenderer->Setup( m_gameClock );
 }
 
 void Game::Shutdown()
@@ -63,14 +67,16 @@ void Game::Shutdown()
 
 void Game::RunFrame(){}
 
-void Game::Update( float deltaSeconds )
+void Game::Update()
 {
+
+	float dt = (float)m_gameClock->GetLastDeltaSeconds();
 	UpdateCameraBounds();
-	m_physics->Update( deltaSeconds );
-	UpdateDebugMouse( deltaSeconds );
+	m_physics->Update( dt );
+	UpdateDebugMouse( dt );
 	CheckBorderCollisions();
-	UpdateGameObjects(deltaSeconds);
-	CheckButtonPresses( deltaSeconds );
+	UpdateGameObjects(dt);
+	CheckButtonPresses( dt );
 
 	m_mouseLastPosition = m_mousePositionOnMainCamera;
 }

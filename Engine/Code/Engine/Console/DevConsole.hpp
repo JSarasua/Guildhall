@@ -7,6 +7,7 @@
 class RenderContext;
 class Camera;
 class InputSystem;
+class Clock;
 
 
 struct ColoredLine
@@ -28,7 +29,7 @@ public:
 
 	void Startup();
 	void BeginFrame();
-	void Update( float deltaSeconds );
+	void Update();
 	void EndFrame();
 	void Shutdown();
 
@@ -68,4 +69,6 @@ private:
 
 	bool m_isCommandValid = true;
 	bool m_isAutoCompleting = false;
+
+	Clock* m_devConsoleClock = nullptr;
 };

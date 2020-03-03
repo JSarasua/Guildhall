@@ -241,6 +241,19 @@ int ClampInt( int rawValue, int inputMin, int inputMax )
 	return rawValue;
 }
 
+double ClampDouble( double rawValue, double inputMin, double inputMax )
+{
+	if( rawValue < inputMin )
+	{
+		return inputMin;
+	}
+	else if( rawValue > inputMax )
+	{
+		return inputMax;
+	}
+	return rawValue;
+}
+
 float ClampZeroToOne( float rawValue )
 {
 	return Clampf( rawValue, 0.f, 1.f );

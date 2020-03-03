@@ -35,6 +35,9 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{0f68498c-9695-4041-9c48-8db1f59553c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Time">
+      <UniqueIdentifier>{69c6862b-1ffb-4be0-af27-27dc0c227bfb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -213,6 +216,12 @@
     </ClCompile>
     <ClCompile Include="Renderer\GPUMesh.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\Clock.cpp">
+      <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\Timer.cpp">
+      <Filter>Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -422,6 +431,12 @@
     </ClInclude>
     <ClInclude Include="Renderer\GPUMesh.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Clock.hpp">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Timer.hpp">
+      <Filter>Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

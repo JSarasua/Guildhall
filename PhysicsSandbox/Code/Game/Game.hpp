@@ -15,6 +15,7 @@
 
 class Physics2D;
 class GameObject;
+class Clock;
 
 class Game
 {
@@ -25,7 +26,7 @@ public:
 	void Shutdown();
 	void RunFrame();
 
-	void Update( float deltaSeconds );
+	void Update();
 	void Render();
 
 public:
@@ -59,7 +60,7 @@ private:
 	Vec2 m_mousePositionOnMainCamera;
 
 
-
+	Clock* m_gameClock = nullptr;
 
 	GameObject*	m_draggingGameObject = nullptr;
 	float m_defaultCameraHeight = 0.f;

@@ -51,9 +51,6 @@ void InputSystem::Startup( Window* window )
 
 void InputSystem::BeginFrame()
 {
-	RECT clientRect;
-	GetWindowRect( (HWND)m_window->m_hwnd, &clientRect );
-	ClipCursor( &clientRect );
 
 	//UpdateMouse
 	UpdateMouse();

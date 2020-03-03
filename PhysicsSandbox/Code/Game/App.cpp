@@ -3,6 +3,7 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Time/Clock.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
@@ -32,6 +33,9 @@ App::~App() {}
 
 void App::Startup()
 {
+	Clock::SystemStartup();
+	m_AppClock = Clock::GetMaster();
+
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
 	g_theWindow->SetInputSystem( g_theInput );
@@ -42,6 +46,7 @@ void App::Startup()
 	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp( g_theWindow );
 	g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
+
 	m_game->Startup();
 	g_theConsole->Startup();
 
@@ -50,6 +55,7 @@ void App::Startup()
 	//m_devConsoleCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_devConsoleCamera.SetProjectionOrthographic( Vec2( GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y ), 0.f, -100.f );
 	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
+
 
 
 	//g_theEventSystem->SubscribeToEvent( "quit", CONSOLECOMMAND, QuitRequested );
@@ -70,33 +76,10 @@ void App::Shutdown()
 
 void App::RunFrame()
 {
-	m_previousTime = m_currentTime;
-	m_currentTime = (float)GetCurrentTimeSeconds();
-	m_deltaTime = Clampf( m_currentTime - m_previousTime, 0.f, 0.1f );
-
 	BeginFrame(); //For all engine systems (Not the game)
-	if( m_isPaused )
-	{
-		Update(NOTIME);
-	} 
-	else if( m_isSlowed )
-	{
-		Update( m_deltaTime * 0.1f );
-	}
-	else if( m_isSpedUp )
-	{
-		Update( m_deltaTime * 4.f );
-	}
-	else
-	{
-		Update(m_deltaTime);
-	}
-
-
-
+	Update();
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
-
 }
 
 
@@ -148,23 +131,22 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
+	Clock::BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theConsole->BeginFrame();
 }
 
-void App::Update(float deltaSeconds)
+void App::Update()
 {
-	g_theConsole->Update( deltaSeconds );
+/*	float dt = (float)m_AppClock->GetLastDeltaSeconds();*/
+	g_theConsole->Update();
 
 	CheckButtonPresses();
 	CheckController();
 
-
-
-	m_game->Update(deltaSeconds);
-
+	m_game->Update();
 }
 
 

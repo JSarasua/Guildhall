@@ -31,7 +31,7 @@ public:
 	bool IsNoClipping();
 
 	void BeginFrame();
-	void Update(float deltaSeconds);
+	void Update();
 	void Render();
 	void EndFrame();
 
@@ -59,13 +59,12 @@ private:
 	bool m_isSpaceStillHeld = false;
 	bool m_isOstillHeld = false;
 	Game* m_game;
-	float m_previousTime = 0.f;
-	float m_currentTime = 0.f;
-	float m_deltaTime = 0.f;
 
 	bool m_debugGameMode = false;
 	bool m_debugCameraMode = false;
 	bool m_noClip = false;
 	bool m_isSpedUp = false;
 	Camera m_devConsoleCamera;
+
+	Clock* m_AppClock = nullptr;
 };

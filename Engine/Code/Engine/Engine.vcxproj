@@ -214,6 +214,8 @@
     <ClCompile Include="Renderer\SwapChain.cpp" />
     <ClCompile Include="Renderer\Texture.cpp" />
     <ClCompile Include="Renderer\TextureView.cpp" />
+    <ClCompile Include="Time\Clock.cpp" />
+    <ClCompile Include="Time\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\fmod\fmod.h" />
@@ -285,6 +287,8 @@
     <ClInclude Include="Renderer\SwapChain.hpp" />
     <ClInclude Include="Renderer\Texture.hpp" />
     <ClInclude Include="Renderer\TextureView.hpp" />
+    <ClInclude Include="Time\Clock.hpp" />
+    <ClInclude Include="Time\Timer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

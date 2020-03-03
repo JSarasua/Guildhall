@@ -49,6 +49,7 @@ float RangeMap( float InputMin, float InputMax, float outputMin, float outputMax
 float Interpolate(float rangeMin, float rangeMax, float rangeScale);
 float Clampf( float rawValue, float inputMin, float inputMax );
 int ClampInt( int rawValue, int inputMin, int inputMax );
+double ClampDouble( double rawValue, double inputMin, double inputMax );
 float ClampZeroToOne(float rawValue);
 int RoundDownToInt(float rawValue);
 

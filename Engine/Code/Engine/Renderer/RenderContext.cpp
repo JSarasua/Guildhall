@@ -13,6 +13,7 @@
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Time/Clock.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
@@ -160,11 +161,23 @@ void RenderContext::Shutdown()
 }
 
 
-void RenderContext::UpdateFrameTime( float deltaSeconds )
+void RenderContext::Setup( Clock* gameClock )
 {
+	m_gameClock = gameClock;
+	if( nullptr == m_gameClock )
+	{
+		m_gameClock = Clock::GetMaster();
+	}
+}
+
+void RenderContext::UpdateFrameTime()
+{
+	float currentTime = (float)m_gameClock->GetTotalElapsedSeconds();
+	float dt = (float)m_gameClock->GetLastDeltaSeconds();
+
 	FrameData framedata;
-	framedata.systemTime = (float)GetCurrentTimeSeconds();
-	framedata.systemDeltaTime = deltaSeconds;
+	framedata.systemTime = currentTime;
+	framedata.systemDeltaTime = dt;
 
 	m_frameUBO->Update( &framedata, sizeof(framedata), sizeof(framedata) );
 }
