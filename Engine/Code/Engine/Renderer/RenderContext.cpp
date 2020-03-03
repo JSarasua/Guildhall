@@ -136,8 +136,6 @@ void RenderContext::Shutdown()
 	delete m_sampPoint;
 	m_sampPoint = nullptr;
 
-	//delete m_texWhite;
-
 
 	DX_SAFE_RELEASE(m_device);
 	DX_SAFE_RELEASE(m_context);
@@ -145,6 +143,8 @@ void RenderContext::Shutdown()
 	DX_SAFE_RELEASE( m_alphaBlendStateHandle );
 	DX_SAFE_RELEASE( m_additiveBlendStateHandle );
 	DX_SAFE_RELEASE( m_solidBlendStateHandle );
+
+	DX_SAFE_RELEASE( m_depthStencilState );
 
 	for( int textureIndex = 0; textureIndex < m_Textures.size(); textureIndex++ )
 	{
@@ -173,6 +173,17 @@ void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
 	UNUSED(clearColor);
 
+}
+
+void RenderContext::ClearDepth( Texture* depthStencilTarget, float depth /*= 1.f*/, float stencil /*= 0.f */ )
+{
+	if( depthStencilTarget != nullptr )
+	{
+		TextureView* depthStencilView = depthStencilTarget->GetOrCreateDepthStencilView();
+		ID3D11DepthStencilView* dsv = depthStencilView->GetAsDSV();
+
+		m_context->ClearDepthStencilView( dsv, D3D11_CLEAR_DEPTH, depth, (UINT8)stencil );
+	}
 }
 
 void RenderContext::DrawVertexArray(int numVertexes, const Vertex_PCU* vertexes )
@@ -312,6 +323,49 @@ void RenderContext::SetModelMatrix( Mat44 const& model )
 	ModelData modelData;
 	modelData.model = model;
 	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
+Texture* RenderContext::CreateDepthStencilTarget()
+{
+	Texture* backBuffer = m_swapchain->GetBackBuffer();
+	IntVec2 backBufferSize = backBuffer->GetTexelSize();
+
+
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = backBufferSize.x;
+	desc.Height = backBufferSize.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_D32_FLOAT;
+	desc.SampleDesc.Count = 1; // MSAA
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT; // if you do mip-chians, we need this to be GPU/DEFAULT
+	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	//DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc, nullptr, &texHandle );
+
+	Texture* newTexture = new Texture( this, texHandle, nullptr );
+	//m_Textures.push_back( newTexture );
+
+
+
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	memset( &dsDesc, 0, sizeof(dsDesc));
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	dsDesc.StencilEnable = false;
+
+
+	m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
+	m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+
+	return newTexture;
 }
 
 Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
@@ -586,6 +640,11 @@ void RenderContext::BeginCamera( Camera& camera )
 		m_context->ClearRenderTargetView( rtv, clearFloats );
 
 	}
+	if( camera.m_clearMode & CLEAR_DEPTH_BIT )
+	{
+		Texture* depthStencilTarget = camera.m_depthStencilTarget;
+		ClearDepth( depthStencilTarget, camera.m_clearDepth, camera.m_clearStencil );
+	}
 
 	Texture* texture = m_swapchain->GetBackBuffer();
 	TextureView* view = texture->GetRenderTargetView();
@@ -604,8 +663,23 @@ void RenderContext::BeginCamera( Camera& camera )
 	//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
 
-	m_context->RSSetViewports( 1, &viewport );
-	m_context->OMSetRenderTargets( 1, &rtv, nullptr );
+	Texture* depthStencilTarget = camera.m_depthStencilTarget;
+	if( depthStencilTarget != nullptr )
+	{
+		TextureView* depthStencilView = depthStencilTarget->GetOrCreateDepthStencilView();
+		ID3D11DepthStencilView* dsv = depthStencilView->GetAsDSV();
+
+		m_context->RSSetViewports( 1, &viewport );
+		m_context->OMSetRenderTargets( 1, &rtv, dsv );
+	}
+	else
+	{
+		m_context->RSSetViewports( 1, &viewport );
+		m_context->OMSetRenderTargets( 1, &rtv, nullptr );
+	}
+
+
+
 
 	m_isDrawing = true;
 

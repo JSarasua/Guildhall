@@ -8,6 +8,8 @@
 
 class Texture;
 class RenderBuffer;
+class RenderContext;
+
 struct Rgba8;
 
 enum eCameraClearBitFlag : unsigned int
@@ -50,6 +52,8 @@ public:
 	float GetAspectRatio() const;
 
 	void SetOutputSize( const Vec2& size );
+	void SetDepthStencilTarget( Texture* texture );
+	void CreateMatchingDepthStencilTarget( RenderContext* context );
 
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
@@ -69,6 +73,9 @@ public:
 	Texture* GetColorTarget() const;
 
 public:
+	Mat44 m_view;
+	Mat44 m_projection;
+
 	Rgba8 m_clearColor;
 	unsigned int m_clearMode = 0;
 
@@ -76,12 +83,11 @@ public:
 
 	Transform m_transform;
 	Vec2 m_outputSize;
-private:
-	Texture* m_texture = nullptr;
+
+	Texture* m_colorTarget = nullptr;
+	Texture* m_depthStencilTarget = nullptr;
+	float m_clearDepth = 1.f;
+	float m_clearStencil = 0.f;
 
 	Vec3 m_position;
-
-public:
-	Mat44 m_view;
-	Mat44 m_projection;
 };

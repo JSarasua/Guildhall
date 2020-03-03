@@ -58,6 +58,9 @@ Texture::~Texture()
 	delete m_shaderResourceView;
 	m_shaderResourceView = nullptr;
 
+	delete m_depthStencilView;
+	m_depthStencilView = nullptr;
+
 	m_owner = nullptr;
 
 	DX_SAFE_RELEASE( m_handle );
@@ -102,5 +105,30 @@ TextureView* Texture::GetOrCreateShaderResourceView()
 	}
 
 	return m_shaderResourceView;
+}
+
+TextureView* Texture::GetOrCreateDepthStencilView()
+{
+	if( nullptr != m_depthStencilView )
+	{
+		return m_depthStencilView;
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	descDSV.Texture2D.MipSlice = 0;
+	descDSV.Flags = 0;
+
+	ID3D11DepthStencilView* dsv = nullptr;
+	m_owner->m_device->CreateDepthStencilView( m_handle, &descDSV, &dsv );
+
+	if( nullptr != dsv )
+	{
+		m_depthStencilView = new TextureView();
+		m_depthStencilView->m_dsv = dsv;
+	}
+
+	return m_depthStencilView;
 }
 

@@ -32,7 +32,7 @@ public:
 
 	void Update(float deltaSeconds);
 	void Render();
-	void RenderCircleOfCubes();
+	void RenderCircleOfSpheres();
 
 private:
 
@@ -60,6 +60,7 @@ private:
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
 	GPUMesh* m_cubeMesh = nullptr;
+	GPUMesh* m_sphereMesh = nullptr;
 	
 
 	Shader* m_invertShader = nullptr;

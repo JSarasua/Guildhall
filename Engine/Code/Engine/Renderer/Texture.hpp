@@ -17,6 +17,7 @@ public:
 
 	TextureView* GetRenderTargetView();
 	TextureView* GetOrCreateShaderResourceView();
+	TextureView* GetOrCreateDepthStencilView();
 
 
 	int GetTextureID() const;
@@ -33,4 +34,5 @@ private:
 
 	TextureView* m_renderTargetView = nullptr;
 	TextureView* m_shaderResourceView = nullptr;
+	TextureView* m_depthStencilView = nullptr;
 };

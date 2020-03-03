@@ -25,6 +25,7 @@ struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 struct ID3D11BlendState;
 struct IDXGIDebug;
+struct ID3D11DepthStencilState;
 
 
 struct FrameData
@@ -75,6 +76,7 @@ public:
 	void UpdateFrameTime( float deltaSeconds );
 
 	void ClearScreen( const Rgba8& clearColor );
+	void ClearDepth( Texture* depthStencilTarget, float depth = 1.f, float stencil = 0.f );
 	void BeginCamera( Camera& camera );
 	void BeginCamera( const Camera& camera, Viewport viewPort );
 	void EndCamera( const Camera& camera );
@@ -99,6 +101,7 @@ public:
 
 	void SetModelMatrix( Mat44 const& model );
 
+	Texture* CreateDepthStencilTarget();
 	Texture* CreateTextureFromColor( Rgba8 color );
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
@@ -127,6 +130,8 @@ public:
 	void CreateDebugModule();
 	void DestroyDebugModule();
 	void ReportLiveObjects();
+
+
 
 protected:
 
@@ -160,6 +165,8 @@ public:
 	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
 	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;
 	ID3D11BlendState* m_solidBlendStateHandle = nullptr;
+
+	ID3D11DepthStencilState* m_depthStencilState = nullptr;
 
 	void* m_debugModule        = nullptr;
 	IDXGIDebug* m_debug           = nullptr;

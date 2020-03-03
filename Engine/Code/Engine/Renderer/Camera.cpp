@@ -5,13 +5,17 @@
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
-
+#include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 
 
 Camera::~Camera()
 {
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
+
+	delete m_depthStencilTarget;
+	m_depthStencilTarget = nullptr;
 }
 
 void Camera::SetPosition( const Vec3& position )
@@ -80,9 +84,9 @@ Vec2 Camera::GetOrthoTopRight() const
 
 Vec2 Camera::GetColorTargetSize() const
 {
-	if( nullptr != m_texture )
+	if( nullptr != m_colorTarget )
 	{
-		return Vec2(m_texture->GetTexelSize());
+		return Vec2(m_colorTarget->GetTexelSize());
 	}
 	else
 	{
@@ -104,6 +108,16 @@ Vec2 Camera::GetClientToWorldPosition( Vec2 clientPos ) const
 void Camera::SetOutputSize( const Vec2& size )
 {
 	m_outputSize = size;
+}
+
+void Camera::SetDepthStencilTarget( Texture* texture )
+{
+	UNUSED( texture );
+}
+
+void Camera::CreateMatchingDepthStencilTarget( RenderContext* context )
+{
+	m_depthStencilTarget = context->CreateDepthStencilTarget();
 }
 
 Vec3 Camera::GetOrthoMin() const
@@ -191,13 +205,13 @@ void Camera::SetColorTarget( Texture* texture )
 {
 	if( nullptr != texture )
 	{
-		m_texture = texture;
+		m_colorTarget = texture;
 	}
 }
 
 Texture* Camera::GetColorTarget() const
 {
-	return m_texture;
+	return m_colorTarget;
 }
 
 void Camera::SetClearMode( unsigned int clearFlags, Rgba8 color, float depth /*= 0.f*/, unsigned int stencil /*= 0 */ )

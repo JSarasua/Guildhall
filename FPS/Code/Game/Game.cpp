@@ -34,6 +34,7 @@ void Game::Startup()
 {
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
+	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
@@ -42,19 +43,29 @@ void Game::Startup()
 	m_numberOfCirclingCubes = 18;
 
 	m_cubeMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCU> cubeVerts;
+	std::vector<uint> cubeIndices;
 
-	std::vector<Vertex_PCU> verts;
-	std::vector<uint> indices;
-	//Vertex_PCU::AppendIndexedVertsCube( verts, indices, 1.f );
-	Vertex_PCU::AppendIndexedVertsSphere( verts, indices, 1.f );
-	m_cubeMesh->UpdateVertices(verts);
-	m_cubeMesh->UpdateIndices(indices);
+	Vertex_PCU::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+	m_cubeMesh->UpdateVertices( cubeVerts );
+	m_cubeMesh->UpdateIndices( cubeIndices );
+
+	m_sphereMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCU> sphereVerts;
+	std::vector<uint> sphereIndices;
+
+	Vertex_PCU::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
+	m_sphereMesh->UpdateVertices( sphereVerts );
+	m_sphereMesh->UpdateIndices( sphereIndices );
 }
 
 void Game::Shutdown()
 {
 	delete m_cubeMesh;
 	m_cubeMesh = nullptr;
+
+	delete m_sphereMesh;
+	m_sphereMesh = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -73,7 +84,7 @@ void Game::Update( float deltaSeconds )
 	clearColor.r = (unsigned char)colorVal;
 	clearColor.b = (unsigned char)colorVal;
 
-	m_camera.SetClearMode( CLEAR_COLOR_BIT, clearColor, 0.f, 0 );
+	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
 	if( !g_theConsole->IsOpen() )
 	{
@@ -144,7 +155,7 @@ void Game::Render()
 // 	g_theRenderer->DrawVertexArray(verts);
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	RenderCircleOfCubes();
+	RenderCircleOfSpheres();
 
 	RenderDevConsole();
 
@@ -154,14 +165,14 @@ void Game::Render()
 }
 
 
-void Game::RenderCircleOfCubes()
+void Game::RenderCircleOfSpheres()
 {
 	float degreeIncrements = 360.f / (float)m_numberOfCirclingCubes;
 
 	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )
 	{
 		g_theRenderer->SetModelMatrix( m_circleOfCubesModelMatrix );
-		g_theRenderer->DrawMesh( m_cubeMesh );
+		g_theRenderer->DrawMesh( m_sphereMesh );
 
 		Mat44 nextModelMatrix;
 		nextModelMatrix.RotateYDegrees( degreeIncrements );
