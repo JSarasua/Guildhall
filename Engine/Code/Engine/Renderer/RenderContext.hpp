@@ -63,6 +63,12 @@ enum class eBufferSlot
 	UBO_CAMERA_SLOT = 1
 };
 
+enum class eDepthCompareMode
+{
+	COMPARE_LESS_THAN_OR_EQUAL,
+	COMPARE_ALWAYS
+};
+
 #undef DrawText
 class RenderContext
 {
@@ -96,6 +102,8 @@ public:
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
+
+	void SetDepth( eDepthCompareMode compareMode );
 
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 

@@ -310,6 +310,43 @@ void RenderContext::BindIndexBuffer( IndexBuffer* ibo )
 
 }
 
+void RenderContext::SetDepth( eDepthCompareMode compareMode )
+{
+	switch( compareMode )
+	{
+		case eDepthCompareMode::COMPARE_ALWAYS:
+		{
+			D3D11_DEPTH_STENCIL_DESC dsDesc;
+			memset( &dsDesc, 0, sizeof( dsDesc ) );
+			dsDesc.DepthEnable = true;
+			dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+			dsDesc.StencilEnable = false;
+
+			DX_SAFE_RELEASE( m_depthStencilState );
+			m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
+			m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+			break;
+		}
+		case eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL:
+		{
+			D3D11_DEPTH_STENCIL_DESC dsDesc;
+			memset( &dsDesc, 0, sizeof( dsDesc ) );
+			dsDesc.DepthEnable = true;
+			dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			dsDesc.StencilEnable = false;
+
+			DX_SAFE_RELEASE( m_depthStencilState );
+			m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
+			m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+			break;
+		}
+		default:
+			break;
+		}
+}
+
 void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 {
 	ID3D11Buffer* uboHandle = ubo->GetHandle();

@@ -47,7 +47,7 @@ private:
 
 private:
 	Mat44 m_cubeModelMatrix;
-	Mat44 m_circleOfCubesModelMatrix;
+	Mat44 m_circleOfSpheresModelMatrix;
 	int m_numberOfCirclingCubes = 0;
 
 	Camera m_UICamera;

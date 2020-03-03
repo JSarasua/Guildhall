@@ -39,7 +39,7 @@ void Game::Startup()
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -2.f ) );
-	m_circleOfCubesModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
+	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
 
 	m_cubeMesh = new GPUMesh( g_theRenderer );
@@ -93,7 +93,12 @@ void Game::Update( float deltaSeconds )
 
 
 	m_cubeModelMatrix.RotateYDegrees( 45.f * deltaSeconds );
-	m_circleOfCubesModelMatrix.RotateYDegrees( 45.f * deltaSeconds );
+
+	Mat44 newCircleOfSpheresRotation;
+	newCircleOfSpheresRotation.RotateYDegrees( 5.f * deltaSeconds );
+	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * deltaSeconds );
+	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
+	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
 
 
@@ -125,7 +130,7 @@ void Game::Update( float deltaSeconds )
 void Game::Render()
 {
 	g_theRenderer->BeginCamera(m_camera);
-	//g_theRenderer->Draw(3, 0);
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
 	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);
@@ -150,9 +155,6 @@ void Game::Render()
 
 	g_theRenderer->BindShader( (Shader*)nullptr );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
-// 	std::vector<Vertex_PCU> verts;
-// 	Vertex_PCU::AppendVertsCube(verts, Transform(), 0.f );
-// 	g_theRenderer->DrawVertexArray(verts);
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	RenderCircleOfSpheres();
@@ -171,13 +173,13 @@ void Game::RenderCircleOfSpheres()
 
 	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )
 	{
-		g_theRenderer->SetModelMatrix( m_circleOfCubesModelMatrix );
+		g_theRenderer->SetModelMatrix( m_circleOfSpheresModelMatrix );
 		g_theRenderer->DrawMesh( m_sphereMesh );
 
 		Mat44 nextModelMatrix;
 		nextModelMatrix.RotateYDegrees( degreeIncrements );
-		nextModelMatrix.TransformBy( m_circleOfCubesModelMatrix );
-		m_circleOfCubesModelMatrix = nextModelMatrix;
+		nextModelMatrix.TransformBy( m_circleOfSpheresModelMatrix );
+		m_circleOfSpheresModelMatrix = nextModelMatrix;
 	}
 }
 
