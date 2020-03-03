@@ -45,10 +45,16 @@ void InputSystem::Startup( Window* window )
 	m_window = window;
 	g_theEventSystem->SubscribeToEvent( "relative mode", CONSOLECOMMAND, SetCursorModeToRelative );
 	g_theEventSystem->SubscribeToEvent( "absolute mode", CONSOLECOMMAND, SetCursorModeToAbsolute );
+
+
 }
 
 void InputSystem::BeginFrame()
 {
+	RECT clientRect;
+	GetWindowRect( (HWND)m_window->m_hwnd, &clientRect );
+	ClipCursor( &clientRect );
+
 	//UpdateMouse
 	UpdateMouse();
 
@@ -215,14 +221,36 @@ void InputSystem::SetCursorMode( eMousePositionMode mode )
 
 	if( mode == MOUSE_MODE_RELATIVE )
 	{
-		ShowCursor( false );
+		HideSystemCursor();
 		UpdateRelativeMode();
 		m_relativeMovement = Vec2(0.f, 0.f);
 	}
 	else if( mode == MOUSE_MODE_ABSOLUTE )
 	{
-		ShowCursor( true );
+		ShowSystemCursor();
 	}
+}
+
+void InputSystem::HideSystemCursor()
+{
+	ShowCursor( false );
+}
+
+void InputSystem::ShowSystemCursor()
+{
+	ShowCursor( true );
+}
+
+void InputSystem::ClipSystemCursor()
+{
+	RECT clientRect;
+	GetWindowRect( (HWND)m_window->m_hwnd, &clientRect );
+	ClipCursor( &clientRect );
+}
+
+void InputSystem::UnclipSystemCursor()
+{
+	ClipCursor( nullptr );
 }
 
 void InputSystem::UpdateRelativeMode()

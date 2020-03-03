@@ -387,10 +387,15 @@ void DevConsole::SetIsOpen( bool isOpen )
 		m_currentColoredLine.m_devConsolePrintString.clear();
 		m_currentCharIndex = 0;
 		ResetSelection();
+		g_theInput->SetCursorMode(MOUSE_MODE_RELATIVE);
+		g_theInput->HideSystemCursor();
+
 	}
 	else if( m_isOpen )
 	{
 		m_currentScrollIndex = (int)m_coloredLines.size() - 1;
+		g_theInput->SetCursorMode(MOUSE_MODE_ABSOLUTE);
+		g_theInput->ShowSystemCursor();
 	}
 }
 

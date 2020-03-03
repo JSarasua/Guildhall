@@ -81,6 +81,13 @@ public:
 	std::string GetClipboardString();
 
 	void SetCursorMode( eMousePositionMode mode );
+	void HideSystemCursor();
+	void ShowSystemCursor();
+	void ClipSystemCursor();
+	void UnclipSystemCursor();
+
+	void SetScreenActive();
+	void SetScreenInactive();
 private:
 
 	void UpdateMouse();
