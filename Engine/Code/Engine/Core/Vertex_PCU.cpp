@@ -356,99 +356,96 @@ void Vertex_PCU::AppendIndexedVertsSphere( std::vector<Vertex_PCU>& masterVertex
 	//top piece is triangles
 	//Afterwards is quads
 
-	int numOfVerticalSlices = 18;		//like an orange slice, change based on theta
-	int numOfHorizontalSlices = 18;		//like latitude lines, change based on phi
-	float thetaIncrements = 360.f / (float)numOfVerticalSlices;
-	float phiIncrements = 360.f / (float)numOfHorizontalSlices;
 
-	Vec3 topPoint = Vec3::MakeFromSphericalDegrees( 0.f, 0.f, 1.f );
-	Vec3 bottomPoint = Vec3::MakeFromSphericalDegrees( 0.f, 180.f, 1.f );
+	int numOfVerticalSlices = 64;		//like an orange slice, change based on theta
+	int numOfHorizontalSlices = 64;		//like latitude lines, change based on phi
+	float thetaIncrements = 360.f / (float)numOfVerticalSlices;
+	float phiIncrements = 180.f / (float)numOfHorizontalSlices;
+
+	Vec3 topPoint = Vec3::MakeFromSphericalDegrees( 0.f, 90.f, 1.f );
+	Vec2 topUV = Vec2( .5f, 1.f );
+	Vec3 bottomPoint = Vec3::MakeFromSphericalDegrees( 0.f, -90.f, 1.f );
+	Vec2 bottomUV = Vec2( 0.5f, 0.f );
 
 	std::vector<Vec3> vertexList;
+	std::vector<Vec2> uvList;
 	vertexList.push_back( topPoint );
+	uvList.push_back( topUV );
 
-	for( float latitudeDegrees = phiIncrements; latitudeDegrees < 180.f; latitudeDegrees += phiIncrements )
+	for( float latitudeDegrees = 90.f - phiIncrements; latitudeDegrees > -90.f; latitudeDegrees -= phiIncrements )
 	{
 
-		for( float longitudeDegrees = 0.f; longitudeDegrees < 180.f; longitudeDegrees += thetaIncrements )
+		for( float longitudeDegrees = 360.f; longitudeDegrees >= 0.f; longitudeDegrees -= thetaIncrements )
 		{
-			Vec3 currentPoint = Vec3::MakeFromSphericalDegrees( longitudeDegrees, latitudeDegrees, 1.f );
+			Vec3 currentPoint = Vec3::MakeFromSphericalDegrees( longitudeDegrees, latitudeDegrees, sphereRadius );
 			vertexList.push_back( currentPoint );
+
+ 			float u = RangeMap( 360.f, 0.f, 0.f, 1.f, longitudeDegrees );
+ 			float v = RangeMap( -90.f, 90.f, 0.f, 1.f, latitudeDegrees );
+			uvList.push_back( Vec2( u, v ) );
 		}
 	}
 	vertexList.push_back( bottomPoint );
+	uvList.push_back( bottomUV );
 
 
-	//Indexes
-	//			0
-	//
-	std::vector<int> indicesList;
+	std::vector<uint> indicesList;
 	//Top of sphere
 	for( int topIndices = 1; topIndices < numOfVerticalSlices + 1; topIndices++ )
 	{
-		if( topIndices == numOfVerticalSlices )
-		{
-			indicesList.push_back( 0 );
-			indicesList.push_back( topIndices );
-			indicesList.push_back( 1 );
-		}
-		else
-		{
 			indicesList.push_back( 0 );
 			indicesList.push_back( topIndices );
 			indicesList.push_back( topIndices + 1 );
-		}
-
 	}
 
 	//Body of Sphere
 	//reduce by 2 the number of vertical slices for the top and bottom of the sphere
-	for( int bodyIndex = 1; bodyIndex < (numOfHorizontalSlices - 2) * (numOfVerticalSlices); bodyIndex += 2 )
+	for( int latitudeIndex = 0; latitudeIndex < numOfHorizontalSlices - 2; latitudeIndex++ )
 	{
-		if( bodyIndex % numOfVerticalSlices == 0 )
+		for( int longitudeIndex = 0; longitudeIndex < numOfVerticalSlices; longitudeIndex++ )
 		{
+
+			int topLeft = latitudeIndex * (numOfVerticalSlices + 1) + longitudeIndex + 1;
+			int topRight = topLeft + 1;
+			int bottomLeft = (latitudeIndex + 1) * (numOfVerticalSlices + 1) + longitudeIndex + 1;
+			int bottomRight = bottomLeft + 1;
+
 			//left quad triangle
-			indicesList.push_back( bodyIndex );
-			indicesList.push_back( bodyIndex + numOfVerticalSlices );
-			indicesList.push_back( bodyIndex - numOfVerticalSlices );
+			indicesList.push_back( topLeft );
+			indicesList.push_back( bottomLeft );
+			indicesList.push_back( topRight );
 
 			//right quad triangle
-			indicesList.push_back( bodyIndex - numOfVerticalSlices );
-			indicesList.push_back( bodyIndex + numOfVerticalSlices );
-			indicesList.push_back( bodyIndex + 1 ); //Should be the next rows first index
+			indicesList.push_back( topRight );
+			indicesList.push_back( bottomLeft );
+			indicesList.push_back( bottomRight );
 		}
-		else
-		{
-			//left quad triangle
-			indicesList.push_back( bodyIndex );
-			indicesList.push_back( bodyIndex + numOfVerticalSlices );
-			indicesList.push_back( bodyIndex + 1 );
-
-			//right quad triangle
-			indicesList.push_back( bodyIndex + 1 );
-			indicesList.push_back( bodyIndex + numOfVerticalSlices );
-			indicesList.push_back( bodyIndex + numOfVerticalSlices + 1 );
-		}
-
 	}
 
 	//Bottom of Sphere
-	for( int bottomIndices = (numOfHorizontalSlices - 3) * numOfVerticalSlices + 1; bottomIndices < (numOfHorizontalSlices - 2) * (numOfVerticalSlices) + 1; bottomIndices++ )
+	for( uint bottomIndices = ((uint)vertexList.size() - 1) - numOfVerticalSlices; bottomIndices < ((uint)vertexList.size() - 1); bottomIndices++ )
 	{
-		if( bottomIndices == (numOfHorizontalSlices - 2) * (numOfVerticalSlices) )
+		if( bottomIndices == ((uint)vertexList.size() - 2) )
 		{
-			indicesList.push_back( (int)vertexList.size() - 1 );
 			indicesList.push_back( bottomIndices );
-			indicesList.push_back( bottomIndices - numOfVerticalSlices );
+			indicesList.push_back( (uint)vertexList.size() - 1 );
+			indicesList.push_back( bottomIndices - (numOfVerticalSlices - 1) );
 		}
 		else
 		{
-			indicesList.push_back( (int)vertexList.size() - 1 );
 			indicesList.push_back( bottomIndices );
+			indicesList.push_back( (uint)vertexList.size() - 1 );
 			indicesList.push_back( bottomIndices + 1 );
 		}
 
 	}
+
+	for( size_t vertexIndex = 0; vertexIndex < vertexList.size(); vertexIndex++ )
+	{
+		masterVertexList.push_back( Vertex_PCU( vertexList[vertexIndex], Rgba8::WHITE, uvList[vertexIndex] ) );
+	}
+ //	masterVertexList.insert( masterVertexList.end(), vertexList.begin(), vertexList.end() );
+ 	masterIndexList.insert( std::end(masterIndexList), std::begin(indicesList), std::end(indicesList) );
 	
 }
 

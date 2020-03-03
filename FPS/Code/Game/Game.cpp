@@ -45,8 +45,8 @@ void Game::Startup()
 
 	std::vector<Vertex_PCU> verts;
 	std::vector<uint> indices;
-	Vertex_PCU::AppendIndexedVertsCube( verts, indices, 1.f );
-	//Vertex_PCU::AppendVertsCube( verts, 1.f );
+	//Vertex_PCU::AppendIndexedVertsCube( verts, indices, 1.f );
+	Vertex_PCU::AppendIndexedVertsSphere( verts, indices, 1.f );
 	m_cubeMesh->UpdateVertices(verts);
 	m_cubeMesh->UpdateIndices(indices);
 }
