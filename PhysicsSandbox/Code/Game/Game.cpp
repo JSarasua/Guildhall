@@ -39,7 +39,12 @@ void Game::Startup()
 	m_camera->SetColorTarget( nullptr );
 	m_UICamera->SetColorTarget( nullptr );
 
+	m_gameClock = new Clock();
+	m_gameClock->SetParent( Clock::GetMaster() );
+
 	m_physics = new Physics2D();
+	m_physics->SetClock( m_gameClock );
+	m_physics->Startup();
 
 	//m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
 	m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
@@ -53,8 +58,7 @@ void Game::Startup()
 	m_mouseDeltaPositions.resize( 5 );
 	m_mouseDeltaTime.resize( 5 );
 	
-	m_gameClock = new Clock();
-	m_gameClock->SetParent( Clock::GetMaster() );
+
 
 	g_theRenderer->Setup( m_gameClock );
 }
@@ -72,7 +76,7 @@ void Game::Update()
 
 	float dt = (float)m_gameClock->GetLastDeltaSeconds();
 	UpdateCameraBounds();
-	m_physics->Update( dt );
+	m_physics->Update();
 	UpdateDebugMouse( dt );
 	CheckBorderCollisions();
 	UpdateGameObjects(dt);

@@ -6,13 +6,38 @@
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Time/Clock.hpp"
+
+void Physics2D::Startup()
+{
+	m_fixedTimeTimer.SetSeconds( m_clock, 1.0/120.0 );
+}
+
+void Physics2D::SetClock( Clock* clock )
+{
+	m_clock = clock;
+
+	if( nullptr == m_clock )
+	{
+		m_clock = Clock::GetMaster();
+	}
+}
 
 void Physics2D::BeginFrame()
 {
 
 }
 
-void Physics2D::Update( float deltaSeconds )
+void Physics2D::Update()
+{
+	while( m_fixedTimeTimer.CheckAndDecrement() )
+	{
+		AdvanceSimulation( m_fixedTimeFrame );
+	}
+
+}
+
+void Physics2D::AdvanceSimulation( float deltaSeconds )
 {
 	ApplyEffectors();
 	MoveRigidbodies( deltaSeconds );

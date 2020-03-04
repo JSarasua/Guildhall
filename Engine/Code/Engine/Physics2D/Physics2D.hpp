@@ -2,18 +2,24 @@
 #include "Engine/Math/vec2.hpp"
 #include <vector>
 #include "Engine/Physics2D/Collision2D.hpp"
+#include "Engine/Time/Timer.hpp"
 
 class Rigidbody2D;
 class DiscCollider2D;
 class PolygonCollider2D;
 class Collider2D;
 class Polygon2D;
+class Clock;
 
 class Physics2D
 {
 public:
+	void Startup();
+	void SetClock( Clock* clock );
+
 	void BeginFrame();
-	void Update( float deltaSeconds );
+	void Update();
+	void AdvanceSimulation( float deltaSeconds );
 	void ApplyEffectors();
 	void MoveRigidbodies( float deltaSeconds );
 	void DetectCollisions();
@@ -42,4 +48,8 @@ private:
 	std::vector<Collision2D> m_collisions;
 
 	float m_gravity = 10.f;
+
+	float m_fixedTimeFrame = 1.f/120.f;
+	Timer m_fixedTimeTimer;
+	Clock* m_clock;
 };
