@@ -65,7 +65,7 @@ protected:
 	bool m_isEnabled = true;
 	Vec2 m_velocity;
 	float m_mass = 1.f;
-	float m_drag = 1.f;
+	float m_drag = 0.f;
 
 	Vec2 m_forcePerFrame = Vec2(0.f,0.f);
 	eSimulationMode m_simulationMode = DYNAMIC;

@@ -247,57 +247,57 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -normalImpulse );
 		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -tangentImpulse);
 	}
-	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
-	{
-		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-		float normalImpulseMagnitude = normalImpulse.GetLength();
-
-		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
-		{
-			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-		}
-		else
-		{
-			tangentImpulse *= combinedFriction;
-		}
-
-		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
-		{
-			tangentImpulse *= -1.f;
-		}
-
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
-	}
-	else if( mySimMode == KINEMATIC && theirSimMode == STATIC )
-	{
-		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-		float normalImpulseMagnitude = normalImpulse.GetLength();
-
-		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
-		{
-			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-		}
-		else
-		{
-			tangentImpulse *= combinedFriction;
-		}
-
-		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
-		{
-			tangentImpulse *= -1.f;
-		}
-
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
-	}
-	else
+// 	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
+// 	{
+// 		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
+// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+// 		float normalImpulseMagnitude = normalImpulse.GetLength();
+// 
+// 		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+// 		{
+// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+// 		}
+// 		else
+// 		{
+// 			tangentImpulse *= combinedFriction;
+// 		}
+// 
+// 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+// 		{
+// 			tangentImpulse *= -1.f;
+// 		}
+// 
+// 		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
+// 		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
+// 	}
+// 	else if( mySimMode == KINEMATIC && theirSimMode == STATIC )
+// 	{
+// 		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
+// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+// 		float normalImpulseMagnitude = normalImpulse.GetLength();
+// 
+// 		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+// 		{
+// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+// 		}
+// 		else
+// 		{
+// 			tangentImpulse *= combinedFriction;
+// 		}
+// 
+// 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+// 		{
+// 			tangentImpulse *= -1.f;
+// 		}
+// 
+// 		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
+// 		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
+// 	}
+	else if( mySimMode == DYNAMIC && theirSimMode == DYNAMIC )
 	{
 		Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );

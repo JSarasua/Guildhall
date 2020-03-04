@@ -300,14 +300,17 @@ void Game::RenderUI() const
 			case DYNAMIC:
 			{
 				simModeString = Stringf("Simulation Mode: DYNAMIC");
+				break;
 			}
 			case KINEMATIC:
 			{
 				simModeString = Stringf("Simulation Mode: KINEMATIC");
+				break;
 			}
 			case STATIC:
 			{
 				simModeString = Stringf("Simulation Mode: STATIC");
+				break;
 			}
 			default: break;
 		}
