@@ -7,6 +7,8 @@
 
 void Rigidbody2D::Update( float deltaSeconds )
 {
+	m_frameStartPosition = m_worldPosition;
+
 	if( m_isEnabled && m_simulationMode == DYNAMIC )
 	{
 		Vec2 acceleration = m_forcePerFrame/m_mass;
@@ -55,6 +57,8 @@ void Rigidbody2D::TakeCollider( Collider2D* collider )
 void Rigidbody2D::SetPosition( Vec2 const& position )
 {
 	m_worldPosition = position;
+	m_frameStartPosition = m_worldPosition;
+
 	if( nullptr != m_collider )
 	{
 		m_collider->UpdateWorldShape();
@@ -94,14 +98,39 @@ void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
 	}
 }
 
+void Rigidbody2D::ApplyDragForce()
+{
+	Vec2 velocity = GetVerletVelocity();
+	Vec2 dragForce = -velocity * m_drag;
+	AddForce( dragForce );
+}
+
+void Rigidbody2D::SetDragCoefficient( float dragCoefficient )
+{
+	m_drag = dragCoefficient;
+}
+
 Vec2 Rigidbody2D::GetVelocity()
 {
 	return m_velocity;
 }
 
+Vec2 Rigidbody2D::GetVerletVelocity()
+{
+	Vec2 verletVelocity = (m_worldPosition - m_frameStartPosition) / m_system->GetFixedDeltaTime();
+	return verletVelocity;
+}
+
 Vec2 Rigidbody2D::GetPosition()
 {
 	return m_worldPosition;
+}
+
+Vec2 Rigidbody2D::GetImpactVelocityAtPoint( Vec2 const& point )
+{
+	UNUSED( point );
+
+	return GetVerletVelocity();
 }
 
 void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )

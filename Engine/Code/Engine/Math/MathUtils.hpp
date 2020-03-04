@@ -12,7 +12,7 @@ class Polygon2D;
 
 int			absInt(int initialValue);
 float		absFloat(float initialValue);
-
+float		SignFloat( float val );
 
 float		Max( float a, float b );
 float		Min( float a, float b );

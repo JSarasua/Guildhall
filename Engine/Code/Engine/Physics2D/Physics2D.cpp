@@ -10,7 +10,8 @@
 
 void Physics2D::Startup()
 {
-	m_fixedTimeTimer.SetSeconds( m_clock, 1.0/120.0 );
+	m_fixedTimeTimer.SetSeconds( m_clock, m_fixedTimeFrame );
+	//g_theEventSystem->SubscribeToEvent( "set_phyics_update hz=NUMBER", CONSOLECOMMAND, )
 }
 
 void Physics2D::SetClock( Clock* clock )
@@ -61,6 +62,7 @@ void Physics2D::ApplyEffectors()
 		gravity *= m_gravity;
 		gravity *= rb->GetMass();
 		rb->AddForce( gravity );
+		rb->ApplyDragForce();
 	}
 }
 
@@ -152,6 +154,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 {
 	Manifold2D manifold = collision.manifold;
 	Vec2 normal = manifold.normal;
+	Vec2 tangent = normal.GetRotatedMinus90Degrees();
 	Rigidbody2D* myRigidbody = collision.me->m_rigidbody;
 	Rigidbody2D* theirRigidbody = collision.them->m_rigidbody;
 
@@ -168,6 +171,10 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	Vec2 pushMe = normal * myMassRatio * penetration;
 	Vec2 pushThem = -normal * theirMassRatio * penetration;
 
+	//save off velocities before moving for VerletVelocity calculations
+	Vec2 myVelocity = myRigidbody->GetImpactVelocityAtPoint( Vec2() );
+	Vec2 theirVelocity = theirRigidbody->GetImpactVelocityAtPoint( Vec2() );
+
 	collision.me->Move( pushMe );
 	collision.them->Move( pushThem );
 
@@ -176,10 +183,10 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	/************************************************************************/
 	float myMass = myRigidbody->GetMass();
 	float theirMass = theirRigidbody->GetMass();
-	Vec2 myVelocity = myRigidbody->GetVelocity();
-	Vec2 theirVelocity = theirRigidbody->GetVelocity();
+
 
 	float combinedRestituion = collision.me->GetBounceWith( collision.them );
+	float combinedFriction = collision.me->GetFrictionWith( collision.them );
 
 	//Get Impulse direction
 
@@ -188,36 +195,135 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	eSimulationMode mySimMode = myRigidbody->GetSimulationMode();
 	eSimulationMode theirSimMode = theirRigidbody->GetSimulationMode();
 
+
+
 	if( mySimMode == DYNAMIC && (theirSimMode == KINEMATIC || theirSimMode == STATIC) )
 	{
 		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		impulse = GetProjectedOnto2D( impulse, normal );
-		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), impulse);
+		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+		float normalImpulseMagnitude = normalImpulse.GetLength();
+
+		if( tangentImpulseMagnitude > normalImpulseMagnitude * combinedFriction )
+		{
+			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+		}
+		else
+		{
+			tangentImpulse *= combinedFriction;
+		}
+
+		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		{
+			tangentImpulse *= -1.f;
+		}
+
+		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), normalImpulse);
+		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), tangentImpulse);
 	}
 	else if( (mySimMode == KINEMATIC || mySimMode == STATIC) && theirSimMode == DYNAMIC )
 	{
 		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		impulse = GetProjectedOnto2D( impulse, normal );
-		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -impulse );
+		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+		float normalImpulseMagnitude = normalImpulse.GetLength();
+
+		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+		{
+			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+		}
+		else
+		{
+			tangentImpulse *= combinedFriction;
+		}
+
+		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		{
+			tangentImpulse *= -1.f;
+		}
+
+		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -normalImpulse );
+		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -tangentImpulse);
 	}
 	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
 	{
 		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		impulse = GetProjectedOnto2D( impulse, normal );
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -impulse );
+		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+		float normalImpulseMagnitude = normalImpulse.GetLength();
+
+		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+		{
+			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+		}
+		else
+		{
+			tangentImpulse *= combinedFriction;
+		}
+
+		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		{
+			tangentImpulse *= -1.f;
+		}
+
+		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
+		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
 	}
 	else if( mySimMode == KINEMATIC && theirSimMode == STATIC )
 	{
 		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		impulse = GetProjectedOnto2D( impulse, normal );
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), impulse );
+		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+		float normalImpulseMagnitude = normalImpulse.GetLength();
+
+		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+		{
+			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+		}
+		else
+		{
+			tangentImpulse *= combinedFriction;
+		}
+
+		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		{
+			tangentImpulse *= -1.f;
+		}
+
+		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
+		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
 	}
 	else
 	{
 		Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-		impulse = GetProjectedOnto2D( impulse, normal );
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), impulse );
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -impulse );
+		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
+		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
+		float tangentImpulseMagnitude = tangentImpulse.GetLength();
+		float normalImpulseMagnitude = normalImpulse.GetLength();
+
+		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+		{
+			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
+		}
+		else
+		{
+			tangentImpulse *= combinedFriction;
+		}
+
+		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		{
+			tangentImpulse *= -1.f;
+		}
+
+		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
+		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
+		
+		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
+		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
 	}
 
 
@@ -304,6 +410,7 @@ void Physics2D::SetFixedDeltaTime( float frameTimeSeconds )
 Rigidbody2D* Physics2D::CreateRigidBody()
 {
 	Rigidbody2D* rb = new Rigidbody2D();
+	rb->m_system = this;
 	m_rigidBodies.push_back(rb);
 	return rb;
 }
@@ -320,6 +427,7 @@ void Physics2D::DestroyRigidBody( Rigidbody2D* rb )
 DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition, float radius )
 {
 	DiscCollider2D* dc = new DiscCollider2D(localPosition, Vec2(0.f, 0.f), radius );
+	dc->m_system = this;
 	m_colliders.push_back(dc);
 	return dc;
 }

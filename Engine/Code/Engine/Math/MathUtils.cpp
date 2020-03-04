@@ -22,6 +22,11 @@ float absFloat( float initialValue )
 	return fabsf( initialValue );
 }
 
+float SignFloat( float val )
+{
+	return ( val >= 0.f ) ? 1.f : -1.f;
+}
+
 float ConvertDegreesToRadians( float orientationDegrees )
 {
 	float degreesToRadiansScale =  3.14159265f / 180.f;

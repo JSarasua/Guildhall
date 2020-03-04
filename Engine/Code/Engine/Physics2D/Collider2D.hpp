@@ -49,6 +49,7 @@ public:
 	eSimulationMode GetSimulationMode() const;
 	PhysicsMaterial GetPhysicsMaterial() const;
 	float GetBounceWith( Collider2D const* other ) const;
+	float GetFrictionWith( Collider2D const* other ) const;
 
 	void SetRestitution( float newRestitution );
 
