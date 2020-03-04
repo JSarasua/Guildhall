@@ -78,6 +78,7 @@ void Rigidbody2D::SetMass( float newMass )
 void Rigidbody2D::Translate( Vec2 const& translator )
 {
 	m_worldPosition += translator;
+	m_frameStartPosition = m_worldPosition;
 }
 
 void Rigidbody2D::SetVelocity( Vec2 const& newVelocity )

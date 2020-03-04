@@ -32,7 +32,7 @@ Vec2 DiscCollider2D::GetClosestPoint( Vec2 const& position ) const
 
 bool DiscCollider2D::Contains( Vec2 const& position ) const
 {
-	if( nullptr != m_rigidbody && !m_rigidbody->IsEnabled() )
+	if( nullptr == m_rigidbody )
 	{
 		return false;
 	}

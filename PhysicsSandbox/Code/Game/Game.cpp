@@ -216,7 +216,30 @@ void Game::UpdateDebugMouse( float deltaSeconds )
 
 	SetCurrentMouseVelocity();
 
-	
+	m_hoveringOverGameObject = nullptr;
+	if( !m_gameObjects.empty() )
+	{
+		for( int goIndex = (int)m_gameObjects.size() - 1; goIndex >= 0; goIndex-- )
+		{
+			if( nullptr == m_gameObjects[goIndex] )
+			{
+				continue;
+			}
+
+			Collider2D* collider = m_gameObjects[goIndex]->m_rigidbody->m_collider;
+			if( nullptr == m_gameObjects[goIndex]->m_rigidbody->m_collider )
+			{
+				continue;
+			}
+
+			if( collider->Contains( m_mousePositionOnMainCamera ) )
+			{
+				m_hoveringOverGameObject = m_gameObjects[goIndex];
+				break;
+			}
+		}
+	}
+
 }
 
 void Game::RenderDebugMouse() const
@@ -237,9 +260,97 @@ void Game::RenderDebugMouse() const
 void Game::RenderUI() const
 {
 	std::string gravityUIString = Stringf("Gravity: %.2f",m_physics->GetSceneGravity());
+	std::string timeScaleUIString = Stringf("Time Scale: %.2f", (float)m_gameClock->GetScale());
 
 	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(60.f, 43.f) , 1.f);
 	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(60.f, 42.f) , 1.f);
+
+	g_theRenderer->DrawTextAtPosition( timeScaleUIString.c_str(), Vec2( 60.f, 40.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( "Adjust: 8/9", Vec2( 60.f, 39.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( "0: Reset", Vec2( 60.f, 38.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( "P: Toggle Pause", Vec2( 60.f, 37.f ), 1.f );
+
+	if( nullptr != m_hoveringOverGameObject )
+	{
+		AABB2 textBox;
+		textBox.SetDimensions( Vec2(20.f, 30.f ) );
+		Vec2 halfDimensions = textBox.GetDimensions() * 0.5f;
+		textBox.SetCenter( m_mousePositionOnMainCamera + halfDimensions );
+
+		g_theRenderer->SetBlendMode(BlendMode::ALPHA);
+		g_theRenderer->BindTexture( nullptr );
+		g_theRenderer->DrawAABB2Filled( textBox, Rgba8(0,0,0,128) );
+
+		Rigidbody2D* rb = m_hoveringOverGameObject->m_rigidbody;
+		Collider2D* col = rb->m_collider;
+		eSimulationMode simMode = rb->GetSimulationMode();
+
+		std::string simModeString;
+		std::string massString;
+		std::string currentVelocityString;
+		std::string currentVerletVelocityString;
+		std::string currentRestitutionString;
+		std::string currentFrictionString;
+		std::string currentDragString;
+
+		//Simulation Mode
+
+		switch( simMode )
+		{
+			case DYNAMIC:
+			{
+				simModeString = Stringf("Simulation Mode: DYNAMIC");
+			}
+			case KINEMATIC:
+			{
+				simModeString = Stringf("Simulation Mode: KINEMATIC");
+			}
+			case STATIC:
+			{
+				simModeString = Stringf("Simulation Mode: STATIC");
+			}
+			default: break;
+		}
+
+		float velocityX = rb->GetVelocity().x;
+		float velocityY = rb->GetVelocity().y;
+
+		float verletVelocityX = rb->GetVerletVelocity().x;
+		float verletVelocityY = rb->GetVerletVelocity().y;
+
+		//Mass
+		massString = Stringf("Mass: %.2f", rb->GetMass());
+		//Current Velocity
+		currentVelocityString = Stringf("Velocity: %.2f, %.2f", velocityX, velocityY);
+		//Current Verlet Velocity
+		currentVerletVelocityString = Stringf("Verlet Velocity: %.2f, %.2f", verletVelocityX, verletVelocityY);
+		//Coefficient of Restitution (bounce)
+		currentRestitutionString = Stringf("Resitution: %.2f", col->GetResitution());
+		//Coefficient of Friction (friction)
+		currentFrictionString = Stringf("Friction: %.2f", col->GetFriction());
+		//Drag value
+		currentDragString = Stringf("Drag: %.2f", rb->GetDrag());
+
+		float vIncrement = 1.f / 8.f;
+		float currentV = 0.f;
+
+		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition(currentFrictionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition(currentRestitutionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( currentVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( massString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( simModeString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+	}
+
+
+	
 }
 
 void Game::CheckButtonPresses(float deltaSeconds)
@@ -261,6 +372,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& sKey				= g_theInput->GetKeyStates('S');
 	const KeyButtonState& dKey				= g_theInput->GetKeyStates('D');
 	const KeyButtonState& oKey				= g_theInput->GetKeyStates('O');
+	const KeyButtonState& pKey				= g_theInput->GetKeyStates('P');
+	const KeyButtonState& eightKey			= g_theInput->GetKeyStates('8');
+	const KeyButtonState& nineKey			= g_theInput->GetKeyStates('9');
+	const KeyButtonState& zeroKey			= g_theInput->GetKeyStates('0');
 	const KeyButtonState& delKey			= g_theInput->GetKeyStates( 0x2E );
 	const KeyButtonState& bSpaceKey			= g_theInput->GetKeyStates( 0x08 ); //backspace
 	const KeyButtonState& escKey			= g_theInput->GetKeyStates( ESC_KEY );	//ESC
@@ -359,6 +474,36 @@ void Game::CheckButtonPresses(float deltaSeconds)
 				m_gameObjects[gameObjectsIndex] = nullptr;
 			}
 
+		}
+
+		if( pKey.WasJustPressed() )
+		{
+			if( m_gameClock->IsPaused() )
+			{
+				m_gameClock->Resume();
+			}
+			else
+			{
+				m_gameClock->Pause();
+			}
+		}
+
+		if( eightKey.WasJustPressed() )
+		{
+			double timeScale = m_gameClock->GetScale();
+			timeScale *= 0.5;
+			m_gameClock->SetScale( timeScale );
+		}
+		if( nineKey.WasJustPressed() )
+		{
+			double timeScale = m_gameClock->GetScale();
+			timeScale *= 2.0;
+			m_gameClock->SetScale( timeScale );
+		}
+		if( zeroKey.WasJustPressed() )
+		{
+			m_gameClock->SetScale( 1.0 );
+			m_gameClock->Resume();
 		}
 	}
 	
@@ -484,8 +629,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			float currentMass = rb->GetMass();
-			float newMass = currentMass - 10.f * deltaSeconds;
-			newMass = Clampf( newMass, 0.001f, 999999.f);
+			float newMass = currentMass - 5.f * deltaSeconds;
+			newMass = Clampf( newMass, 0.01f, 999999.f);
 			
 			rb->SetMass( newMass );
 		}
@@ -496,7 +641,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			float currentMass = rb->GetMass();
-			float newMass = currentMass + 10.f * deltaSeconds;
+			float newMass = currentMass + 5.f * deltaSeconds;
 			newMass = Clampf( newMass, 0.001f, 999999.f );
 
 			rb->SetMass( newMass );
@@ -511,7 +656,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			Collider2D* col = rb->m_collider;
 			float currentFriction = col->GetFriction();
-			float newFriction = currentFriction - 10.f * deltaSeconds;
+			float newFriction = currentFriction - 1.f * deltaSeconds;
 			newFriction = Clampf( newFriction, 0.f, 1.f );
 
 			col->SetFriction( newFriction );
@@ -524,7 +669,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			Collider2D* col = rb->m_collider;
 			float currentFriction = col->GetFriction();
-			float newFriction = currentFriction + 10.f * deltaSeconds;
+			float newFriction = currentFriction + 1.f * deltaSeconds;
 			newFriction = Clampf( newFriction, 0.f, 1.f );
 
 			col->SetFriction( newFriction );
@@ -538,7 +683,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			float currentDrag = rb->GetDrag();
-			float newDrag = currentDrag - 10.f * deltaSeconds;
+			float newDrag = currentDrag - 1.f * deltaSeconds;
 			newDrag = Clampf( newDrag, 0.f, 999999.f );
 
 			rb->SetDragCoefficient( newDrag );
@@ -550,7 +695,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
 			float currentDrag = rb->GetDrag();
-			float newDrag = currentDrag + 10.f * deltaSeconds;
+			float newDrag = currentDrag + 1.f * deltaSeconds;
 			newDrag = Clampf( newDrag, 0.f, 999999.f );
 
 			rb->SetDragCoefficient( newDrag );

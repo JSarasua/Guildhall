@@ -63,6 +63,7 @@ private:
 	Clock* m_gameClock = nullptr;
 
 	GameObject*	m_draggingGameObject = nullptr;
+	GameObject* m_hoveringOverGameObject = nullptr;
 	float m_defaultCameraHeight = 0.f;
 	Vec2 m_draggingOffset;
 	std::vector<GameObject*> m_gameObjects;
