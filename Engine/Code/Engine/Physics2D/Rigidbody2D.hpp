@@ -21,11 +21,13 @@ public:
 	void Update( float deltaSeconds );
 	void AddForce( Vec2 const& forceValue );
 	float GetMass() const;
+	float GetDrag() const;
 
 	void Destroy();
 	void TakeCollider( Collider2D* collider );
 
 	void SetPosition( Vec2 const& position );
+	void SetMass( float newMass );
 	void Translate( Vec2 const& translator );
 	void SetVelocity( Vec2 const& newVelocity );
 	void SetSimulationMode( eSimulationMode simulationMode );
@@ -36,6 +38,7 @@ public:
 	void ApplyDragForce();
 
 	void SetDragCoefficient( float dragCoefficient );
+
 
 	Vec2 GetVelocity();
 	Vec2 GetVerletVelocity();

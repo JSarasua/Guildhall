@@ -256,16 +256,22 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	float mouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
 
 
-	const KeyButtonState& wKey = g_theInput->GetKeyStates('W');
-	const KeyButtonState& aKey = g_theInput->GetKeyStates('A');
-	const KeyButtonState& sKey = g_theInput->GetKeyStates('S');
-	const KeyButtonState& dKey = g_theInput->GetKeyStates('D');
-	const KeyButtonState& oKey = g_theInput->GetKeyStates('O');
-	const KeyButtonState& delKey = g_theInput->GetKeyStates( 0x2E );
-	const KeyButtonState& bSpaceKey = g_theInput->GetKeyStates( 0x08 ); //backspace
-	const KeyButtonState& escKey = g_theInput->GetKeyStates( 0x1B );	//ESC
-	const KeyButtonState& plusKey = g_theInput->GetKeyStates( 0xBB ); //+
-	const KeyButtonState& minusKey = g_theInput->GetKeyStates( 0xBD ); //-
+	const KeyButtonState& wKey				= g_theInput->GetKeyStates('W');
+	const KeyButtonState& aKey				= g_theInput->GetKeyStates('A');
+	const KeyButtonState& sKey				= g_theInput->GetKeyStates('S');
+	const KeyButtonState& dKey				= g_theInput->GetKeyStates('D');
+	const KeyButtonState& oKey				= g_theInput->GetKeyStates('O');
+	const KeyButtonState& delKey			= g_theInput->GetKeyStates( 0x2E );
+	const KeyButtonState& bSpaceKey			= g_theInput->GetKeyStates( 0x08 ); //backspace
+	const KeyButtonState& escKey			= g_theInput->GetKeyStates( ESC_KEY );	//ESC
+	const KeyButtonState& plusKey			= g_theInput->GetKeyStates( 0xBB ); //+
+	const KeyButtonState& minusKey			= g_theInput->GetKeyStates( 0xBD ); //-
+	const KeyButtonState& lBracketKey		= g_theInput->GetKeyStates( LBRACKET_KEY );
+	const KeyButtonState& rBracketKey		= g_theInput->GetKeyStates( RBRACKET_KEY );
+	const KeyButtonState& commaKey			= g_theInput->GetKeyStates( COMMA_KEY );
+	const KeyButtonState& periodKey			= g_theInput->GetKeyStates( PERIOD_KEY );
+	const KeyButtonState& singleQuoteKey	= g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
+	const KeyButtonState& backSlashKey		= g_theInput->GetKeyStates( BACKSLASH_KEY );
 
 
 	if( !m_isPolyDrawing )
@@ -470,6 +476,86 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		Vec2 outputSize = Vec2( cameraHeight * m_camera->GetAspectRatio(), cameraHeight );
 		m_camera->SetProjectionOrthographic( outputSize, 0.f, 1.f );
  	}
+
+	//Change mass minimum of 0.001
+	if( lBracketKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			float currentMass = rb->GetMass();
+			float newMass = currentMass - 10.f * deltaSeconds;
+			newMass = Clampf( newMass, 0.001f, 999999.f);
+			
+			rb->SetMass( newMass );
+		}
+	}
+	if( rBracketKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			float currentMass = rb->GetMass();
+			float newMass = currentMass + 10.f * deltaSeconds;
+			newMass = Clampf( newMass, 0.001f, 999999.f );
+
+			rb->SetMass( newMass );
+		}
+	}
+
+	//Change friction between 0, 1
+	if( commaKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			Collider2D* col = rb->m_collider;
+			float currentFriction = col->GetFriction();
+			float newFriction = currentFriction - 10.f * deltaSeconds;
+			newFriction = Clampf( newFriction, 0.f, 1.f );
+
+			col->SetFriction( newFriction );
+		}
+	}
+	if( periodKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			Collider2D* col = rb->m_collider;
+			float currentFriction = col->GetFriction();
+			float newFriction = currentFriction + 10.f * deltaSeconds;
+			newFriction = Clampf( newFriction, 0.f, 1.f );
+
+			col->SetFriction( newFriction );
+		}
+	}
+
+	//Change drag minimum of 0
+	if( singleQuoteKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			float currentDrag = rb->GetDrag();
+			float newDrag = currentDrag - 10.f * deltaSeconds;
+			newDrag = Clampf( newDrag, 0.f, 999999.f );
+
+			rb->SetDragCoefficient( newDrag );
+		}
+	}
+	if( backSlashKey.IsPressed() )
+	{
+		if( nullptr != m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+			float currentDrag = rb->GetDrag();
+			float newDrag = currentDrag + 10.f * deltaSeconds;
+			newDrag = Clampf( newDrag, 0.f, 999999.f );
+
+			rb->SetDragCoefficient( newDrag );
+		}
+	}
 
 
 

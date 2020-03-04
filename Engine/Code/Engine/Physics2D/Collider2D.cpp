@@ -101,6 +101,11 @@ PhysicsMaterial Collider2D::GetPhysicsMaterial() const
 	return m_physicsMaterial;
 }
 
+float Collider2D::GetFriction() const
+{
+	return m_physicsMaterial.m_friction;
+}
+
 float Collider2D::GetBounceWith( Collider2D const* other ) const
 {
 	float myRestitution = m_physicsMaterial.m_restitution;
@@ -122,6 +127,11 @@ void Collider2D::SetRestitution( float newRestitution )
 {
 	float restitution = Clampf( newRestitution, 0.f, 1.f );
 	m_physicsMaterial.m_restitution = restitution;
+}
+
+void Collider2D::SetFriction( float newFriction )
+{
+	m_physicsMaterial.m_friction = newFriction;
 }
 
 Collider2D::Collider2D( float restitution /*= 1.f */ )

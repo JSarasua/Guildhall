@@ -38,6 +38,11 @@ float Rigidbody2D::GetMass() const
 	return m_mass;
 }
 
+float Rigidbody2D::GetDrag() const
+{
+	return m_drag;
+}
+
 void Rigidbody2D::Destroy()
 {
 	m_system->DestroyRigidBody(this);
@@ -63,6 +68,11 @@ void Rigidbody2D::SetPosition( Vec2 const& position )
 	{
 		m_collider->UpdateWorldShape();
 	}
+}
+
+void Rigidbody2D::SetMass( float newMass )
+{
+	m_mass = newMass;
 }
 
 void Rigidbody2D::Translate( Vec2 const& translator )

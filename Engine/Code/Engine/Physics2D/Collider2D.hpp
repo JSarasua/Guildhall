@@ -48,10 +48,12 @@ public:
 	float GetMass();
 	eSimulationMode GetSimulationMode() const;
 	PhysicsMaterial GetPhysicsMaterial() const;
+	float GetFriction() const;
 	float GetBounceWith( Collider2D const* other ) const;
 	float GetFrictionWith( Collider2D const* other ) const;
 
 	void SetRestitution( float newRestitution );
+	void SetFriction( float newFriction );
 
 	virtual void DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness ) = 0;
 

@@ -29,6 +29,12 @@ const unsigned char SHIFT_KEY		= VK_SHIFT;
 const unsigned char CTRL_C_KEY		= 0x03;
 const unsigned char CTRL_V_KEY		= 0x16;
 const unsigned char CTRL_X_KEY		= 0x18;
+const unsigned char LBRACKET_KEY	= VK_OEM_4;
+const unsigned char RBRACKET_KEY	= VK_OEM_6;
+const unsigned char COMMA_KEY		= VK_OEM_COMMA;
+const unsigned char PERIOD_KEY		= VK_OEM_PERIOD;
+const unsigned char BACKSLASH_KEY	= VK_OEM_5;
+const unsigned char SINGLEQUOTE_KEY	= VK_OEM_7;
 
 InputSystem::InputSystem()
 {

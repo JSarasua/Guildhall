@@ -27,6 +27,12 @@ extern const unsigned char SHIFT_KEY;
 extern const unsigned char CTRL_C_KEY;
 extern const unsigned char CTRL_V_KEY;
 extern const unsigned char CTRL_X_KEY;
+extern const unsigned char LBRACKET_KEY;
+extern const unsigned char RBRACKET_KEY;
+extern const unsigned char COMMA_KEY;
+extern const unsigned char PERIOD_KEY;
+extern const unsigned char BACKSLASH_KEY;
+extern const unsigned char SINGLEQUOTE_KEY;
 
 class Window;
 struct IntVec2;
