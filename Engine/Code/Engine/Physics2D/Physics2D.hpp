@@ -30,6 +30,9 @@ public:
 
 	float GetMassRatio( Rigidbody2D* me, Rigidbody2D* them ) const;
 
+	float GetFixedDeltaTime() const;
+	void SetFixedDeltaTime( float frameTimeSeconds );
+
 	//factory style create/destroy
 
 	Rigidbody2D* CreateRigidBody();

@@ -291,6 +291,16 @@ float Physics2D::GetMassRatio( Rigidbody2D* me, Rigidbody2D* them ) const
 	}
 }
 
+float Physics2D::GetFixedDeltaTime() const
+{
+	return m_fixedTimeFrame;
+}
+
+void Physics2D::SetFixedDeltaTime( float frameTimeSeconds )
+{
+	m_fixedTimeFrame = frameTimeSeconds;
+}
+
 Rigidbody2D* Physics2D::CreateRigidBody()
 {
 	Rigidbody2D* rb = new Rigidbody2D();
