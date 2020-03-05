@@ -310,14 +310,11 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
 		float normalImpulseMagnitude = normalImpulse.GetLength();
 
-		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
+		if( tangentImpulseMagnitude > normalImpulseMagnitude * combinedFriction )
 		{
 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
 		}
-		else
-		{
-			tangentImpulse *= combinedFriction;
-		}
+
 
 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
 		{
