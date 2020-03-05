@@ -14,6 +14,7 @@
 #include "Game/Player.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -47,7 +48,7 @@ void Game::Startup()
 	std::vector<Vertex_PCU> cubeVerts;
 	std::vector<uint> cubeIndices;
 
-	Vertex_PCU::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
 	m_cubeMesh->UpdateVertices( cubeVerts );
 	m_cubeMesh->UpdateIndices( cubeIndices );
 
@@ -55,7 +56,8 @@ void Game::Startup()
 	std::vector<Vertex_PCU> sphereVerts;
 	std::vector<uint> sphereIndices;
 
-	Vertex_PCU::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
+
+	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3(0.f, 0.f, 0.f), 1.f, 64, 64, Rgba8::WHITE );
 	m_sphereMesh->UpdateVertices( sphereVerts );
 	m_sphereMesh->UpdateIndices( sphereIndices );
 
@@ -204,6 +206,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 
 	Vec3 translator;
 
@@ -230,6 +233,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( spaceKey.IsPressed() )
 	{
 		translator.y -=  10.f * deltaSeconds;
+	}
+
+	if( shiftKey.IsPressed() )
+	{
+		translator *= 2.f;
 	}
 
 	m_camera.TranslateRelativeToView( translator );

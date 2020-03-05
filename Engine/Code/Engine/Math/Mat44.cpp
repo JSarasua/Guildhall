@@ -80,6 +80,38 @@ Mat44::Mat44( const Vec4& iBasisHomogeneous, const Vec4& jBasisHomogeneous, cons
 	tW = translationHomogeneous.w;
 }
 
+bool Mat44::operator==( Mat44 const& compare ) const
+{
+	Mat44 c = compare;
+	if( iX == c.iX &&
+		iY == c.iY &&
+		iZ == c.iZ &&
+		iW == c.iW &&
+
+		jX == c.jX &&
+		jY == c.jY &&
+		jZ == c.jZ &&
+		jW == c.jW &&
+
+		kX == c.kX &&
+		kY == c.kY &&
+		kZ == c.kZ &&
+		kW == c.kW &&
+
+		tX == c.tX &&
+		tY == c.tY &&
+		tZ == c.tZ &&
+		tW == c.tW
+		)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 const Vec2 Mat44::TransformVector2D( const Vec2& vectorQuantity ) const
 {
 	Vec2 transformedVec;

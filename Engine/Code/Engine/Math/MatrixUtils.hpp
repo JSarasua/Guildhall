@@ -16,3 +16,4 @@ Mat44 MakePerspectiveProjectMatrixD3D(
 void MatrixTranspose( Mat44& mat );
 void MatrixInvertOrthoNormal( Mat44& mat );
 void MatrixInvert( Mat44& mat );
+bool MatrixIsOrthoNormal( Mat44 const& mat );

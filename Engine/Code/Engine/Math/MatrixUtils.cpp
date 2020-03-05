@@ -223,3 +223,19 @@ void MatrixInvert( Mat44& mat )
 
 }
 
+bool MatrixIsOrthoNormal( Mat44 const& mat )
+{
+	Mat44 invertedMat = mat;
+	MatrixInvertOrthoNormal( invertedMat );
+
+	invertedMat.TransformBy( mat );
+	Mat44 identityMatrix;
+
+	if( invertedMat == identityMatrix )
+	{
+		return true;
+	}
+
+	return false;
+}
+

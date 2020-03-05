@@ -58,8 +58,6 @@ public:
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
 	Vec2 GetColorTargetSize() const;
-	Vec3 GetOrthoMin() const;
-	Vec3 GetOrthoMax() const;
 	Mat44 GetProjection() const;
 
 	void SetProjectionOrthographic( Vec2 const& size, float nearZ, float farZ );

@@ -34,6 +34,7 @@ public:
 	explicit Mat44( const Vec3& iBasis3D, const Vec3& jBasis3D, const Vec3& kBasis3D, const Vec3& translation3D );
 	explicit Mat44( const Vec4& iBasisHomogeneous, const Vec4& jBasisHomogeneous, const Vec4& kBasisHomogeneous, const Vec4& translationHomogeneous );
 
+	bool operator==( Mat44 const& compare ) const;
 
 	//Transform position and vector quantities
 	const Vec2 TransformVector2D( const Vec2& vectorQuantity ) const;	//Assume z = 0, w = 0
