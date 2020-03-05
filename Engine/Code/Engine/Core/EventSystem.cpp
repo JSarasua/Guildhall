@@ -32,6 +32,7 @@ void EventSystem::UnsubscribeToEvent( const std::string& eventName )
 
 void EventSystem::FireEvent( const std::string& stringToCall, eEventType eventType, const EventArgs* args )
 {
+
 	bool wasAnEventCalled = false;
 	for( int eventSystemIndex = 0; eventSystemIndex < m_eventSubscriptions.size(); eventSystemIndex++ )
 	{

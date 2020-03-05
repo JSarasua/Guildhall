@@ -7,11 +7,16 @@
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+
+static float m_fixedTimeFrame = 1.f/120.f;
 
 void Physics2D::Startup()
 {
 	m_fixedTimeTimer.SetSeconds( m_clock, m_fixedTimeFrame );
-	//g_theEventSystem->SubscribeToEvent( "set_phyics_update hz=NUMBER", CONSOLECOMMAND, )
+	g_theEventSystem->SubscribeToEvent( "set_phyics_update", CONSOLECOMMAND, SetPhysicsUpdate );
+
+	m_fixedTimeFrame = 1.f/120.f;
 }
 
 void Physics2D::SetClock( Clock* clock )
@@ -453,5 +458,16 @@ void Physics2D::SetSceneGravity( float newGravity )
 float Physics2D::GetSceneGravity() const
 {
 	return m_gravity;
+}
+
+bool Physics2D::SetPhysicsUpdate( const EventArgs* args )
+{
+	float argValue = args->GetValue(std::string("hz"),120.f);
+	//float argVal = (float)atof(argValue.c_str());
+
+	m_fixedTimeFrame = 1.f/argValue;
+
+	return true;
+	
 }
 

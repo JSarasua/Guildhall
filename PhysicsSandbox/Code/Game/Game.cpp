@@ -261,6 +261,16 @@ void Game::RenderUI() const
 {
 	std::string gravityUIString = Stringf("Gravity: %.2f",m_physics->GetSceneGravity());
 	std::string timeScaleUIString = Stringf("Time Scale: %.2f", (float)m_gameClock->GetScale());
+	std::string isPausedString;
+
+	if( m_gameClock->IsPaused() )
+	{
+		isPausedString = Stringf("Game is: Paused");
+	}
+	else
+	{
+		isPausedString = Stringf("Game is: Unpaused");
+	}
 
 	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(60.f, 43.f) , 1.f);
 	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(60.f, 42.f) , 1.f);
@@ -268,12 +278,14 @@ void Game::RenderUI() const
 	g_theRenderer->DrawTextAtPosition( timeScaleUIString.c_str(), Vec2( 60.f, 40.f ), 1.f );
 	g_theRenderer->DrawTextAtPosition( "Adjust: 8/9", Vec2( 60.f, 39.f ), 1.f );
 	g_theRenderer->DrawTextAtPosition( "0: Reset", Vec2( 60.f, 38.f ), 1.f );
-	g_theRenderer->DrawTextAtPosition( "P: Toggle Pause", Vec2( 60.f, 37.f ), 1.f );
+
+	g_theRenderer->DrawTextAtPosition( isPausedString.c_str(), Vec2( 60.f, 36.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( "P: Toggle Pause", Vec2( 60.f, 35.f ), 1.f );
 
 	if( nullptr != m_hoveringOverGameObject )
 	{
 		AABB2 textBox;
-		textBox.SetDimensions( Vec2(20.f, 30.f ) );
+		textBox.SetDimensions( Vec2(30.f, 30.f ) );
 		Vec2 halfDimensions = textBox.GetDimensions() * 0.5f;
 		textBox.SetCenter( m_mousePositionOnMainCamera + halfDimensions );
 
@@ -334,7 +346,7 @@ void Game::RenderUI() const
 		//Drag value
 		currentDragString = Stringf("Drag: %.2f", rb->GetDrag());
 
-		float vIncrement = 1.f / 8.f;
+		float vIncrement = 1.f / 7.f;
 		float currentV = 0.f;
 
 		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );

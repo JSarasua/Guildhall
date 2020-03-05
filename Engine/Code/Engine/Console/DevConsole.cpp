@@ -87,7 +87,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 		else
 		{
 			PrintString( m_currentColoredLine.m_textColor, m_currentColoredLine.m_devConsolePrintString );
-			g_theEventSystem->FireEvent( m_currentColoredLine.m_devConsolePrintString, CONSOLECOMMAND, nullptr );
+			ExecuteString( m_currentColoredLine.m_devConsolePrintString );
 			m_commandHistory.push_back( m_currentColoredLine );
 			if( !m_isCommandValid )
 			{
@@ -489,5 +489,43 @@ void DevConsole::ResetSelection()
 	m_beginSelect = 0;
 	m_endSelect = 0;
 	m_isAutoCompleting = false;
+}
+
+void DevConsole::ExecuteString( std::string const& commandToExecute )
+{
+	//Clean this up in the future. Use a loop to get input instead of grabbing one
+
+	std::string fullString = commandToExecute;
+	std::string executeString;
+	
+	size_t spacePos = fullString.find(' ');
+	if( spacePos == std::string::npos )
+	{
+		g_theEventSystem->FireEvent( fullString, CONSOLECOMMAND, nullptr );
+	}
+	else
+	{
+		
+		size_t equalPos = fullString.find( '=', spacePos );
+		if( equalPos == std::string::npos )
+		{
+			g_theEventSystem->FireEvent( fullString, CONSOLECOMMAND, nullptr );
+		}
+		else
+		{
+			executeString = fullString.substr(0, spacePos);
+			
+			size_t argCharCount = equalPos - spacePos;
+			std::string argName = fullString.substr( spacePos + 1, argCharCount - 1 );
+			std::string argValue = fullString.substr( equalPos + 1 );
+			EventArgs args;
+			args.SetValue( argName, argValue );
+
+			g_theEventSystem->FireEvent( executeString, CONSOLECOMMAND, &args );
+		}
+	}
+
+
+
 }
 

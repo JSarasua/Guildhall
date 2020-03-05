@@ -51,6 +51,7 @@ private:
 	void EraseSelectedChars();
 	void ClampCurrentLine();
 	void ResetSelection();
+	void ExecuteString( std::string const& commandToExecute );
 
 private:
 	std::vector<ColoredLine> m_coloredLines;

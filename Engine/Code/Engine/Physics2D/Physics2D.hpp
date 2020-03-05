@@ -3,6 +3,7 @@
 #include <vector>
 #include "Engine/Physics2D/Collision2D.hpp"
 #include "Engine/Time/Timer.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 class Rigidbody2D;
 class DiscCollider2D;
@@ -45,6 +46,11 @@ public:
 	void SetSceneGravity( float newGravity );
 	float GetSceneGravity() const;
 
+	static bool SetPhysicsUpdate( const EventArgs* args );
+
+public:
+
+
 private:
 	std::vector<Rigidbody2D*> m_rigidBodies;
 	std::vector<Collider2D*> m_colliders;
@@ -52,7 +58,7 @@ private:
 
 	float m_gravity = 10.f;
 
-	float m_fixedTimeFrame = 1.f/120.f;
+
 	Timer m_fixedTimeTimer;
 	Clock* m_clock;
 };
