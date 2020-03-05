@@ -179,8 +179,11 @@ void Game::UpdateDebugMouse( float deltaSeconds )
 {
 	Vec2 mouseNormalizedPos = g_theInput->GetMouseNormalizedPos();
 	//m_mousePositionOnMainCamera = m_camera->GetClientToWorldPosition(mouseNormalizedPos);
-	Vec3 clientToWorld = m_camera->ClientToWorld( mouseNormalizedPos, 0.f );
-	m_mousePositionOnMainCamera = Vec2( clientToWorld.x, clientToWorld.y );
+	Vec3 clientToWorldMainCamera = m_camera->ClientToWorld( mouseNormalizedPos, 0.f );
+	Vec3 clientToWorldUICamera = m_UICamera->ClientToWorld( mouseNormalizedPos, 0.f );
+
+	m_mousePositionOnMainCamera = Vec2( clientToWorldMainCamera.x, clientToWorldMainCamera.y );
+	m_mousePositionOnUICamera = Vec2( clientToWorldUICamera.x, clientToWorldUICamera.y );
 
 	if( m_draggingGameObject )
 	{
@@ -217,7 +220,12 @@ void Game::UpdateDebugMouse( float deltaSeconds )
 	SetCurrentMouseVelocity();
 
 	m_hoveringOverGameObject = nullptr;
-	if( !m_gameObjects.empty() )
+
+	if( nullptr != m_draggingGameObject )
+	{
+		m_hoveringOverGameObject = m_draggingGameObject;
+	}
+	else if( !m_gameObjects.empty() )
 	{
 		for( int goIndex = (int)m_gameObjects.size() - 1; goIndex >= 0; goIndex-- )
 		{
@@ -287,11 +295,13 @@ void Game::RenderUI() const
 		AABB2 textBox;
 		textBox.SetDimensions( Vec2(30.f, 30.f ) );
 		Vec2 halfDimensions = textBox.GetDimensions() * 0.5f;
-		textBox.SetCenter( m_mousePositionOnMainCamera + halfDimensions );
+		textBox.SetCenter( m_mousePositionOnUICamera + halfDimensions );
 
 		g_theRenderer->SetBlendMode(BlendMode::ALPHA);
 		g_theRenderer->BindTexture( nullptr );
 		g_theRenderer->DrawAABB2Filled( textBox, Rgba8(0,0,0,128) );
+
+
 
 		Rigidbody2D* rb = m_hoveringOverGameObject->m_rigidbody;
 		Collider2D* col = rb->m_collider;
@@ -408,26 +418,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		if( wKey.IsPressed() )
 		{
-			Vec2 upVector = Vec2( 0.f, 10.f );
-			m_camera->Translate2D( upVector * deltaSeconds );
+			Vec3 upVector = Vec3( 0.f, 20.f, 0.f );
+			m_camera->Translate( upVector * deltaSeconds );
 		}
 
 		if( sKey.IsPressed() )
 		{
-			Vec2 downVector = Vec2( 0.f, -10.f );
-			m_camera->Translate2D( downVector * deltaSeconds );
+			Vec3 downVector = Vec3( 0.f, -20.f, 0.f );
+			m_camera->Translate( downVector * deltaSeconds );
 		}
 
 		if( aKey.IsPressed() )
 		{
-			Vec2 leftVector = Vec2( 10.f, 0.f );
-			m_camera->Translate2D( leftVector * deltaSeconds );
+			Vec3 leftVector = Vec3( 20.f, 0.f, 0.f );
+			m_camera->Translate( leftVector * deltaSeconds );
 		}
 
 		if( dKey.IsPressed() )
 		{
-			Vec2 rightVector = Vec2( -10.f, 0.f );
-			m_camera->Translate2D( rightVector * deltaSeconds );
+			Vec3 rightVector = Vec3( -20.f, 0.f, 0.f );
+			m_camera->Translate( rightVector * deltaSeconds );
 		}
 
 		if( oKey.WasJustPressed() )
@@ -487,6 +497,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 				m_draggingGameObject = nullptr;
 				m_gameObjects[gameObjectsIndex] = nullptr;
+
+				if( m_hoveringOverGameObject )
+				{
+					m_hoveringOverGameObject = nullptr;
+				}
 			}
 
 		}

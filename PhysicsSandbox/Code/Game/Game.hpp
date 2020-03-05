@@ -58,6 +58,7 @@ private:
 
 
 	Vec2 m_mousePositionOnMainCamera;
+	Vec2 m_mousePositionOnUICamera;
 
 
 	Clock* m_gameClock = nullptr;
