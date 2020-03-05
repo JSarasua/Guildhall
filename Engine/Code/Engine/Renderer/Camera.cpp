@@ -43,7 +43,13 @@ void Camera::TranslateRelativeToView( Vec3 const& translation )
 
 void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 {
-	m_transform.RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
+	Vec3 rotationPitchRollYaw = m_transform.m_rotationPitchRollYawDegrees;
+	rotationPitchRollYaw += rotator;
+
+	float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
+
+	//m_transform.RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
+	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 }
 
 Vec3 Camera::GetPosition()
