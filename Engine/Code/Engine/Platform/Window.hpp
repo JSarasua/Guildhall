@@ -15,6 +15,8 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
+	void ToggleBorder();
+
 	void SetInputSystem( InputSystem* input );
 	void SetEventSystem( EventSystem* eventSystem );
 	InputSystem* GetInputSystem() const { return m_input; }
@@ -29,4 +31,6 @@ public:
 
 	unsigned int m_clientWidth = 0;
 	unsigned int m_clientHeight = 0;
+
+	bool m_isbordered = true;
 };

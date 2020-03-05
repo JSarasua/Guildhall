@@ -2,6 +2,7 @@
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Math/vec2.hpp"
 #include <string>
+#include <stack>
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 //#include "Engine/Core/EngineCommon.hpp"
@@ -33,6 +34,7 @@ extern const unsigned char COMMA_KEY;
 extern const unsigned char PERIOD_KEY;
 extern const unsigned char BACKSLASH_KEY;
 extern const unsigned char SINGLEQUOTE_KEY;
+extern const unsigned char F11_KEY;
 
 class Window;
 struct IntVec2;
@@ -53,6 +55,14 @@ enum eMousePositionMode
 	MOUSE_MODE_ABSOLUTE,
 	MOUSE_MODE_RELATIVE
 };
+
+struct MouseOptions
+{
+	eMousePositionMode m_mouseMode = MOUSE_MODE_ABSOLUTE;
+	bool m_isMouseVisible = true;
+	bool m_isMouseClipped = false;
+};
+
 
 class InputSystem
 {
@@ -94,6 +104,11 @@ public:
 
 	void SetScreenActive();
 	void SetScreenInactive();
+
+	void PushMouseOptions( eMousePositionMode mouseMode, bool isMouseVisible, bool isMouseClipped );
+	void PopMouseOptions();
+	void SetMouseOptionsFromTopOfStack();
+
 private:
 
 	void UpdateMouse();
@@ -122,4 +137,6 @@ private:
 		XboxController(2),
 		XboxController(3)
 	};
+
+	std::stack<MouseOptions> m_mouseOptionStack;
 };

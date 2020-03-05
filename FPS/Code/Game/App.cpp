@@ -32,7 +32,7 @@ void App::Startup()
 	g_theWindow->SetEventSystem(g_theEventSystem);
 	
 	g_theInput->Startup( g_theWindow );
-	g_theInput->SetCursorMode( MOUSE_MODE_RELATIVE );
+	g_theInput->PushMouseOptions( MOUSE_MODE_RELATIVE, false, true );
 
 	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp(g_theWindow);

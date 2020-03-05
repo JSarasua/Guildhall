@@ -95,6 +95,19 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 		g_theInput->AddMouseWheelScrollAmount( scrollAmount ); // let the input system know that the mouse wheel has moved - again, interface design is up to you - this is just a suggestion
 		break;
 	}
+	case  WM_ACTIVATE:
+	{
+
+		if( wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
+		{
+			g_theInput->SetScreenActive();
+		}
+		else if( wParam == WA_INACTIVE )
+		{
+			g_theInput->SetScreenInactive();
+		}
+		break;
+	}
 // 	case WM_COMMAND:
 // 	{
 // 		unsigned char asKey = (unsigned char)wParam;
@@ -256,6 +269,21 @@ void Window::BeginFrame()
 
 void Window::EndFrame()
 {
+
+}
+
+void Window::ToggleBorder()
+{
+	if( m_isbordered )
+	{
+		m_isbordered = false;
+		SetWindowLongPtr( (HWND)m_hwnd, GWL_STYLE, WS_VISIBLE | WS_POPUP );
+	}
+	else
+	{
+		m_isbordered = true;
+		SetWindowLongPtr( (HWND)m_hwnd, GWL_STYLE, WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_SYSMENU | WS_OVERLAPPED | WS_VISIBLE );
+	}
 
 }
 

@@ -14,7 +14,7 @@
         - [x] When storing degrees, make sure they are stored in sane ranges...
             - [x] Roll & Yaw is `-180` to `180` 
             - [x] Pitch is `-90` to `90`
-- [x] Camera now calculates `view` matrix from their transform.
+- [-] Camera now calculates `view` matrix from their transform.
     - [x] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
     - [x] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
         - [-] `MatrixIsOrthoNormal` check added
@@ -75,14 +75,9 @@
 ------
 
 ## Extras
-- [ ] *X04.10: 03%*: Mouse input, show, and clip options should use a stack to track state `InputSystem::PushMouseOptions`, see notes...
-- [ ] *X04.11: 02%*: **Requires X04.10** - Mouse options are disabled when window loses focus, and re-applied when gaining focus.
-- [ ] *X04.15: 04%*: CPU Mesh Subdivide (tesselation)
-- [ ] *X04.20: 02%*: Cube Sphere Generation
-- [ ] *X04.30: 04%*: IcoSphere Generation (No UV)
-- [ ] *X04.31: 02%*: **Requiers X04.30** - IcoSphere UVs (Can use spherical projection - there's no clean seam so  will require a wrapping sampler to wo -k)
-- [ ] *X04.40: 02%*: Plane Generation (with subdivision count)
-- [ ] *X04.41: 04%*: **Requires X04.40** - Surface Generation for equations of the form "vec3 f(u, v)";
-- [ ] *X04.42: 04%*: **Requires X04.40** - NURB Generation (can use previous)
+- [x] *X01.00 : 05pts*:  Borderless Window Support 
+     - **Press F11 to toggle Borderless
+- [x] *X04.10: 03%*: Mouse input, show, and clip options should use a stack to track state `InputSystem::PushMouseOptions`, see notes...
+- [x] *X04.11: 02%*: **Requires X04.10** - Mouse options are disabled when window loses focus, and re-applied when gaining focus.
 
 ------

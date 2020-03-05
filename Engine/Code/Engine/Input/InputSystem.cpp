@@ -35,6 +35,7 @@ const unsigned char COMMA_KEY		= VK_OEM_COMMA;
 const unsigned char PERIOD_KEY		= VK_OEM_PERIOD;
 const unsigned char BACKSLASH_KEY	= VK_OEM_5;
 const unsigned char SINGLEQUOTE_KEY	= VK_OEM_7;
+const unsigned char F11_KEY			= VK_F11;
 
 InputSystem::InputSystem()
 {
@@ -224,24 +225,24 @@ void InputSystem::SetCursorMode( eMousePositionMode mode )
 
 	if( mode == MOUSE_MODE_RELATIVE )
 	{
-		HideSystemCursor();
+/*		HideSystemCursor();*/
 		UpdateRelativeMode();
 		m_relativeMovement = Vec2(0.f, 0.f);
 	}
 	else if( mode == MOUSE_MODE_ABSOLUTE )
 	{
-		ShowSystemCursor();
+/*		ShowSystemCursor();*/
 	}
 }
 
 void InputSystem::HideSystemCursor()
 {
-	ShowCursor( false );
+	while( ShowCursor( false ) >= 0 ) {}
 }
 
 void InputSystem::ShowSystemCursor()
 {
-	ShowCursor( true );
+	while( ShowCursor( true ) < 0 ) {}
 }
 
 void InputSystem::ClipSystemCursor()
@@ -254,6 +255,70 @@ void InputSystem::ClipSystemCursor()
 void InputSystem::UnclipSystemCursor()
 {
 	ClipCursor( nullptr );
+}
+
+void InputSystem::SetScreenActive()
+{
+	SetMouseOptionsFromTopOfStack();
+}
+
+void InputSystem::SetScreenInactive()
+{
+	SetCursorMode(MOUSE_MODE_ABSOLUTE);
+	ShowSystemCursor();
+	UnclipSystemCursor();
+}
+
+void InputSystem::PushMouseOptions( eMousePositionMode mouseMode, bool isMouseVisible, bool isMouseClipped )
+{
+	MouseOptions options;
+	options.m_mouseMode = mouseMode;
+	options.m_isMouseVisible = isMouseVisible;
+	options.m_isMouseClipped = isMouseClipped;
+
+	m_mouseOptionStack.push( options );
+
+	SetMouseOptionsFromTopOfStack();
+}
+
+void InputSystem::PopMouseOptions()
+{
+	m_mouseOptionStack.pop();
+	SetMouseOptionsFromTopOfStack();
+	
+}
+
+void InputSystem::SetMouseOptionsFromTopOfStack()
+{
+	MouseOptions options;
+	if( !m_mouseOptionStack.empty() )
+	{
+		options = m_mouseOptionStack.top();
+	}
+
+
+	bool isVisible = options.m_isMouseVisible;
+	bool isClipped = options.m_isMouseClipped;
+
+	SetCursorMode( options.m_mouseMode );
+
+	if( isVisible )
+	{
+		ShowSystemCursor();
+	}
+	else
+	{
+		HideSystemCursor();
+	}
+
+	if( isClipped )
+	{
+		ClipSystemCursor();
+	}
+	else
+	{
+		UnclipSystemCursor();
+	}
 }
 
 void InputSystem::UpdateRelativeMode()

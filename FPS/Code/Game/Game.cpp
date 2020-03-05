@@ -207,6 +207,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
+
+	if( f11Key.WasJustPressed() )
+	{
+		g_theWindow->ToggleBorder();
+	}
 
 	Vec3 translator;
 
