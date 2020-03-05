@@ -336,9 +336,13 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode )
 			dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 			dsDesc.StencilEnable = false;
 
-			DX_SAFE_RELEASE( m_depthStencilState );
+			if( nullptr != m_depthStencilState )
+			{
+				DX_SAFE_RELEASE( m_depthStencilState );
+			}
+
 			m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
-			m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+			m_context->OMSetDepthStencilState( m_depthStencilState, 0 );
 			break;
 		}
 		case eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL:
@@ -350,9 +354,13 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode )
 			dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 			dsDesc.StencilEnable = false;
 
-			DX_SAFE_RELEASE( m_depthStencilState );
+			if( nullptr != m_depthStencilState )
+			{
+				DX_SAFE_RELEASE( m_depthStencilState );
+			}
+
 			m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
-			m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+			m_context->OMSetDepthStencilState( m_depthStencilState, 0 );
 			break;
 		}
 		default:
