@@ -13,6 +13,7 @@ class Polygon2D;
 int			absInt(int initialValue);
 float		absFloat(float initialValue);
 float		SignFloat( float val );
+bool		AlmostEqualsFloat( float a, float b, float epsilon = 0.01f);
 
 float		Max( float a, float b );
 float		Min( float a, float b );

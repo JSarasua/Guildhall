@@ -27,6 +27,19 @@ float SignFloat( float val )
 	return ( val >= 0.f ) ? 1.f : -1.f;
 }
 
+bool AlmostEqualsFloat( float a, float b, float epsilon /*= 0.01f*/ )
+{
+	float bMin = b - epsilon;
+	float bMax = b + epsilon;
+
+	if( a >= bMin && a <= bMax )
+	{
+		return true;
+	}
+
+	return false;
+}
+
 float ConvertDegreesToRadians( float orientationDegrees )
 {
 	float degreesToRadiansScale =  3.14159265f / 180.f;
