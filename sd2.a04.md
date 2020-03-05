@@ -14,19 +14,19 @@
         - [x] When storing degrees, make sure they are stored in sane ranges...
             - [x] Roll & Yaw is `-180` to `180` 
             - [x] Pitch is `-90` to `90`
-- [-] Camera now calculates `view` matrix from their transform.
+- [x] Camera now calculates `view` matrix from their transform.
     - [x] `Transform::GetAsMatrix` implemented to calculate the camera's model matrix
     - [x] `MatrixInvertOrthoNormal` implemented to invert the camera's model into a view matrix
-        - [-] `MatrixIsOrthoNormal` check added
+        - [x] `MatrixIsOrthoNormal` check added
         - [x] `MatrixTranspose` added
 - [x] Draw a Quad at `(0, 0, -10)`, or 10 units in front of the origin (should be visible when you start)
-- [ ] Allow player to move the camera by change the camera transform position
+- [x] Allow player to move the camera by change the camera transform position
    - [x] `W` & `S`: Forward & Back (movement is relative to where you're looking)
    - [x] `A` & `D`: Left and Right (movement is relative to where you're looking)
    - [x] `Space` & `C`: Up and Down Movement (movement is absolute (world up and world down)
    - [x] `Left-Shift`: Move faster while held.
    - *Note:  If you want different controls, just make a note in your readme*
-- [-] Allow player to turn the camera using the mouse.
+- [x] Allow player to turn the camera using the mouse.
     - [x] `InputSystem::HideSystemCursor` implemented
     - [x] `InputSystem::ClipSystemCursor` implemented
     - [x] `InputSystem::SetCursorMode` implemented
@@ -40,7 +40,7 @@
         - [x] `DevConsole` should unlock the mouse and set to `ABSOLUTE` mode
     - [x] Associate `X` movement with `yaw`
     - [x] Associate `Y` movement with `pitch`
-        - [-] Do not allow pitch above `85` degrees or below `95` degrees - no going upside down... yet...
+        - [x] Do not allow pitch above `85` degrees or below `95` degrees - no going upside down... yet...
         - *Note:  Up to you if you want inverted-y or not.*
 - [x] Support `RenderContext::SetModelMatrix`
     - [x] Create a new uniform buffer for storing a model matrix (slot 2)
