@@ -1,6 +1,8 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+
 #include <math.h>
 
 Mat44 MakeOrthographicProjectionMatrixD3D( float minX, float maxX, float minY, float maxY, float minZ, float maxZ )
@@ -85,6 +87,11 @@ void MatrixInvertOrthoNormal( Mat44& mat )
 	//Vec3 inverseTranslation = translation * -1.f;
 	Vec3 inverseTranslation = inverse.TransformPosition3D( -translation );
 	inverse.SetTranslation3D( inverseTranslation );
+
+	Mat44 identityFromInversion = inverse;
+	identityFromInversion.TransformBy( mat );
+
+	GUARANTEE_OR_DIE( IsMatrixEqual( identityFromInversion, Mat44(), 0.001f ), "Tried to invert a matrix with orthonormal inversion on a non orthonormal matrix" );
 
 	mat = inverse;
 }
@@ -231,11 +238,46 @@ bool MatrixIsOrthoNormal( Mat44 const& mat )
 	invertedMat.TransformBy( mat );
 	Mat44 identityMatrix;
 
-	if( invertedMat == identityMatrix )
+	if( IsMatrixEqual( invertedMat, identityMatrix, 0.01f ) )
 	{
 		return true;
 	}
 
 	return false;
+}
+
+bool IsMatrixEqual( Mat44 const& matA, Mat44 const& matB, float epsilon /*= 0.01f */ )
+{
+	Mat44 a = matA;
+	Mat44 b = matB;
+	
+
+	if( AlmostEqualsFloat(a.iX, b.iX, epsilon) &&
+		AlmostEqualsFloat(a.iY, b.iY, epsilon) &&
+		AlmostEqualsFloat(a.iZ, b.iZ, epsilon) &&
+		AlmostEqualsFloat(a.iW, b.iW, epsilon) &&
+
+		AlmostEqualsFloat(a.jX, b.jX, epsilon) &&
+		AlmostEqualsFloat(a.jY, b.jY, epsilon) &&
+		AlmostEqualsFloat(a.jZ, b.jZ, epsilon) &&
+		AlmostEqualsFloat(a.jW, b.jW, epsilon) &&
+
+		AlmostEqualsFloat(a.kX, b.kX, epsilon) &&
+		AlmostEqualsFloat(a.kY, b.kY, epsilon) &&
+		AlmostEqualsFloat(a.kZ, b.kZ, epsilon) &&
+		AlmostEqualsFloat(a.kW, b.kW, epsilon) &&
+
+		AlmostEqualsFloat(a.tX, b.tX, epsilon) &&
+		AlmostEqualsFloat(a.tY, b.tY, epsilon) &&
+		AlmostEqualsFloat(a.tZ, b.tZ, epsilon) &&
+		AlmostEqualsFloat(a.tW, b.tW, epsilon)
+		)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
