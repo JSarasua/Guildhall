@@ -11,6 +11,10 @@
 
 Camera::~Camera()
 {
+	delete m_colorTarget;
+	m_colorTarget = nullptr;
+
+
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
 

@@ -138,8 +138,7 @@ void RenderContext::Shutdown()
 	m_sampPoint = nullptr;
 
 
-	DX_SAFE_RELEASE(m_device);
-	DX_SAFE_RELEASE(m_context);
+
 
 	DX_SAFE_RELEASE( m_alphaBlendStateHandle );
 	DX_SAFE_RELEASE( m_additiveBlendStateHandle );
@@ -156,9 +155,14 @@ void RenderContext::Shutdown()
 
 	m_texWhite = nullptr;
 
+	DX_SAFE_RELEASE( m_device );
+	DX_SAFE_RELEASE( m_context );
+
 	ReportLiveObjects();    // do our leak reporting just before shutdown to give us a better detailed list; 
 	DestroyDebugModule();
 }
+
+
 
 
 void RenderContext::Setup( Clock* gameClock )

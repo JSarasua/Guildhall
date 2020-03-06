@@ -40,10 +40,10 @@ void App::Startup()
 	m_game->Startup();
 	g_theConsole->Startup();
 
-	m_devConsoleCamera = Camera();
-	m_devConsoleCamera.SetColorTarget(nullptr);
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetColorTarget(nullptr);
 	//m_devConsoleCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
-	m_devConsoleCamera.SetProjectionOrthographic(Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y), 0.f, -100.f );
+	m_devConsoleCamera->SetProjectionOrthographic(Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y), 0.f, -100.f );
 	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
 
 
@@ -52,14 +52,17 @@ void App::Startup()
 
 void App::Shutdown()
 {
+	delete m_devConsoleCamera;
+
+
 	m_game->Shutdown();
 	delete m_game;
-	g_theRenderer->Shutdown();
-	delete g_theRenderer;
 	g_theInput->Shutdown();
 	delete g_theInput;
 	g_theConsole->Shutdown();
 	delete g_theConsole;
+	g_theRenderer->Shutdown();
+	delete g_theRenderer;
 }
 
 
@@ -142,10 +145,10 @@ void App::Render()
 {
 	m_game->Render();
 
-	g_theRenderer->BeginCamera(m_devConsoleCamera);
+	g_theRenderer->BeginCamera(*m_devConsoleCamera);
 	g_theRenderer->SetBlendMode(BlendMode::ALPHA);
-	g_theConsole->Render(*g_theRenderer, m_devConsoleCamera, 0.1f);
-	g_theRenderer->EndCamera(m_devConsoleCamera);
+	g_theConsole->Render(*g_theRenderer, *m_devConsoleCamera, 0.1f);
+	g_theRenderer->EndCamera(*m_devConsoleCamera);
 }
 void App::EndFrame()
 {

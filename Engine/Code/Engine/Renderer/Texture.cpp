@@ -77,8 +77,11 @@ TextureView* Texture::GetRenderTargetView()
 	ID3D11RenderTargetView* rtv = nullptr;
 	device->CreateRenderTargetView( m_handle, nullptr, &rtv);
 
+
 	if( nullptr != rtv )
 	{
+		const char* debugName = "Render Target View                                              YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO";
+		rtv->SetPrivateData( WKPDID_D3DDebugObjectName, sizeof(debugName) - 1, debugName );
 		m_renderTargetView = new TextureView();
 		m_renderTargetView->m_rtv = rtv;
 	}

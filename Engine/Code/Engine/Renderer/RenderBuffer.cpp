@@ -11,6 +11,7 @@ RenderBuffer::RenderBuffer( RenderContext* owner, eRenderBufferUsage usage, eRen
 	m_bufferByteSize(0U),
 	m_elementByteSize(0U)
 {
+	//
 }
 
 RenderBuffer::~RenderBuffer()
