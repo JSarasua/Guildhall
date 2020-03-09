@@ -69,4 +69,10 @@ protected:
 
 	Vec2 m_forcePerFrame = Vec2(0.f,0.f);
 	eSimulationMode m_simulationMode = DYNAMIC;
+
+	float m_rotationInRadians = 0.f;	//Radians
+	float m_angularVelocity = 0.f;		//Radians/Sec
+	float m_frameTorque = 0.f;			//???
+	float m_moment = 0.f;				//Moment of Inertia
+
 };
