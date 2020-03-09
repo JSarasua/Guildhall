@@ -209,6 +209,18 @@ void Polygon2D::Translate( Vec2 const& translator )
 	}
 }
 
+void Polygon2D::RotateAroundCenter( float rotationRadians )
+{
+	Vec2 center = GetCenterOfMass();
+
+	for( size_t pointIndex = 0; pointIndex < m_points.size(); pointIndex++ )
+	{
+		m_points[pointIndex] -= center;
+		m_points[pointIndex].RotateRadians(rotationRadians);
+		m_points[pointIndex] += center;
+	}
+}
+
 AABB2 Polygon2D::GetTightlyFixBox() const
 {
 	AABB2 box(m_points[0], m_points[0] );

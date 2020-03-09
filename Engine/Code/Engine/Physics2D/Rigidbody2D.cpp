@@ -3,6 +3,7 @@
 #include "Engine/Physics2D/Collider2D.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 
 void Rigidbody2D::Update( float deltaSeconds )
@@ -19,13 +20,33 @@ void Rigidbody2D::Update( float deltaSeconds )
 	if( m_simulationMode != STATIC )
 	{
 		m_worldPosition += m_velocity * deltaSeconds;
+		UpdateRotation( deltaSeconds );
 		if( nullptr != m_collider )
 		{
 			m_collider->UpdateWorldShape();
 		}
 	}
 
+
+
+	m_frameTorque = 0.f;
 	m_forcePerFrame = Vec2(0.f, 0.f);
+}
+
+void Rigidbody2D::UpdateRotation( float deltaSeconds )
+{
+	CalculateMoment();
+	if( m_isEnabled && m_simulationMode == DYNAMIC )
+	{
+		float angularAcceleration = m_frameTorque / m_moment;
+		m_angularVelocity += angularAcceleration * deltaSeconds;
+	}
+
+
+	if( m_simulationMode != STATIC )
+	{
+		m_orientationInRadians += m_angularVelocity * deltaSeconds;
+	}
 }
 
 void Rigidbody2D::AddForce( Vec2 const& forceValue )
@@ -41,6 +62,12 @@ float Rigidbody2D::GetMass() const
 float Rigidbody2D::GetDrag() const
 {
 	return m_drag;
+}
+
+float Rigidbody2D::CalculateMoment()
+{
+	m_moment = m_collider->CalculateMoment( m_mass );
+	return m_moment;
 }
 
 void Rigidbody2D::Destroy()
@@ -73,6 +100,7 @@ void Rigidbody2D::SetPosition( Vec2 const& position )
 void Rigidbody2D::SetMass( float newMass )
 {
 	m_mass = newMass;
+	CalculateMoment();
 }
 
 void Rigidbody2D::Translate( Vec2 const& translator )
@@ -98,14 +126,33 @@ eSimulationMode Rigidbody2D::GetSimulationMode() const
 
 void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
 {
-	UNUSED( worldPos );
+	//UNUSED( worldPos );
 
-	if( m_simulationMode != STATIC )
+	if( m_simulationMode == DYNAMIC )
 	{
 		float inverseMass = 1.f/m_mass;
 		Vec2 deltaVelocity = impulse * inverseMass;
 
 		m_velocity += deltaVelocity;
+
+
+		Vec2 center = m_collider->GetCenterOfMass();
+		Vec2 centerToWorldPos = worldPos - center;
+// 		float colliderAngle = centerToWorldPos.GetAngleDegrees();
+// 		float impulseAngle = impulse.GetAngleDegrees();
+// 		float angularDisplacement = GetShortestAngularDisplacement( colliderAngle, impulseAngle );
+// 		float angularDisplacementRadians = ConvertDegreesToRadians( angularDisplacement );
+// 
+// 		float distanceToWorldPos = GetDistance2D( center, worldPos );
+// 		float impulseMagnitude = impulse.GetLength();
+
+		//m_frameTorque += distanceToWorldPos * impulseMagnitude * sinf( angularDisplacementRadians );
+
+		Vec2 centerToWorldPerp = centerToWorldPos.GetRotated90Degrees();
+
+		float deltaAngularVelocity = DotProduct2D( centerToWorldPerp, impulse ) / m_moment;
+		m_angularVelocity += deltaAngularVelocity;
+
 	}
 }
 
@@ -175,6 +222,11 @@ void Rigidbody2D::DisableRigidbody()
 bool Rigidbody2D::IsEnabled()
 {
 	return m_isEnabled;
+}
+
+float Rigidbody2D::GetOrientationRadians() const
+{
+	return m_orientationInRadians;
 }
 
 Rigidbody2D::~Rigidbody2D()

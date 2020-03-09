@@ -160,6 +160,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	Manifold2D manifold = collision.manifold;
 	Vec2 normal = manifold.normal;
 	Vec2 tangent = normal.GetRotatedMinus90Degrees();
+	Vec2 contactPoint = manifold.contactPoint;
 	Rigidbody2D* myRigidbody = collision.me->m_rigidbody;
 	Rigidbody2D* theirRigidbody = collision.them->m_rigidbody;
 
@@ -224,8 +225,8 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			tangentImpulse *= -1.f;
 		}
 
-		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), normalImpulse);
-		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), tangentImpulse);
+		myRigidbody->ApplyImpulseAt( contactPoint, normalImpulse);
+		myRigidbody->ApplyImpulseAt( contactPoint, tangentImpulse);
 	}
 	else if( (mySimMode == KINEMATIC || mySimMode == STATIC) && theirSimMode == DYNAMIC )
 	{
@@ -249,8 +250,8 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			tangentImpulse *= -1.f;
 		}
 
-		theirRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -normalImpulse );
-		myRigidbody->ApplyImpulseAt( Vec2(0.f, 0.f), -tangentImpulse);
+		theirRigidbody->ApplyImpulseAt( contactPoint, -normalImpulse );
+		myRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse);
 	}
 // 	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
 // 	{
@@ -321,11 +322,11 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			tangentImpulse *= -1.f;
 		}
 
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
+		myRigidbody->ApplyImpulseAt( contactPoint, normalImpulse );
+		theirRigidbody->ApplyImpulseAt( contactPoint, -normalImpulse );
 		
-		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
-		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
+		myRigidbody->ApplyImpulseAt( contactPoint, tangentImpulse );
+		theirRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse );
 	}
 
 

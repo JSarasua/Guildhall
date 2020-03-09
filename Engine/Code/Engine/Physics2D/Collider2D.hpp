@@ -38,8 +38,10 @@ public:
 	virtual void UpdateWorldShape()								= 0;
 
 	virtual Vec2 GetClosestPoint( Vec2 const& position ) const	= 0;
-	AABB2 GetBounds() const;
 	virtual bool Contains( Vec2 const& position ) const			= 0;
+	virtual float CalculateMoment( float mass ) const			= 0;
+	virtual Vec2 GetCenterOfMass() const						= 0;
+	AABB2 GetBounds() const;
 	
 	void Move( Vec2 const& translator );
 	
@@ -73,6 +75,8 @@ public:
 	PhysicsMaterial m_physicsMaterial;
 	AABB2 m_bounds;
 protected:
+	float m_orientationRadians = 0.f;
+
 	bool m_isGarbage = false;
 };
 

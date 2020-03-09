@@ -27,7 +27,7 @@ public:
 	size_t GetTriangleCount() const;	//Gets number of triangles polygon is made of
 
 	void Translate( Vec2 const& translator );
-
+	void RotateAroundCenter( float rotationRadians );
 	AABB2 GetTightlyFixBox() const;
 
 public:

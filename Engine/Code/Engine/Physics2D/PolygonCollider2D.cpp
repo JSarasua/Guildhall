@@ -23,6 +23,13 @@ void PolygonCollider2D::UpdateWorldShape()
 	m_polygon.Translate( translator );
 	m_worldPosition = m_rigidbody->GetPosition();
 
+	float orientationDegrees = ConvertRadiansToDegrees( m_orientationRadians );
+	float newOrientationDegrees = ConvertRadiansToDegrees( m_rigidbody->GetOrientationRadians() );
+	float rotationDegrees = GetShortestAngularDisplacement( orientationDegrees, newOrientationDegrees );
+	float rotationRadians = ConvertDegreesToRadians( rotationDegrees );
+	m_polygon.RotateAroundCenter( rotationRadians );
+
+
 	m_bounds = m_polygon.GetTightlyFixBox();
 }
 
@@ -67,6 +74,25 @@ eOffScreenDirection PolygonCollider2D::IsOffScreen( AABB2 const& bounds ) const
 	{
 		return RIGHTOFSCREEN;
 	}
+}
+
+float PolygonCollider2D::CalculateMoment( float mass ) const
+{
+	//WRONG EQUATION
+	float vertices = (float)m_polygon.GetVertexCount();
+	AABB2 aabb2 = GetBounds();
+	float radius = 0.5f * GetDistance2D( aabb2.mins, aabb2.maxs ) ;
+
+	float innerArg = sinf(3.14159265f/vertices);
+
+	float moment = 0.5f * mass * (radius * radius) * ( 1.f - 2.f/3.f * (innerArg * innerArg) );
+	
+	return moment;
+}
+
+Vec2 PolygonCollider2D::GetCenterOfMass() const
+{
+	return m_polygon.GetCenterOfMass();
 }
 
 void PolygonCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness )

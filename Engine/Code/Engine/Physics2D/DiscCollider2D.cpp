@@ -70,8 +70,26 @@ eOffScreenDirection DiscCollider2D::IsOffScreen( AABB2 const& bounds ) const
 	}
 }
 
+float DiscCollider2D::CalculateMoment( float mass ) const
+{
+	float radius = m_radius;
+	float moment = (3.f/2.f) * mass * (radius * radius);
+
+	return moment;
+}
+
+Vec2 DiscCollider2D::GetCenterOfMass() const
+{
+	return m_localPosition + m_worldPosition;
+}
+
 void DiscCollider2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor, float thickness )
 {
 	context->DrawDisc(m_worldPosition, m_radius, fillColor , borderColor, thickness );
+	float orientationRadians = m_rigidbody->GetOrientationRadians();
+
+	Vec2 rightPoint = Vec2::MakeFromPolarRadians( orientationRadians, m_radius );
+	rightPoint += m_worldPosition + m_localPosition;
+	context->DrawLine( m_worldPosition, rightPoint, borderColor, thickness );
 }
 
