@@ -299,7 +299,7 @@ void Game::RenderUI() const
 
 		g_theRenderer->SetBlendMode(BlendMode::ALPHA);
 		g_theRenderer->BindTexture( nullptr );
-		g_theRenderer->DrawAABB2Filled( textBox, Rgba8(0,0,0,128) );
+		g_theRenderer->DrawAABB2Filled( textBox, Rgba8(0,0,128,128) );
 
 
 
@@ -309,6 +309,7 @@ void Game::RenderUI() const
 
 		std::string simModeString;
 		std::string massString;
+		std::string momentString;
 		std::string currentVelocityString;
 		std::string currentVerletVelocityString;
 		std::string orientationRadiansString;
@@ -347,9 +348,12 @@ void Game::RenderUI() const
 
 		float orientationRadians = rb->GetOrientationRadians();
 		float angularVelocity = rb->GetAngularVelocityRadians();
+		float moment = rb->GetMoment();
 
 		//Mass
 		massString = Stringf("Mass: %.2f", rb->GetMass());
+		//Moment Of Inertia
+		momentString = Stringf("Moment of Inertia: %.2f", moment );
 		//Current Velocity
 		currentVelocityString = Stringf("Velocity: %.2f, %.2f", velocityX, velocityY);
 		//Current Verlet Velocity
@@ -365,7 +369,7 @@ void Game::RenderUI() const
 		//Drag value
 		currentDragString = Stringf("Drag: %.2f", rb->GetDrag());
 
-		float vIncrement = 1.f / 9.f;
+		float vIncrement = 1.f / 10.f;
 		float currentV = 0.f;
 
 		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
@@ -381,6 +385,8 @@ void Game::RenderUI() const
 		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition( currentVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( momentString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition( massString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;

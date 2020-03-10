@@ -54,6 +54,7 @@ public:
 	void DisableRigidbody();
 	bool IsEnabled();
 
+	float GetMoment() const;
 	float GetOrientationRadians() const;
 	float GetAngularVelocityRadians() const;
 public:
@@ -80,5 +81,4 @@ protected:
 	float m_angularVelocity = 0.f;		//Radians/Sec
 	float m_frameTorque = 0.f;			//???
 	float m_moment = 0.f;				//Moment of Inertia
-
 };
