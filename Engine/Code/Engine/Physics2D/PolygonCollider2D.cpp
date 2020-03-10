@@ -29,6 +29,7 @@ void PolygonCollider2D::UpdateWorldShape()
 	float rotationRadians = ConvertDegreesToRadians( rotationDegrees );
 	m_polygon.RotateAroundCenter( rotationRadians );
 
+	m_orientationRadians = m_rigidbody->GetOrientationRadians();
 
 	m_bounds = m_polygon.GetTightlyFixBox();
 }

@@ -30,6 +30,8 @@ public:
 
 	void SetPosition( Vec2 const& position );
 	void SetMass( float newMass );
+	void SetOrientationRadians( float newOrientationRadians );
+	void SetAngularVelocityRandians( float newAngularVelocity );
 	void Translate( Vec2 const& translator );
 	void SetVelocity( Vec2 const& newVelocity );
 	void SetSimulationMode( eSimulationMode simulationMode );
@@ -53,6 +55,7 @@ public:
 	bool IsEnabled();
 
 	float GetOrientationRadians() const;
+	float GetAngularVelocityRadians() const;
 public:
 	Physics2D* m_system;
 	Collider2D* m_collider;

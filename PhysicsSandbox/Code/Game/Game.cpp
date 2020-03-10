@@ -311,6 +311,8 @@ void Game::RenderUI() const
 		std::string massString;
 		std::string currentVelocityString;
 		std::string currentVerletVelocityString;
+		std::string orientationRadiansString;
+		std::string angularVelocityString;
 		std::string currentRestitutionString;
 		std::string currentFrictionString;
 		std::string currentDragString;
@@ -343,12 +345,19 @@ void Game::RenderUI() const
 		float verletVelocityX = rb->GetVerletVelocity().x;
 		float verletVelocityY = rb->GetVerletVelocity().y;
 
+		float orientationRadians = rb->GetOrientationRadians();
+		float angularVelocity = rb->GetAngularVelocityRadians();
+
 		//Mass
 		massString = Stringf("Mass: %.2f", rb->GetMass());
 		//Current Velocity
 		currentVelocityString = Stringf("Velocity: %.2f, %.2f", velocityX, velocityY);
 		//Current Verlet Velocity
 		currentVerletVelocityString = Stringf("Verlet Velocity: %.2f, %.2f", verletVelocityX, verletVelocityY);
+		//Current Orientation
+		orientationRadiansString = Stringf( "Orientation (Radians): %.2f", orientationRadians );
+		//Current Angular Velocity
+		angularVelocityString = Stringf( "Angular Velocity: %.2f", angularVelocity );
 		//Coefficient of Restitution (bounce)
 		currentRestitutionString = Stringf("Resitution: %.2f", col->GetResitution());
 		//Coefficient of Friction (friction)
@@ -356,7 +365,7 @@ void Game::RenderUI() const
 		//Drag value
 		currentDragString = Stringf("Drag: %.2f", rb->GetDrag());
 
-		float vIncrement = 1.f / 7.f;
+		float vIncrement = 1.f / 9.f;
 		float currentV = 0.f;
 
 		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
@@ -364,6 +373,10 @@ void Game::RenderUI() const
 		g_theRenderer->DrawAlignedTextAtPosition(currentFrictionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition(currentRestitutionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( angularVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( orientationRadiansString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
@@ -396,6 +409,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& aKey				= g_theInput->GetKeyStates('A');
 	const KeyButtonState& sKey				= g_theInput->GetKeyStates('S');
 	const KeyButtonState& dKey				= g_theInput->GetKeyStates('D');
+	const KeyButtonState& rKey				= g_theInput->GetKeyStates( 'R' );
+	const KeyButtonState& fKey				= g_theInput->GetKeyStates( 'F' );
+	const KeyButtonState& tKey				= g_theInput->GetKeyStates( 'T' );
+	const KeyButtonState& gKey				= g_theInput->GetKeyStates( 'G' );
+	const KeyButtonState& vKey				= g_theInput->GetKeyStates( 'V' );
 	const KeyButtonState& oKey				= g_theInput->GetKeyStates('O');
 	const KeyButtonState& pKey				= g_theInput->GetKeyStates('P');
 	const KeyButtonState& eightKey			= g_theInput->GetKeyStates('8');
@@ -446,6 +464,50 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			//m_camera->m_position = Vec2( 0.f, 0.f );
 			m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
 			//m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
+		}
+
+		if( m_draggingGameObject )
+		{
+			Rigidbody2D* rb = m_draggingGameObject->m_rigidbody;
+
+			if( rKey.IsPressed() )
+			{
+				//rotate object counter clockwise
+				float currentOrientation = rb->GetOrientationRadians();
+				float newOrientation = currentOrientation + ( 1.f * deltaSeconds );
+				rb->SetOrientationRadians( newOrientation );
+			}
+
+			if( fKey.IsPressed() )
+			{
+				//rotate object clockwise
+				float currentOrientation = rb->GetOrientationRadians();
+				float newOrientation = currentOrientation - (1.f * deltaSeconds);
+				rb->SetOrientationRadians( newOrientation );
+			}
+
+			if( tKey.IsPressed() )
+			{
+				//Increase angular velocity
+				float currentAngularVelocity = rb->GetAngularVelocityRadians();
+				float newAngularVelocity = currentAngularVelocity + (0.5f * deltaSeconds);
+				rb->SetAngularVelocityRandians( newAngularVelocity );
+			}
+
+			if( gKey.IsPressed() )
+			{
+				//increase negative angular velocity
+				float currentAngularVelocity = rb->GetAngularVelocityRadians();
+				float newAngularVelocity = currentAngularVelocity - (0.5f * deltaSeconds);
+				rb->SetAngularVelocityRandians( newAngularVelocity );
+			}
+
+			if( vKey.IsPressed() )
+			{
+				//set angular velocity to 0
+				rb->SetOrientationRadians( 0.f );
+				rb->SetAngularVelocityRandians( 0.f );
+			}
 		}
 
 		if( plusKey.IsPressed() )

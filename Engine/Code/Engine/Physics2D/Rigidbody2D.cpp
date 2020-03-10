@@ -103,6 +103,17 @@ void Rigidbody2D::SetMass( float newMass )
 	CalculateMoment();
 }
 
+void Rigidbody2D::SetOrientationRadians( float newOrientationRadians )
+{
+	m_orientationInRadians = newOrientationRadians;
+	m_collider->UpdateWorldShape();
+}
+
+void Rigidbody2D::SetAngularVelocityRandians( float newAngularVelocity )
+{
+	m_angularVelocity = newAngularVelocity;
+}
+
 void Rigidbody2D::Translate( Vec2 const& translator )
 {
 	m_worldPosition += translator;
@@ -138,15 +149,6 @@ void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
 
 		Vec2 center = m_collider->GetCenterOfMass();
 		Vec2 centerToWorldPos = worldPos - center;
-// 		float colliderAngle = centerToWorldPos.GetAngleDegrees();
-// 		float impulseAngle = impulse.GetAngleDegrees();
-// 		float angularDisplacement = GetShortestAngularDisplacement( colliderAngle, impulseAngle );
-// 		float angularDisplacementRadians = ConvertDegreesToRadians( angularDisplacement );
-// 
-// 		float distanceToWorldPos = GetDistance2D( center, worldPos );
-// 		float impulseMagnitude = impulse.GetLength();
-
-		//m_frameTorque += distanceToWorldPos * impulseMagnitude * sinf( angularDisplacementRadians );
 
 		Vec2 centerToWorldPerp = centerToWorldPos.GetRotated90Degrees();
 
@@ -188,7 +190,19 @@ Vec2 Rigidbody2D::GetImpactVelocityAtPoint( Vec2 const& point )
 {
 	UNUSED( point );
 
-	return GetVerletVelocity();
+// 	Vec2 centerToPoint = point - m_collider->GetCenterOfMass();
+// 	float radius = centerToPoint.GetLength();
+// 	float linearSpeedFromRotation = radius * m_angularVelocity;
+// 	Vec2 centerToPointTangent = centerToPoint.GetRotated90Degrees();
+// 	centerToPointTangent.Normalize();
+// 
+// 	Vec2 linearVelocityFromRotation = centerToPointTangent * linearSpeedFromRotation;
+
+
+
+	
+
+	return GetVerletVelocity()/* + linearVelocityFromRotation*/;
 }
 
 void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )
@@ -227,6 +241,11 @@ bool Rigidbody2D::IsEnabled()
 float Rigidbody2D::GetOrientationRadians() const
 {
 	return m_orientationInRadians;
+}
+
+float Rigidbody2D::GetAngularVelocityRadians() const
+{
+	return m_angularVelocity;
 }
 
 Rigidbody2D::~Rigidbody2D()
