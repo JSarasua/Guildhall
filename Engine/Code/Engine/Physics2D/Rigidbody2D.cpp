@@ -188,7 +188,6 @@ Vec2 Rigidbody2D::GetPosition()
 
 Vec2 Rigidbody2D::GetImpactVelocityAtPoint( Vec2 const& point )
 {
-	UNUSED( point );
 
 	Vec2 centerToPoint = point - m_collider->GetCenterOfMass();
 	float radius = centerToPoint.GetLength();
@@ -198,11 +197,9 @@ Vec2 Rigidbody2D::GetImpactVelocityAtPoint( Vec2 const& point )
 
 	Vec2 linearVelocityFromRotation = centerToPointTangent * linearSpeedFromRotation;
 
+	Vec2 currentVelocity = GetVerletVelocity() + linearVelocityFromRotation;
 
-
-	
-
-	return GetVerletVelocity() + linearVelocityFromRotation;
+	return currentVelocity;
 }
 
 void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )
