@@ -47,7 +47,7 @@ public:
 	
 	bool Intersects( Collider2D const* other ) const;
 	bool GetManifold( Collider2D const* other, Manifold2D* manifold ) const;
-	float GetMass();
+	float GetMass() const;
 	eSimulationMode GetSimulationMode() const;
 	PhysicsMaterial GetPhysicsMaterial() const;
 	float GetFriction() const;

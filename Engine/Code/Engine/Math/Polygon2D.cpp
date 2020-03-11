@@ -98,6 +98,19 @@ bool Polygon2D::Contains( Vec2 const& point ) const
 	return true;
 }
 
+float Polygon2D::GetArea() const
+{
+	float area = 0.f;
+	size_t triangleCount = GetTriangleCount();
+
+	for( size_t triangleIndex = 0; triangleIndex < triangleCount; triangleIndex++ )
+	{
+		area += GetAreaOfTriangle( triangleIndex );
+	}
+
+	return area;
+}
+
 float Polygon2D::GetDistance( Vec2 const& point ) const
 {
 	if( !IsConvex() )
@@ -139,12 +152,18 @@ Vec2 Polygon2D::GetClosestPoint( Vec2 const& point ) const
 Vec2 Polygon2D::GetCenterOfMass() const
 {
 	Vec2 center;
+	float polygonArea = GetArea();
 
-	for( size_t vertexIndex = 0; vertexIndex < m_points.size(); vertexIndex++ )
+	for( size_t triangleIndex = 0; triangleIndex < GetTriangleCount(); triangleIndex++ )
 	{
-		center += m_points[vertexIndex];
+		Vec2 weightedCenterOfTriangle = GetCenterOfTriangle( triangleIndex );
+		float weightedArea = GetAreaOfTriangle( triangleIndex );
+		weightedArea /= polygonArea;
+		weightedCenterOfTriangle *= weightedArea;
+
+		center += weightedCenterOfTriangle;
 	}
-	center /= (float)m_points.size();
+
 	return center;
 }
 
@@ -194,6 +213,36 @@ void Polygon2D::GetTriangle( Vec2* outA, Vec2* outB, Vec2* outC, size_t triangle
 	*outA = m_points[0];
 	*outB = m_points[triangleIndex + 1];
 	*outC = m_points[triangleIndex + 2];
+}
+
+float Polygon2D::GetAreaOfTriangle( size_t triangleIndex ) const
+{
+	//3 Vertices of the triangle
+	Vec2 a;
+	Vec2 b;
+	Vec2 c;
+	GetTriangle( &a, &b, &c, triangleIndex );
+
+	float area = a.x*(b.y - c.y) + b.x*(c.y - a.y) + c.x*(a.y - b.y);
+	area *= 0.5f;
+	area = absFloat( area );
+
+	return area;
+}
+
+Vec2 Polygon2D::GetCenterOfTriangle( size_t triangleIndex ) const
+{
+	//3 Vertices of the triangle
+	Vec2 a;
+	Vec2 b;
+	Vec2 c;
+	GetTriangle( &a, &b, &c, triangleIndex );
+
+	Vec2 center;
+	center = a + b + c;
+	center /= 3.f;
+
+	return center;
 }
 
 size_t Polygon2D::GetTriangleCount() const

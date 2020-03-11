@@ -24,6 +24,9 @@ public:
 
 	Polygon2D GetPolygon() const;
 
+private:
+	float CalculateMomentOfATriangle( size_t triangleIndex ) const;	//Calculate moment of a piece of the polygon
+
 public:
 	Vec2 m_localPosition;
 	Vec2 m_worldPosition;

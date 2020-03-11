@@ -79,7 +79,7 @@ bool Collider2D::Intersects( Collider2D const* other ) const
 	}
 }
 
-float Collider2D::GetMass()
+float Collider2D::GetMass() const
 {
 	if( nullptr == m_rigidbody )
 	{

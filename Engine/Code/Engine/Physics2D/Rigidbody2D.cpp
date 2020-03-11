@@ -66,8 +66,14 @@ float Rigidbody2D::GetDrag() const
 
 float Rigidbody2D::CalculateMoment()
 {
-	m_moment = m_collider->CalculateMoment( m_mass );
-	return m_moment;
+	if( nullptr != m_collider )
+	{
+		m_moment = m_collider->CalculateMoment( m_mass );
+		return m_moment;
+	}
+
+	//Safe value before deleting
+	return 1.f;
 }
 
 void Rigidbody2D::Destroy()

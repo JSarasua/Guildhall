@@ -18,7 +18,10 @@ PolygonCollider2D::PolygonCollider2D( Vec2 const& localPosition, Vec2 const& wor
 
 void PolygonCollider2D::UpdateWorldShape()
 {
-	Vec2 translator = m_rigidbody->GetPosition() - m_worldPosition;
+	Vec2 newWorldPosition = m_rigidbody->GetPosition();
+	Vec2 currentWorldPosition = m_worldPosition;
+
+	Vec2 translator = newWorldPosition - currentWorldPosition;
 
 	m_polygon.Translate( translator );
 	m_worldPosition = m_rigidbody->GetPosition();
@@ -80,14 +83,29 @@ eOffScreenDirection PolygonCollider2D::IsOffScreen( AABB2 const& bounds ) const
 float PolygonCollider2D::CalculateMoment( float mass ) const
 {
 	//WRONG EQUATION
-	float vertices = (float)m_polygon.GetVertexCount();
-	AABB2 aabb2 = GetBounds();
-	float radius = 0.5f * GetDistance2D( aabb2.mins, aabb2.maxs ) ;
+// 	float vertices = (float)m_polygon.GetVertexCount();
+// 	AABB2 aabb2 = GetBounds();
+// 	float radius = 0.5f * GetDistance2D( aabb2.mins, aabb2.maxs ) ;
+// 
+// 	float innerArg = sinf(3.14159265f/vertices);
+// 
+// 	float moment = 0.5f * mass * (radius * radius) * ( 1.f - 2.f/3.f * (innerArg * innerArg) );
+// 	
+// 	return moment;
 
-	float innerArg = sinf(3.14159265f/vertices);
 
-	float moment = 0.5f * mass * (radius * radius) * ( 1.f - 2.f/3.f * (innerArg * innerArg) );
-	
+/*	float mass = GetMass();*/
+	float area = m_polygon.GetArea();
+
+	float sumOfTriangleMoments = 0.f;
+
+	for( size_t triangleIndex = 0; triangleIndex < m_polygon.GetTriangleCount(); triangleIndex++ )
+	{
+		sumOfTriangleMoments += CalculateMomentOfATriangle( triangleIndex );
+	}
+
+	float moment = (mass/area) * sumOfTriangleMoments;
+
 	return moment;
 }
 
@@ -104,5 +122,38 @@ void PolygonCollider2D::DebugRender( RenderContext* context, Rgba8 const& border
 Polygon2D PolygonCollider2D::GetPolygon() const
 {
 	return m_polygon;
+}
+
+float PolygonCollider2D::CalculateMomentOfATriangle( size_t triangleIndex ) const
+{
+	//Vertices of the triangle
+	Vec2 a;
+	Vec2 b;
+	Vec2 c;
+
+	m_polygon.GetTriangle( &a, &b, &c, triangleIndex );
+
+	Vec2 centerOfTriangle = m_polygon.GetCenterOfTriangle( triangleIndex );
+	Vec2 centerOfMass = GetCenterOfMass();
+
+	Vec2 pivotVector = centerOfTriangle - centerOfMass;
+	float pivotLength = pivotVector.GetLength();
+	float rSquared = pivotLength * pivotLength; //Added to moment
+
+
+
+	float area = m_polygon.GetAreaOfTriangle( triangleIndex );
+	Vec2 ac = c - a;
+	Vec2 ab = b - a;
+	Vec2 abPerp = ab.GetRotated90Degrees();
+
+	float base = ab.GetLength();
+	float height = GetProjectedLength2D( ac, abPerp );
+	height = absFloat( height );
+
+	float moment = (base*height)/36 * ( (base*base) - (base*area) + (area*area) + (height*height) ); //moment around itself
+	moment += rSquared;
+
+	return moment;
 }
 
