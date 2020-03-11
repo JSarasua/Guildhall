@@ -8,6 +8,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/FloatRange.hpp"
 
 static float m_fixedTimeFrame = 1.f/120.f;
 
@@ -190,7 +191,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	float myMass = myRigidbody->GetMass();
 	float theirMass = theirRigidbody->GetMass();
 	float myMoment = myRigidbody->CalculateMoment();
-	float theirMoment = myRigidbody->CalculateMoment();
+	float theirMoment = theirRigidbody->CalculateMoment();
 
 	Vec2 myCoM = collision.me->GetCenterOfMass();
 	Vec2 theirCoM = collision.them->GetCenterOfMass();
@@ -222,7 +223,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float rAPNormalMoment = (DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
 		//float rBPNormalMoment = (DotProduct2D( rThemToPointPerp, normal ) * DotProduct2D( rThemToPointPerp, normal )) / theirMoment;
 
-		float bottomPieceOfNormalEquation = DotProduct2D( normal, normal ) * (1.f/myMass /*+ 1.f/theirMass*/) + rAPNormalMoment /*+ rBPNormalMoment*/;
+		float bottomPieceOfNormalEquation = /*DotProduct2D( normal, normal ) **/ (1.f/myMass /*+ 1.f/theirMass*/) + rAPNormalMoment /*+ rBPNormalMoment*/;
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
@@ -233,7 +234,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float rAPTangentMoment = (DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent )) / myMoment;
 		//float rBPTangentMoment = (DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent )) / theirMoment;
 
-		float bottomPieceOfTangentEquation = DotProduct2D( tangent, tangent ) * (1.f/myMass /*+ 1.f/theirMass*/) + rAPTangentMoment /*+ rBPTangentMoment*/;
+		float bottomPieceOfTangentEquation = /*DotProduct2D( tangent, tangent ) **/ (1.f/myMass /*+ 1.f/theirMass*/) + rAPTangentMoment /*+ rBPTangentMoment*/;
 		float tangentImpulseMagnitude = topPieceOfTangentEquation / bottomPieceOfTangentEquation;
 		Vec2 tangentImpulse = tangentImpulseMagnitude * tangent;
 
@@ -242,22 +243,6 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		{
 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
 		}
-		
-		
-		// 		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-// 		float normalImpulseMagnitude = normalImpulse.GetLength();
-// 
-// 		if( tangentImpulseMagnitude > normalImpulseMagnitude * combinedFriction )
-// 		{
-// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-// 		}
-// 		else
-// 		{
-// 			tangentImpulse *= combinedFriction;
-// 		}
 
 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
 		{
@@ -275,7 +260,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		//float rAPNormalMoment = (DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
 		float rBPNormalMoment = (DotProduct2D( rThemToPointPerp, normal ) * DotProduct2D( rThemToPointPerp, normal )) / theirMoment;
 
-		float bottomPieceOfNormalEquation = DotProduct2D( normal, normal ) * (/*1.f/myMass*/ + 1.f/theirMass) + /*rAPNormalMoment*/ + rBPNormalMoment;
+		float bottomPieceOfNormalEquation = /*DotProduct2D( normal, normal ) **/ (/*1.f/myMass*/ + 1.f/theirMass) + /*rAPNormalMoment*/ + rBPNormalMoment;
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
@@ -286,7 +271,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		//float rAPTangentMoment = (DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent )) / myMoment;
 		float rBPTangentMoment = (DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent )) / theirMoment;
 
-		float bottomPieceOfTangentEquation = DotProduct2D( tangent, tangent ) * (/*1.f/myMass*/ + 1.f/theirMass) + /*rAPTangentMoment*/ + rBPTangentMoment;
+		float bottomPieceOfTangentEquation = /*DotProduct2D( tangent, tangent ) **/ (/*1.f/myMass*/ + 1.f/theirMass) + /*rAPTangentMoment*/ + rBPTangentMoment;
 		float tangentImpulseMagnitude = topPieceOfTangentEquation / bottomPieceOfTangentEquation;
 		Vec2 tangentImpulse = tangentImpulseMagnitude * tangent;
 
@@ -296,96 +281,35 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
 		}
 
-
-
-// 		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-// 		float normalImpulseMagnitude = normalImpulse.GetLength();
-// 
-// 		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
-// 		{
-// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-// 		}
-// 		else
-// 		{
-// 			tangentImpulse *= combinedFriction;
-// 		}
-
-		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+		FloatRange zeroRange = FloatRange(-0.001f, 0.0001f);
+		if( zeroRange.IsInRange( myVelocity.GetLength() ) )
 		{
-			tangentImpulse *= -1.f;
+			if( GetProjectedLength2D( tangentImpulse, theirVelocity ) < 0.f )
+			{
+				tangentImpulse *= -1.f;
+			}
+		}
+		else
+		{
+			if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
+			{
+				tangentImpulse *= -1.f;
+			}
 		}
 
 		theirRigidbody->ApplyImpulseAt( contactPoint, -normalImpulse );
-		myRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse);
+		theirRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse);
 	}
-// 	else if( mySimMode == STATIC && theirSimMode == KINEMATIC )
-// 	{
-// 		Vec2 impulse = theirMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-// 		float normalImpulseMagnitude = normalImpulse.GetLength();
-// 
-// 		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
-// 		{
-// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-// 		}
-// 		else
-// 		{
-// 			tangentImpulse *= combinedFriction;
-// 		}
-// 
-// 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
-// 		{
-// 			tangentImpulse *= -1.f;
-// 		}
-// 
-// 		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -normalImpulse );
-// 		theirRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), -tangentImpulse );
-// 	}
-// 	else if( mySimMode == KINEMATIC && theirSimMode == STATIC )
-// 	{
-// 		Vec2 impulse = myMass * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-// 		Vec2 normalImpulse = GetProjectedOnto2D( impulse, normal );
-// 		Vec2 tangentImpulse = GetProjectedOnto2D( impulse, tangent );
-// 		float tangentImpulseMagnitude = tangentImpulse.GetLength();
-// 		float normalImpulseMagnitude = normalImpulse.GetLength();
-// 
-// 		if( tangentImpulseMagnitude > normalImpulseMagnitude* combinedFriction )
-// 		{
-// 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
-// 		}
-// 		else
-// 		{
-// 			tangentImpulse *= combinedFriction;
-// 		}
-// 
-// 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
-// 		{
-// 			tangentImpulse *= -1.f;
-// 		}
-// 
-// 		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), normalImpulse );
-// 		myRigidbody->ApplyImpulseAt( Vec2( 0.f, 0.f ), tangentImpulse );
-// 	}
+
 	else if( mySimMode == DYNAMIC && theirSimMode == DYNAMIC )
 	{
-		//OLD
-		//Vec2 impulse = ((myMass * theirMass)/(myMass + theirMass)) * (1.f + combinedRestituion) * (theirVelocity - myVelocity);
-
-
-
-
 		Vec2 velocityMeThem = theirVelocity - myVelocity;  //vAB
 		float topPieceOfNormalEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, normal );
 
 		float rAPNormalMoment = ( DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
 		float rBPNormalMoment = ( DotProduct2D( rThemToPointPerp, normal ) * DotProduct2D( rThemToPointPerp, normal )) / theirMoment;
 
-		float bottomPieceOfNormalEquation = DotProduct2D( normal, normal ) * ( 1.f/myMass + 1.f/theirMass ) + rAPNormalMoment + rBPNormalMoment;
+		float bottomPieceOfNormalEquation = /*DotProduct2D( normal, normal ) * */( 1.f/myMass + 1.f/theirMass ) + rAPNormalMoment + rBPNormalMoment;
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
@@ -396,7 +320,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float rAPTangentMoment = ( DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent ) ) / myMoment;
 		float rBPTangentMoment = ( DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent ) ) / theirMoment;
 
-		float bottomPieceOfTangentEquation = DotProduct2D( tangent, tangent ) * (1.f/myMass + 1.f/theirMass) + rAPTangentMoment + rBPTangentMoment;
+		float bottomPieceOfTangentEquation = /*DotProduct2D( tangent, tangent ) **/ (1.f/myMass + 1.f/theirMass) + rAPTangentMoment + rBPTangentMoment;
 		float tangentImpulseMagnitude = topPieceOfTangentEquation / bottomPieceOfTangentEquation;
 		Vec2 tangentImpulse = tangentImpulseMagnitude * tangent;
 
@@ -405,18 +329,6 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		{
 			tangentImpulse = normalImpulse.GetLength() * tangent * combinedFriction;
 		}
-
-
-
-
-
-
-// 		Vec2 normalImpulseOld = GetProjectedOnto2D( impulse, normal );
-//  		Vec2 tangentImpulseOld = GetProjectedOnto2D( impulse, tangent );
-//  		float tangentImpulseMagnitudeOld = tangentImpulse.GetLength();
-// 		float normalImpulseMagnitudeOld = normalImpulse.GetLength();
-
-
 
 		if( GetProjectedLength2D( tangentImpulse, myVelocity ) > 0.f )
 		{
@@ -429,9 +341,6 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		myRigidbody->ApplyImpulseAt( contactPoint, tangentImpulse );
 		theirRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse );
 	}
-
-
-
 }
 
 void Physics2D::CleanupDestroyedObjects()

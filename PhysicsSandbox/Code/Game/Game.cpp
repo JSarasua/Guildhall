@@ -310,6 +310,7 @@ void Game::RenderUI() const
 		std::string simModeString;
 		std::string massString;
 		std::string momentString;
+		std::string positionString;
 		std::string currentVelocityString;
 		std::string currentVerletVelocityString;
 		std::string orientationRadiansString;
@@ -349,11 +350,14 @@ void Game::RenderUI() const
 		float orientationRadians = rb->GetOrientationRadians();
 		float angularVelocity = rb->GetAngularVelocityRadians();
 		float moment = rb->GetMoment();
+		Vec2 worldPos = rb->GetPosition();
 
 		//Mass
 		massString = Stringf("Mass: %.2f", rb->GetMass());
 		//Moment Of Inertia
 		momentString = Stringf("Moment of Inertia: %.2f", moment );
+		//World Position
+		positionString = Stringf("World Position: %.2f, %.2f", worldPos.x, worldPos.y );
 		//Current Velocity
 		currentVelocityString = Stringf("Velocity: %.2f, %.2f", velocityX, velocityY);
 		//Current Verlet Velocity
@@ -369,7 +373,7 @@ void Game::RenderUI() const
 		//Drag value
 		currentDragString = Stringf("Drag: %.2f", rb->GetDrag());
 
-		float vIncrement = 1.f / 10.f;
+		float vIncrement = 1.f / 11.f;
 		float currentV = 0.f;
 
 		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
@@ -385,6 +389,8 @@ void Game::RenderUI() const
 		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition( currentVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		currentV += vIncrement;
+		g_theRenderer->DrawAlignedTextAtPosition( positionString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
 		g_theRenderer->DrawAlignedTextAtPosition( momentString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;

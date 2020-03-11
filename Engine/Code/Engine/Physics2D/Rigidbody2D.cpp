@@ -90,6 +90,7 @@ void Rigidbody2D::TakeCollider( Collider2D* collider )
 
 	m_collider = collider;
 	m_collider->m_rigidbody = this;
+	CalculateMoment();
 }
 
 void Rigidbody2D::SetPosition( Vec2 const& position )
@@ -143,8 +144,6 @@ eSimulationMode Rigidbody2D::GetSimulationMode() const
 
 void Rigidbody2D::ApplyImpulseAt( Vec2 const& worldPos, Vec2 const& impulse )
 {
-	//UNUSED( worldPos );
-
 	if( m_simulationMode == DYNAMIC )
 	{
 		float inverseMass = 1.f/m_mass;

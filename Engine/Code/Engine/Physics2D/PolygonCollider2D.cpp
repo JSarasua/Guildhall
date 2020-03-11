@@ -137,12 +137,14 @@ float PolygonCollider2D::CalculateMomentOfATriangle( size_t triangleIndex ) cons
 	Vec2 centerOfMass = GetCenterOfMass();
 
 	Vec2 pivotVector = centerOfTriangle - centerOfMass;
-	float pivotLength = pivotVector.GetLength();
-	float rSquared = pivotLength * pivotLength; //Added to moment
-
-
-
+	float pivotDotProduct = DotProduct2D( pivotVector, pivotVector );
 	float area = m_polygon.GetAreaOfTriangle( triangleIndex );
+	
+	
+	float parallelAxisPiece = area * pivotDotProduct; //Added to moment
+
+
+
 	Vec2 ac = c - a;
 	Vec2 ab = b - a;
 	Vec2 abPerp = ab.GetRotated90Degrees();
@@ -151,8 +153,12 @@ float PolygonCollider2D::CalculateMomentOfATriangle( size_t triangleIndex ) cons
 	float height = GetProjectedLength2D( ac, abPerp );
 	height = absFloat( height );
 
-	float moment = (base*height)/36 * ( (base*base) - (base*area) + (area*area) + (height*height) ); //moment around itself
-	moment += rSquared;
+	//old equation
+	//float moment = (base*height)/36 * ( (base*base) - (base*area) + (area*area) + (height*height) ); //moment around itself
+	
+	//Equation off of the internet
+	float moment = base * height * height * height /36.f;
+	moment += parallelAxisPiece;
 
 	return moment;
 }
