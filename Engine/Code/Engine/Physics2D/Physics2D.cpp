@@ -470,10 +470,12 @@ float Physics2D::GetSceneGravity() const
 
 bool Physics2D::SetPhysicsUpdate( const EventArgs* args )
 {
-	float argValue = args->GetValue(std::string("hz"),120.f);
-	//float argVal = (float)atof(argValue.c_str());
+	if( nullptr != args )
+	{
+		float argValue = args->GetValue(std::string("hz"),120.f);
 
-	m_fixedTimeFrame = 1.f/argValue;
+		m_fixedTimeFrame = 1.f/argValue;
+	}
 
 	return true;
 	

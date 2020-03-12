@@ -498,6 +498,7 @@ void DevConsole::ExecuteString( std::string const& commandToExecute )
 	std::string fullString = commandToExecute;
 	std::string executeString;
 	
+	//size_t currentPos = 0;
 	size_t spacePos = fullString.find(' ');
 	if( spacePos == std::string::npos )
 	{
@@ -505,27 +506,27 @@ void DevConsole::ExecuteString( std::string const& commandToExecute )
 	}
 	else
 	{
-		
-		size_t equalPos = fullString.find( '=', spacePos );
-		if( equalPos == std::string::npos )
-		{
-			g_theEventSystem->FireEvent( fullString, CONSOLECOMMAND, nullptr );
-		}
-		else
-		{
-			executeString = fullString.substr(0, spacePos);
-			
-			size_t argCharCount = equalPos - spacePos;
-			std::string argName = fullString.substr( spacePos + 1, argCharCount - 1 );
-			std::string argValue = fullString.substr( equalPos + 1 );
-			EventArgs args;
-			args.SetValue( argName, argValue );
+		EventArgs args;
+		executeString = fullString.substr( 0, spacePos );
 
-			g_theEventSystem->FireEvent( executeString, CONSOLECOMMAND, &args );
+		while( spacePos != std::string::npos )
+		{
+			size_t equalPos = fullString.find( '=', spacePos );
+			if( equalPos == std::string::npos )
+			{
+				break;
+			}
+			else
+			{
+				size_t argCharCount = equalPos - spacePos;
+				std::string argName = fullString.substr( spacePos + 1, argCharCount - 1 );
+
+				spacePos = fullString.find(' ', equalPos);
+				std::string argValue = fullString.substr( equalPos + 1, spacePos - equalPos - 1 );
+				args.SetValue( argName, argValue );
+			}
 		}
+		g_theEventSystem->FireEvent( executeString, CONSOLECOMMAND, &args );
 	}
-
-
-
 }
 
