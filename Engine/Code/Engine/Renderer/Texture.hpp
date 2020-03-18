@@ -3,8 +3,8 @@
 #include <string>
 
 class RenderContext;
-struct ID3D11Texture2D;
 class TextureView;
+struct ID3D11Texture2D;
 
 class Texture
 {

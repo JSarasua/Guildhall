@@ -1,14 +1,10 @@
 #pragma once
 #include "Engine/Core/Vertex_PCU.hpp"
-#include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/Texture.hpp"
-
 #include <vector>
 #include <string>
 
 
-
-struct AABB2;
 class Sampler;
 class BitmapFont;
 class Polygon2D;
@@ -21,13 +17,13 @@ class IndexBuffer;
 class GPUMesh;
 class Clock;
 
+struct AABB2;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11Buffer;
 struct ID3D11BlendState;
 struct IDXGIDebug;
 struct ID3D11DepthStencilState;
-
 
 struct FrameData
 {
@@ -86,15 +82,12 @@ public:
 	void ClearScreen( const Rgba8& clearColor );
 	void ClearDepth( Texture* depthStencilTarget, float depth = 1.f, float stencil = 0.f );
 	void BeginCamera( Camera& camera );
-	void BeginCamera( const Camera& camera, Viewport viewPort );
 	void EndCamera( const Camera& camera );
 
 	void Draw( int numVertexes, int vertexOffset = 0 );
 	void DrawIndexed( int numIndices, int indexOffset = 0, int vertexOffset = 0 );
-
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
-
 	void DrawMesh( GPUMesh* mesh );
 
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
@@ -104,44 +97,42 @@ public:
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
-
-	void SetDepth( eDepthCompareMode compareMode );
-
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
+	void SetDepth( eDepthCompareMode compareMode );
 	void SetModelMatrix( Mat44 const& model );
+
+
 
 	Texture* CreateDepthStencilTarget();
 	Texture* CreateTextureFromColor( Rgba8 color );
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
 	Shader*		GetOrCreateShader( char const* filename );
+	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
 	void BindTexture( const Texture* constTex  );
 	void BindSampler( Sampler const* constSampler );
 	void SetBlendMode( BlendMode blendMode );
 	void CreateBlendModes();
 	bool IsDrawing() const;
 
+	//Debug Draw methods that will be replaced
 	void DrawLine( const Vec2& startPoint, const Vec2& endPoint, const Rgba8& color, float thickness );
 	void DrawRing( const Vec2& center, float radius, const Rgba8& color, float thickness );
 	void DrawDisc( Vec2 const& center, float radius, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness );
 	void DrawAABB2( const AABB2& aabb, const Rgba8& color, float thickness );
-	//void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color);
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, float z = 0.f );
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax);
 	void DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees);
-
-
 	void DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness );
-	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
+
+	//Draw text
 	void DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint = Rgba8::WHITE );
 	void DrawAlignedTextAtPosition( const char* textstring, const AABB2& box, float fontHeight, const Vec2& alignment, const Rgba8& tint = Rgba8::WHITE );
 
 	void CreateDebugModule();
 	void DestroyDebugModule();
 	void ReportLiveObjects();
-
-
 
 protected:
 

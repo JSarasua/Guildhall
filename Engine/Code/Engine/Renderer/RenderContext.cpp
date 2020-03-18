@@ -14,6 +14,7 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/Camera.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
@@ -788,44 +789,6 @@ void RenderContext::BeginCamera( Camera& camera )
 	BindUniformBuffer( 2, m_modelUBO );
 }
 
-
-//-----DONT USE THIS BEGINCAMERA, ITS AN OLD METHOD FOR USING SPLIT SCREEN
-void RenderContext::BeginCamera( const Camera& camera, Viewport viewPort )
-{
-
-	UNUSED(camera);
-	UNUSED(viewPort);
-	UNIMPLEMENTED();
-// 	RECT clientRect;
-// 	GetClientRect( g_hWnd, &clientRect );
-// 	AABB2 clientBounds( (float)clientRect.left, (float)clientRect.top, (float)clientRect.right, (float)clientRect.bottom );
-// 	AABB2 singleBox = clientBounds.GetTranslated(-clientBounds.mins);
-// 	singleBox.maxs /= 2.f;
-// 	
-// 	glLoadIdentity();
-// 	switch( viewPort )
-// 	{
-// 	case Viewport::TopLeft:
-// 		glViewport(0,(int)singleBox.maxs.y,(int)singleBox.maxs.x, (int)singleBox.maxs.y);
-// 		break;
-// 	case Viewport::TopRight:
-// 		glViewport( (int)singleBox.maxs.x, (int)singleBox.maxs.y, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-// 		break;
-// 	case Viewport::BottomLeft:
-// 		glViewport( 0, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-// 		break;
-// 	case Viewport::BottomRight:
-// 		glViewport( (int)singleBox.maxs.x, 0, (int)singleBox.maxs.x, (int)singleBox.maxs.y );
-// 		break;
-// 	case Viewport::FullScreen:
-// 		glViewport( 0, 0, (int)clientBounds.maxs.x, (int)clientBounds.maxs.y );
-// 		break;
-// 	default:
-// 		break;
-// 	}
-// 	glOrtho(camera.GetOrthoBottomLeft().x, camera.GetOrthoTopRight().x, camera.GetOrthoBottomLeft().y, camera.GetOrthoTopRight().y, 0.f, 1.f);
-}
-
 void RenderContext::EndCamera( const Camera& camera )
 {
 	UNUSED(camera);
@@ -833,8 +796,6 @@ void RenderContext::EndCamera( const Camera& camera )
 	m_lastVBOHandle = nullptr;
 	m_isDrawing = false;
 }
-
-
 
 void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
 {
