@@ -4,6 +4,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
@@ -36,6 +37,8 @@ void App::Startup()
 
 	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp(g_theWindow);
+
+	DebugRenderSystemStartup( g_theRenderer );
 	
 	m_game->Startup();
 	g_theConsole->Startup();
@@ -61,6 +64,7 @@ void App::Shutdown()
 	delete g_theInput;
 	g_theConsole->Shutdown();
 	delete g_theConsole;
+	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
 }

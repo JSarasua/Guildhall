@@ -14,6 +14,7 @@ struct Rgba8;
 
 enum eCameraClearBitFlag : unsigned int
 {
+	NO_CLEAR				= 0,
 	CLEAR_COLOR_BIT			= (1 << 0 ),
 	CLEAR_DEPTH_BIT			= (1 << 1 ),
 	CLEAR_STENCIL_BIT		= (1 << 2 ),

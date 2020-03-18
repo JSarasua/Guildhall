@@ -15,6 +15,7 @@
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -34,6 +35,7 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	EnableDebugRendering();
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
@@ -148,6 +150,10 @@ void Game::Render()
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
 
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
+	DebugRenderEndFrame();
+
 }
 
 
@@ -208,10 +214,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
+	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 
 	if( f11Key.WasJustPressed() )
 	{
 		g_theWindow->ToggleBorder();
+	}
+
+	if( num1Key.WasJustPressed() )
+	{
+		DebugAddWorldPoint( m_camera.GetPosition(), 0.1f, Rgba8::RED, Rgba8::GREEN, 5.f, DEBUG_RENDER_USE_DEPTH );
 	}
 
 	Vec3 translator;

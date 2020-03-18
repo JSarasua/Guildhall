@@ -6,6 +6,7 @@
  */
 class Camera;
 class Texture;
+class RenderContext;
 
 struct Vec3;
 struct Rgba8;
@@ -30,7 +31,7 @@ enum eDebugRenderMode
 /************************************************************************/
 
 //Setup
-void DebugRenderSystemStartup();
+void DebugRenderSystemStartup( RenderContext* context );
 void DebugRenderSystemShutdown();
 
 //control
