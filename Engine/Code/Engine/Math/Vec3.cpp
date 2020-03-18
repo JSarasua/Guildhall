@@ -282,11 +282,13 @@ Vec3 Vec3::GetClamped( float maxLength ) const
 //-----------------------------------------------------------------------------------------------
 Vec3 Vec3::GetNormalized() const
 {
-	float angle = Atan2Degrees( y, x );
-
+	float length = GetLength();
 	Vec3 normalizedVec;
-	normalizedVec.x = CosDegrees( angle );
-	normalizedVec.y = SinDegrees( angle );
+
+	if( length != 0.f )
+	{
+		normalizedVec /= length;
+	}
 
 	return normalizedVec;
 }
@@ -303,4 +305,14 @@ void Vec3::SetFromText( const char* text )
 	x = (float)atof( splitStrings[0].c_str() );
 	y = (float)atof( splitStrings[1].c_str() );
 	z = (float)atof( splitStrings[2].c_str() );
+}
+
+void Vec3::Normalize()
+{
+	float length = GetLength();
+
+	if( length != 0.f )
+	{
+		*this /= length;
+	}
 }

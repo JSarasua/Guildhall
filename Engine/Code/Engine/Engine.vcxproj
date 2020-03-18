@@ -179,6 +179,7 @@
     <ClCompile Include="Math\IntRange.cpp" />
     <ClCompile Include="Math\IntVec2.cpp" />
     <ClCompile Include="Math\LineSegment2.cpp" />
+    <ClCompile Include="Math\LineSegment3.cpp" />
     <ClCompile Include="Math\Mat44.cpp" />
     <ClCompile Include="Math\MathUtils.cpp" />
     <ClCompile Include="Math\MatrixUtils.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\BufferAttribute.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
+    <ClCompile Include="Renderer\DebugRender.cpp" />
     <ClCompile Include="Renderer\GPUMesh.cpp" />
     <ClCompile Include="Renderer\MeshUtils.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
@@ -252,6 +254,7 @@
     <ClInclude Include="Math\IntRange.hpp" />
     <ClInclude Include="Math\IntVec2.hpp" />
     <ClInclude Include="Math\LineSegment2.hpp" />
+    <ClInclude Include="Math\LineSegment3.hpp" />
     <ClInclude Include="Math\Mat44.hpp" />
     <ClInclude Include="Math\MathUtils.hpp" />
     <ClInclude Include="Math\MatrixUtils.hpp" />
@@ -276,6 +279,7 @@
     <ClInclude Include="Renderer\BufferAttribute.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />
     <ClInclude Include="Renderer\D3D11Common.hpp" />
+    <ClInclude Include="Renderer\DebugRender.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
     <ClInclude Include="Renderer\MeshUtils.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />

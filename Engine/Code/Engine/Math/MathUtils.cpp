@@ -358,6 +358,11 @@ const Vec2 GetNearestPointOnOBB2D( const Vec2& refPos, const OBB2& box )
 	return box.GetNearestPoint( refPos );
 }
 
+// Vec3 const GetNearestPointOnLineSegment3D( Vec3 const& refPos, Vec3 const& start, Vec3 const& end )
+// {
+// 
+// }
+
 float Max( float a, float b )
 {
 	return (a>b) ? a : b;

@@ -226,6 +226,12 @@
     <ClCompile Include="Renderer\MeshUtils.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\DebugRender.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\LineSegment3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -443,6 +449,12 @@
     </ClInclude>
     <ClInclude Include="Renderer\MeshUtils.hpp">
       <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\DebugRender.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\LineSegment3.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

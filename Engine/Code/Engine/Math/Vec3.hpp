@@ -73,4 +73,5 @@ public:
 	void	Normalize();
 	float	NormalizeAndGetPreviousLength();
 	*/
+	void Normalize();
 };

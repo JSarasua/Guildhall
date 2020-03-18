@@ -61,6 +61,8 @@ const Vec2 GetNearestPointOnLineSegment2D( const Vec2& refPos, const Vec2& start
 const Vec2 GetNearestPointOnCapsule2D( const Vec2& refPos, const Vec2& capsuleMidStart, const Vec2& capsuleMidEnd, float capsuleRadius );
 const Vec2 GetNearestPointOnOBB2D( const Vec2& refPos, const OBB2& box );
 
+//Vec3 const GetNearestPointOnLineSegment3D( Vec3 const& refPos, Vec3 const& start, Vec3 const& end );
+
 bool DoAABBsOverlap2D(const AABB2& aabbA, const AABB2& aabbB);
 bool DoDiscAndAABBOverlap2D(const Vec2& discPosition, float discRadius, const AABB2& aabb);
 bool DoDiscAndLineSegmentOverlap2D( Vec2 const& discPosition, float discRadius, LineSegment2 const& line );
