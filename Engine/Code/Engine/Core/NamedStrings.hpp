@@ -13,7 +13,7 @@ class NamedStrings
 public:
 	NamedStrings() = default;
 
-	void		PopulateFromXmlElementAttributes( const XMLElement& element );
+	void		PopulateFromXmlElementAttributes( const XmlElement& element );
 	void		SetValue( const std::string& keyName, const std::string& newValue );
 
 	bool		GetValue( const std::string& keyName, bool defaultValue ) const;

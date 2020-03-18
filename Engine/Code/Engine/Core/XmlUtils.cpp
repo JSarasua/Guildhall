@@ -7,22 +7,21 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/AABB2.hpp"
 
-todo("Fix to Xml instead of XML");
 
-const XMLElement& GetRootElement( XmlDocument& document, const char* xmlFilePath )
+const XmlElement& GetRootElement( XmlDocument& document, const char* xmlFilePath )
 {
-	XMLError errorFlag = document.LoadFile( xmlFilePath );
+	XmlError errorFlag = document.LoadFile( xmlFilePath );
  	std::string errorMessage = "Xml Not Found: ";
  	errorMessage.append(xmlFilePath);
- 	GUARANTEE_OR_DIE( errorFlag == XMLError::XML_SUCCESS, errorMessage.c_str() );
+ 	GUARANTEE_OR_DIE( errorFlag == XmlError::XML_SUCCESS, errorMessage.c_str() );
 
-	const XMLElement* element = document.RootElement();
+	const XmlElement* element = document.RootElement();
 	return *element;
 }
 
 
 
-std::string ParseXMLAttribute( const XMLElement& element, const char* attributeName, const std::string& defaultValue )
+std::string ParseXMLAttribute( const XmlElement& element, const char* attributeName, const std::string& defaultValue )
 {
 	const char* attribute = element.Attribute(attributeName);
 	std::string value = defaultValue;
@@ -33,7 +32,7 @@ std::string ParseXMLAttribute( const XMLElement& element, const char* attributeN
 	return value;
 }
 
-std::string ParseXMLAttribute( const XMLElement& element, const char* attributeName, const char* defaultValue )
+std::string ParseXMLAttribute( const XmlElement& element, const char* attributeName, const char* defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	std::string value = defaultValue;
@@ -44,7 +43,7 @@ std::string ParseXMLAttribute( const XMLElement& element, const char* attributeN
 	return value;
 }
 
-int ParseXMLAttribute( const XMLElement& element, const char* attributeName, int defaultValue )
+int ParseXMLAttribute( const XmlElement& element, const char* attributeName, int defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	int value = defaultValue;
@@ -55,7 +54,7 @@ int ParseXMLAttribute( const XMLElement& element, const char* attributeName, int
 	return value;
 }
 
-char ParseXMLAttribute( const XMLElement& element, const char* attributeName, char defaultValue )
+char ParseXMLAttribute( const XmlElement& element, const char* attributeName, char defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	char value = defaultValue;
@@ -66,7 +65,7 @@ char ParseXMLAttribute( const XMLElement& element, const char* attributeName, ch
 	return value;
 }
 
-bool ParseXMLAttribute( const XMLElement& element, const char* attributeName, bool defaultValue )
+bool ParseXMLAttribute( const XmlElement& element, const char* attributeName, bool defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	bool value = defaultValue;
@@ -77,7 +76,7 @@ bool ParseXMLAttribute( const XMLElement& element, const char* attributeName, bo
 	return value;
 }
 
-float ParseXMLAttribute( const XMLElement& element, const char* attributeName, float defaultValue )
+float ParseXMLAttribute( const XmlElement& element, const char* attributeName, float defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	float value = defaultValue;
@@ -88,7 +87,7 @@ float ParseXMLAttribute( const XMLElement& element, const char* attributeName, f
 	return value;
 }
 
-Rgba8 ParseXMLAttribute( const XMLElement& element, const char* attributeName, const Rgba8& defaultValue )
+Rgba8 ParseXMLAttribute( const XmlElement& element, const char* attributeName, const Rgba8& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	Rgba8 value = defaultValue;
@@ -99,7 +98,7 @@ Rgba8 ParseXMLAttribute( const XMLElement& element, const char* attributeName, c
 	return value;
 }
 
-Vec2 ParseXMLAttribute( const XMLElement& element, const char* attributeName, const Vec2& defaultValue )
+Vec2 ParseXMLAttribute( const XmlElement& element, const char* attributeName, const Vec2& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	Vec2 value = defaultValue;
@@ -110,7 +109,7 @@ Vec2 ParseXMLAttribute( const XMLElement& element, const char* attributeName, co
 	return value;
 }
 
-IntVec2 ParseXMLAttribute( const XMLElement& element, const char* attributeName, const IntVec2& defaultValue )
+IntVec2 ParseXMLAttribute( const XmlElement& element, const char* attributeName, const IntVec2& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	IntVec2 value = defaultValue;
@@ -121,7 +120,7 @@ IntVec2 ParseXMLAttribute( const XMLElement& element, const char* attributeName,
 	return value;
 }
 
-Strings ParseXMLAttribute( const XMLElement& element, const char* attributeName, const Strings& defaultValue, const unsigned char delimeter /*= ',' */ )
+Strings ParseXMLAttribute( const XmlElement& element, const char* attributeName, const Strings& defaultValue, const unsigned char delimeter /*= ',' */ )
 {
 	const char* attribute = element.Attribute( attributeName );
 	Strings value = defaultValue;
@@ -132,7 +131,7 @@ Strings ParseXMLAttribute( const XMLElement& element, const char* attributeName,
 	return value;
 }
 
-FloatRange ParseXMLAttribute( const XMLElement& element, const char* attributeName, const FloatRange& defaultValue )
+FloatRange ParseXMLAttribute( const XmlElement& element, const char* attributeName, const FloatRange& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	FloatRange value = defaultValue;
@@ -143,7 +142,7 @@ FloatRange ParseXMLAttribute( const XMLElement& element, const char* attributeNa
 	return value;
 }
 
-AABB2 ParseXMLAttribute( const XMLElement& element, const char* attributeName, const AABB2& defaultValue )
+AABB2 ParseXMLAttribute( const XmlElement& element, const char* attributeName, const AABB2& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	AABB2 value = defaultValue;
@@ -154,7 +153,7 @@ AABB2 ParseXMLAttribute( const XMLElement& element, const char* attributeName, c
 	return value;
 }
 
-IntRange ParseXMLAttribute( const XMLElement& element, const char* attributeName, const IntRange& defaultValue )
+IntRange ParseXMLAttribute( const XmlElement& element, const char* attributeName, const IntRange& defaultValue )
 {
 	const char* attribute = element.Attribute( attributeName );
 	IntRange value = defaultValue;

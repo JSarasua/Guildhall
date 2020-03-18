@@ -1,8 +1,8 @@
 #include "Engine/Core/NamedStrings.hpp"
 
-void NamedStrings::PopulateFromXmlElementAttributes( const XMLElement& element )
+void NamedStrings::PopulateFromXmlElementAttributes( const XmlElement& element )
 {
-	for( const XMLAttribute* attribute = element.FirstAttribute(); attribute; attribute=attribute->Next()) {
+	for( const XmlAttribute* attribute = element.FirstAttribute(); attribute; attribute=attribute->Next()) {
 		std::string attributeName = attribute->Name();
 		std::string attributeValue = attribute->Value();
 		SetValue(attributeName,attributeValue);

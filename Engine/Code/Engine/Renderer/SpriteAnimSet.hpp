@@ -11,7 +11,7 @@ typedef std::map<std::string, SpriteAnimDefinition*>::const_iterator SpriteAnimC
 class SpriteAnimSet
 {
 public:
-	SpriteAnimSet( const XMLElement& element, SpriteSheet& spriteSheet );
+	SpriteAnimSet( const XmlElement& element, SpriteSheet& spriteSheet );
 
 	SpriteAnimDefinition* GetSpriteAnimDefinition(const std::string& animName) const;
 

@@ -22,7 +22,7 @@ public:
 	SpriteAnimDefinition( const SpriteSheet& sheet, const std::vector<int>& spriteIndexes,
 		float durationSeconds, SpriteAnimPlaybackType playbacktype = SpriteAnimPlaybackType::LOOP );
 
-	SpriteAnimDefinition( const SpriteSheet& sheet, const XMLElement& element, 
+	SpriteAnimDefinition( const SpriteSheet& sheet, const XmlElement& element, 
 		float framesPerSecond, SpriteAnimPlaybackType playbacktype = SpriteAnimPlaybackType::LOOP );
 
 	const SpriteDefinition& GetSpriteDefAtTime( float seconds ) const;

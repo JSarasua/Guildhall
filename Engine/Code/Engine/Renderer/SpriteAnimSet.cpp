@@ -3,12 +3,12 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
-SpriteAnimSet::SpriteAnimSet( const XMLElement& element, SpriteSheet& spriteSheet )
+SpriteAnimSet::SpriteAnimSet( const XmlElement& element, SpriteSheet& spriteSheet )
 {
 
 	float framesPerSecond = ParseXMLAttribute(element,"fps",15.f);
 
-	for( const XMLElement* currentElement = element.FirstChildElement(); currentElement; currentElement=currentElement->NextSiblingElement() ) {
+	for( const XmlElement* currentElement = element.FirstChildElement(); currentElement; currentElement=currentElement->NextSiblingElement() ) {
 		//std::string attributeName = currentElement->Name();
 		std::string animationName = ParseXMLAttribute(*currentElement, "name", std::string(""));
 		SpriteAnimDefinition* spriteAnimDef = new SpriteAnimDefinition(spriteSheet,*currentElement,framesPerSecond, SpriteAnimPlaybackType::PINGPONG);

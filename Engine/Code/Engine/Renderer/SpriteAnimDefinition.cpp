@@ -42,7 +42,7 @@ SpriteAnimDefinition::SpriteAnimDefinition( const SpriteSheet& sheet, const std:
 	m_spriteIndexes = spriteIndexes;
 }
 
-SpriteAnimDefinition::SpriteAnimDefinition( const SpriteSheet& sheet, const XMLElement& element, float framesPerSecond, SpriteAnimPlaybackType playbacktype ) :
+SpriteAnimDefinition::SpriteAnimDefinition( const SpriteSheet& sheet, const XmlElement& element, float framesPerSecond, SpriteAnimPlaybackType playbacktype ) :
 	m_spriteSheet( sheet ),
 	m_playbackType( playbacktype )
 {
