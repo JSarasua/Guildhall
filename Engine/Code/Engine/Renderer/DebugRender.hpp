@@ -7,6 +7,7 @@
 class Camera;
 class Texture;
 class RenderContext;
+struct Mat44;
 
 struct Vec3;
 struct Rgba8;
@@ -74,9 +75,9 @@ void DebugAddWorldLine( LineSegment3 const& line,
 
 //text
 //non-billboarded
-
+void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& starColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text );
 //billboarded
-
+void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text ); 
 //grid [EXTRA]
 
 //mesh [EXTRA]

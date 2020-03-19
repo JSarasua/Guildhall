@@ -215,6 +215,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
+	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -224,6 +225,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num1Key.WasJustPressed() )
 	{
 		DebugAddWorldPoint( m_camera.GetPosition(), 0.1f, Rgba8::RED, Rgba8::GREEN, 5.f, DEBUG_RENDER_USE_DEPTH );
+	}
+	if( num2Key.WasJustPressed() )
+	{
+		DebugAddWorldBillboardText( m_camera.GetPosition(), Vec2(), Rgba8::WHITE, Rgba8::RED, 2.f, DEBUG_RENDER_USE_DEPTH, "Hello!" );
 	}
 
 	Vec3 translator;

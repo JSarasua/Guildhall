@@ -142,11 +142,11 @@ protected:
 
 private:
 	std::vector<Texture*> m_Textures;
-	std::vector<BitmapFont*> m_fonts;
 
 	bool m_isDrawing = false;
 
 public:
+	std::vector<BitmapFont*> m_fonts;
 	Clock* m_gameClock = nullptr;
 
 	ID3D11Device* m_device;			//Our GPU
