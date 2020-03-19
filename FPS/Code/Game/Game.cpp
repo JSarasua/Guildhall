@@ -224,11 +224,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.WasJustPressed() )
 	{
-		DebugAddWorldPoint( m_camera.GetPosition(), 0.1f, Rgba8::RED, Rgba8::GREEN, 5.f, DEBUG_RENDER_USE_DEPTH );
+		DebugAddWorldPoint( m_camera.GetPosition(), 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( num2Key.WasJustPressed() )
 	{
-		DebugAddWorldBillboardText( m_camera.GetPosition(), Vec2(), Rgba8::WHITE, Rgba8::RED, 2.f, DEBUG_RENDER_USE_DEPTH, "Hello!" );
+		DebugAddWorldBillboardText( m_camera.GetPosition(), Vec2( 0.f, 0.f ), Rgba8::WHITE, Rgba8::RED, 15.f, DEBUG_RENDER_USE_DEPTH, "Hello!" );
 	}
 
 	Vec3 translator;
