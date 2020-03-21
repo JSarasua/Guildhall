@@ -27,6 +27,7 @@ public:
 	eDebugRenderMode m_mode = DEBUG_RENDER_USE_DEPTH;
 	Texture const* m_texture = nullptr;
 	/*GPUMesh* m_mesh = nullptr;*/
+	Vec3 pivotDim;
 	Transform m_transform;
 	std::vector<Vertex_PCU> m_vertices;
 	std::vector<int> m_indices;
@@ -71,23 +72,21 @@ void DebugRenderObject::UpdateColors()
 void DebugRenderObject::AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView )
 {
 	//Check for billboarding
-	Mat44 reversedCamera = cameraView;
-	//reversedCamera.ScaleUniform3D(-1.f);
-	MatrixInvertOrthoNormal( reversedCamera );
+	//Camera doesn't need to be reversed because camera is facing -Z but our append verts are already assuming drawing +Z
+	Mat44 reversedCameraView = cameraView;
+	Mat44 pivotTransform = Mat44::CreateTranslation3D( -pivotDim );
 	Mat44 transformMatrix = m_transform.ToMatrix();
-	//transformMatrix.TransformBy( reversedCamera );
-	//reversedCamera.TransformBy( transformMatrix );
+	transformMatrix.TransformBy( reversedCameraView );
+	transformMatrix.TransformBy( pivotTransform );
+
 	for( size_t vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++ )
 	{
 		Vec3 vertex = m_vertices[vertexIndex].position;
 		Rgba8 const& tint = m_vertices[vertexIndex].tint;
 		Vec2 const& uv = m_vertices[vertexIndex].uvTexCoords;
 
-		//transformMatrix.TransformBy( cameraView );
-		vertex = reversedCamera.TransformVector3D(vertex);
 		vertex = transformMatrix.TransformPosition3D( vertex );
-		//Vec4 vertexT = transformMatrix.TransformHomogeneousPoint3D( Vec4(vertex.x, vertex.y, vertex.z, 1.f) );
-		//vertex = Vec3( vertexT.x, vertexT.y, vertexT.z );
+
 		Vertex_PCU transformedVert = Vertex_PCU( vertex, tint, uv );
 
 		vertexList.push_back( transformedVert );
@@ -206,8 +205,8 @@ void DebugRenderWorldToCamera( Camera* cam )
 	//UpdateColors
 	s_DebugRenderSystem->UpdateColors();
 	//AppendVerts
-	s_DebugRenderSystem->AppendVerts( vertices, cam->GetViewMatrix() );
-	s_DebugRenderSystem->AppendTextVerts( textVertices, cam->GetViewMatrix() );
+	s_DebugRenderSystem->AppendVerts( vertices, cam->GetViewRotationMatrix() );
+	s_DebugRenderSystem->AppendTextVerts( textVertices, cam->GetViewRotationMatrix() );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
@@ -299,12 +298,13 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 	RenderContext* context = s_DebugRenderSystem->m_context;
 	Vec2 textDimensions = context->m_fonts[0]->GetDimensionsForText2D(0.1f, strText );
 	Vec2 pivotDim = pivot * textDimensions;
-	context->m_fonts[0]->AddVertsForText2D( debugObject->m_vertices, Vec2( 0.f,0.f ), 0.1f, std::string(text) );
+	context->m_fonts[0]->AddVertsForText2D( debugObject->m_vertices, Vec2(0.f, 0.f), 0.1f, std::string(text) );
 	debugObject->m_texture = context->m_fonts[0]->GetTexture();
 
 
-	Vec3 pivotOrigin = Vec3( origin.x - pivotDim.x, origin.y - pivotDim.y, origin.z );
+	Vec3 pivotOrigin = Vec3( origin.x, origin.y, origin.z );
 	debugObject->m_transform.SetPosition( pivotOrigin );
+	debugObject->pivotDim = Vec3( pivotDim.x, pivotDim.y, 0.f );
 
 
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )

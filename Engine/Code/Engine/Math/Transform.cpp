@@ -44,3 +44,13 @@ Mat44 Transform::ToMatrix() const
 
 }
 
+Mat44 Transform::ToRotationMatrix() const
+{
+	Mat44 mat;
+	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
+	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
+	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
+
+	return mat;
+}
+

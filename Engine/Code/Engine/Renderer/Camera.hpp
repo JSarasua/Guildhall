@@ -65,6 +65,7 @@ public:
 	void SetProjectionPerspective( float fov, float nearZ, float farZ );
 
 	Mat44 GetViewMatrix() const;
+	Mat44 GetViewRotationMatrix() const;
 	Mat44 GetProjectionMatrix() const;
 
 	Vec3 ClientToWorld( Vec2 client, float ndcZ ) const;

@@ -11,6 +11,7 @@ public:
 	void SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw );
 
 	Mat44 ToMatrix() const;
+	Mat44 ToRotationMatrix() const;
 
 public:
 	Vec3 m_position = Vec3( 0.f, 0.f, 0.f );
