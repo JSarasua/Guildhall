@@ -11,10 +11,6 @@
 
 Camera::~Camera()
 {
-	delete m_colorTarget;
-	m_colorTarget = nullptr;
-
-
 	delete m_cameraUBO;
 	m_cameraUBO = nullptr;
 
@@ -73,8 +69,15 @@ float Camera::GetAspectRatio() const
 	//switch to GetColorTargetSize();
 // 	Vec2 outputSize = GetColorTargetSize();
 // 	return outputSize.x/outputSize.y;
-
-	return 16.f/9.f;
+	if( nullptr == m_colorTarget )
+	{
+		return m_outputSize.x / m_outputSize.y;
+	}
+	else
+	{
+		return m_colorTarget->GetAspectRatio();
+	}
+	//return 16.f/9.f;
 }
 
 

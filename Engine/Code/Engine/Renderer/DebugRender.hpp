@@ -21,6 +21,12 @@ enum eDebugRenderMode
 	DEBUG_RENDER_XRAY
 };
 
+enum eDebugRenderTo
+{
+	DEBUG_RENDER_TO_SCREEN,
+	DEBUG_RENDER_TO_WORLD
+};
+
 
 /************************************************************************/
 /* Function Prototypes                                                  */
@@ -85,6 +91,9 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 /************************************************************************/
 /* Screen Rendering                                                     */
 /************************************************************************/
+void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, Rgba8 const& endColor, float duration);
+
+
 
 void DebugRenderSetScreenHeight( float height );
 AABB2 DebugGetScreenBounds();

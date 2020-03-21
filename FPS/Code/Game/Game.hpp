@@ -64,7 +64,7 @@ private:
 	Player* m_player = nullptr;
 	GPUMesh* m_cubeMesh = nullptr;
 	GPUMesh* m_sphereMesh = nullptr;
-	
+	Texture* m_screenTexture = nullptr;
 
 	Shader* m_invertShader = nullptr;
 

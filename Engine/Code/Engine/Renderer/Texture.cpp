@@ -23,6 +23,7 @@ Texture::Texture( RenderContext* context, ID3D11Texture2D* handle )
 Texture::Texture( RenderContext* ctx, ID3D11Texture2D* handle, const char* filePath )
 	: Texture(ctx, handle)
 {
+	m_filePath = std::string();
 	if( nullptr != filePath )
 	{
 		m_filePath = filePath;
@@ -48,6 +49,19 @@ bool Texture::IsFileInTexture( std::string filePath )
 		return true;
 	}
 	return false;
+}
+
+RenderContext* Texture::GetRenderContext()
+{
+	return m_owner;
+}
+
+float Texture::GetAspectRatio() const
+{
+	Vec2 outputDimensions = Vec2( GetTexelSize() );
+	float aspectRatio = outputDimensions.x / outputDimensions.y;
+
+	return aspectRatio;
 }
 
 Texture::~Texture()

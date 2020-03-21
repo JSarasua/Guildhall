@@ -39,6 +39,7 @@ void Game::Startup()
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
+	m_camera.SetOutputSize( Vec2( 160.f, 90.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
@@ -67,6 +68,8 @@ void Game::Startup()
 	m_gameClock->SetParent( Clock::GetMaster() );
 
 	g_theRenderer->Setup( m_gameClock );
+
+	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 }
 
 void Game::Shutdown()
@@ -152,6 +155,8 @@ void Game::Render()
 
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
+
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
 
 }
@@ -216,6 +221,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
+	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -229,6 +235,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num2Key.WasJustPressed() )
 	{
 		DebugAddWorldBillboardText( m_camera.GetPosition(), Vec2( 0.5f, 0.5f ), Rgba8::WHITE, Rgba8::RED, 15.f, DEBUG_RENDER_USE_DEPTH, "Hello!" );
+	}
+	if( num3Key.WasJustPressed() )
+	{
+		DebugAddScreenPoint( Vec2(1900, 1060.f), 10.f, Rgba8::RED, Rgba8::GREEN, 10.f );
 	}
 
 	Vec3 translator;

@@ -23,6 +23,8 @@ public:
 	int GetTextureID() const;
 	const IntVec2& GetTexelSize() const;
 	bool IsFileInTexture( std::string filePath );
+	RenderContext* GetRenderContext();
+	float GetAspectRatio() const;
 
 private:
 	RenderContext* m_owner		= nullptr;

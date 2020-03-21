@@ -102,10 +102,10 @@ public:
 	void SetDepth( eDepthCompareMode compareMode );
 	void SetModelMatrix( Mat44 const& model );
 
-
+	Texture* GetBackBuffer();
 
 	Texture* CreateDepthStencilTarget();
-	Texture* CreateTextureFromColor( Rgba8 color );
+	Texture* CreateTextureFromColor( Rgba8 color, IntVec2 texelSize = IntVec2( 1, 1 ) );
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
 	Shader*		GetOrCreateShader( char const* filename );

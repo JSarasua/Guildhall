@@ -388,6 +388,11 @@ void RenderContext::SetModelMatrix( Mat44 const& model )
 	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
 }
 
+Texture* RenderContext::GetBackBuffer()
+{
+	return m_swapchain->GetBackBuffer();
+}
+
 Texture* RenderContext::CreateDepthStencilTarget()
 {
 	Texture* backBuffer = m_swapchain->GetBackBuffer();
@@ -431,38 +436,36 @@ Texture* RenderContext::CreateDepthStencilTarget()
 	return newTexture;
 }
 
-Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
+Texture* RenderContext::CreateTextureFromColor( Rgba8 color, IntVec2 texelSize )
 {
-	// make a 1x1 texture of that color, and return it;
-	unsigned char imageDataRaw[4];
-	imageDataRaw[0] = color.r;
-	imageDataRaw[1] = color.g;
-	imageDataRaw[2] = color.b;
-	imageDataRaw[3] = color.a;
-
-	int imageTexelSizeX = 1; // This will be filled in for us to indicate image width
-	int imageTexelSizeY = 1; // This will be filled in for us to indicate image height
-	//int numComponents = 0; // This will be filled in for us to indicate how many color components the image had (e.g. 3=RGB=24bit, 4=RGBA=32bit)
-	//int numComponentsRequested = 4; // don't care; we support 3 (24-bit RGB) or 4 (32-bit RGBA)
-	//unsigned char* imageData = stbi_load_from_memory(imageDataRaw, 4,&imageTexelSizeX, &imageTexelSizeY, &numComponents, numComponentsRequested);
+	unsigned char* imageDataRawArray = new unsigned char[texelSize.x * texelSize.y * 4];
 	
+	for( int dataIndex = 0; dataIndex < texelSize.x * texelSize.y; dataIndex++ )
+	{
+		int currentIndex = dataIndex * 4;
+		imageDataRawArray[currentIndex]		 = color.r;
+		imageDataRawArray[currentIndex + 1]	 = color.g;
+		imageDataRawArray[currentIndex + 2]	 = color.b;
+		imageDataRawArray[currentIndex + 3]	 = color.a;
+		
+	}
 
 	D3D11_TEXTURE2D_DESC desc;
-	desc.Width = imageTexelSizeX;
-	desc.Height = imageTexelSizeY;
+	desc.Width = texelSize.x;
+	desc.Height = texelSize.y;
 	desc.MipLevels = 1;
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.SampleDesc.Count = 1; // MSAA
 	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_IMMUTABLE; // if you do mip-chians, we need this to be GPU/DEFAULT
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA initialData;
-	initialData.pSysMem = imageDataRaw;
-	initialData.SysMemPitch = imageTexelSizeX * 4;
+	initialData.pSysMem = imageDataRawArray;
+	initialData.SysMemPitch = texelSize.x * 4;
 	initialData.SysMemSlicePitch = 0;
 
 	//DirectX Creation
@@ -471,7 +474,7 @@ Texture* RenderContext::CreateTextureFromColor( Rgba8 color )
 
 	// Free the raw image texel data now that we've sent a copy of it down to the GPU to be stored in video memory
 	//stbi_image_free( imageData );
-	const IntVec2 texelSize( imageTexelSizeX, imageTexelSizeY );
+	////const IntVec2 texelSize( imageTexelSizeX, imageTexelSizeY );
 	//Texture* newTexture = new Texture(textureID, texelSize, imageFilePath);
 	Texture* newTexture = new Texture( this, texHandle, nullptr );
 	m_Textures.push_back( newTexture );
@@ -676,6 +679,15 @@ void RenderContext::BeginCamera( Camera& camera )
 		m_context->ClearState();		//Can be slow but helps to find bugs
 	#endif
 
+	Texture* backbuffer = nullptr;
+	if( nullptr == camera.GetColorTarget() )
+	{
+		backbuffer = m_swapchain->GetBackBuffer();
+	}
+	else
+	{
+		backbuffer = camera.GetColorTarget();
+	}
 
 	if( camera.m_clearMode & CLEAR_COLOR_BIT )
 	{
@@ -687,16 +699,7 @@ void RenderContext::BeginCamera( Camera& camera )
 		clearFloats[2] = clearColor.b / 255.f;
 		clearFloats[3] = clearColor.a / 255.f;
 
-		Texture* backbuffer = nullptr;
 
-		if( nullptr == camera.GetColorTarget() )
-		{
-			backbuffer = m_swapchain->GetBackBuffer();
-		}
-		else
-		{
-			backbuffer = camera.GetColorTarget();
-		}
 		TextureView* backbuffer_rtv = backbuffer->GetRenderTargetView();
 
 		ID3D11RenderTargetView* rtv = backbuffer_rtv->GetAsRTV();
@@ -709,7 +712,8 @@ void RenderContext::BeginCamera( Camera& camera )
 		ClearDepth( depthStencilTarget, camera.m_clearDepth, camera.m_clearStencil );
 	}
 
-	Texture* texture = m_swapchain->GetBackBuffer();
+	//Texture* texture = m_swapchain->GetBackBuffer();
+	Texture* texture = backbuffer;
 	TextureView* view = texture->GetRenderTargetView();
 	ID3D11RenderTargetView* rtv = view->GetAsRTV();
 
@@ -724,7 +728,6 @@ void RenderContext::BeginCamera( Camera& camera )
 
 	// TEMPORARY - this will be moved
 	//m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
 
 	Texture* depthStencilTarget = camera.m_depthStencilTarget;
 	if( depthStencilTarget != nullptr )
@@ -741,20 +744,12 @@ void RenderContext::BeginCamera( Camera& camera )
 		m_context->OMSetRenderTargets( 1, &rtv, nullptr );
 	}
 
-
-
-
 	m_isDrawing = true;
 
 	BindShader( m_currentShader );
-
 	BindUniformBuffer( 0, m_frameUBO );
-
 	BindTexture( nullptr );
 	BindSampler( nullptr );
-
-
-
 
 	if( nullptr == camera.m_cameraUBO )
 	{
@@ -763,20 +758,7 @@ void RenderContext::BeginCamera( Camera& camera )
 	}
 
 	camera.UpdateCameraUBO();
-
-
-// 	//CameraData
-// 	CameraData camData;
-// 	camData.projection = camera.GetProjection();
-// 	camData.view = Mat44::CreateTranslation3D( -camera.GetPosition() );
-// // 	camData.mins = camera.GetOrthoBottomLeft();
-// // 	camData.maxs = camera.GetOrthoTopRight();
-// 
-// 	camera.m_cameraUBO->Update( & camData, sizeof( camData ), sizeof( camData ) );
-
-
 	BindUniformBuffer( 1, camera.m_cameraUBO );
-
 
 	if( nullptr == m_modelUBO )
 	{
