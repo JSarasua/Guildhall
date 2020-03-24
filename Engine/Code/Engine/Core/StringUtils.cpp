@@ -42,6 +42,13 @@ const std::string Stringf( const int maxLength, const char* format, ... )
 	return returnValue;
 }
 
+const std::string Stringv( const char* format, va_list args )
+{
+	char buffer[STRINGF_STACK_LOCAL_TEMP_LENGTH];
+	vsnprintf_s( buffer, STRINGF_STACK_LOCAL_TEMP_LENGTH, format, args );
+	return buffer;
+}
+
 const std::vector<std::string> SplitStringOnDelimeter( const char* text, const char delimeter )
 {
 	std::string textAsString = text;

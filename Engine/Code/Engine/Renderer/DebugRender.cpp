@@ -8,6 +8,8 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include <stdarg.h>
 
 static RenderContext*	s_DebugRenderContext = nullptr;
 static Camera*			s_DebugCamera = nullptr;
@@ -429,6 +431,24 @@ void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& startColor,
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
+void DebugAddWorldTextf( Mat44 const& basis, Vec2 pivot, Rgba8 const& color, float duration, eDebugRenderMode mode, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddWorldText( basis, pivot, color, color, duration, mode, text.c_str() );
+}
+
+void DebugAddWorldTextf( Mat44 const& basis, Vec2 pivot, Rgba8 const& color, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddWorldText( basis, pivot, color, color, 0.f, DEBUG_RENDER_USE_DEPTH, text.c_str() );
+}
+
 // void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& starColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text )
 // {
 // // 	Vec3 mins = Vec3( -0.5f, -0.5f, 0.f );
@@ -469,10 +489,7 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-// 	for( int vertIndex = (int)debugObject->m_vertices.size(); vertIndex >= 0; vertIndex-- )
-// 	{
-// 		debugObject->m_indices.push_back( (uint)vertIndex );
-// 	}
+
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
