@@ -113,6 +113,12 @@ void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, fl
 void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 const& endColor, float duration );
 void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& color, float duration = 0.f );
 
+//Textured AABB2
+void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& startTint, Rgba8 const& endTint, float duration = 0.f );
+void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& tint, float duration = 0.f );
+void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex ); //UVs assumed to be 0 to 1
+
+
 
 void DebugRenderSetScreenHeight( float height );
 AABB2 DebugGetScreenBounds();
