@@ -350,7 +350,7 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode, eDepthWriteMode wri
 	memset( &dsDesc, 0, sizeof( dsDesc ) );
 	dsDesc.DepthEnable = true;
 	dsDesc.StencilEnable = false;
-
+	
 	switch( compareMode )
 	{
 		case eDepthCompareMode::COMPARE_ALWAYS:
@@ -1079,6 +1079,7 @@ void RenderContext::CreateDefaultRasterState()
 
 	ID3D11Device* device = m_device;
 	device->CreateRasterizerState( &desc, &m_rasterState );
+	m_context->RSSetState( m_rasterState );
 }
 
 void RenderContext::SetCullMode( eCullMode cullMode )
@@ -1105,6 +1106,8 @@ void RenderContext::SetCullMode( eCullMode cullMode )
 
 	ID3D11Device* device = m_device;
 	device->CreateRasterizerState( &desc, &m_rasterState );
+	m_context->RSSetState( m_rasterState );
+	
 }
 
 void RenderContext::SetFillMode( eFillMode fillMode )
@@ -1126,6 +1129,7 @@ void RenderContext::SetFillMode( eFillMode fillMode )
 
 	ID3D11Device* device = m_device;
 	device->CreateRasterizerState( &desc, &m_rasterState );
+	m_context->RSSetState( m_rasterState );
 }
 
 void RenderContext::SetFrontFaceWindOrder( eFrontFaceWindOrder windOrder )
@@ -1147,6 +1151,7 @@ void RenderContext::SetFrontFaceWindOrder( eFrontFaceWindOrder windOrder )
 
 	ID3D11Device* device = m_device;
 	device->CreateRasterizerState( &desc, &m_rasterState );
+	m_context->RSSetState( m_rasterState );
 }
 
 // create the debug module for us to use (for now, only for reporting)
