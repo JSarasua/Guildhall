@@ -328,13 +328,21 @@ void DebugRenderWorldToCamera( Camera* cam )
 	std::vector<Vertex_PCU> XRayTextVertices;
 	std::vector<uint> XRayTextIndices;
 
+	std::vector<Vertex_PCU> AlwaysVertices;
+	std::vector<uint> AlwaysIndices;
+	std::vector<Vertex_PCU> AlwaysTextVertices;
+	std::vector<uint> AlwaysTextIndices;
+
 	//UpdateColors
 	s_DebugRenderSystem->UpdateColors();
 	//AppendVerts
-	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
-	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
-	s_DebugRenderSystem->AppendIndexedVerts( XRayVertices, XRayIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
-	s_DebugRenderSystem->AppendIndexedTextVerts( XRayTextVertices, XRayTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
+	Mat44 camTransformRotationMatrix = cam->GetViewRotationMatrix();
+	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
+	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
+	s_DebugRenderSystem->AppendIndexedVerts( XRayVertices, XRayIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
+	s_DebugRenderSystem->AppendIndexedTextVerts( XRayTextVertices, XRayTextIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
+	s_DebugRenderSystem->AppendIndexedVerts( AlwaysVertices, AlwaysIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_ALWAYS );
+	s_DebugRenderSystem->AppendIndexedTextVerts( AlwaysTextVertices, AlwaysTextIndices, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_ALWAYS );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
@@ -349,6 +357,9 @@ void DebugRenderWorldToCamera( Camera* cam )
 	context->SetDepth( eDepthCompareMode::COMPARE_GREATER_THAN, eDepthWriteMode::WRITE_NONE );
 	context->DrawIndexedVertexArray( XRayVertices, XRayIndices );
 
+	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_NONE );
+	context->DrawIndexedVertexArray( AlwaysVertices, AlwaysIndices );
+
 	//Draw Text
 	context->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	Texture const* tex = context->m_fonts[0]->GetTexture();
@@ -357,6 +368,10 @@ void DebugRenderWorldToCamera( Camera* cam )
 
 	context->SetDepth( eDepthCompareMode::COMPARE_GREATER_THAN, eDepthWriteMode::WRITE_NONE );
 	context->DrawIndexedVertexArray( XRayTextVertices, XRayTextIndices );
+
+	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_NONE );
+	context->DrawIndexedVertexArray( AlwaysTextVertices, AlwaysTextIndices );
+
 
 	context->EndCamera( *cam );
 }
