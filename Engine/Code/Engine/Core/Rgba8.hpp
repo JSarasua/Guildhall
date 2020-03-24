@@ -22,6 +22,7 @@ public:
 	const Rgba8		operator+( const Rgba8& copyRgba8 ) const;
 
 	void SetFromText(const char* text);
+	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
 
 	static const Rgba8 WHITE;
 	static const Rgba8 RED;

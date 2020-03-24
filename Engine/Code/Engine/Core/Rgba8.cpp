@@ -1,6 +1,7 @@
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include <vector>
 #include <string>
 
@@ -90,4 +91,25 @@ void Rgba8::SetFromText( const char* text )
 
 
 
+}
+
+Rgba8 Rgba8::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue )
+{
+	float startR	= (float)startColor.r;
+	float startG	= (float)startColor.g;
+	float startB	= (float)startColor.b;
+	float startA	= (float)startColor.a;
+	float endR		= (float)endColor.r;
+	float endG		= (float)endColor.g;
+	float endB		= (float)endColor.b;
+	float endA		= (float)endColor.a;
+
+	unsigned char lerpR = (unsigned char)Interpolate( startR, endR, lerpValue );
+	unsigned char lerpG = (unsigned char)Interpolate( startG, endG, lerpValue );
+	unsigned char lerpB = (unsigned char)Interpolate( startB, endB, lerpValue );
+	unsigned char lerpA = (unsigned char)Interpolate( startA, endA, lerpValue );
+
+	Rgba8 color = Rgba8( lerpR, lerpG, lerpB, lerpA );
+
+	return color;
 }

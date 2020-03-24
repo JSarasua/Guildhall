@@ -92,7 +92,6 @@ void RenderContext::StartUp(Window* window)
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
 
 	CreateBlendModes();
-	
 }
 
 void RenderContext::BeginFrame()

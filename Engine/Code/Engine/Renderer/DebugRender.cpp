@@ -21,8 +21,6 @@ public:
 	void AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView );
 	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, Rgba8 const& tint = Rgba8::WHITE, float tintStrength = 0.f );
 
-	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
-
 public:
 	Timer m_timer;
 
@@ -39,7 +37,6 @@ public:
 	std::vector<uint> m_indices;
 	bool m_isText = false;
 	bool m_isBillBoarded = false;
-	//bool m_isReadyToBeCulled = false;
 };
 
 void DebugRenderObject::UpdateColors()
@@ -124,7 +121,7 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 		Rgba8 const& color = m_vertices[vertexIndex].tint;
 		Vec2 const& uv = m_vertices[vertexIndex].uvTexCoords;
 
-		Rgba8 tintedColor = LerpColorTo( color, tint, tintStrength );
+		Rgba8 tintedColor = Rgba8::LerpColorTo( color, tint, tintStrength );
 
 		vertex = transformMatrix.TransformPosition3D( vertex );
 
@@ -137,27 +134,6 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 	{
 		indexList.push_back( currentVertexListEnd + (uint)m_indices[indexIndex] );
 	}
-}
-
-Rgba8 DebugRenderObject::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue )
-{
-	float startR	= (float)startColor.r;
-	float startG	= (float)startColor.g;
-	float startB	= (float)startColor.b;
-	float startA	= (float)startColor.a;
-	float endR		= (float)endColor.r;
-	float endG		= (float)endColor.g;
-	float endB		= (float)endColor.b;
-	float endA		= (float)endColor.a;
-
-	unsigned char lerpR = (unsigned char)Interpolate( startR, endR, lerpValue );
-	unsigned char lerpG = (unsigned char)Interpolate( startG, endG, lerpValue );
-	unsigned char lerpB = (unsigned char)Interpolate( startB, endB, lerpValue );
-	unsigned char lerpA = (unsigned char)Interpolate( startA, endA, lerpValue );
-
-	Rgba8 color = Rgba8( lerpR, lerpG, lerpB, lerpA );
-
-	return color;
 }
 
 class DebugRenderSystem
