@@ -32,7 +32,6 @@
 
 
 
-
 void RenderContext::StartUp(Window* window)
 {
 	//ID3D11Device
@@ -83,6 +82,7 @@ void RenderContext::StartUp(Window* window)
 	m_swapchain = new SwapChain( this, swapchain );
 	//m_defaultShader = new Shader( this );
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
+	CreateDefaultRasterState();
 
 	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
 	m_immediateIBO = new IndexBuffer( this, MEMORY_HINT_DYNAMIC );
@@ -121,6 +121,7 @@ void RenderContext::Shutdown()
 		m_shaders[shaderIndex] = nullptr;
 	}
 	m_defaultShader = nullptr;
+	DX_SAFE_RELEASE( m_rasterState );
 
 	delete m_swapchain;
 	m_swapchain = nullptr;
@@ -294,7 +295,6 @@ void RenderContext::BindShader( Shader* shader )
 	}
 
 	m_context->VSSetShader( m_currentShader->m_vertexStage.m_vs, nullptr, 0 );
-	m_context->RSSetState( m_currentShader->m_rasterState ); //use defaults
 	m_context->PSSetShader( m_currentShader->m_fragmentStage.m_fs, nullptr, 0 );
 }
 
@@ -763,6 +763,7 @@ void RenderContext::BeginCamera( Camera& camera )
 	m_isDrawing = true;
 
 	BindShader( m_currentShader );
+	m_context->RSSetState( m_rasterState );
 	BindUniformBuffer( 0, m_frameUBO );
 	BindTexture( nullptr );
 	BindSampler( nullptr );
@@ -1047,6 +1048,94 @@ void RenderContext::DrawAlignedTextAtPosition( const char* textstring, const AAB
 	const Texture* texture = m_fonts[0]->GetTexture();
 	BindTexture( texture );
 	DrawVertexArray( vertexArray );
+}
+
+void RenderContext::CreateDefaultRasterState()
+{
+	D3D11_RASTERIZER_DESC desc; //description
+
+	desc.FillMode = D3D11_FILL_SOLID; //full triangle
+	desc.CullMode = D3D11_CULL_BACK;
+	desc.FrontCounterClockwise = TRUE; //the only reason we're doing this;
+	desc.DepthBias = 0U;
+	desc.DepthBiasClamp = 0.f;
+	desc.SlopeScaledDepthBias = 0.f;
+	desc.DepthClipEnable = TRUE;
+	desc.ScissorEnable = FALSE;
+	desc.MultisampleEnable = FALSE;
+	desc.AntialiasedLineEnable = FALSE;
+
+	ID3D11Device* device = m_device;
+	device->CreateRasterizerState( &desc, &m_rasterState );
+
+}
+
+void RenderContext::SetCullMode( eCullMode cullMode )
+{
+	D3D11_RASTERIZER_DESC desc; //description
+	m_rasterState->GetDesc( &desc );
+	
+	switch( cullMode )
+	{
+	case eCullMode::CULL_BACK:
+		desc.CullMode = D3D11_CULL_BACK;
+		break;
+	case eCullMode::CULL_FRONT:
+		desc.CullMode = D3D11_CULL_FRONT;
+		break;
+	case eCullMode::CULL_NONE:
+		desc.CullMode = D3D11_CULL_NONE;
+		break;
+	default: ERROR_AND_DIE("Invalid Cull Mode");
+		break;
+	}
+
+	DX_SAFE_RELEASE( m_rasterState );
+
+	ID3D11Device* device = m_device;
+	device->CreateRasterizerState( &desc, &m_rasterState );
+}
+
+void RenderContext::SetFillMode( eFillMode fillMode )
+{
+	D3D11_RASTERIZER_DESC desc; //description
+	m_rasterState->GetDesc( &desc );
+
+	switch( fillMode )
+	{
+	case eFillMode::FILL_WIREFRAME: desc.FillMode = D3D11_FILL_WIREFRAME;
+		break;
+	case eFillMode::FILL_SOLID: desc.FillMode = D3D11_FILL_SOLID;
+		break;
+	default: ERROR_AND_DIE("Invalid Cull Mode");
+		break;
+	}
+
+	DX_SAFE_RELEASE( m_rasterState );
+
+	ID3D11Device* device = m_device;
+	device->CreateRasterizerState( &desc, &m_rasterState );
+}
+
+void RenderContext::SetFrontFaceWindOrder( eFrontFaceWindOrder windOrder )
+{
+	D3D11_RASTERIZER_DESC desc; //description
+	m_rasterState->GetDesc( &desc );
+
+	switch( windOrder )
+	{
+	case eFrontFaceWindOrder::COUNTERCLOCKWISE: desc.FrontCounterClockwise = TRUE;
+		break;
+	case eFrontFaceWindOrder::CLOCKWISE: desc.FrontCounterClockwise = FALSE;
+		break;
+	default: ERROR_AND_DIE("Invalid Cull Mode");
+		break;
+	}
+
+	DX_SAFE_RELEASE( m_rasterState );
+
+	ID3D11Device* device = m_device;
+	device->CreateRasterizerState( &desc, &m_rasterState );
 }
 
 // create the debug module for us to use (for now, only for reporting)

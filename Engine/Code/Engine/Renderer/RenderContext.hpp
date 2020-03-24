@@ -24,6 +24,7 @@ struct ID3D11Buffer;
 struct ID3D11BlendState;
 struct IDXGIDebug;
 struct ID3D11DepthStencilState;
+struct ID3D11RasterizerState;
 
 struct FrameData
 {
@@ -64,6 +65,26 @@ enum class eDepthCompareMode
 {
 	COMPARE_LESS_THAN_OR_EQUAL,
 	COMPARE_ALWAYS
+};
+
+
+enum class eCullMode
+{
+	CULL_BACK,
+	CULL_FRONT,
+	CULL_NONE
+};
+
+enum class eFillMode
+{
+	FILL_WIREFRAME,
+	FILL_SOLID
+};
+
+enum class eFrontFaceWindOrder
+{
+	COUNTERCLOCKWISE,
+	CLOCKWISE
 };
 
 #undef DrawText
@@ -131,6 +152,11 @@ public:
 	void DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint = Rgba8::WHITE );
 	void DrawAlignedTextAtPosition( const char* textstring, const AABB2& box, float fontHeight, const Vec2& alignment, const Rgba8& tint = Rgba8::WHITE );
 
+	void CreateDefaultRasterState();
+	void SetCullMode( eCullMode cullMode ); //back, front, mode, none
+	void SetFillMode( eFillMode fillMode ); //fill, solid, wire mode
+	void SetFrontFaceWindOrder( eFrontFaceWindOrder windOrder ); //counterclockwise, clockwise
+
 	void CreateDebugModule();
 	void DestroyDebugModule();
 	void ReportLiveObjects();
@@ -175,6 +201,8 @@ public:
 
 	void* m_debugModule        = nullptr;
 	IDXGIDebug* m_debug           = nullptr;
+
+	ID3D11RasterizerState* m_rasterState = nullptr;
 };
 
 

@@ -52,7 +52,6 @@ public:
 	~Shader();
 
 	bool CreateFromFile( std::string const& filename );
-	void CreateRasterState();
 
 	ID3D11InputLayout* GetOrCreateInputLayout( const BufferAttribute*  layout );
 
@@ -62,7 +61,6 @@ public:
 	ShaderStage m_fragmentStage; //PixelStage
 	std::string m_filename;
 
-	ID3D11RasterizerState* m_rasterState = nullptr;
 	ID3D11InputLayout* m_inputLayout = nullptr;
 	BufferAttribute const* m_previousLayout = nullptr;
 };
