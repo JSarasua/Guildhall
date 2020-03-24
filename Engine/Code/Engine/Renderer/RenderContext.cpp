@@ -85,6 +85,7 @@ void RenderContext::StartUp(Window* window)
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 
 	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
+	m_immediateIBO = new IndexBuffer( this, MEMORY_HINT_DYNAMIC );
 
 	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 
@@ -102,7 +103,6 @@ void RenderContext::BeginFrame()
 
 void RenderContext::EndFrame()
 {
-
 	m_swapchain->Present();
 }
 
@@ -127,7 +127,11 @@ void RenderContext::Shutdown()
 
 
 	delete m_immediateVBO;
+	m_immediateVBO = nullptr;
 	m_swapchain = nullptr;
+
+	delete m_immediateIBO;
+	m_immediateIBO = nullptr;
 
 	delete m_frameUBO;
 	m_frameUBO = nullptr;
@@ -137,9 +141,6 @@ void RenderContext::Shutdown()
 
 	delete m_sampPoint;
 	m_sampPoint = nullptr;
-
-
-
 
 	DX_SAFE_RELEASE( m_alphaBlendStateHandle );
 	DX_SAFE_RELEASE( m_additiveBlendStateHandle );
@@ -190,7 +191,6 @@ void RenderContext::UpdateFrameTime()
 void RenderContext::ClearScreen( const Rgba8& clearColor )
 {
 	UNUSED(clearColor);
-
 }
 
 void RenderContext::ClearDepth( Texture* depthStencilTarget, float depth /*= 1.f*/, float stencil /*= 0.f */ )
@@ -225,6 +225,22 @@ void RenderContext::DrawVertexArray( const std::vector<Vertex_PCU>& vertexes )
 	if( !vertexes.empty() )
 	{
 	DrawVertexArray( static_cast<int>(vertexes.size()), &vertexes[0] );
+	}
+}
+
+void RenderContext::DrawIndexedVertexArray( std::vector<Vertex_PCU> const& vertexes, std::vector<uint> const& indices )
+{
+	if( vertexes.size() > 0 )
+	{
+		size_t bufferTotalByteSize = vertexes.size() * sizeof( Vertex_PCU );
+		size_t elementSize = sizeof( Vertex_PCU );
+		m_immediateVBO->Update( &vertexes[0], bufferTotalByteSize, elementSize );
+		m_immediateIBO->Update(indices);
+
+		BindVertexBuffer( m_immediateVBO );
+		BindIndexBuffer( m_immediateIBO );
+
+		DrawIndexed( (int)indices.size() );
 	}
 }
 

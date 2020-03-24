@@ -88,6 +88,7 @@ public:
 	void DrawIndexed( int numIndices, int indexOffset = 0, int vertexOffset = 0 );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
+	void DrawIndexedVertexArray( std::vector<Vertex_PCU> const& vertexes, std::vector<uint> const& indices );
 	void DrawMesh( GPUMesh* mesh );
 
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
@@ -156,7 +157,8 @@ public:
 	Shader* m_currentShader = nullptr;
 	Shader* m_defaultShader = nullptr;
 	std::vector<Shader*> m_shaders;
-	VertexBuffer* m_immediateVBO;
+	VertexBuffer* m_immediateVBO = nullptr;
+	IndexBuffer* m_immediateIBO = nullptr;
 	ID3D11Buffer* m_lastVBOHandle = nullptr;
 
 	Sampler* m_sampPoint = nullptr;

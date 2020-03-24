@@ -17,7 +17,7 @@ struct DebugRenderObject
 public:
 	void UpdateColors();
 	void AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView );
-	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<int>& indexList, Mat44 const& cameraView );
+	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView );
 
 public:
 	Timer m_timer;
@@ -32,7 +32,7 @@ public:
 	Vec3 pivotDim;
 	Transform m_transform;
 	std::vector<Vertex_PCU> m_vertices;
-	std::vector<int> m_indices;
+	std::vector<uint> m_indices;
 	bool m_isText = false;
 	bool m_isBillBoarded = false;
 	//bool m_isReadyToBeCulled = false;
@@ -96,9 +96,9 @@ void DebugRenderObject::AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 
 	}
 }
 
-void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<int>& indexList, Mat44 const& cameraView )
+void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView )
 {
-	int currentVertexListEnd = (int)vertexList.size() - 1;
+	uint currentVertexListEnd = (uint)vertexList.size();
 
 	Mat44 transformMatrix = m_transform.ToMatrix();
 	if( m_isBillBoarded )
@@ -108,7 +108,6 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 		transformMatrix.TransformBy( cameraView ); 	//Camera doesn't need to be reversed because camera is facing -Z but our append verts are already assuming drawing +Z
 		transformMatrix.TransformBy( pivotTransform );
 	}
-
 
 	for( size_t vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++ )
 	{
@@ -125,7 +124,7 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 
 	for( size_t indexIndex = 0; indexIndex < m_indices.size(); indexIndex++ )
 	{
-		indexList.push_back( currentVertexListEnd + (int)indexIndex );
+		indexList.push_back( currentVertexListEnd + (uint)m_indices[indexIndex] );
 	}
 }
 
@@ -135,7 +134,8 @@ public:
 	void UpdateColors();
 	void AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
 	void AppendTextVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
-	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<int>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
+	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
+	void AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
 
 public:
 	RenderContext* m_context;
@@ -188,13 +188,29 @@ void DebugRenderSystem::AppendTextVerts( std::vector<Vertex_PCU>& vertexList, Ma
 	}
 }
 
-void DebugRenderSystem::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<int>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo )
+void DebugRenderSystem::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo )
 {
 	for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
 	{
 		DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
 
 		if( nullptr != debugObject && !debugObject->m_isText )
+		{
+			if( debugObject->m_renderTo == renderTo )
+			{
+				debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+			}
+		}
+	}
+}
+
+void DebugRenderSystem::AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo )
+{
+	for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
+	{
+		DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+
+		if( nullptr != debugObject && debugObject->m_isText )
 		{
 			if( debugObject->m_renderTo == renderTo )
 			{
@@ -214,7 +230,6 @@ void DebugRenderSystemStartup( RenderContext* context )
 	s_DebugRenderSystem = new DebugRenderSystem();
 	s_DebugRenderSystem->m_context = context;
 	//s_DebugRenderSystem->m_fontText = context->m_fonts[0]->GetTexture();
-
 }
 
 void DebugRenderSystemShutdown()
@@ -258,14 +273,15 @@ void DebugRenderWorldToCamera( Camera* cam )
 	RenderContext* context = s_DebugRenderSystem->m_context;
 	//std::vector<DebugRenderObject*>& debugObjects = s_DebugRenderSystem->m_renderObjects;
 	std::vector<Vertex_PCU> vertices;
-	std::vector<int> indices;
+	std::vector<uint> indices;
 	std::vector<Vertex_PCU> textVertices;
+	std::vector<uint> textIndices;
 
 	//UpdateColors
 	s_DebugRenderSystem->UpdateColors();
 	//AppendVerts
-	s_DebugRenderSystem->AppendVerts( vertices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
-	s_DebugRenderSystem->AppendTextVerts( textVertices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
+	s_DebugRenderSystem->AppendIndexedVerts( vertices, indices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
+	s_DebugRenderSystem->AppendIndexedTextVerts( textVertices, textIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
@@ -275,13 +291,13 @@ void DebugRenderWorldToCamera( Camera* cam )
 	context->BindShader( (Shader*)nullptr );
 
 	//Draw
-	context->DrawVertexArray( vertices );
+	context->DrawIndexedVertexArray( vertices, indices );
 	//context->DrawIndexedVertexArray( vertices, indices );
 
 	//Draw Text
 	Texture const* tex = context->m_fonts[0]->GetTexture();
 	context->BindTexture( tex );
-	context->DrawVertexArray( textVertices );
+	context->DrawIndexedVertexArray( textVertices, textIndices );
 
 	context->EndCamera( *cam );
 }
@@ -368,7 +384,7 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, R
 	Vertex_PCU::AppendVertsAABB2D(debugObject->m_vertices, aabb, startColor);
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
-		debugObject->m_indices.push_back((int)vertIndex);
+		debugObject->m_indices.push_back((uint)vertIndex);
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
@@ -411,7 +427,7 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
-		debugObject->m_indices.push_back( (int)vertIndex );
+		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
@@ -432,7 +448,7 @@ void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, 
 	Vertex_PCU::AppendVertsAABB2D( debugObject->m_vertices, aabb, startColor );
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
-		debugObject->m_indices.push_back((int)vertIndex);
+		debugObject->m_indices.push_back((uint)vertIndex);
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
