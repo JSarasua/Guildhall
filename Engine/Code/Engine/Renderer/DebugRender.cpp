@@ -19,7 +19,9 @@ struct DebugRenderObject
 public:
 	void UpdateColors();
 	void AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView );
-	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView );
+	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, Rgba8 const& tint = Rgba8::WHITE, float tintStrength = 0.f );
+
+	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
 
 public:
 	Timer m_timer;
@@ -99,7 +101,7 @@ void DebugRenderObject::AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 
 	}
 }
 
-void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView )
+void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, Rgba8 const& tint, float tintStrength )
 {
 	uint currentVertexListEnd = (uint)vertexList.size();
 
@@ -119,12 +121,14 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 	for( size_t vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++ )
 	{
 		Vec3 vertex = m_vertices[vertexIndex].position;
-		Rgba8 const& tint = m_vertices[vertexIndex].tint;
+		Rgba8 const& color = m_vertices[vertexIndex].tint;
 		Vec2 const& uv = m_vertices[vertexIndex].uvTexCoords;
+
+		Rgba8 tintedColor = LerpColorTo( color, tint, tintStrength );
 
 		vertex = transformMatrix.TransformPosition3D( vertex );
 
-		Vertex_PCU transformedVert = Vertex_PCU( vertex, tint, uv );
+		Vertex_PCU transformedVert = Vertex_PCU( vertex, tintedColor, uv );
 
 		vertexList.push_back( transformedVert );
 	}
@@ -133,6 +137,27 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 	{
 		indexList.push_back( currentVertexListEnd + (uint)m_indices[indexIndex] );
 	}
+}
+
+Rgba8 DebugRenderObject::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue )
+{
+	float startR	= (float)startColor.r;
+	float startG	= (float)startColor.g;
+	float startB	= (float)startColor.b;
+	float startA	= (float)startColor.a;
+	float endR		= (float)endColor.r;
+	float endG		= (float)endColor.g;
+	float endB		= (float)endColor.b;
+	float endA		= (float)endColor.a;
+
+	unsigned char lerpR = (unsigned char)Interpolate( startR, endR, lerpValue );
+	unsigned char lerpG = (unsigned char)Interpolate( startG, endG, lerpValue );
+	unsigned char lerpB = (unsigned char)Interpolate( startB, endB, lerpValue );
+	unsigned char lerpA = (unsigned char)Interpolate( startA, endA, lerpValue );
+
+	Rgba8 color = Rgba8( lerpR, lerpG, lerpB, lerpA );
+
+	return color;
 }
 
 class DebugRenderSystem
@@ -208,7 +233,14 @@ void DebugRenderSystem::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 			{
 				if( debugObject->m_mode == mode || (debugObject->m_mode == DEBUG_RENDER_XRAY && mode == DEBUG_RENDER_USE_DEPTH) )
 				{
-					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+					if( mode == DEBUG_RENDER_XRAY )
+					{
+						debugObject->AppendIndexedVerts( vertexList, indexList, cameraView, Rgba8::BLACK, 0.5f );
+					}
+					else
+					{
+						debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+					}
 				}
 			}
 		}
@@ -243,7 +275,15 @@ void DebugRenderSystem::AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexL
 			{
 				if( debugObject->m_mode == mode || (debugObject->m_mode == DEBUG_RENDER_XRAY && mode == DEBUG_RENDER_USE_DEPTH) )
 				{
-					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+					if( mode == DEBUG_RENDER_XRAY )
+					{
+						debugObject->AppendIndexedVerts( vertexList, indexList, cameraView, Rgba8::BLACK, 0.5f );
+					}
+					else
+					{
+						debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+					}
+
 				}
 			}
 		}
@@ -331,6 +371,8 @@ void DebugRenderWorldToCamera( Camera* cam )
 	//AppendVerts
 	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
 	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
+	s_DebugRenderSystem->AppendIndexedVerts( XRayVertices, XRayIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
+	s_DebugRenderSystem->AppendIndexedTextVerts( XRayTextVertices, XRayTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
@@ -342,10 +384,17 @@ void DebugRenderWorldToCamera( Camera* cam )
 	//Draw
 	context->DrawIndexedVertexArray( useDepthVertices, useDepthIndices );
 
+	context->SetDepth( eDepthCompareMode::COMPARE_GREATER_THAN, eDepthWriteMode::WRITE_NONE );
+	context->DrawIndexedVertexArray( XRayVertices, XRayIndices );
+
 	//Draw Text
+	context->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	Texture const* tex = context->m_fonts[0]->GetTexture();
 	context->BindTexture( tex );
 	context->DrawIndexedVertexArray( useDepthTextVertices, useDepthTextIndices );
+
+	context->SetDepth( eDepthCompareMode::COMPARE_GREATER_THAN, eDepthWriteMode::WRITE_NONE );
+	context->DrawIndexedVertexArray( XRayTextVertices, XRayTextIndices );
 
 	context->EndCamera( *cam );
 }

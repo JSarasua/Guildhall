@@ -248,7 +248,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		Mat44 cameraView = m_camera.GetViewMatrix();
 		Vec3 cameraPos = m_camera.GetPosition();
 		MatrixInvertOrthoNormal( cameraView );
-		DebugAddWorldTextf( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_USE_DEPTH, "Non-billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
+		DebugAddWorldTextf( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_XRAY, "Non-billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
 	}
 
 	Vec3 translator;
