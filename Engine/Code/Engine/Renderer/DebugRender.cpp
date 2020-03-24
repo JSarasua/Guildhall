@@ -449,16 +449,6 @@ void DebugAddWorldTextf( Mat44 const& basis, Vec2 pivot, Rgba8 const& color, cha
 	DebugAddWorldText( basis, pivot, color, color, 0.f, DEBUG_RENDER_USE_DEPTH, text.c_str() );
 }
 
-// void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& starColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text )
-// {
-// // 	Vec3 mins = Vec3( -0.5f, -0.5f, 0.f );
-// // 	Vec3 maxs = Vec3( 0.5f, 0.5f, 0.f );
-// // 	basis.TransformPosition3D( mins );
-// // 	basis.TransformPosition3D( maxs );
-// // 
-// 
-// }
-
 void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text )
 {
 	DebugRenderObject* debugObject = new DebugRenderObject;
@@ -491,6 +481,24 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 	}
 
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& color, float duration, eDebugRenderMode mode, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddWorldBillboardText( origin, pivot, color, color, duration, mode, text.c_str() );
+}
+
+void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& color, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddWorldBillboardText( origin, pivot, color, color, 0.f, DEBUG_RENDER_USE_DEPTH, text.c_str() );
 }
 
 void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, Rgba8 const& endColor, float duration )

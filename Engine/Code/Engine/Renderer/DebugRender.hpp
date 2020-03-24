@@ -87,6 +87,8 @@ void DebugAddWorldTextf( Mat44 const& basis, Vec2 pivot, Rgba8 const& color, cha
 
 																										//billboarded
 void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text ); 
+void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& color, float duration, eDebugRenderMode mode, char const* format, ... );
+void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& color, char const* format, ... );
 //grid [EXTRA]
 
 //mesh [EXTRA]
