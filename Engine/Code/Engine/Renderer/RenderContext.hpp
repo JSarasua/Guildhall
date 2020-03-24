@@ -64,7 +64,14 @@ enum class eBufferSlot
 enum class eDepthCompareMode
 {
 	COMPARE_LESS_THAN_OR_EQUAL,
+	COMPARE_GREATER_THAN,
 	COMPARE_ALWAYS
+};
+
+enum class eDepthWriteMode
+{
+	WRITE_ALL,
+	WRITE_NONE
 };
 
 
@@ -121,7 +128,7 @@ public:
 	void BindIndexBuffer( IndexBuffer* ibo );
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
-	void SetDepth( eDepthCompareMode compareMode );
+	void SetDepth( eDepthCompareMode compareMode, eDepthWriteMode writeMode = eDepthWriteMode::WRITE_ALL );
 	void SetModelMatrix( Mat44 const& model );
 
 	Texture* GetBackBuffer();
