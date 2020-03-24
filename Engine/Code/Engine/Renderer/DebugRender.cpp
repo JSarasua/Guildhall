@@ -141,8 +141,8 @@ public:
 	void UpdateColors();
 	void AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
 	void AppendTextVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
-	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
-	void AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo );
+	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode );
+	void AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode );
 
 public:
 	RenderContext* m_context;
@@ -195,33 +195,71 @@ void DebugRenderSystem::AppendTextVerts( std::vector<Vertex_PCU>& vertexList, Ma
 	}
 }
 
-void DebugRenderSystem::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo )
+void DebugRenderSystem::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode )
 {
-	for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
+	if( renderTo == DEBUG_RENDER_TO_WORLD )
 	{
-		DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
 
-		if( nullptr != debugObject && !debugObject->m_isText )
+		for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
 		{
-			if( debugObject->m_renderTo == renderTo )
+			DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+
+			if( nullptr != debugObject && !debugObject->m_isText )
 			{
-				debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				if( debugObject->m_mode == mode || (debugObject->m_mode == DEBUG_RENDER_XRAY && mode == DEBUG_RENDER_USE_DEPTH) )
+				{
+					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				}
+			}
+		}
+	}
+	else
+	{
+		for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
+		{
+			DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+
+			if( nullptr != debugObject && !debugObject->m_isText )
+			{
+				if( debugObject->m_renderTo == DEBUG_RENDER_TO_SCREEN )
+				{
+					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				}
 			}
 		}
 	}
 }
 
-void DebugRenderSystem::AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo )
+void DebugRenderSystem::AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode )
 {
-	for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
+	if( renderTo == DEBUG_RENDER_TO_WORLD )
 	{
-		DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
 
-		if( nullptr != debugObject && debugObject->m_isText )
+		for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
 		{
-			if( debugObject->m_renderTo == renderTo )
+			DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+
+			if( nullptr != debugObject && debugObject->m_isText )
 			{
-				debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				if( debugObject->m_mode == mode || (debugObject->m_mode == DEBUG_RENDER_XRAY && mode == DEBUG_RENDER_USE_DEPTH) )
+				{
+					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				}
+			}
+		}
+	}
+	else
+	{
+		for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
+		{
+			DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+
+			if( nullptr != debugObject && debugObject->m_isText )
+			{
+				if( debugObject->m_renderTo == DEBUG_RENDER_TO_SCREEN )
+				{
+					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
+				}
 			}
 		}
 	}
@@ -283,11 +321,16 @@ void DebugRenderWorldToCamera( Camera* cam )
 	std::vector<Vertex_PCU> useDepthTextVertices;
 	std::vector<uint> useDepthTextIndices;
 
+	std::vector<Vertex_PCU> XRayVertices;
+	std::vector<uint> XRayIndices;
+	std::vector<Vertex_PCU> XRayTextVertices;
+	std::vector<uint> XRayTextIndices;
+
 	//UpdateColors
 	s_DebugRenderSystem->UpdateColors();
 	//AppendVerts
-	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
-	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
+	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
+	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
