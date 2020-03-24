@@ -271,7 +271,6 @@ void DebugRenderWorldToCamera( Camera* cam )
 	}
 
 	RenderContext* context = s_DebugRenderSystem->m_context;
-	//std::vector<DebugRenderObject*>& debugObjects = s_DebugRenderSystem->m_renderObjects;
 	std::vector<Vertex_PCU> vertices;
 	std::vector<uint> indices;
 	std::vector<Vertex_PCU> textVertices;
@@ -292,7 +291,6 @@ void DebugRenderWorldToCamera( Camera* cam )
 
 	//Draw
 	context->DrawIndexedVertexArray( vertices, indices );
-	//context->DrawIndexedVertexArray( vertices, indices );
 
 	//Draw Text
 	Texture const* tex = context->m_fonts[0]->GetTexture();
@@ -308,7 +306,8 @@ void DebugRenderScreenTo( Texture* output )
 	{
 		return;
 	}
-	
+	s_DebugRenderSystem->UpdateColors();
+
 	RenderContext* context = output->GetRenderContext();
 
 	Camera cam;
