@@ -31,7 +31,6 @@
 
 
 
-
 void RenderContext::StartUp(Window* window)
 {
 	//ID3D11Device
@@ -778,7 +777,6 @@ void RenderContext::BeginCamera( Camera& camera )
 	if( nullptr == camera.m_cameraUBO )
 	{
 		camera.m_cameraUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
-
 	}
 
 	camera.UpdateCameraUBO();
@@ -860,15 +858,12 @@ void RenderContext::DrawRing( const Vec2& center, float radius, const Rgba8& col
 		{
 			BindTexture(nullptr);
 			DrawLine( ringArray[ringIndex], ringArray[ringIndex+1], color, thickness );
-
 		}
 		else {
 			BindTexture(nullptr);
 			DrawLine( ringArray[ringIndex], ringArray[0], color, thickness );
-
 		}
 	}
-
 }
 
 void RenderContext::DrawDisc( Vec2 const& center, float radius, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness )
@@ -897,24 +892,7 @@ void RenderContext::DrawAABB2( const AABB2& aabb, const Rgba8& color, float thic
 	DrawLine(aabb.mins, Vec2(aabb.maxs.x, aabb.mins.y), color, thickness);
 	DrawLine(Vec2(aabb.maxs.x, aabb.mins.y), aabb.maxs, color, thickness);
 	DrawLine(Vec2(aabb.mins.x, aabb.maxs.y), aabb.maxs, color, thickness);
-
 }
-
-// void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color )
-// {
-// 	Vertex_PCU vertexes[6] =
-// 	{
-// 		Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
-// 		Vertex_PCU( Vec3( aabb.maxs.x, aabb.mins.y,0.f ),color,Vec2( 1.f,0.f ) ),
-// 		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
-// 
-// 		Vertex_PCU( Vec3( aabb.mins.x,aabb.mins.y,0.f ),color,Vec2( 0.f,0.f ) ),
-// 		Vertex_PCU( Vec3( aabb.maxs.x,aabb.maxs.y,0.f ),color,Vec2( 1.f,1.f ) ),
-// 		Vertex_PCU( Vec3( aabb.mins.x,aabb.maxs.y,0.f ),color,Vec2( 0.f,1.f ) )
-// 	};
-// 	//BindTexture(nullptr);
-// 	DrawVertexArray( 6, vertexes );
-// }
 
 void RenderContext::DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, float z )
 {
@@ -1035,8 +1013,6 @@ void RenderContext::CreateBlendStates()
 }
 
 //DrawText is a macro don't call it that!
-
-
 void RenderContext::DrawTextAtPosition( const char* textstring, const Vec2& textMins, float fontHeight, const Rgba8& tint /*= Rgba8::WHITE*/ )
 {
 	std::vector<Vertex_PCU> vertexArray;

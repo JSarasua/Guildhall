@@ -169,7 +169,6 @@ public:
 	void ReportLiveObjects();
 
 protected:
-
 	Texture* CreateTextureFromFile(const char* filePath);
 	BitmapFont* CreateBitMapFontFromFile( const char* filePath );
 	void CreateBlendStates();
