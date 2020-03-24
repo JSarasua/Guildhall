@@ -1052,6 +1052,11 @@ void RenderContext::DrawAlignedTextAtPosition( const char* textstring, const AAB
 
 void RenderContext::CreateDefaultRasterState()
 {
+	if( nullptr != m_rasterState )
+	{
+		DX_SAFE_RELEASE( m_rasterState );
+	}
+
 	D3D11_RASTERIZER_DESC desc; //description
 
 	desc.FillMode = D3D11_FILL_SOLID; //full triangle
