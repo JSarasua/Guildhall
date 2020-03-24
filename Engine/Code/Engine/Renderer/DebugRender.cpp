@@ -29,8 +29,8 @@ public:
 	eDebugRenderTo m_renderTo = DEBUG_RENDER_TO_WORLD;
 	Texture const* m_texture = nullptr;
 	/*GPUMesh* m_mesh = nullptr;*/
-	Vec3 pivotDim;
-	Transform m_transform;
+	Vec3 m_pivotDim;
+	Mat44 m_modelMatrix;
 	std::vector<Vertex_PCU> m_vertices;
 	std::vector<uint> m_indices;
 	bool m_isText = false;
@@ -73,10 +73,11 @@ void DebugRenderObject::UpdateColors()
 
 void DebugRenderObject::AppendVerts( std::vector<Vertex_PCU>& vertexList, Mat44 const& cameraView )
 {
-	Mat44 transformMatrix = m_transform.ToMatrix();
+	//Mat44 transformMatrix = m_transform.ToMatrix();
+	Mat44 transformMatrix = m_modelMatrix;
 	if( m_isBillBoarded )
 	{
-		Mat44 pivotTransform = Mat44::CreateTranslation3D( -pivotDim );
+		Mat44 pivotTransform = Mat44::CreateTranslation3D( -m_pivotDim );
 
 		transformMatrix.TransformBy( cameraView ); 	//Camera doesn't need to be reversed because camera is facing -Z but our append verts are already assuming drawing +Z
 		transformMatrix.TransformBy( pivotTransform );
@@ -100,14 +101,18 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 {
 	uint currentVertexListEnd = (uint)vertexList.size();
 
-	Mat44 transformMatrix = m_transform.ToMatrix();
+	//Mat44 transformMatrix = m_transform.ToMatrix();
+	Mat44 transformMatrix = m_modelMatrix;
+
 	if( m_isBillBoarded )
 	{
-		Mat44 pivotTransform = Mat44::CreateTranslation3D( -pivotDim );
+		//Mat44 pivotTransform = Mat44::CreateTranslation3D( -m_pivotDim );
 
 		transformMatrix.TransformBy( cameraView ); 	//Camera doesn't need to be reversed because camera is facing -Z but our append verts are already assuming drawing +Z
-		transformMatrix.TransformBy( pivotTransform );
+		//transformMatrix.TransformBy( pivotTransform );
 	}
+	Mat44 pivotTransform = Mat44::CreateTranslation3D( -m_pivotDim );
+	transformMatrix.TransformBy( pivotTransform );
 
 	for( size_t vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++ )
 	{
@@ -377,13 +382,49 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, R
 	debugObject->m_mode = mode;
 	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
-	debugObject->m_transform.SetPosition( pos );
+	debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
 	debugObject->m_isBillBoarded = true;
 	debugObject->m_isText = false;
 	Vertex_PCU::AppendVertsAABB2D(debugObject->m_vertices, aabb, startColor);
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
 		debugObject->m_indices.push_back((uint)vertIndex);
+	}
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isText = true;
+	debugObject->m_isBillBoarded = false;
+
+	std::string strText( text );
+	RenderContext* context = s_DebugRenderSystem->m_context;
+	Vec2 textDimensions = context->m_fonts[0]->GetDimensionsForText2D( 0.1f, strText );
+	Vec2 pivotDim = pivot * textDimensions;
+	context->m_fonts[0]->AddVertsForText2D( debugObject->m_vertices, Vec2( 0.f, 0.f ), 0.1f, std::string( text ) );
+	debugObject->m_texture = context->m_fonts[0]->GetTexture();
+
+
+	//Vec3 pivotOrigin = Vec3( origin.x, origin.y, origin.z );
+	debugObject->m_modelMatrix = basis;
+	debugObject->m_pivotDim = Vec3( pivotDim.x, pivotDim.y, 0.f );
+
+
+	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
+	}
+	for( int vertIndex = (int)debugObject->m_vertices.size() - 1; vertIndex >= 0; vertIndex-- )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
@@ -420,14 +461,18 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 
 
 	Vec3 pivotOrigin = Vec3( origin.x, origin.y, origin.z );
-	debugObject->m_transform.SetPosition( pivotOrigin );
-	debugObject->pivotDim = Vec3( pivotDim.x, pivotDim.y, 0.f );
+	debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pivotOrigin );
+	debugObject->m_pivotDim = Vec3( pivotDim.x, pivotDim.y, 0.f );
 
 
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
+// 	for( int vertIndex = (int)debugObject->m_vertices.size(); vertIndex >= 0; vertIndex-- )
+// 	{
+// 		debugObject->m_indices.push_back( (uint)vertIndex );
+// 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
@@ -440,7 +485,7 @@ void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, 
 	debugObject->m_endColor = endColor;
 	debugObject->m_duration = duration;
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
-	debugObject->m_transform.SetPosition( pos );
+	debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
 	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
 	debugObject->m_isBillBoarded = false;
 

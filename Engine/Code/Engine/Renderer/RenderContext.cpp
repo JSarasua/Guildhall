@@ -1072,7 +1072,6 @@ void RenderContext::CreateDefaultRasterState()
 
 	ID3D11Device* device = m_device;
 	device->CreateRasterizerState( &desc, &m_rasterState );
-
 }
 
 void RenderContext::SetCullMode( eCullMode cullMode )

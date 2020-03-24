@@ -16,6 +16,7 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -222,6 +223,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
+	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -239,6 +241,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num3Key.WasJustPressed() )
 	{
 		DebugAddScreenPoint( Vec2(1900, 1060.f), 10.f, Rgba8::RED, Rgba8::GREEN, 10.f );
+	}
+	if( num4Key.WasJustPressed() )
+	{
+		Mat44 cameraView = m_camera.GetViewMatrix();
+		MatrixInvertOrthoNormal( cameraView );
+		DebugAddWorldText( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::BLUE, Rgba8::GREY, 5.f, DEBUG_RENDER_USE_DEPTH, "NON-Billboarded text" );
 	}
 
 	Vec3 translator;
