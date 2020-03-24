@@ -96,8 +96,22 @@ void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 c
 /************************************************************************/
 /* Screen Rendering                                                     */
 /************************************************************************/
+//point
 void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, Rgba8 const& endColor, float duration);
+void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& color, float duration = 0.f );
+void DebugAddScreenPoint( Vec2 const& pos, Rgba8 const& color ); //assumed size
 
+//line
+void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor, Rgba8 const& endColor, float duration );
+void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration = 0.f );
+
+//Arrow
+void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor, Rgba8 const& endColor, float duration );
+void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration = 0.f );
+
+//AABB2
+void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 const& endColor, float duration );
+void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& color, float duration = 0.f );
 
 
 void DebugRenderSetScreenHeight( float height );

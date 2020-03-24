@@ -9,6 +9,7 @@
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Math/LineSegment2.hpp"
 #include <stdarg.h>
 
 static RenderContext*	s_DebugRenderContext = nullptr;
@@ -589,5 +590,43 @@ void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, 
 		debugObject->m_indices.push_back((uint)vertIndex);
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& color, float duration /*= 0.f */ )
+{
+	DebugAddScreenPoint( pos, size, color, color, duration );
+}
+
+void DebugAddScreenPoint( Vec2 const& pos, Rgba8 const& color )
+{
+	DebugAddScreenPoint( pos, 10.f, color, color, 0.f );
+}
+
+void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor, Rgba8 const& endColor, float duration )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_modelMatrix = Mat44(); //Identity
+	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_isBillBoarded = false;
+
+	LineSegment2 line = LineSegment2( p0, p1 );
+	float lineLength = line.GetLength();
+	lineLength *= 0.025f;
+	Vertex_PCU::AppendVertsLine2D( debugObject->m_vertices, line, lineLength, startColor );
+
+	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
+	}
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration /*= 0.f */ )
+{
+	DebugAddScreenLine( p0, p1, color, color, duration );
 }
 

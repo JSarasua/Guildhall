@@ -224,6 +224,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
 	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
+	const KeyButtonState& num5Key = g_theInput->GetKeyStates( '5' );
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -249,6 +250,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		Vec3 cameraPos = m_camera.GetPosition();
 		MatrixInvertOrthoNormal( cameraView );
 		DebugAddWorldTextf( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_XRAY, "Non-billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
+	}
+	if( num5Key.WasJustPressed() )
+	{
+		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
 	}
 
 	Vec3 translator;
