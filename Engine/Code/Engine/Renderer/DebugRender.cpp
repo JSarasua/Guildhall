@@ -278,16 +278,16 @@ void DebugRenderWorldToCamera( Camera* cam )
 	}
 
 	RenderContext* context = s_DebugRenderSystem->m_context;
-	std::vector<Vertex_PCU> vertices;
-	std::vector<uint> indices;
-	std::vector<Vertex_PCU> textVertices;
-	std::vector<uint> textIndices;
+	std::vector<Vertex_PCU> useDepthVertices;
+	std::vector<uint> useDepthIndices;
+	std::vector<Vertex_PCU> useDepthTextVertices;
+	std::vector<uint> useDepthTextIndices;
 
 	//UpdateColors
 	s_DebugRenderSystem->UpdateColors();
 	//AppendVerts
-	s_DebugRenderSystem->AppendIndexedVerts( vertices, indices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
-	s_DebugRenderSystem->AppendIndexedTextVerts( textVertices, textIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
+	s_DebugRenderSystem->AppendIndexedVerts( useDepthVertices, useDepthIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
+	s_DebugRenderSystem->AppendIndexedTextVerts( useDepthTextVertices, useDepthTextIndices, cam->GetViewRotationMatrix(), DEBUG_RENDER_TO_WORLD );
 	cam->m_clearMode = NO_CLEAR;
 
 	context->BeginCamera( *cam );
@@ -297,12 +297,12 @@ void DebugRenderWorldToCamera( Camera* cam )
 	context->BindShader( (Shader*)nullptr );
 
 	//Draw
-	context->DrawIndexedVertexArray( vertices, indices );
+	context->DrawIndexedVertexArray( useDepthVertices, useDepthIndices );
 
 	//Draw Text
 	Texture const* tex = context->m_fonts[0]->GetTexture();
 	context->BindTexture( tex );
-	context->DrawIndexedVertexArray( textVertices, textIndices );
+	context->DrawIndexedVertexArray( useDepthTextVertices, useDepthTextIndices );
 
 	context->EndCamera( *cam );
 }
