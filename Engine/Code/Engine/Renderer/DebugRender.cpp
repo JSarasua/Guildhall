@@ -41,15 +41,6 @@ public:
 
 void DebugRenderObject::UpdateColors()
 {
-	float startR	= (float)m_startColor.r;
-	float startG	= (float)m_startColor.g;
-	float startB	= (float)m_startColor.b;
-	float startA	= (float)m_startColor.a;
-	float endR		= (float)m_endColor.r;
-	float endG		= (float)m_endColor.g;
-	float endB		= (float)m_endColor.b;
-	float endA		= (float)m_endColor.a;
-
 	float duration = (float)m_timer.GetElapsedSeconds();
 	float totalTime = duration + (float)m_timer.GetSecondsRemaining();
 	float lerpValue = 1.f;
@@ -59,12 +50,7 @@ void DebugRenderObject::UpdateColors()
 		lerpValue = duration / totalTime;
 	}
 
-	unsigned char lerpR = (unsigned char)Interpolate( startR, endR, lerpValue );
-	unsigned char lerpG = (unsigned char)Interpolate( startG, endG, lerpValue );
-	unsigned char lerpB = (unsigned char)Interpolate( startB, endB, lerpValue );
-	unsigned char lerpA = (unsigned char)Interpolate( startA, endA, lerpValue );
-
-	Rgba8 color = Rgba8( lerpR, lerpG, lerpB, lerpA );
+	Rgba8 color = Rgba8::LerpColorTo( m_startColor, m_endColor, lerpValue );
 
 	for( size_t vertIndex = 0; vertIndex < m_vertices.size(); vertIndex++ )
 	{
