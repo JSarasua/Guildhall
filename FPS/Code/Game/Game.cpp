@@ -225,6 +225,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
 	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
 	const KeyButtonState& num5Key = g_theInput->GetKeyStates( '5' );
+	const KeyButtonState& num6Key = g_theInput->GetKeyStates( '6' );
+	const KeyButtonState& num7Key = g_theInput->GetKeyStates( '7' );
+	const KeyButtonState& num8Key = g_theInput->GetKeyStates( '8' );
+	const KeyButtonState& num9Key = g_theInput->GetKeyStates( '9' );
+	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -252,6 +257,28 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		DebugAddWorldTextf( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_XRAY, "Non-billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
 	}
 	if( num5Key.WasJustPressed() )
+	{
+		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+	}
+	if( num6Key.WasJustPressed() )
+	{
+		DebugAddScreenAABB2( AABB2( 10.f, 10.f, 200.f, 200.f ), Rgba8::RED, Rgba8::GREEN, 10.f );
+	}
+	if( num7Key.WasJustPressed() )
+	{
+		Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
+		AABB2 aabb(0.2f, 0.2f, .8f, .8f);
+		DebugAddScreenTexturedQuad( AABB2( 500.f, 300.f, 700.f, 500.f ), tex, aabb, Rgba8::WHITE, Rgba8::BLACK, 5.f );
+	}
+	if( num8Key.WasJustPressed() )
+	{
+		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+	}
+	if( num9Key.WasJustPressed() )
+	{
+		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+	}
+	if( num0Key.WasJustPressed() )
 	{
 		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
 	}

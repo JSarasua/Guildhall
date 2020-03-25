@@ -132,10 +132,13 @@ public:
 	void AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode );
 	void AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode );
 
+	void DrawTexturedObjects( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode );
+
 public:
 	RenderContext* m_context;
 	Texture const* m_fontText = nullptr;
 	std::vector<DebugRenderObject*> m_renderObjects;
+	std::vector<DebugRenderObject*> m_texturedRenderObjects;
 	bool m_isDebugRenderingEnabled = false;
 	float m_screenHeight = 1080.f;
 };
@@ -145,6 +148,15 @@ void DebugRenderSystem::UpdateColors()
 	for( size_t debugObjectIndex = 0; debugObjectIndex < m_renderObjects.size(); debugObjectIndex++ )
 	{
 		DebugRenderObject* debugObject = m_renderObjects[debugObjectIndex];
+		if( nullptr != debugObject )
+		{
+			debugObject->UpdateColors();
+		}
+	}
+
+	for( size_t debugObjectIndex = 0; debugObjectIndex < m_texturedRenderObjects.size(); debugObjectIndex++ )
+	{
+		DebugRenderObject* debugObject = m_texturedRenderObjects[debugObjectIndex];
 		if( nullptr != debugObject )
 		{
 			debugObject->UpdateColors();
@@ -269,6 +281,32 @@ void DebugRenderSystem::AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexL
 				{
 					debugObject->AppendIndexedVerts( vertexList, indexList, cameraView );
 				}
+			}
+		}
+	}
+}
+
+void DebugRenderSystem::DrawTexturedObjects( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode )
+{
+	if( nullptr == context )
+	{
+		return;
+	}
+
+	for( size_t debugObjectIndex = 0; debugObjectIndex < m_texturedRenderObjects.size(); debugObjectIndex++ )
+	{
+		DebugRenderObject* debugObject = m_texturedRenderObjects[debugObjectIndex];
+		if( nullptr != debugObject )
+		{
+			if( debugObject->m_renderTo == renderTo && debugObject->m_mode == renderMode )
+			{
+				std::vector<Vertex_PCU> vertexList;
+				std::vector<uint> indexList;
+				debugObject->AppendIndexedVerts( vertexList, indexList, cameraModel );
+
+				Texture const* tex = debugObject->m_texture;
+				context->BindTexture( tex );
+				context->DrawIndexedVertexArray( vertexList, indexList );
 			}
 		}
 	}
@@ -428,6 +466,8 @@ void DebugRenderScreenTo( Texture* output )
 	context->BindTexture( tex );
 	context->DrawIndexedVertexArray( textVertices, textIndices );
 
+	s_DebugRenderSystem->DrawTexturedObjects( context, cam.GetViewRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+
 	context->EndCamera( cam );
 
 
@@ -438,16 +478,29 @@ void DebugRenderEndFrame()
 	std::vector<DebugRenderObject*>& debugObjects = s_DebugRenderSystem->m_renderObjects;
 	for( size_t debugIndex = 0; debugIndex < debugObjects.size(); debugIndex++ )
 	{
-		Timer& objTimer = debugObjects[debugIndex]->m_timer;
-		if( nullptr != &objTimer )
+		if( nullptr != debugObjects[debugIndex] )
 		{
+			Timer& objTimer = debugObjects[debugIndex]->m_timer;
 			if( objTimer.HasElapsed() )
 			{
 				delete debugObjects[debugIndex];
 				debugObjects[debugIndex] = nullptr;
 			}
 		}
+	}
 
+	std::vector<DebugRenderObject*>& texturedDebugObjects = s_DebugRenderSystem->m_texturedRenderObjects;
+	for( size_t debugIndex = 0; debugIndex < texturedDebugObjects.size(); debugIndex++ )
+	{
+		if( nullptr != texturedDebugObjects[debugIndex] )
+		{
+			Timer& objTimer = texturedDebugObjects[debugIndex]->m_timer;
+			if( objTimer.HasElapsed() )
+			{
+				delete texturedDebugObjects[debugIndex];
+				texturedDebugObjects[debugIndex] = nullptr;
+			}
+		}
 	}
 }
 
@@ -590,6 +643,7 @@ void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, 
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
 	debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
 	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
 	debugObject->m_isBillBoarded = false;
 
 	Vertex_PCU::AppendVertsAABB2D( debugObject->m_vertices, aabb, startColor );
@@ -619,6 +673,7 @@ void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
 	debugObject->m_modelMatrix = Mat44(); //Identity
 	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
 	debugObject->m_isBillBoarded = false;
 
 	LineSegment2 line = LineSegment2( p0, p1 );
@@ -657,6 +712,7 @@ void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 co
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
 	debugObject->m_modelMatrix = Mat44(); //Identity
 	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
 	debugObject->m_isBillBoarded = false;
 	Vertex_PCU::AppendVertsAABB2D( debugObject->m_vertices, bounds, startColor );
 
@@ -681,6 +737,7 @@ void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const&
 	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
 	debugObject->m_modelMatrix = Mat44(); //Identity
 	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
 	debugObject->m_isBillBoarded = false;
 	debugObject->m_texture = tex;
 	Vertex_PCU::AppendVertsAABB2D( debugObject->m_vertices, bounds, startTint, uvs );
@@ -689,7 +746,7 @@ void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const&
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->m_texturedRenderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& tint, float duration /*= 0.f */ )
