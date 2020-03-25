@@ -22,6 +22,26 @@ Vec4::Vec4( float initialX, float initialY, float initialZ, float initialW )
 }
 
 
+const bool Vec4::operator==( Vec4 const& b )
+{
+	if( x == b.x && y == b.y && z == b.z && w == b.w )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+const bool Vec4::operator!=( Vec4 const& b )
+{
+	if( *this == b )
+	{
+		return false;
+	}
+
+	return true;
+}
+
 const Vec4 Vec4::operator/( float inverseScale ) const
 {
 	Vec4 newVec;

@@ -11,6 +11,7 @@ class Transform;
 
 struct Mat44;
 struct Vec3;
+struct Vec4;
 struct Rgba8;
 struct LineSegment3;
 
@@ -122,7 +123,11 @@ void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const&
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& tint, float duration = 0.f );
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex ); //UVs assumed to be 0 to 1
 
-
+void DebugAddScreenText( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* text );
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* format, ... );
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, float duration, char const* format, ... );
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, char const* format, ... );
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color, char const* format, ... );
 
 void DebugRenderSetScreenHeight( float height );
 AABB2 DebugGetScreenBounds();

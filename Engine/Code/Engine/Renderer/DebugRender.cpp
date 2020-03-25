@@ -11,6 +11,7 @@
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/LineSegment2.hpp"
+#include "Engine/Math/Vec4.hpp"
 #include <stdarg.h>
 
 static RenderContext*	s_DebugRenderContext = nullptr;
@@ -35,6 +36,7 @@ public:
 	Texture const* m_texture = nullptr;
 	GPUMesh* m_mesh = nullptr;
 	Vec3 m_pivotDim;
+	Vec4 m_screenLocation;
 	Mat44 m_modelMatrix;
 	std::vector<Vertex_PCU> m_vertices;
 	std::vector<uint> m_indices;
@@ -96,8 +98,20 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 {
 	uint currentVertexListEnd = (uint)vertexList.size();
 
-	//Mat44 transformMatrix = m_transform.ToMatrix();
 	Mat44 transformMatrix = m_modelMatrix;
+	Mat44 screenTranslation;
+	if( m_screenLocation != Vec4() )
+	{
+		AABB2 screenBounds = DebugGetScreenBounds();
+		Vec2 relativePos;
+		relativePos.x = screenBounds.maxs.x * m_screenLocation.x;
+		relativePos.y = screenBounds.maxs.y * m_screenLocation.y;
+
+		Vec2 relativeOffset = Vec2( m_screenLocation.z, m_screenLocation.w );
+
+		Vec2 absolutePos = relativePos + relativeOffset;
+		screenTranslation = Mat44::CreateTranslationXY( absolutePos );
+	}
 
 	if( m_isBillBoarded )
 	{
@@ -106,6 +120,8 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 		transformMatrix.TransformBy( cameraView ); 	//Camera doesn't need to be reversed because camera is facing -Z but our append verts are already assuming drawing +Z
 		//transformMatrix.TransformBy( pivotTransform );
 	}
+
+	transformMatrix.TransformBy( screenTranslation );
 	Mat44 pivotTransform = Mat44::CreateTranslation3D( -m_pivotDim );
 	transformMatrix.TransformBy( pivotTransform );
 
@@ -150,6 +166,7 @@ public:
 	std::vector<DebugRenderObject*> m_meshObjects;
 	bool m_isDebugRenderingEnabled = false;
 	float m_screenHeight = 1080.f;
+	float m_aspectRatio = 0.f;
 
 	GPUMesh* m_cubeMesh;
 	GPUMesh* m_sphereMesh;
@@ -525,7 +542,15 @@ void DebugRenderScreenTo( Texture* output )
 	cam.SetClearMode( NO_CLEAR, Rgba8::BLACK );
 
 	Vec2 outputDimensions = Vec2(output->GetTexelSize());
-	float aspectRatio = outputDimensions.x / outputDimensions.y;
+	
+
+	if( s_DebugRenderSystem->m_aspectRatio == 0.f )
+	{
+		float aspectRatio = outputDimensions.x / outputDimensions.y;
+		s_DebugRenderSystem->m_aspectRatio = aspectRatio;
+	}
+
+	float aspectRatio = s_DebugRenderSystem->m_aspectRatio;
 	float screenHeight = s_DebugRenderSystem->m_screenHeight;
 
 	Vec2 max( aspectRatio * screenHeight, screenHeight );
@@ -898,5 +923,68 @@ void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const&
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex )
 {
 	DebugAddScreenTexturedQuad( bounds, tex, AABB2(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
+}
+
+void DebugAddScreenText( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* text )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isText = true;
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_screenLocation = pos;
+
+
+	std::string strText( text );
+	RenderContext* context = s_DebugRenderSystem->m_context;
+	Vec2 textDimensions = context->m_fonts[0]->GetDimensionsForText2D( textSize, strText );
+	Vec2 pivotDim = pivot * textDimensions;
+	context->m_fonts[0]->AddVertsForText2D( debugObject->m_vertices, Vec2( 0.f, 0.f ), textSize, std::string( text ) );
+	debugObject->m_texture = context->m_fonts[0]->GetTexture();
+	debugObject->m_pivotDim = Vec3( pivotDim.x, pivotDim.y, 0.f );
+
+
+	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
+	}
+
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* format, ... )
+// {
+// 
+// }
+// 
+// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, float duration, char const* format, ... )
+// {
+// 
+// }
+// 
+// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, char const* format, ... )
+// {
+// 
+// }
+// 
+// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color, char const* format, ... )
+// {
+// 
+// }
+
+void DebugRenderSetScreenHeight( float height )
+{
+	s_DebugRenderSystem->m_screenHeight = height;
+}
+
+AABB2 DebugGetScreenBounds()
+{
+	float height = s_DebugRenderSystem->m_screenHeight;
+	float width = height * s_DebugRenderSystem->m_aspectRatio;
+	return AABB2( 0.f, 0.f, width, height );
 }
 

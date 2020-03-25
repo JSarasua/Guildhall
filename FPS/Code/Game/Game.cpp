@@ -247,7 +247,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num3Key.WasJustPressed() )
 	{
-		DebugAddScreenPoint( Vec2(1900, 1060.f), 10.f, Rgba8::RED, Rgba8::GREEN, 10.f );
+		AABB2 aabb = DebugGetScreenBounds();
+		Vec2 maxs = aabb.maxs;
+		maxs -= Vec2( 60.f, 80.f );
+		DebugAddScreenPoint( maxs, 50.f, Rgba8::RED, Rgba8::GREEN, 10.f );
 	}
 	if( num4Key.WasJustPressed() )
 	{
@@ -283,7 +286,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num0Key.WasJustPressed() )
 	{
-		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+		DebugAddScreenText( Vec4( 1.f, 1.f, -20.f, -20.f ), Vec2( 1.f, 1.f ), 20.f, Rgba8::RED, Rgba8::GREEN, 10.f, "Screen Text" );
 	}
 
 	Vec3 translator;
