@@ -96,6 +96,7 @@ float GetTurnedToward(float oldOrientationDegrees, float newOrientationDegrees, 
 
 
 float DotProduct2D(const Vec2& vecA, const Vec2& vecB);
+Vec3 CrossProduct( Vec3 const& a, Vec3 const& b );
 
 float SmoothStart2( float t );	// [0, 1] quadratic ease-in
 float SmoothStart3( float t );	// [0, 1] cubic ease-in

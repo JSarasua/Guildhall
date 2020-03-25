@@ -844,6 +844,16 @@ float DotProduct2D( const Vec2& vecA, const Vec2& vecB )
 	return vecA.x*vecB.x + vecA.y*vecB.y;
 }
 
+Vec3 CrossProduct( Vec3 const& a, Vec3 const& b )
+{
+	float x = a.y*b.z - a.z*b.y;
+	float y = a.z*b.x - a.x*b.z;
+	float z = a.x*b.y - a.y*b.x;
+
+	Vec3 c = Vec3( x, y, z );
+	return c;
+}
+
 float SmoothStart2( float t )
 {
 	float smoothStart2 = t*t;
