@@ -286,7 +286,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num0Key.WasJustPressed() )
 	{
-		DebugAddScreenText( Vec4( 1.f, 1.f, -20.f, -20.f ), Vec2( 1.f, 1.f ), 20.f, Rgba8::RED, Rgba8::GREEN, 10.f, "Screen Text" );
+		Vec4 pos( 1.f, 1.f, -20.f, -20.f );
+		DebugAddScreenTextf( pos, Vec2( 1.f, 1.f ), 20.f, Rgba8::RED, Rgba8::GREEN, 10.f, "Screen Text Location: %.1f, %.1f, %.1f, %.1f", pos.x, pos.y, pos.z, pos.w );
 	}
 
 	Vec3 translator;

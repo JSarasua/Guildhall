@@ -956,25 +956,41 @@ void DebugAddScreenText( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgb
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
-// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* format, ... )
-// {
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddScreenText( pos, pivot, textSize, startColor, endColor, duration, text.c_str() );
+}
 // 
-// }
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, float duration, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddScreenText( pos, pivot, textSize, color, color, duration, text.c_str() );
+}
 // 
-// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, float duration, char const* format, ... )
-// {
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddScreenText( pos, pivot, textSize, color, color, 0.f, text.c_str() );
+}
 // 
-// }
-// 
-// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, char const* format, ... )
-// {
-// 
-// }
-// 
-// void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color, char const* format, ... )
-// {
-// 
-// }
+void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color, char const* format, ... )
+{
+	va_list args;
+	va_start( args, format );
+	std::string text = Stringv( format, args );
+
+	DebugAddScreenText( pos, pivot, 10.f, color, color, 0.f, text.c_str() );
+}
 
 void DebugRenderSetScreenHeight( float height )
 {
