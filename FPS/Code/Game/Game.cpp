@@ -230,6 +230,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num8Key = g_theInput->GetKeyStates( '8' );
 	const KeyButtonState& num9Key = g_theInput->GetKeyStates( '9' );
 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
+	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
+	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
+
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -288,6 +291,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		Vec4 pos( 1.f, 1.f, -20.f, -20.f );
 		DebugAddScreenTextf( pos, Vec2( 1.f, 1.f ), 20.f, Rgba8::RED, Rgba8::GREEN, 10.f, "Screen Text Location: %.1f, %.1f, %.1f, %.1f", pos.x, pos.y, pos.z, pos.w );
+	}
+	if( lBracketKey.WasJustPressed() )
+	{
+		DebugAddScreenArrow( Vec2( 100.f, 100.f ), Vec2( 200.f, 250. ), Rgba8::RED, Rgba8::BLUE, 10.f );
+	}
+	if( rBracketKey.WasJustPressed() )
+	{
+
 	}
 
 	Vec3 translator;

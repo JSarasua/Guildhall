@@ -844,8 +844,8 @@ void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor
 
 	LineSegment2 line = LineSegment2( p0, p1 );
 	float lineLength = line.GetLength();
-	lineLength *= 0.025f;
-	Vertex_PCU::AppendVertsLine2D( debugObject->m_vertices, line, lineLength, startColor );
+	float lineThickness = lineLength * .01f;
+	Vertex_PCU::AppendVertsLine2D( debugObject->m_vertices, line, lineThickness, startColor );
 
 	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
 	{
@@ -859,15 +859,48 @@ void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, flo
 	DebugAddScreenLine( p0, p1, color, color, duration );
 }
 
-// void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor, Rgba8 const& endColor, float duration )
-// {
-// 
-// }
-// 
-// void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration /*= 0.f */ )
-// {
-// 
-// }
+void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor, Rgba8 const& endColor, float duration )
+{
+
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_modelMatrix = Mat44(); //Identity
+	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
+	debugObject->m_isBillBoarded = false;
+
+	LineSegment2 line( p0, p1 );
+	Vec2 normalizedDisplacement = (line.endPosition - line.startPosition).GetNormalized();
+	float lineLength = line.GetLength();
+	float lineThickness = lineLength * .025f;
+	float radius = lineThickness * 5.f;
+	Vec2 fwd = normalizedDisplacement * radius;
+	Vec2 leftVec = fwd.GetRotated90Degrees();
+	Vec2 endLeft = line.endPosition + leftVec;
+	Vec2 endRight= line.endPosition + -leftVec;
+	Vec2 endHead = line.endPosition + fwd;
+
+	Vertex_PCU::AppendVertsLine2D( debugObject->m_vertices, line, lineThickness, startColor );
+	debugObject->m_vertices.push_back( Vertex_PCU( Vec3(endRight), startColor, Vec2() ) );
+	debugObject->m_vertices.push_back( Vertex_PCU( Vec3(endHead), startColor, Vec2() ) );
+	debugObject->m_vertices.push_back( Vertex_PCU( Vec3(endLeft), startColor, Vec2() ) );
+
+	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
+	}
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration /*= 0.f */ )
+{
+	DebugAddScreenArrow( p0, p1, color, color, duration );
+}
+
+
 
 void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 const& endColor, float duration )
 {
