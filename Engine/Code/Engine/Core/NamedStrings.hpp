@@ -3,6 +3,7 @@
 #include <string>
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/vec2.hpp"
+#include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 
@@ -23,6 +24,7 @@ public:
 	std::string	GetValue( const std::string& keyName, const char* defaultValue ) const;
 	Rgba8		GetValue( const std::string& keyName, const Rgba8& defaultValue ) const;
 	Vec2		GetValue( const std::string& keyName, const Vec2& defaultValue ) const;
+	Vec3		GetValue( const std::string& keyName, const Vec3& defaultValue ) const;
 	IntVec2		GetValue( const std::string& keyName, const IntVec2& defaultValue ) const;
 	std::vector<std::string> GetAllValues() const;
 

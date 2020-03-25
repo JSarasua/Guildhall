@@ -131,6 +131,20 @@ IntVec2 NamedStrings::GetValue( const std::string& keyName, const IntVec2& defau
 	return value;
 }
 
+Vec3 NamedStrings::GetValue( const std::string& keyName, const Vec3& defaultValue ) const
+{
+	Vec3 value = defaultValue;
+
+	MapStringConstIterator keyValueIterator = m_keyValuePairs.find( keyName );
+	if( keyValueIterator != m_keyValuePairs.cend() )
+	{
+		value.SetFromText( keyValueIterator->second.c_str() );
+	}
+
+
+	return value;
+}
+
 std::vector<std::string> NamedStrings::GetAllValues() const
 {
 	std::vector<std::string> allNamedStrings;

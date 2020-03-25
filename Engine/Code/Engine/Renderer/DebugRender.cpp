@@ -397,6 +397,15 @@ void DebugRenderSystemStartup( RenderContext* context )
 {
 	s_DebugRenderSystem = new DebugRenderSystem();
 	s_DebugRenderSystem->m_context = context;
+
+	g_theEventSystem->SubscribeToEvent("debug_render", CONSOLECOMMAND, SetDebugRenderEnabled );
+	g_theEventSystem->SubscribeToEvent("debug_add_world_point", CONSOLECOMMAND, DebugAddWorldPoint );
+	g_theEventSystem->SubscribeToEvent("debug_add_world_wire_sphere", CONSOLECOMMAND, DebugAddWorldWireSphere );
+	g_theEventSystem->SubscribeToEvent("debug_add_world_wire_bounds", CONSOLECOMMAND, DebugAddWorldWireBounds );
+	g_theEventSystem->SubscribeToEvent("debug_add_world_billboard_text", CONSOLECOMMAND, DebugAddWorldBillboardText );
+	g_theEventSystem->SubscribeToEvent("debug_add_screen_point", CONSOLECOMMAND, DebugAddScreenPoint );
+	g_theEventSystem->SubscribeToEvent("debug_add_screen_quad", CONSOLECOMMAND, DebugAddScreenQuad );
+	g_theEventSystem->SubscribeToEvent("debug_add_screen_text", CONSOLECOMMAND, DebugAddScreenText );
 	//s_DebugRenderSystem->m_fontText = context->m_fonts[0]->GetTexture();
 
 
@@ -652,6 +661,16 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, R
 		debugObject->m_indices.push_back((uint)vertIndex);
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldPoint( pos, size, color, color, duration, mode );
+}
+
+void DebugAddWorldPoint( Vec3 const& pos, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldPoint( pos, 10.f, color, color, duration, mode );
 }
 
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -1035,5 +1054,112 @@ AABB2 DebugGetScreenBounds()
 	float height = s_DebugRenderSystem->m_screenHeight;
 	float width = height * s_DebugRenderSystem->m_aspectRatio;
 	return AABB2( 0.f, 0.f, width, height );
+}
+
+bool SetDebugRenderEnabled( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		bool argValue = args->GetValue( std::string( "enabled" ), true );
+
+		s_DebugRenderSystem->m_isDebugRenderingEnabled = argValue;
+	}
+
+	return true;
+}
+
+bool DebugAddWorldPoint( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+ 		Vec3 argPosition = args->GetValue( std::string( "position" ), Vec3() );
+ 		float argDuration = args->GetValue( std::string( "duration" ), 0.f );
+ 		DebugAddWorldPoint( argPosition, Rgba8::WHITE, argDuration );
+	}
+
+	return true;
+}
+
+bool DebugAddWorldWireSphere( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec3 argPosition = args->GetValue( std::string( "position" ), Vec3() );
+		float argRadius = args->GetValue( std::string( "radius" ), 1.f );
+		float argDuration = args->GetValue( std::string( "duration" ), 0.f );
+		DebugAddWorldWireSphere( argPosition, argRadius, Rgba8::WHITE, Rgba8::WHITE, argDuration );
+	}
+
+	return true;
+}
+
+bool DebugAddWorldWireBounds( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec3 argMin = args->GetValue( std::string( "min" ), Vec3() );
+		Vec3 argMax = args->GetValue( std::string( "max" ), Vec3() );
+		Vec3 diff = argMax - argMin;
+/*		Vec3 halfDiff = 0.5f * diff;*/
+		Transform transform;
+		transform.SetPosition( diff + argMin );
+		transform.SetNonUniformScale( diff );
+		float argDuration = args->GetValue( std::string( "duration" ), 0.f );
+		DebugAddWorldWireBounds( transform, Rgba8::WHITE, Rgba8::WHITE, argDuration );
+	}
+	return true;
+}
+
+bool DebugAddWorldBillboardText( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec3 argPosition = args->GetValue( std::string( "position" ), Vec3() );
+		Vec2 argPivot = args->GetValue( std::string( "radius" ), Vec2() );
+		std::string argString = args->GetValue( std::string( "text" ), std::string("") );
+		DebugAddWorldBillboardText( argPosition, argPivot, Rgba8::WHITE, Rgba8::WHITE, 1.f, DEBUG_RENDER_USE_DEPTH, argString.c_str() );
+	}
+
+	return true;
+}
+
+bool DebugAddScreenPoint( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec2 argPosition = args->GetValue( std::string( "position" ), Vec2() );
+		float argDuration = args->GetValue( std::string( "duration" ), 0.f );
+		DebugAddScreenPoint( argPosition, 10.f, Rgba8::WHITE, argDuration );
+	}
+
+	return true;
+}
+
+bool DebugAddScreenQuad( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec2 argMin = args->GetValue( std::string( "min" ), Vec2() );
+		Vec2 argMax = args->GetValue( std::string( "max" ), Vec2(1.f, 1.f) );
+		float argDuration = args->GetValue( std::string( "duration" ), 0.f );
+
+		AABB2 aabb( argMin, argMax );
+		DebugAddScreenAABB2( aabb, Rgba8::WHITE, argDuration );
+	}
+
+	return true;
+}
+
+bool DebugAddScreenText( const EventArgs* args )
+{
+	if( nullptr != args )
+	{
+		Vec2 argPosition = args->GetValue( std::string( "position" ), Vec2() );
+		Vec2 argPivot = args->GetValue( std::string( "radius" ), Vec2() );
+		std::string argString = args->GetValue( std::string( "text" ), std::string( "" ) );
+		Vec4 pos = Vec4( 0.f, 0.f, argPosition.x, argPosition.y );
+		DebugAddScreenTextf( pos, argPivot, Rgba8::WHITE, argString.c_str() );
+	}
+	return true;
 }
 

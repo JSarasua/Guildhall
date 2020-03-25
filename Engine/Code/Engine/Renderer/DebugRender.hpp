@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 /*
  *	TYPES
@@ -132,4 +133,13 @@ void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color
 void DebugRenderSetScreenHeight( float height );
 AABB2 DebugGetScreenBounds();
 
+
+bool SetDebugRenderEnabled( const EventArgs* args );
+bool DebugAddWorldPoint( const EventArgs* args );
+bool DebugAddWorldWireSphere( const EventArgs* args );
+bool DebugAddWorldWireBounds( const EventArgs* args );
+bool DebugAddWorldBillboardText( const EventArgs* args );
+bool DebugAddScreenPoint( const EventArgs* args );
+bool DebugAddScreenQuad( const EventArgs* args );
+bool DebugAddScreenText( const EventArgs* args );
 
