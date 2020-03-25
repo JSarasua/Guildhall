@@ -402,10 +402,46 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 	m_context->PSSetConstantBuffers( slot, 1, &uboHandle );
 }
 
-void RenderContext::SetModelMatrix( Mat44 const& model )
+void RenderContext::SetModelMatrix( Mat44 const& model, Rgba8 const& tint )
 {
 	ModelData modelData;
 	modelData.model = model;
+
+	float tintFloatArray[4];
+	tint.ToFloatArray( tintFloatArray );
+	tint.ToFloatArray( modelData.tint );
+	modelData.tint[0] /= 255.f;
+	modelData.tint[1] /= 255.f;
+	modelData.tint[2] /= 255.f;
+	modelData.tint[3] /= 255.f;
+
+	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
+void RenderContext::SetModelTint( Rgba8 const& tint )
+{
+	float tintFloatArray[4];
+	tint.ToFloatArray( tintFloatArray );
+
+	ModelData modelData;
+	tint.ToFloatArray( modelData.tint );
+	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
+void RenderContext::SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint )
+{
+	ModelData modelData;
+	modelData.model = model;
+
+	float tintFloatArray[4];
+	tint.ToFloatArray( tintFloatArray );
+	tint.ToFloatArray( modelData.tint );
+	modelData.tint[0] /= 255.f;
+	modelData.tint[1] /= 255.f;
+	modelData.tint[2] /= 255.f;
+	modelData.tint[3] /= 255.f;
+
+
 	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
 }
 

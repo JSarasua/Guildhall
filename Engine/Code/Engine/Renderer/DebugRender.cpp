@@ -8,6 +8,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/LineSegment2.hpp"
 #include <stdarg.h>
@@ -27,11 +28,12 @@ public:
 
 	Rgba8 m_startColor = Rgba8::WHITE;
 	Rgba8 m_endColor = Rgba8::WHITE;
+	Rgba8 m_meshColor = Rgba8::WHITE;
 	float m_duration = 0.f;
 	eDebugRenderMode m_mode = DEBUG_RENDER_USE_DEPTH;
 	eDebugRenderTo m_renderTo = DEBUG_RENDER_TO_WORLD;
 	Texture const* m_texture = nullptr;
-	/*GPUMesh* m_mesh = nullptr;*/
+	GPUMesh* m_mesh = nullptr;
 	Vec3 m_pivotDim;
 	Mat44 m_modelMatrix;
 	std::vector<Vertex_PCU> m_vertices;
@@ -56,6 +58,11 @@ void DebugRenderObject::UpdateColors()
 	for( size_t vertIndex = 0; vertIndex < m_vertices.size(); vertIndex++ )
 	{
 		m_vertices[vertIndex].tint = color;
+	}
+
+	if( nullptr != m_mesh )
+	{
+		m_meshColor = color;
 	}
 }
 
@@ -133,14 +140,19 @@ public:
 	void AppendIndexedTextVerts( std::vector<Vertex_PCU>& vertexList, std::vector<uint>& indexList, Mat44 const& cameraView, eDebugRenderTo renderTo, eDebugRenderMode mode );
 
 	void DrawTexturedObjects( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode );
+	void DrawMeshes( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode );
 
 public:
 	RenderContext* m_context;
 	Texture const* m_fontText = nullptr;
 	std::vector<DebugRenderObject*> m_renderObjects;
 	std::vector<DebugRenderObject*> m_texturedRenderObjects;
+	std::vector<DebugRenderObject*> m_meshObjects;
 	bool m_isDebugRenderingEnabled = false;
 	float m_screenHeight = 1080.f;
+
+	GPUMesh* m_cubeMesh;
+	GPUMesh* m_sphereMesh;
 };
 
 void DebugRenderSystem::UpdateColors()
@@ -157,6 +169,15 @@ void DebugRenderSystem::UpdateColors()
 	for( size_t debugObjectIndex = 0; debugObjectIndex < m_texturedRenderObjects.size(); debugObjectIndex++ )
 	{
 		DebugRenderObject* debugObject = m_texturedRenderObjects[debugObjectIndex];
+		if( nullptr != debugObject )
+		{
+			debugObject->UpdateColors();
+		}
+	}
+
+	for( size_t debugObjectIndex = 0; debugObjectIndex < m_meshObjects.size(); debugObjectIndex++ )
+	{
+		DebugRenderObject* debugObject = m_meshObjects[debugObjectIndex];
 		if( nullptr != debugObject )
 		{
 			debugObject->UpdateColors();
@@ -312,6 +333,34 @@ void DebugRenderSystem::DrawTexturedObjects( RenderContext* context, Mat44 const
 	}
 }
 
+void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode )
+{
+	UNUSED( cameraModel );
+	if( nullptr == context )
+	{
+		return;
+	}
+
+	context->BindTexture( nullptr );
+	context->SetFillMode( eFillMode::FILL_WIREFRAME );
+	for( size_t debugObjectIndex = 0; debugObjectIndex < m_meshObjects.size(); debugObjectIndex++ )
+	{
+		DebugRenderObject* debugObject = m_meshObjects[debugObjectIndex];
+		if( nullptr != debugObject )
+		{
+			if( debugObject->m_renderTo == renderTo && debugObject->m_mode == renderMode )
+			{
+				GPUMesh* mesh = debugObject->m_mesh;
+				Mat44 modelMatrix = debugObject->m_modelMatrix;
+				context->SetModelMatrix( modelMatrix, debugObject->m_meshColor );
+
+				context->DrawMesh( mesh );
+			}
+		}
+	}
+	context->SetFillMode( eFillMode::FILL_SOLID );
+}
+
 static DebugRenderSystem* s_DebugRenderSystem = nullptr;
 
 /************************************************************************/
@@ -322,6 +371,24 @@ void DebugRenderSystemStartup( RenderContext* context )
 	s_DebugRenderSystem = new DebugRenderSystem();
 	s_DebugRenderSystem->m_context = context;
 	//s_DebugRenderSystem->m_fontText = context->m_fonts[0]->GetTexture();
+
+
+	s_DebugRenderSystem->m_cubeMesh = new GPUMesh( context );
+	std::vector<Vertex_PCU> cubeVerts;
+	std::vector<uint> cubeIndices;
+
+	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+	s_DebugRenderSystem->m_cubeMesh->UpdateVertices( cubeVerts );
+	s_DebugRenderSystem->m_cubeMesh->UpdateIndices( cubeIndices );
+
+	s_DebugRenderSystem->m_sphereMesh = new GPUMesh( context );
+	std::vector<Vertex_PCU> sphereVerts;
+	std::vector<uint> sphereIndices;
+
+
+	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3( 0.f, 0.f, 0.f ), 1.f, 64, 64, Rgba8::WHITE );
+	s_DebugRenderSystem->m_sphereMesh->UpdateVertices( sphereVerts );
+	s_DebugRenderSystem->m_sphereMesh->UpdateIndices( sphereIndices );
 }
 
 void DebugRenderSystemShutdown()
@@ -333,6 +400,12 @@ void DebugRenderSystemShutdown()
 		debugObjects[renderObjectIndex] = nullptr;
 	}
 	debugObjects.clear();
+
+	delete s_DebugRenderSystem->m_cubeMesh;
+	s_DebugRenderSystem->m_cubeMesh = nullptr;
+
+	delete s_DebugRenderSystem->m_sphereMesh;
+	s_DebugRenderSystem->m_sphereMesh = nullptr;
 }
 
 void EnableDebugRendering()
@@ -417,6 +490,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_NONE );
 	context->DrawIndexedVertexArray( AlwaysTextVertices, AlwaysTextIndices );
 
+	s_DebugRenderSystem->DrawMeshes( context, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
 
 	context->EndCamera( *cam );
 }
@@ -502,6 +576,20 @@ void DebugRenderEndFrame()
 			}
 		}
 	}
+
+	std::vector<DebugRenderObject*>& meshObjects = s_DebugRenderSystem->m_meshObjects;
+	for( size_t debugIndex = 0; debugIndex < meshObjects.size(); debugIndex++ )
+	{
+		if( nullptr != meshObjects[debugIndex] )
+		{
+			Timer& objTimer = meshObjects[debugIndex]->m_timer;
+			if( objTimer.HasElapsed() )
+			{
+				delete meshObjects[debugIndex];
+				meshObjects[debugIndex] = nullptr;
+			}
+		}
+	}
 }
 
 void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -524,6 +612,44 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, R
 		debugObject->m_indices.push_back((uint)vertIndex);
 	}
 	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_modelMatrix = transform.ToMatrix();
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	debugObject->m_mesh	= s_DebugRenderSystem->m_cubeMesh;
+	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+}
+
+void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	debugObject->m_mesh	= s_DebugRenderSystem->m_sphereMesh;
+
+	Transform transform;
+	transform.SetPosition( pos );
+	transform.SetUniformScale( radius );
+
+	debugObject->m_modelMatrix = transform.ToMatrix();
+
+	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode, char const* text )

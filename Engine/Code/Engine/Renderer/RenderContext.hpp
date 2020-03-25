@@ -37,6 +37,7 @@ struct FrameData
 struct ModelData
 {
 	Mat44 model;
+	float tint[4];
 };
 
 enum class Viewport
@@ -129,7 +130,9 @@ public:
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
 	void SetDepth( eDepthCompareMode compareMode, eDepthWriteMode writeMode = eDepthWriteMode::WRITE_ALL );
-	void SetModelMatrix( Mat44 const& model );
+	void SetModelMatrix( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
+	void SetModelTint( Rgba8 const& tint );
+	void SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
 
 	Texture* GetBackBuffer();
 

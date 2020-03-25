@@ -272,11 +272,13 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num8Key.WasJustPressed() )
 	{
-		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+		DebugAddWorldWireSphere( m_camera.GetPosition(), 5.f, Rgba8::RED, Rgba8::GREEN, 10.f, DEBUG_RENDER_USE_DEPTH );
+
 	}
 	if( num9Key.WasJustPressed() )
 	{
-		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+		Transform transform = m_camera.GetTransform();
+		DebugAddWorldWireBounds( transform, Rgba8::BLUE, Rgba8::RED, 5.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( num0Key.WasJustPressed() )
 	{
