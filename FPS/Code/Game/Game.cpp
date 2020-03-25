@@ -278,6 +278,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num9Key.WasJustPressed() )
 	{
 		Transform transform = m_camera.GetTransform();
+		transform.SetNonUniformScale( Vec3( 1.f, 1.f, 5.f ) );
 		DebugAddWorldWireBounds( transform, Rgba8::BLUE, Rgba8::RED, 5.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( num0Key.WasJustPressed() )
