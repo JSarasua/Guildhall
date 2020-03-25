@@ -9,6 +9,8 @@ public:
 	void Translate( Vec3 const& translator );
 	void RotatePitchRollYawDegrees( float pitch, float roll, float yaw );
 	void SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw );
+	void SetUniformScale( float scale );
+	void SetNonUniformScale( Vec3 const& scale );
 
 	Mat44 ToMatrix() const;
 	Mat44 ToRotationMatrix() const;
@@ -16,5 +18,5 @@ public:
 public:
 	Vec3 m_position = Vec3( 0.f, 0.f, 0.f );
 	Vec3 m_rotationPitchRollYawDegrees = Vec3( 0.f, 0.f, 0.f );
-	Vec3 m_scale = Vec3( 0.f, 0.f, 0.f );
+	Vec3 m_scale = Vec3( 1.f, 1.f, 1.f );
 };

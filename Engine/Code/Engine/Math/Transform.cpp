@@ -31,6 +31,18 @@ void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, flo
 	m_rotationPitchRollYawDegrees.z = yaw;
 }
 
+void Transform::SetUniformScale( float scale )
+{
+	m_scale.x = scale;
+	m_scale.y = scale;
+	m_scale.z = scale;
+}
+
+void Transform::SetNonUniformScale( Vec3 const& scale )
+{
+	m_scale = scale;
+}
+
 Mat44 Transform::ToMatrix() const
 {
 	Mat44 mat;
@@ -38,7 +50,7 @@ Mat44 Transform::ToMatrix() const
 	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
-	mat.CreateNonUniformScale3D(m_scale);
+	mat.ScaleNonUniform3D( m_scale );
 
 	return mat;
 
