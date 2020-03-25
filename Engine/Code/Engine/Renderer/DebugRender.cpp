@@ -348,13 +348,23 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 		DebugRenderObject* debugObject = m_meshObjects[debugObjectIndex];
 		if( nullptr != debugObject )
 		{
-			if( debugObject->m_renderTo == renderTo && debugObject->m_mode == renderMode )
+			if( debugObject->m_renderTo == renderTo && ( (debugObject->m_mode == renderMode) || (debugObject->m_mode == DEBUG_RENDER_XRAY && renderMode == DEBUG_RENDER_USE_DEPTH) ) )
 			{
-				GPUMesh* mesh = debugObject->m_mesh;
-				Mat44 modelMatrix = debugObject->m_modelMatrix;
-				context->SetModelMatrix( modelMatrix, debugObject->m_meshColor );
-
-				context->DrawMesh( mesh );
+				if( renderMode == DEBUG_RENDER_XRAY )
+				{
+					GPUMesh* mesh = debugObject->m_mesh;
+					Mat44 modelMatrix = debugObject->m_modelMatrix;
+					Rgba8 tintColor = Rgba8::LerpColorTo( debugObject->m_meshColor, Rgba8(0,0,0,0), 0.7f );
+					context->SetModelMatrix( modelMatrix, tintColor );
+					context->DrawMesh( mesh );
+				}
+				else
+				{
+					GPUMesh* mesh = debugObject->m_mesh;
+					Mat44 modelMatrix = debugObject->m_modelMatrix;
+					context->SetModelMatrix( modelMatrix, debugObject->m_meshColor );
+					context->DrawMesh( mesh );
+				}
 			}
 		}
 	}
@@ -490,7 +500,12 @@ void DebugRenderWorldToCamera( Camera* cam )
 	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_NONE );
 	context->DrawIndexedVertexArray( AlwaysTextVertices, AlwaysTextIndices );
 
+	context->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	s_DebugRenderSystem->DrawMeshes( context, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_USE_DEPTH );
+	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_NONE );
+	s_DebugRenderSystem->DrawMeshes( context, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_ALWAYS );
+	context->SetDepth( eDepthCompareMode::COMPARE_GREATER_THAN, eDepthWriteMode::WRITE_NONE );
+	s_DebugRenderSystem->DrawMeshes( context, camTransformRotationMatrix, DEBUG_RENDER_TO_WORLD, DEBUG_RENDER_XRAY );
 
 	context->EndCamera( *cam );
 }
