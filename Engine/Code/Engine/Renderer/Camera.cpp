@@ -171,6 +171,11 @@ Mat44 Camera::GetProjectionMatrix() const
 	return m_projection;
 }
 
+Transform Camera::GetTransform() const
+{
+	return m_transform;
+}
+
 Vec3 Camera::ClientToWorld( Vec2 client, float ndcZ ) const
 {
 	float x = RangeMap( 0.f, 1.f, -1.f, 1.f, client.x );

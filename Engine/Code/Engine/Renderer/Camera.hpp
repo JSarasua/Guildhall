@@ -67,6 +67,7 @@ public:
 	Mat44 GetViewMatrix() const;
 	Mat44 GetViewRotationMatrix() const;
 	Mat44 GetProjectionMatrix() const;
+	Transform GetTransform() const;
 
 	Vec3 ClientToWorld( Vec2 client, float ndcZ ) const;
 	Vec3 WorldToClient( Vec3 worldPos ) const;
