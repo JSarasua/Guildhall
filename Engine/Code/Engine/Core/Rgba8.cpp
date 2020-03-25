@@ -113,3 +113,13 @@ Rgba8 Rgba8::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float 
 
 	return color;
 }
+
+void Rgba8::ToFloatArray( float* colorArray ) const
+{
+	colorArray[0] = (float)r;
+	colorArray[1] = (float)g;
+	colorArray[2] = (float)b;
+	colorArray[3] = (float)a;
+
+	return;
+}

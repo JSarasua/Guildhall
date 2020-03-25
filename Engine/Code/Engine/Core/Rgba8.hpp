@@ -23,6 +23,7 @@ public:
 
 	void SetFromText(const char* text);
 	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
+	void ToFloatArray( float* colorArray ) const;
 
 	static const Rgba8 WHITE;
 	static const Rgba8 RED;
