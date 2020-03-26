@@ -161,7 +161,12 @@ Mat44 Camera::GetViewMatrix() const
 	return m_view;
 }
 
-Mat44 Camera::GetViewRotationMatrix() const
+Mat44 Camera::GetCameraModelMatrix() const
+{
+	return m_transform.ToMatrix();
+}
+
+Mat44 Camera::GetModelRotationMatrix() const
 {
 	return m_transform.ToRotationMatrix();
 }

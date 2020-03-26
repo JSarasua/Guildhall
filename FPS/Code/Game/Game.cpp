@@ -309,7 +309,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		Vec3 startPos = m_camera.GetPosition();
 		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
-		Mat44 cameraModel = m_camera.GetViewRotationMatrix();
+		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
 
 		endPos = cameraModel.TransformPosition3D( endPos );
 		endPos += startPos;
@@ -322,7 +322,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		Vec3 startPos = m_camera.GetPosition();
 		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
-		Mat44 cameraModel = m_camera.GetViewRotationMatrix();
+		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
 
 		endPos = cameraModel.TransformPosition3D( endPos );
 		endPos += startPos;
@@ -331,7 +331,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( tKey.WasJustPressed() )
 	{
-
+		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
+		DebugAddWorldBasis( cameraModel, Rgba8::WHITE, Rgba8::GREEN, 10.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( gKey.WasJustPressed() )
 	{

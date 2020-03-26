@@ -76,7 +76,7 @@ void DebugAddWorldLine( LineSegment3 const& line,
 void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode );
 void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& color, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
-// AABB3
+
 
 // bounds
 //Assuming an AABB3 bounds of -0.5 to 0.5
@@ -84,6 +84,8 @@ void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColo
 
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 //basis
+void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+void DebugAddWorldBasis( Mat44 const& basis, float duration = 0.f, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 //text
 //non-billboarded
