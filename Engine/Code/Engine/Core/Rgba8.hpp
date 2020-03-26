@@ -27,6 +27,11 @@ public:
 	void ToFloatArray( float* colorArray ) const;
 
 	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
+	static Rgba8 LerpColorAsHSL( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
+	static void RGBToHSL( Rgba8 const& rgba, float* hsl );
+	static void HSLToRGB( float const* hsl, Rgba8& rgba );
+
+	static float hue2RGB( float p, float q, float t );
 
 	static const Rgba8 WHITE;
 	static const Rgba8 RED;

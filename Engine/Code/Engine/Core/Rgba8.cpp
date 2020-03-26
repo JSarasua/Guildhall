@@ -147,6 +147,124 @@ Rgba8 Rgba8::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float 
 	return color;
 }
 
+
+
+Rgba8 Rgba8::LerpColorAsHSL( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue )
+{
+	float startHSL[4];
+	float endHSL[4];
+	float newHSL[4];
+
+	Rgba8::RGBToHSL( startColor, startHSL );
+	Rgba8::RGBToHSL( endColor, endHSL );
+
+	newHSL[0] = Interpolate( startHSL[0], endHSL[0], lerpValue );
+	newHSL[1] = Interpolate( startHSL[1], endHSL[1], lerpValue );
+	newHSL[2] = Interpolate( startHSL[2], endHSL[2], lerpValue );
+	newHSL[3] = Interpolate( startHSL[3], endHSL[3], lerpValue );
+
+	Rgba8 lerpedColor;
+	Rgba8::HSLToRGB( newHSL, lerpedColor );
+
+	return lerpedColor;
+}
+
+void Rgba8::RGBToHSL( Rgba8 const& rgba, float* hsl )
+{
+	float rgbArray[4];
+	rgba.ToFloatArray( rgbArray );
+
+	float& r = rgbArray[0];
+	float& g = rgbArray[1];
+	float& b = rgbArray[2];
+	float& a = rgbArray[3];
+
+	r /= 255.f;
+	g /= 255.f;
+	b /= 255.f;
+	a /= 255.f;
+
+	float max = Max( r, Max( g, b ) );
+	float min = Min( r, Min( g, b ) );
+
+	float h = 0.f, s = 0.f, l = (max + min) / 2.f;
+	if( max == min )
+	{
+		h = s = 0.f;
+	}
+	else
+	{
+		float diff = max - min;
+		s = l > 0.5f ? (diff / (2.f - max - min )) : (diff / (max + min));
+		
+		if( r == max )
+		{
+			h = ( (g - b) / diff ) + (g < b ? 6.f : 0.f);
+		}
+		else if( g == max )
+		{
+			h = ( (b - r) / diff ) + 2.f;
+		}
+		else if( b == max )
+		{
+			h = (r - g) / diff + 4.f;
+		}
+		h /= 6.f;
+	}
+
+	hsl[0] = h;
+	hsl[1] = s;
+	hsl[2] = l;
+	hsl[3] = a;
+
+}
+
+void Rgba8::HSLToRGB( float const* hsl, Rgba8& rgba )
+{
+	float const& h = hsl[0];
+	float const& s = hsl[1];
+	float const& l = hsl[2];
+	float const& a = hsl[3];
+
+	float r, g, b = 0.f;
+
+	if( s == 0.f )
+	{
+		r = g = b = 1.f;
+	}
+	else
+	{
+		float q = l < 0.5f ? (l * (1.f+s)) : (l + s - (l*s));
+		float p = (2.f*l) - q;
+
+		r = hue2RGB( p, q, h + 1.f/3.f );
+		g = hue2RGB( p, q, h );
+		b = hue2RGB( p, q, h - 1.f/3.f );
+	}
+
+	r *= 255.f;
+	g *= 255.f;
+	b *= 255.f;
+	float alpha = a * 255.f;
+
+	rgba.r = (unsigned char)r;
+	rgba.g = (unsigned char)g;
+	rgba.b = (unsigned char)b;
+	rgba.a = (unsigned char)alpha;
+
+	return;
+}
+
+float Rgba8::hue2RGB( float p, float q, float t )
+{
+	if( t < 0.f ) t += 1.f;
+	if( t > 1.f ) t -= 1.f;
+	if( t < 1.f/6.f ) return p + (q - p) * 6.f * t;
+	if( t < 1.f/2.f ) return q;
+	if( t < 2.f/3.f ) return p + (q - p) * (2.f/3.f - t) * 6.f;
+	return p;
+}
+
 void Rgba8::ToFloatArray( float* colorArray ) const
 {
 	colorArray[0] = (float)r;

@@ -57,7 +57,7 @@ void DebugRenderObject::UpdateColors()
 		lerpValue = duration / totalTime;
 	}
 
-	Rgba8 color = Rgba8::LerpColorTo( m_startColor, m_endColor, lerpValue );
+	Rgba8 color = Rgba8::LerpColorAsHSL( m_startColor, m_endColor, lerpValue );
 
 	for( size_t vertIndex = 0; vertIndex < m_vertices.size(); vertIndex++ )
 	{
@@ -133,7 +133,7 @@ void DebugRenderObject::AppendIndexedVerts( std::vector<Vertex_PCU>& vertexList,
 		Rgba8 const& color = m_vertices[vertexIndex].tint;
 		Vec2 const& uv = m_vertices[vertexIndex].uvTexCoords;
 
-		Rgba8 tintedColor = Rgba8::LerpColorTo( color, tint, tintStrength );
+		Rgba8 tintedColor = Rgba8::LerpColorAsHSL( color, tint, tintStrength );
 
 		vertex = transformMatrix.TransformPosition3D( vertex );
 
@@ -378,7 +378,7 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 					}
 					GPUMesh* mesh = debugObject->m_mesh;
 					Mat44 modelMatrix = debugObject->m_modelMatrix;
-					Rgba8 tintColor = Rgba8::LerpColorTo( debugObject->m_meshColor, Rgba8(0,0,0,0), 0.7f );
+					Rgba8 tintColor = Rgba8::LerpColorAsHSL( debugObject->m_meshColor, Rgba8(0,0,0,0), 0.7f );
 					context->SetModelMatrix( modelMatrix, tintColor );
 					context->DrawMesh( mesh );
 					context->SetFillMode( eFillMode::FILL_SOLID );

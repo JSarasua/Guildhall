@@ -61,4 +61,4 @@ If I could do it over, I'd move pretty much everything to meshes and use ModelMa
     - [ ] *X05.00: 03%*: Grid is clipped to area the camera can potentially see (allowing for an infinitly large grid)
 - [x] *X05.00: 03%*: MeshUtils: `AddCylinderToIndexedVertexArray`
 - [x] *X05.00: 03%*: MeshUtils: `AddConeToIndexedVertexArray`
-- [ ] *X05.00: 04%*: `RGBA LerpAsHSL( RGBA const &a, RGBA const &b, float t );` 
+- [x] *X05.00: 04%*: `RGBA LerpAsHSL( RGBA const &a, RGBA const &b, float t );` 
