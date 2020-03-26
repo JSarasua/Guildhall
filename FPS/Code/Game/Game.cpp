@@ -308,11 +308,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( rKey.WasJustPressed() )
 	{
 		Vec3 startPos = m_camera.GetPosition();
-		Vec3 endPos = startPos;
-		endPos.z -= 5.f;
+		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
 		Mat44 cameraModel = m_camera.GetViewRotationMatrix();
 
 		endPos = cameraModel.TransformPosition3D( endPos );
+		endPos += startPos;
 		LineSegment3 line = LineSegment3( startPos, endPos );
 		DebugAddWorldLine( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
 		//DebugAddWorldPoint( startPos, 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
@@ -320,7 +320,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( fKey.WasJustPressed() )
 	{
+		Vec3 startPos = m_camera.GetPosition();
+		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
+		Mat44 cameraModel = m_camera.GetViewRotationMatrix();
 
+		endPos = cameraModel.TransformPosition3D( endPos );
+		endPos += startPos;
+		LineSegment3 line = LineSegment3( startPos, endPos );
+		DebugAddWorldArrow( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( tKey.WasJustPressed() )
 	{

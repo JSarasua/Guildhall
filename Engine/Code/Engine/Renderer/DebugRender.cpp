@@ -701,6 +701,38 @@ void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& color, float dura
 	DebugAddWorldLine( line, color, color, duration, mode );
 }
 
+void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	//debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+
+	float lineLength = arrow.GetLength();
+	float lineThickness = lineLength * 0.025f;
+	float lineRadius = lineThickness * 0.5f;
+	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, arrow.startPosition, lineRadius, arrow.endPosition, 0.f, 8U, startColor );
+
+	Vec3 startOfFlair = arrow.startPosition - arrow.endPosition;
+	startOfFlair *= 0.2f;
+	startOfFlair += arrow.endPosition;
+	float flairRadius = lineRadius * 3.f;
+	AppendIndexedVertsCone( debugObject->m_vertices, debugObject->m_indices, startOfFlair, flairRadius, arrow.endPosition, 8U, startColor );
+
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& color, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldArrow( arrow, color, color, duration, mode );
+}
+
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugRenderObject* debugObject = new DebugRenderObject;

@@ -73,7 +73,8 @@ void DebugAddWorldLine( LineSegment3 const& line,
 // line strip [EXTRA]
 
 // arrows
-
+void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode );
+void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& color, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 
 // AABB3
 
