@@ -28,6 +28,14 @@ Rgba8::Rgba8( unsigned char initialRed, unsigned char initialGreen, unsigned cha
 {
 }
 
+Rgba8::Rgba8( float const* colorArray )
+{
+	r = (unsigned char)colorArray[0];
+	g = (unsigned char)colorArray[1];
+	b = (unsigned char)colorArray[2];
+	a = (unsigned char)colorArray[3];
+}
+
 bool Rgba8::operator==( const Rgba8& compare ) const
 {
 	if( r == compare.r &&
@@ -91,6 +99,31 @@ void Rgba8::SetFromText( const char* text )
 
 
 
+}
+
+void Rgba8::TintColorBy( Rgba8 const& tint )
+{
+	float currentColor[4];
+	float tintColor[4];
+
+	ToFloatArray( currentColor );
+	tint.ToFloatArray( tintColor );
+
+	tintColor[0] /= 255.f;
+	tintColor[1] /= 255.f;
+	tintColor[2] /= 255.f;
+	tintColor[3] /= 255.f;
+
+	float tintedColor[4];
+	tintedColor[0] = currentColor[0] * tintColor[0];
+	tintedColor[1] = currentColor[1] * tintColor[1];
+	tintedColor[2] = currentColor[2] * tintColor[2];
+	tintedColor[3] = currentColor[3] * tintColor[3];
+	Rgba8 newColor = Rgba8(tintedColor);
+
+	*this = newColor;
+
+	return;
 }
 
 Rgba8 Rgba8::LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue )

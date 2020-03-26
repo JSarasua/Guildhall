@@ -15,6 +15,7 @@ public:
 	~Rgba8() {}												// destructor (do nothing)
 	Rgba8() {}												// default constructor (do nothing)
 	Rgba8( const Rgba8& copyFrom );							// copy constructor (from another Rgba8)
+	Rgba8( float const* colorArray);						// 4 elements in array
 	explicit Rgba8( unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255 );		// 
 
 	bool		operator==( const Rgba8& compare ) const;
@@ -22,8 +23,10 @@ public:
 	const Rgba8		operator+( const Rgba8& copyRgba8 ) const;
 
 	void SetFromText(const char* text);
-	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
+	void TintColorBy( Rgba8 const& tint );
 	void ToFloatArray( float* colorArray ) const;
+
+	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
 
 	static const Rgba8 WHITE;
 	static const Rgba8 RED;
