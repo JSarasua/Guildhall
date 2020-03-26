@@ -747,7 +747,7 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& color, float 
 
 void DebugAddWorldPoint( Vec3 const& pos, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
-	DebugAddWorldPoint( pos, 10.f, color, color, duration, mode );
+	DebugAddWorldPoint( pos, 0.1f, color, color, duration, mode );
 }
 
 void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode )
@@ -1341,7 +1341,6 @@ bool DebugAddWorldWireBounds( const EventArgs* args )
 		Vec3 argMin = args->GetValue( std::string( "min" ), Vec3() );
 		Vec3 argMax = args->GetValue( std::string( "max" ), Vec3() );
 		Vec3 diff = argMax - argMin;
-/*		Vec3 halfDiff = 0.5f * diff;*/
 		Transform transform;
 		transform.SetPosition( diff + argMin );
 		transform.SetNonUniformScale( diff );
