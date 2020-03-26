@@ -291,6 +291,16 @@ Mat44 LookAt( Vec3 const& worldLocation, Vec3 const& target, Vec3 const& worldUp
 
 	Vec3 up = CrossProduct( right, forward );
 
+	//Fix this, it assumes worldUp is 0,1,0 and is probably not correct in the first place
+	float rightLength = right.GetLength();
+	if( AlmostEqualsFloat( rightLength, 0.f ) )
+	{
+		forward = Vec3( 0.f, 1.f, 0.f );
+		right = Vec3( 1.f, 0.f, 0.f );
+		up = Vec3( 0.f, 0.f, 1.f );
+	}
+
+
 	Mat44 lookatMatrix;
 	lookatMatrix.SetBasisVectors3D( right, up, -forward );
 	
@@ -308,9 +318,19 @@ Mat44 LookAtAndMoveToWorld( Vec3 const& worldLocation, Vec3 const& target, Vec3 
 
 	Vec3 up = CrossProduct( right, forward );
 
+	//Fix this, it assumes worldUp is 0,1,0 and is probably not correct in the first place
+	float rightLength = right.GetLength();
+	if( AlmostEqualsFloat( rightLength, 0.f ) )
+	{
+		forward = Vec3( 0.f, 1.f, 0.f );
+		right = Vec3( 1.f, 0.f, 0.f );
+		up = Vec3( 0.f, 0.f, 1.f );
+	}
+
 	Mat44 lookatMatrix;
 	lookatMatrix.SetBasisVectors3D( right, up, -forward );
 	lookatMatrix.SetTranslation3D( worldLocation );
+
 
 	return lookatMatrix;
 }
