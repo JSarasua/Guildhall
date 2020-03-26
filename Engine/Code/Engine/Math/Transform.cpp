@@ -22,9 +22,12 @@ void Transform::RotatePitchRollYawDegrees( float pitch, float roll, float yaw )
 
 void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw )
 {
+	//Clamping may not be necessary
 	pitch = Clampf( pitch, -90.f, 90.f );
-	roll = Clampf( roll, -180.f, 180.f );
-	yaw = Clampf( yaw, -180.f, 180.f );
+
+	pitch = GetAngleBetweenMinus180And180Degrees( pitch );
+	roll = GetAngleBetweenMinus180And180Degrees( roll );
+	yaw = GetAngleBetweenMinus180And180Degrees( yaw );
 
 	m_rotationPitchRollYawDegrees.x = pitch;
 	m_rotationPitchRollYawDegrees.y = roll;

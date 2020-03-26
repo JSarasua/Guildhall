@@ -93,7 +93,7 @@ void PushDiscOutOfAABB2D(Vec2& disc, float discRadius, const AABB2& aabb);
 float GetShortestAngularDisplacement(float oldOrientationDegrees, float newOrientationDegrees);
 float GetShortestAngularDistance(float oldOrientationDegrees, float newOrientationDegrees);
 float GetTurnedToward(float oldOrientationDegrees, float newOrientationDegrees, float rotateSpeed);
-
+float GetAngleBetweenMinus180And180Degrees( float currentAngleDegrees );
 
 float DotProduct2D(const Vec2& vecA, const Vec2& vecB);
 Vec3 CrossProduct( Vec3 const& a, Vec3 const& b );

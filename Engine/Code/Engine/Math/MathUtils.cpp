@@ -839,6 +839,20 @@ float GetTurnedToward( float oldOrientationDegrees, float newOrientationDegrees,
 	}
 }
 
+float GetAngleBetweenMinus180And180Degrees( float currentAngleDegrees )
+{
+	while( currentAngleDegrees > 180.f )
+	{
+		currentAngleDegrees -= 360.f;
+	}
+	while( currentAngleDegrees <= -180.f )
+	{
+		currentAngleDegrees += 360.f;
+	}
+
+	return currentAngleDegrees;
+}
+
 float DotProduct2D( const Vec2& vecA, const Vec2& vecB )
 {
 	return vecA.x*vecB.x + vecA.y*vecB.y;
