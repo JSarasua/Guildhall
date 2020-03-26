@@ -34,6 +34,7 @@ public:
 	void Shutdown();
 
 	void HandleKeyStroke( unsigned char keyStroke );
+	void HandleSpecialKeyStroke ( unsigned char keyStroke ); //Delete, pg up, pg down, etc.
 
 	void PrintString( const Rgba8& textColor, const std::string& devConsolePrintString );
 	void Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const;

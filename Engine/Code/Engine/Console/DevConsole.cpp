@@ -119,22 +119,7 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			}
 		}
 	}
-	else if( keyStroke == DEL_KEY )
-	{
-		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
-		{
-			if( m_beginSelect != m_endSelect )
-			{
-				EraseSelectedChars();
-			}
-			else if( m_currentCharIndex < m_currentColoredLine.m_devConsolePrintString.size() )
-			{
-				m_currentColoredLine.m_devConsolePrintString.erase( m_currentCharIndex, 1 );
-			}
-
-		}
-	}
-	else if( keyStroke == '`' ||keyStroke == TILDE_KEY )	//tilde
+	else if( keyStroke == '`' || keyStroke == TILDE_KEY )	//tilde
 	{
 		
 	}
@@ -211,48 +196,6 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 			}
 		}
 	}
-	else if( keyStroke == PGUP_KEY )
-	{
-		m_currentScrollIndex--;
-		ClampScrollIndex();
-	}
-	else if( keyStroke == PGDOWN_KEY )
-	{
-		m_currentScrollIndex++;
-		ClampScrollIndex();
-	}
-	else if( keyStroke == HOME_KEY )
-	{
-		if( shiftKey.IsPressed() )
-		{
-			if( m_beginSelect == 0 )
-			{
-				m_beginSelect = m_currentCharIndex;
-			}
-			m_endSelect = 0;
-		}
-		else
-		{
-			ResetSelection();
-		}
-		m_currentCharIndex = 0;
-	}
-	else if( keyStroke == END_KEY )
-	{
-		if( shiftKey.IsPressed() )
-		{
-			if( m_beginSelect == 0 )
-			{
-				m_beginSelect = m_currentCharIndex;
-			}
-			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
-		}
-		else
-		{
-			ResetSelection();
-		}
-		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
-	}
 	else if( keyStroke =='\t' )	//TAB
 	{
 		if( m_isAutoCompleting )
@@ -324,6 +267,68 @@ void DevConsole::HandleKeyStroke( unsigned char keyStroke )
 	}
 }
 
+void DevConsole::HandleSpecialKeyStroke( unsigned char keyStroke )
+{
+	KeyButtonState const& shiftKey = g_theInput->GetKeyStates(SHIFT_KEY);
+
+	if( keyStroke == DEL_KEY )
+	{
+		if( !m_currentColoredLine.m_devConsolePrintString.empty() )
+		{
+			if( m_beginSelect != m_endSelect )
+			{
+				EraseSelectedChars();
+			}
+			else if( m_currentCharIndex < m_currentColoredLine.m_devConsolePrintString.size() )
+			{
+				m_currentColoredLine.m_devConsolePrintString.erase( m_currentCharIndex, 1 );
+			}
+		}
+	}
+	else if( keyStroke == PGUP_KEY )
+	{
+		m_currentScrollIndex--;
+		ClampScrollIndex();
+	}
+	else if( keyStroke == PGDOWN_KEY )
+	{
+		m_currentScrollIndex++;
+		ClampScrollIndex();
+	}
+	else if( keyStroke == HOME_KEY )
+	{
+		if( shiftKey.IsPressed() )
+		{
+			if( m_beginSelect == 0 )
+			{
+				m_beginSelect = m_currentCharIndex;
+			}
+			m_endSelect = 0;
+		}
+		else
+		{
+			ResetSelection();
+		}
+		m_currentCharIndex = 0;
+	}
+	else if( keyStroke == END_KEY )
+	{
+		if( shiftKey.IsPressed() )
+		{
+			if( m_beginSelect == 0 )
+			{
+				m_beginSelect = m_currentCharIndex;
+			}
+			m_endSelect = (int)m_currentColoredLine.m_devConsolePrintString.size();
+		}
+		else
+		{
+			ResetSelection();
+		}
+		m_currentCharIndex = (int)m_currentColoredLine.m_devConsolePrintString.size();
+	}
+}
+
 void DevConsole::PrintString( const Rgba8& textColor, const std::string& devConsolePrintString )
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));
@@ -342,6 +347,7 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 	renderer.DrawAABB2Filled(cameraAABB,Rgba8(0,0,0,128));
 
 	Vec2 currentDrawPosition = camera.GetOrthoBottomLeft();
+	renderer.SetCullMode( eCullMode::CULL_NONE );
 
 	/************************************************************************/
 	/* Render Caret                                                         */
@@ -379,6 +385,8 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 		currentDrawPosition.y += lineHeight;
 		textIndex--;
 	}
+
+	renderer.SetCullMode( eCullMode::CULL_BACK );
 }
 
 void DevConsole::SetIsOpen( bool isOpen )
@@ -452,7 +460,7 @@ bool DevConsole::ListCommands( const EventArgs* args )
 
 void DevConsole::ClampScrollIndex()
 {
-	m_currentScrollIndex = ClampInt(m_currentScrollIndex, 0, (int)m_coloredLines.size() - 1);
+	m_currentScrollIndex = ClampInt(m_currentScrollIndex, -1, (int)m_coloredLines.size() - 1);
 }
 
 void DevConsole::EraseSelectedChars()

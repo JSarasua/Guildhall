@@ -44,7 +44,7 @@ static LRESULT CALLBACK WindowsMessageHandlingProcedure( HWND windowHandle, UINT
 			}
 			else if( asKey == DEL_KEY || asKey == PGUP_KEY || asKey == PGDOWN_KEY || asKey == HOME_KEY || asKey == END_KEY )
 			{
-				g_theConsole->HandleKeyStroke(asKey);
+				g_theConsole->HandleSpecialKeyStroke(asKey);
 			}
 		}
 		else
