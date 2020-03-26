@@ -336,7 +336,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( gKey.WasJustPressed() )
 	{
+		Vec3 p0 = Vec3( -1.f,-1.f, -1.f );
+		Vec3 p1 = Vec3( 1.f, -1.f, -1.f );
+		Vec3 p2 = Vec3( 1.f, 3.f, -2.f );
+		Vec3 p3 = Vec3( -1.f, 3.f, -2.f );
 
+		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
+		p0 = cameraModel.TransformPosition3D( p0 );
+		p1 = cameraModel.TransformPosition3D( p1 );
+		p2 = cameraModel.TransformPosition3D( p2 );
+		p3 = cameraModel.TransformPosition3D( p3 );
+
+		DebugAddWorldQuad( p0, p1, p2, p3, Rgba8::GREEN, Rgba8::RED, 5.f, DEBUG_RENDER_XRAY );
 	}
 
 	Vec3 translator;

@@ -801,6 +801,25 @@ void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& color, float du
 	DebugAddWorldArrow( arrow, color, color, duration, mode );
 }
 
+void DebugAddWorldQuad( Vec3 const& p0, Vec3 const& p1, Vec3 const& p2, Vec3 const& p3, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	//debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	
+	
+	Vertex_PCU::AppendVerts4Points( debugObject->m_vertices, debugObject->m_indices, p0, p1, p2, p3, startColor );
+
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugRenderObject* debugObject = new DebugRenderObject;
@@ -816,6 +835,11 @@ void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColo
 	debugObject->m_isWireMesh = true;
 	debugObject->m_mesh	= s_DebugRenderSystem->m_cubeMesh;
 	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+}
+
+void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldWireBounds( transform, color, color, duration, mode );
 }
 
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -839,6 +863,11 @@ void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startC
 	debugObject->m_modelMatrix = transform.ToMatrix();
 
 	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+}
+
+void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldWireSphere( pos, radius, color, color, duration, mode );
 }
 
 void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
