@@ -1,6 +1,10 @@
 #pragma once
 #include "Game/Game.hpp"
 #include "App.hpp"
+#include "Game/World.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Player.hpp"
+#include "Engine/Math/LineSegment3.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
@@ -9,9 +13,6 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/AABB2.hpp"
-#include "Game/World.hpp"
-#include "Game/GameCommon.hpp"
-#include "Game/Player.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
@@ -232,6 +233,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
 	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
+	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
+	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
+	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
 
 
 	if( f11Key.WasJustPressed() )
@@ -297,6 +302,31 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		DebugAddScreenArrow( Vec2( 100.f, 100.f ), Vec2( 200.f, 250. ), Rgba8::RED, Rgba8::BLUE, 10.f );
 	}
 	if( rBracketKey.WasJustPressed() )
+	{
+
+	}
+	if( rKey.WasJustPressed() )
+	{
+		Vec3 startPos = m_camera.GetPosition();
+		Vec3 endPos = startPos;
+		endPos.z -= 5.f;
+		Mat44 cameraModel = m_camera.GetViewRotationMatrix();
+
+		endPos = cameraModel.TransformPosition3D( endPos );
+		LineSegment3 line = LineSegment3( startPos, endPos );
+		DebugAddWorldLine( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
+		//DebugAddWorldPoint( startPos, 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
+		//DebugAddWorldPoint( endPos, 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
+	}
+	if( fKey.WasJustPressed() )
+	{
+
+	}
+	if( tKey.WasJustPressed() )
+	{
+
+	}
+	if( gKey.WasJustPressed() )
 	{
 
 	}

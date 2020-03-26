@@ -65,8 +65,7 @@ void DebugAddWorldPoint( Vec3 const& pos, Rgba8 const& color, float duration = 0
 
 // lines
 void DebugAddWorldLine( LineSegment3 const& line, 
-	Rgba8 const& p0StartColor, Rgba8 const& p0EndColor, 
-	Rgba8 const& p1StartColor, Rgba8 const& p1EndColor, 
+	Rgba8 const& startColor, Rgba8 const& endColor, 
 	float duration, eDebugRenderMode mode );
 void DebugAddWorldLine( LineSegment3 const& line, 
 	Rgba8 const& color, float duration = 0.f, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );

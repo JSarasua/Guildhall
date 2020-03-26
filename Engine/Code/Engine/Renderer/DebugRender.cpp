@@ -11,6 +11,7 @@
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/LineSegment2.hpp"
+#include "Engine/Math/LineSegment3.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include <stdarg.h>
 
@@ -671,6 +672,33 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& color, float 
 void DebugAddWorldPoint( Vec3 const& pos, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugAddWorldPoint( pos, 10.f, color, color, duration, mode );
+}
+
+void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode )
+{
+	
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	//debugObject->m_modelMatrix = Mat44::CreateTranslation3D( pos );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+
+	float lineLength = line.GetLength();
+	float lineThickness = lineLength * 0.025f;
+	float lineRadius = lineThickness * 0.5f;
+	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, line.startPosition, lineRadius, line.endPosition, lineRadius, 8U, startColor );
+
+	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+}
+
+void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugAddWorldLine( line, color, color, duration, mode );
 }
 
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )

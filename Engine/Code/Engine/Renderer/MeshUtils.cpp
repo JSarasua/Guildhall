@@ -316,22 +316,22 @@ void AppendIndexedVertsCylinder( std::vector<Vertex_PCU>& masterVertexList, std:
 	//Top of cylinder indices
 	for( uint cutIndex = 0; cutIndex < cuts - 2; cutIndex++ )
 	{
-		indices.push_back( cuts );
-		indices.push_back( cuts + cutIndex + 1 );
 		indices.push_back( cuts + cutIndex + 2 );
+		indices.push_back( cuts + cutIndex + 1 );
+		indices.push_back( cuts );
 	}
 
+	uint startIndex = (uint)masterVertexList.size();
 	//transform
 	Mat44 transform = LookAtAndMoveToWorld( startPos, endPos, Vec3(0.f, 1.f, 0.f ) );
 	for( size_t vertexIndex = 0; vertexIndex < vertexes.size(); vertexIndex++ )
 	{
 		Vec3 vertex = vertexes[vertexIndex];
-		transform.TransformPosition3D( vertex );
+		vertex = transform.TransformPosition3D( vertex );
 
 		masterVertexList.push_back( Vertex_PCU( vertex, color, Vec2() ) );
 	}
 
-	uint startIndex = (uint)masterVertexList.size();
 	for( size_t indexIndex = 0; indexIndex < indices.size(); indexIndex++ )
 	{
 		uint currentIndex = indices[indexIndex] + startIndex;
