@@ -449,6 +449,28 @@ void Vertex_PCU::AppendIndexedVertsSphere( std::vector<Vertex_PCU>& masterVertex
 	
 }
 
+void Vertex_PCU::AppendVerts4Points( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 const& p0, Vec3 const& p1, Vec3 const& p2, Vec3 const& p3, Rgba8 const& color, AABB2 const& uvs /*= AABB2() */ )
+{
+	uint currentIndex = (uint)masterIndexList.size();
+
+	masterVertexList.push_back( Vertex_PCU( p0, color, uvs.mins ) );
+	masterVertexList.push_back( Vertex_PCU( p1, color, Vec2( uvs.maxs.x, uvs.mins.y ) ) );
+	masterVertexList.push_back( Vertex_PCU( p2, color, uvs.maxs ) );
+
+	masterVertexList.push_back( Vertex_PCU( p0, color, uvs.mins ) );
+	masterVertexList.push_back( Vertex_PCU( p2, color, uvs.maxs ) );
+	masterVertexList.push_back( Vertex_PCU( p3, color, Vec2( uvs.mins.x, uvs.maxs.y ) ) );
+
+
+	masterIndexList.push_back( currentIndex );
+	masterIndexList.push_back( currentIndex + 1 );
+	masterIndexList.push_back( currentIndex + 2 );
+
+	masterIndexList.push_back( currentIndex + 3 );
+	masterIndexList.push_back( currentIndex + 4 );
+	masterIndexList.push_back( currentIndex + 5);
+}
+
 Vertex_PCU::Vertex_PCU( const Vertex_PCU& copy )
 	: position( copy.position )
 	, tint( copy.tint )
