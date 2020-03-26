@@ -18,3 +18,5 @@ void MatrixInvertOrthoNormal( Mat44& mat );
 void MatrixInvert( Mat44& mat );
 bool MatrixIsOrthoNormal( Mat44 const& mat );
 bool IsMatrixEqual( Mat44 const& matA, Mat44 const& matB, float epsilon = 0.01f );
+Mat44 LookAt( Vec3 const& worldLocation, Vec3 const& target, Vec3 const& worldUp );
+Mat44 LookAtAndMoveToWorld( Vec3 const& worldLocation, Vec3 const& target, Vec3 const& worldUp );

@@ -281,3 +281,37 @@ bool IsMatrixEqual( Mat44 const& matA, Mat44 const& matB, float epsilon /*= 0.01
 	}
 }
 
+Mat44 LookAt( Vec3 const& worldLocation, Vec3 const& target, Vec3 const& worldUp )
+{
+	Vec3 forward = target - worldLocation;
+	forward.Normalize();
+
+	Vec3 right = CrossProduct( forward, worldUp );
+	right.Normalize();
+
+	Vec3 up = CrossProduct( right, forward );
+
+	Mat44 lookatMatrix;
+	lookatMatrix.SetBasisVectors3D( right, up, -forward );
+	
+	return lookatMatrix;
+}
+
+//LookAt + translate by worldLocation
+Mat44 LookAtAndMoveToWorld( Vec3 const& worldLocation, Vec3 const& target, Vec3 const& worldUp )
+{
+	Vec3 forward = target - worldLocation;
+	forward.Normalize();
+
+	Vec3 right = CrossProduct( forward, worldUp );
+	right.Normalize();
+
+	Vec3 up = CrossProduct( right, forward );
+
+	Mat44 lookatMatrix;
+	lookatMatrix.SetBasisVectors3D( right, up, -forward );
+	lookatMatrix.SetTranslation3D( worldLocation );
+
+	return lookatMatrix;
+}
+
