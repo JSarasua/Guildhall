@@ -301,9 +301,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		DebugAddScreenArrow( Vec2( 100.f, 100.f ), Vec2( 200.f, 250. ), Rgba8::RED, Rgba8::BLUE, 10.f );
 	}
-	if( rBracketKey.WasJustPressed() )
+	if( rBracketKey.IsPressed() )
 	{
-
+		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
+		DebugAddScreenBasis( cameraModel, Rgba8::WHITE, Rgba8::WHITE, 0.f );
 	}
 	if( rKey.WasJustPressed() )
 	{

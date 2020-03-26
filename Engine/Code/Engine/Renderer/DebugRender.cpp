@@ -375,6 +375,7 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 					if( debugObject->m_isWireMesh )
 					{
 						context->SetFillMode( eFillMode::FILL_WIREFRAME );
+						context->SetCullMode( eCullMode::CULL_NONE );
 					}
 					GPUMesh* mesh = debugObject->m_mesh;
 					Mat44 modelMatrix = debugObject->m_modelMatrix;
@@ -382,18 +383,21 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 					context->SetModelMatrix( modelMatrix, tintColor );
 					context->DrawMesh( mesh );
 					context->SetFillMode( eFillMode::FILL_SOLID );
+					context->SetCullMode( eCullMode::CULL_BACK );
 				}
 				else
 				{
 					if( debugObject->m_isWireMesh )
 					{
 						context->SetFillMode( eFillMode::FILL_WIREFRAME );
+						context->SetCullMode( eCullMode::CULL_NONE );
 					}
 					GPUMesh* mesh = debugObject->m_mesh;
 					Mat44 modelMatrix = debugObject->m_modelMatrix;
 					context->SetModelMatrix( modelMatrix, debugObject->m_meshColor );
 					context->DrawMesh( mesh );
 					context->SetFillMode( eFillMode::FILL_SOLID );
+					context->SetCullMode( eCullMode::CULL_BACK );
 				}
 			}
 		}
@@ -403,7 +407,7 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 static DebugRenderSystem* s_DebugRenderSystem = nullptr;
 
 /************************************************************************/
-/* Methods                                                              */
+/* Methods                                                              
 /************************************************************************/
 void DebugRenderSystemStartup( RenderContext* context )
 {
@@ -418,26 +422,47 @@ void DebugRenderSystemStartup( RenderContext* context )
 	g_theEventSystem->SubscribeToEvent("debug_add_screen_point", CONSOLECOMMAND, DebugAddScreenPoint );
 	g_theEventSystem->SubscribeToEvent("debug_add_screen_quad", CONSOLECOMMAND, DebugAddScreenQuad );
 	g_theEventSystem->SubscribeToEvent("debug_add_screen_text", CONSOLECOMMAND, DebugAddScreenText );
-	//s_DebugRenderSystem->m_fontText = context->m_fonts[0]->GetTexture();
 
+	DebugRenderCreateMeshes();
+}
 
-	s_DebugRenderSystem->m_cubeMesh = new GPUMesh( context );
+void DebugRenderSystemShutdown()
+{
+	std::vector<DebugRenderObject*>& debugObjects = s_DebugRenderSystem->m_renderObjects;
+	for( size_t renderObjectIndex = 0; renderObjectIndex < debugObjects.size(); renderObjectIndex++ )
+	{
+		delete debugObjects[renderObjectIndex];
+		debugObjects[renderObjectIndex] = nullptr;
+	}
+	debugObjects.clear();
+
+	delete s_DebugRenderSystem->m_cubeMesh;
+	s_DebugRenderSystem->m_cubeMesh = nullptr;
+
+	delete s_DebugRenderSystem->m_sphereMesh;
+	s_DebugRenderSystem->m_sphereMesh = nullptr;
+
+	delete s_DebugRenderSystem->m_basisMesh;
+	s_DebugRenderSystem->m_basisMesh = nullptr;
+}
+
+void DebugRenderCreateMeshes()
+{
+	//Cube
+	s_DebugRenderSystem->m_cubeMesh = new GPUMesh( s_DebugRenderSystem->m_context );
 	std::vector<Vertex_PCU> cubeVerts;
 	std::vector<uint> cubeIndices;
-
 	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
 	s_DebugRenderSystem->m_cubeMesh->UpdateVertices( cubeVerts );
 	s_DebugRenderSystem->m_cubeMesh->UpdateIndices( cubeIndices );
 
-	s_DebugRenderSystem->m_sphereMesh = new GPUMesh( context );
+	//Sphere
+	s_DebugRenderSystem->m_sphereMesh = new GPUMesh( s_DebugRenderSystem->m_context );
 	std::vector<Vertex_PCU> sphereVerts;
 	std::vector<uint> sphereIndices;
-
-
 	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3( 0.f, 0.f, 0.f ), 1.f, 64, 64, Rgba8::WHITE );
 	s_DebugRenderSystem->m_sphereMesh->UpdateVertices( sphereVerts );
 	s_DebugRenderSystem->m_sphereMesh->UpdateIndices( sphereIndices );
-
 
 
 	//Bases
@@ -450,7 +475,7 @@ void DebugRenderSystemStartup( RenderContext* context )
 	jBasis += tBasis;
 	kBasis += tBasis;
 
-	s_DebugRenderSystem->m_basisMesh = new GPUMesh( context );
+	s_DebugRenderSystem->m_basisMesh = new GPUMesh( s_DebugRenderSystem->m_context );
 	std::vector<Vertex_PCU> basisVerts;
 	std::vector<uint> basisIndices;
 
@@ -491,26 +516,6 @@ void DebugRenderSystemStartup( RenderContext* context )
 
 	s_DebugRenderSystem->m_basisMesh->UpdateVertices( basisVerts );
 	s_DebugRenderSystem->m_basisMesh->UpdateIndices( basisIndices );
-}
-
-void DebugRenderSystemShutdown()
-{
-	std::vector<DebugRenderObject*>& debugObjects = s_DebugRenderSystem->m_renderObjects;
-	for( size_t renderObjectIndex = 0; renderObjectIndex < debugObjects.size(); renderObjectIndex++ )
-	{
-		delete debugObjects[renderObjectIndex];
-		debugObjects[renderObjectIndex] = nullptr;
-	}
-	debugObjects.clear();
-
-	delete s_DebugRenderSystem->m_cubeMesh;
-	s_DebugRenderSystem->m_cubeMesh = nullptr;
-
-	delete s_DebugRenderSystem->m_sphereMesh;
-	s_DebugRenderSystem->m_sphereMesh = nullptr;
-
-	delete s_DebugRenderSystem->m_basisMesh;
-	s_DebugRenderSystem->m_basisMesh = nullptr;
 }
 
 void EnableDebugRendering()
@@ -632,7 +637,7 @@ void DebugRenderScreenTo( Texture* output )
 	float screenHeight = s_DebugRenderSystem->m_screenHeight;
 
 	Vec2 max( aspectRatio * screenHeight, screenHeight );
-	cam.SetProjectionOrthographic(max, 0.f, 1.f );
+	cam.SetProjectionOrthographic(max, 0.f, 1000.f );
 	cam.SetPosition( Vec3(0.5f * max) );
 
 	std::vector<Vertex_PCU> vertices;
@@ -660,6 +665,9 @@ void DebugRenderScreenTo( Texture* output )
 
 	s_DebugRenderSystem->DrawTexturedObjects( context, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
 
+	
+	s_DebugRenderSystem->DrawMeshes( context, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+	
 	context->EndCamera( cam );
 
 
@@ -884,50 +892,6 @@ void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const
 	debugObject->m_startColor = startTint;
 	debugObject->m_endColor = endTint;
 	debugObject->m_isWireMesh = false;
-
-// 	Vec3 iBasis = basis.GetIBasis3D();
-// 	Vec3 jBasis = basis.GetJBasis3D();
-// 	Vec3 kBasis = basis.GetKBasis3D();
-// 	Vec3 tBasis = basis.GetTranslation3D();
-// 
-// 	iBasis += tBasis;
-// 	jBasis += tBasis;
-// 	kBasis += tBasis;
-// 
-// 	float ilineLength = GetDistance3D(tBasis, iBasis );
-// 	float ilineThickness = ilineLength * 0.025f;
-// 	float ilineRadius = ilineThickness * 0.5f;
-// 	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, tBasis, ilineRadius, iBasis, 0.f, 8U, Rgba8::RED );
-// 
-// 	Vec3 istartOfFlair = tBasis - iBasis;
-// 	istartOfFlair *= 0.2f;
-// 	istartOfFlair += iBasis;
-// 	float iflairRadius = ilineRadius * 3.f;
-// 	AppendIndexedVertsCone( debugObject->m_vertices, debugObject->m_indices, istartOfFlair, iflairRadius, iBasis, 8U, Rgba8::RED );
-// 
-// 
-// 	float jlineLength = GetDistance3D( tBasis, jBasis );
-// 	float jlineThickness = jlineLength * 0.025f;
-// 	float jlineRadius = jlineThickness * 0.5f;
-// 	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, tBasis, ilineRadius, jBasis, 0.f, 8U, Rgba8::GREEN );
-// 
-// 	Vec3 jstartOfFlair = tBasis - jBasis;
-// 	jstartOfFlair *= 0.2f;
-// 	jstartOfFlair += jBasis;
-// 	float jflairRadius = jlineRadius * 3.f;
-// 	AppendIndexedVertsCone( debugObject->m_vertices, debugObject->m_indices, jstartOfFlair, jflairRadius, jBasis, 8U, Rgba8::GREEN );
-// 
-// 
-// 	float klineLength = GetDistance3D( tBasis, kBasis );
-// 	float klineThickness = klineLength * 0.025f;
-// 	float klineRadius = klineThickness * 0.5f;
-// 	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, tBasis, klineRadius, kBasis, 0.f, 8U, Rgba8::BLUE );
-// 
-// 	Vec3 kstartOfFlair = tBasis - kBasis;
-// 	kstartOfFlair *= 0.2f;
-// 	kstartOfFlair += kBasis;
-// 	float kflairRadius = klineRadius * 3.f;
-// 	AppendIndexedVertsCone( debugObject->m_vertices, debugObject->m_indices, kstartOfFlair, kflairRadius, kBasis, 8U, Rgba8::BLUE );
 
 	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
@@ -1268,6 +1232,38 @@ void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color
 	std::string text = Stringv( format, args );
 
 	DebugAddScreenText( pos, pivot, 10.f, color, color, 0.f, text.c_str() );
+}
+
+void DebugAddScreenBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	debugObject->m_mesh	= s_DebugRenderSystem->m_basisMesh;
+	debugObject->m_startColor = startTint;
+	debugObject->m_endColor = endTint;
+	debugObject->m_isWireMesh = false;
+
+	
+	AABB2 screenBounds = DebugGetScreenBounds();
+	float height = screenBounds.maxs.y - screenBounds.mins.y;
+	float screenBasisScale = height * 0.1f;
+	Vec3 screenOffset( height * 0.2f, height * 0.2f, 0.f );
+	Vec3 pos = screenBounds.maxs;
+	pos.z = 100.f;
+	pos -= screenOffset;
+	
+	debugObject->m_modelMatrix = basis;
+	debugObject->m_modelMatrix.SetTranslation3D( Vec3( 0.f, 0.f, 0.f ) );
+	debugObject->m_modelMatrix.ScaleUniform3D( screenBasisScale );
+	debugObject->m_modelMatrix.SetTranslation3D( pos );
+
+
+	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugRenderSetScreenHeight( float height )

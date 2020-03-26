@@ -43,6 +43,7 @@ enum eDebugRenderTo
 //Setup
 void DebugRenderSystemStartup( RenderContext* context );
 void DebugRenderSystemShutdown();
+void DebugRenderCreateMeshes();
 
 //control
 void EnableDebugRendering();
@@ -136,9 +137,11 @@ void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rg
 void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& color, char const* format, ... );
 void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, Rgba8 const& color, char const* format, ... );
 
+//Extra
+void DebugAddScreenBasis(  Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration );
+
 void DebugRenderSetScreenHeight( float height );
 AABB2 DebugGetScreenBounds();
-
 
 bool SetDebugRenderEnabled( const EventArgs* args );
 bool DebugAddWorldPoint( const EventArgs* args );
