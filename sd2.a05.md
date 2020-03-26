@@ -6,7 +6,8 @@
     - [x] `RenderContext::SetFrontFaceWindOrder`
     - [x] Create a default raster state to set when `BeginCamera` is called.
     - [x] Have a transient raster state to create/set when above calls are used.
-
+	**I only have one raster state saved off and get its description when I need to change.
+	  This means I don't need two separate default and transient raster states
 - [x] World Rendering
     - [x] Points
     - [x] Lines
@@ -14,10 +15,11 @@
     - [x] Basis
     - [x] Quad
     - [x] Wire Box
+	**See note below: using transform instead of OBB3
     - [x] Wire Sphere
     - [x] Text
     - [x] Billboarded Text
-    - [-] All world commands support all rendering modes; 
+    - [x] All world commands support all rendering modes; 
 
 - [x] Screen Rendering
     - [x] Points
@@ -44,9 +46,10 @@
 
 
 Notes: 
-My Wire bounds takes a transform instead of an OBB3/AABB3 because it made sense in my mind 
-I don't have multi colors on lines or arrows since it broke my architecture
-If I could do it over, I'd move pretty much everything to meshes and use ModelMatrices+tint to do all of the work
+* My Wire bounds takes a transform instead of an OBB3/AABB3 because it made sense in my mind and allows for only one GPUMesh. It does mean I current don't have an OBB3/AABB3 class, but I can render one. Also this means your scale determines the size of the bounds
+* I don't have multi colors on lines or arrows since it broke my architecture
+* If I could do it over, I'd move pretty much everything to meshes and use ModelMatrices+tint to do all of the work
+
 
 Hotkeys:
 1: World Point (billboarded)
