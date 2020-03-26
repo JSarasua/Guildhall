@@ -6,8 +6,9 @@
  *	TYPES
  */
 class Camera;
-class Texture;
+class GPUMesh;
 class RenderContext;
+class Texture;
 class Transform;
 
 struct Mat44;
@@ -87,6 +88,8 @@ void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& color, fl
 // sphere
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& color, float duration = 0.f, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );
+
+void DebugAddWireMeshToWorld( Mat44 const& modelMatrix, GPUMesh* mesh, Rgba8 startTint, Rgba8 endTint, float duration, eDebugRenderMode mode );
 
 //basis
 void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration, eDebugRenderMode mode = DEBUG_RENDER_USE_DEPTH );

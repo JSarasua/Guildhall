@@ -44,19 +44,39 @@
 
 
 Notes: 
-My hotkeys are a little all over the place but 1-0, left bracket, r,f,t,g all are a different test.
 My Wire bounds takes a transform instead of an OBB3/AABB3 because it made sense in my mind 
 I don't have multi colors on lines or arrows since it broke my architecture
 If I could do it over, I'd move pretty much everything to meshes and use ModelMatrices+tint to do all of the work
 
+Hotkeys:
+1: World Point (billboarded)
+2: Billboarded World Text (move back to see)
+3: Screen Point (top right)
+4: NonBillboarded text (move back to see)
+5: Screen Line
+6: Screen Quad (AABB2)
+7: Textured Screen Quad (FLipped the uvs intentionally to show passing uvs works)
+8: Wired sphere (Xray)
+9: Wired bounds (Render_Always)
+0: Screen Text
+[: Screen Arrow
+]: Screen Basis (EXTRA)
+r: World Line
+f: World Arrow
+t: World Basis
+g: World Quad (Xray)
+y: World Wire Mesh (EXTRA)
+
 ## Extras
-- [ ] *X05.00: 02%*: Screen Basis functions implemented
+- [x] *X05.00: 02%*: Screen Basis functions implemented
+	** Right bracket ] key hold down to see camera basis
 - [ ] *X05.00: 05%*: Message functions implemented
 - [ ] *X05.00: 04%*: Border Around Text (one or two texel black border around text drawn in the world)
 - [ ] *X05.00: 03%*: Option to include a background behind rendered text (color with alpha)
 - [ ] *X05.00: 05%*: Option to pass bounds to text, and pass an alignment.  Text should wrap and align to within the box.  If the text would be larger than the box, you may handle this in your preferred way (clip overflow, center it, or shrink to fit)
 - [ ] *X05.00: 02%*: `DebugAddWorldLineStrip`
-- [ ] *X05.00: 02%*: `DebugAddWireMeshToWorld( mat44 mode, GPUMesh* mesh, rgba start_tint, rgba end_tint, float duration, eDebugRenderMode mode );` 
+- [x] *X05.00: 02%*: `DebugAddWireMeshToWorld( mat44 mode, GPUMesh* mesh, rgba start_tint, rgba end_tint, float duration, eDebugRenderMode mode );`
+	**Y key Uses sphere mesh from my spinning spheres
 - [ ] *X05.00: 02%*: `DebugRenderAddGrid`, see notes.
     - [ ] *X05.00: 03%*: Grid is clipped to area the camera can potentially see (allowing for an infinitly large grid)
 - [x] *X05.00: 03%*: MeshUtils: `AddCylinderToIndexedVertexArray`

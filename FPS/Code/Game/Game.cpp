@@ -237,6 +237,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
+	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 
 
 	if( f11Key.WasJustPressed() )
@@ -278,7 +279,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num7Key.WasJustPressed() )
 	{
 		Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
-		AABB2 aabb(0.2f, 0.2f, .8f, .8f);
+		AABB2 aabb(1.f, 0.f, 0.f, 1.f);
 		DebugAddScreenTexturedQuad( AABB2( 500.f, 300.f, 700.f, 500.f ), tex, aabb, Rgba8::WHITE, Rgba8::BLACK, 5.f );
 	}
 	if( num8Key.WasJustPressed() )
@@ -349,6 +350,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		p3 = cameraModel.TransformPosition3D( p3 );
 
 		DebugAddWorldQuad( p0, p1, p2, p3, Rgba8::GREEN, Rgba8::RED, 5.f, DEBUG_RENDER_XRAY );
+	}
+	if( yKey.WasJustPressed() )
+	{
+		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
+		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 5.f, DEBUG_RENDER_USE_DEPTH );
 	}
 
 	Vec3 translator;

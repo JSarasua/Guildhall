@@ -878,6 +878,25 @@ void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& color,
 	DebugAddWorldWireSphere( pos, radius, color, color, duration, mode );
 }
 
+void DebugAddWireMeshToWorld( Mat44 const& modelMatrix, GPUMesh* mesh, Rgba8 startTint, Rgba8 endTint, float duration, eDebugRenderMode mode )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startTint;
+	debugObject->m_endColor = endTint;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	debugObject->m_isWireMesh = true;
+	debugObject->m_mesh	= mesh;
+
+	debugObject->m_modelMatrix = modelMatrix;
+
+	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+}
+
 void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugRenderObject* debugObject = new DebugRenderObject;
