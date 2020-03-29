@@ -28,10 +28,12 @@ public:
 	float GetAreaOfTriangle( size_t triangleIndex ) const;
 	Vec2 GetCenterOfTriangle( size_t triangleIndex ) const;
 	size_t GetTriangleCount() const;	//Gets number of triangles polygon is made of
+	AABB2 GetTightlyFixBox() const;
+
+	Vec2 GetGJKSupport( Vec2 const& direction ); //Farthest point in a direction
 
 	void Translate( Vec2 const& translator );
 	void RotateAroundCenter( float rotationRadians );
-	AABB2 GetTightlyFixBox() const;
 
 public:
 	static Polygon2D MakeFromLineLoop( Vec2 const* points, unsigned int pointCount );

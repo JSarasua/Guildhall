@@ -283,6 +283,25 @@ AABB2 Polygon2D::GetTightlyFixBox() const
 	return box;
 }
 
+Vec2 Polygon2D::GetGJKSupport( Vec2 const& direction )
+{
+	Vec2 currentFarthestVertex;
+	float currentMaxDistance = 0.f;
+	size_t edgeCount = (size_t)GetEdgeCount();
+	for( size_t vertexIndex = 0; vertexIndex < edgeCount; vertexIndex++ )
+	{
+		Vec2 const& currentVertex = m_points[vertexIndex];
+		float currentDistance = GetProjectedLength2D( currentVertex, direction );
+		if( currentDistance > currentMaxDistance )
+		{
+			currentFarthestVertex = currentVertex;
+			currentMaxDistance = currentDistance;
+		}
+	}
+
+	return currentFarthestVertex;
+}
+
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points, unsigned int pointCount )
 {
 	return Polygon2D( points, pointCount );
