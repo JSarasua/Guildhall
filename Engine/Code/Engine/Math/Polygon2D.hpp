@@ -30,7 +30,8 @@ public:
 	size_t GetTriangleCount() const;	//Gets number of triangles polygon is made of
 	AABB2 GetTightlyFixBox() const;
 
-	Vec2 GetGJKSupport( Vec2 const& direction ); //Farthest point in a direction
+	Vec2 GetFurthestPointInDirection( Vec2 const& direction ) const; //Farthest point in a direction
+	Vec2 GetGJKSupport( Polygon2D const& otherPoly, Vec2 const& dir ) const;
 
 	void Translate( Vec2 const& translator );
 	void RotateAroundCenter( float rotationRadians );

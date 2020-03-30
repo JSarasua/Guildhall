@@ -283,7 +283,7 @@ AABB2 Polygon2D::GetTightlyFixBox() const
 	return box;
 }
 
-Vec2 Polygon2D::GetGJKSupport( Vec2 const& direction )
+Vec2 Polygon2D::GetFurthestPointInDirection( Vec2 const& direction )  const
 {
 	Vec2 currentFarthestVertex;
 	float currentMaxDistance = 0.f;
@@ -300,6 +300,16 @@ Vec2 Polygon2D::GetGJKSupport( Vec2 const& direction )
 	}
 
 	return currentFarthestVertex;
+}
+
+Vec2 Polygon2D::GetGJKSupport( Polygon2D const& otherPoly, Vec2 const& dir ) const
+{
+	Vec2 myGJKSupport = GetFurthestPointInDirection( dir );
+	Vec2 otherGJKSupport = otherPoly.GetFurthestPointInDirection( -dir );
+
+	Vec2 GJKMinkowskiDifference = myGJKSupport - otherGJKSupport;
+
+	return GJKMinkowskiDifference;
 }
 
 Polygon2D Polygon2D::MakeFromLineLoop( Vec2 const* points, unsigned int pointCount )
