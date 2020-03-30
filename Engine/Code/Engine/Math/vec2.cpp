@@ -6,10 +6,11 @@
 #include <vector>
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 
 //-----------------------------------------------------------------------------------------------
-Vec2::Vec2( const Vec2& copy )
+Vec2::Vec2( Vec2 const& copy )
 	: x( copy.x )
 	, y( copy.y )
 {}
@@ -23,21 +24,26 @@ Vec2::Vec2( float initialX, float initialY )
 
 
 //-----------------------------------------------------------------------------------------------
-Vec2::Vec2( const IntVec2& copyFrom )
+Vec2::Vec2( IntVec2 const& copyFrom )
 	: x( static_cast<float>(copyFrom.x))
 	, y( static_cast<float>(copyFrom.y))
 {}
 
 
+Vec2::Vec2( Vec3 const& copyFrom )
+	: x( copyFrom.x )
+	, y( copyFrom.y )
+{}
+
 //-----------------------------------------------------------------------------------------------
-const Vec2 Vec2::operator + ( const Vec2& vecToAdd ) const
+const Vec2 Vec2::operator + ( Vec2 const& vecToAdd ) const
 {
 	return Vec2(x + vecToAdd.x, y + vecToAdd.y);
 }
 
 
 //-----------------------------------------------------------------------------------------------
-const Vec2 Vec2::operator-( const Vec2& vecToSubtract ) const
+const Vec2 Vec2::operator-( Vec2 const& vecToSubtract ) const
 {
 	return Vec2( x - vecToSubtract.x, y - vecToSubtract.y );
 }
@@ -58,7 +64,7 @@ const Vec2 Vec2::operator*( float uniformScale ) const
 
 
 //------------------------------------------------------------------------------------------------
-const Vec2 Vec2::operator*( const Vec2& vecToMultiply ) const
+const Vec2 Vec2::operator*( Vec2 const& vecToMultiply ) const
 {
 	return Vec2( x * vecToMultiply.x, y * vecToMultiply.y );
 }
@@ -72,7 +78,7 @@ const Vec2 Vec2::operator/( float inverseScale ) const
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::operator+=( const Vec2& vecToAdd )
+void Vec2::operator+=( Vec2 const& vecToAdd )
 {
 	x += vecToAdd.x;
 	y += vecToAdd.y;
@@ -80,7 +86,7 @@ void Vec2::operator+=( const Vec2& vecToAdd )
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::operator-=( const Vec2& vecToSubtract )
+void Vec2::operator-=( Vec2 const& vecToSubtract )
 {
 	x -= vecToSubtract.x;
 	y -= vecToSubtract.y;
@@ -88,7 +94,7 @@ void Vec2::operator-=( const Vec2& vecToSubtract )
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::operator*=( const float uniformScale )
+void Vec2::operator*=( float const uniformScale )
 {
 	x *= uniformScale;
 	y *= uniformScale;
@@ -96,7 +102,7 @@ void Vec2::operator*=( const float uniformScale )
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::operator/=( const float uniformDivisor )
+void Vec2::operator/=( float const uniformDivisor )
 {
 	x /= uniformDivisor;
 	y /= uniformDivisor;
@@ -104,7 +110,7 @@ void Vec2::operator/=( const float uniformDivisor )
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::operator=( const Vec2& copyFrom )
+void Vec2::operator=( Vec2 const& copyFrom )
 {
 	x = copyFrom.x;
 	y = copyFrom.y;
@@ -112,14 +118,14 @@ void Vec2::operator=( const Vec2& copyFrom )
 
 
 //-----------------------------------------------------------------------------------------------
-const Vec2 operator*( float uniformScale, const Vec2& vecToScale )
+const Vec2 operator*( float uniformScale, Vec2 const& vecToScale )
 {
 	return Vec2( vecToScale.x * uniformScale, vecToScale.y * uniformScale );
 }
 
 
 //-----------------------------------------------------------------------------------------------
-bool Vec2::operator==( const Vec2& compare ) const
+bool Vec2::operator==( Vec2 const& compare ) const
 {
 	if( x == compare.x && y == compare.y ) {
 		return true;
@@ -129,7 +135,7 @@ bool Vec2::operator==( const Vec2& compare ) const
 
 
 //-----------------------------------------------------------------------------------------------
-bool Vec2::operator!=( const Vec2& compare ) const
+bool Vec2::operator!=( Vec2 const& compare ) const
 {
 	if ( !(x == compare.x && y == compare.y) ) {
 		return true;
@@ -282,7 +288,7 @@ Vec2 Vec2::GetNormalized() const
 
 
 //-----------------------------------------------------------------------------------------------
-Vec2 Vec2::GetReflected( const Vec2& normalVector ) const
+Vec2 Vec2::GetReflected( Vec2 const& normalVector ) const
 {
 	/*
 		Solve in N,T coordinates where N is Normal and T is Tangent.
@@ -437,7 +443,7 @@ float Vec2::NormalizeAndGetPreviousLength()
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::Reflect( const Vec2& normalVector )
+void Vec2::Reflect( Vec2 const& normalVector )
 {
 	Vec2 ProjectedOntoNormal = GetProjectedOnto2D( *this, normalVector );
 	Vec2 VecTangent = *this - ProjectedOntoNormal;
@@ -450,7 +456,7 @@ void Vec2::Reflect( const Vec2& normalVector )
 
 
 //-----------------------------------------------------------------------------------------------
-void Vec2::SetFromText( const char* text )
+void Vec2::SetFromText( char const* text )
 {
 	std::string strText = text;
 	
