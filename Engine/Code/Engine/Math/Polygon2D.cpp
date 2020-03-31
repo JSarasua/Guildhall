@@ -364,6 +364,12 @@ void Polygon2D::CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const
 		vertexes.push_back( B );
 		vertexes.push_back( A );
 		GJKTriangle = Polygon2D( vertexes );
+
+		if( !GJKTriangle.IsConvex() )
+		{
+			//Should never be here
+			ERROR_AND_DIE("Could not make convex");
+		}
 	}
 	*simplex = GJKTriangle;
 
@@ -375,10 +381,12 @@ void Polygon2D::CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const
 	LineSegment3 BC ( B3D, C3D );
 	LineSegment3 CA ( C3D, A3D );
 
-	DebugAddWorldArrow( AB, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( BC, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( CA, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-
+// 	DebugAddWorldArrow( AB, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( BC, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( CA, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+// 
+// 	DebugAddWorldPoint( C, 0.1f, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldPoint( B, 0.1f, Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
  	DebugAddWorldPoint( Vec3(), 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldPoint( B3D, 1.f, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldPoint( C3D, 1.f, Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
@@ -386,12 +394,12 @@ void Polygon2D::CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const
 	return;
 }
 
-bool Polygon2D::EvolveNormalDir( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex )
+bool Polygon2D::EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex )
 {
 	Vec2 origin = Vec2( 0.f, 0.f );
-	Vec2 OA = simplex->m_points[0] - origin;
-	Vec2 OB = simplex->m_points[1] - origin;
-	Vec2 OC = simplex->m_points[2] - origin;
+	Vec2 OA = origin - simplex->m_points[0];
+	Vec2 OB = origin - simplex->m_points[1];
+	Vec2 OC = origin - simplex->m_points[2];
 
 	Vec2 ABEdgeNormal;
 	Vec2 BCEdgeNormal;

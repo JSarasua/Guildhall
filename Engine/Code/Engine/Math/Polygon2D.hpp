@@ -42,7 +42,7 @@ public:
 	static Polygon2D MakeFromLineLoop( Vec2 const* points, unsigned int pointCount );
 	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points, unsigned int pointCount );
 	static void CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const& poly1,  Polygon2D* simplex );
-	static bool EvolveNormalDir( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex ); //Returns true if it successfully evolved the simplex, else returns false
+	static bool EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex ); //Returns true if it successfully evolved the simplex, else returns false
 
 private:
 
