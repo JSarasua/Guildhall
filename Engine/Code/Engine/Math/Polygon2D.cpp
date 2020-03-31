@@ -5,6 +5,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Math/LineSegment3.hpp"
 #include "Engine/Math/LineSegment2.hpp"
+#include "Engine/Math/FloatRange.hpp"
 
 
 Polygon2D::Polygon2D( Vec2 const* points, unsigned int pointCount )
@@ -93,7 +94,7 @@ bool Polygon2D::Contains( Vec2 const& point ) const
 
 		float dotProd = DotProduct2D( edgeNormal, startToRefPoint );
 
-		if( dotProd < 0.f )
+		if( dotProd < 0.f && !AlmostEqualsFloat(dotProd, 0.f, 0.00001f) )
 		{
 			return false;
 		}
@@ -385,6 +386,11 @@ void Polygon2D::CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const
 	normalDir.Normalize();
 	Vec2 A = poly0.GetGJKSupport( poly1, normalDir );
 
+	if( A.IsAlmostEqual( B ) || A.IsAlmostEqual( C ) )
+	{
+		A = poly0.GetGJKSupport( poly1, -normalDir );
+	}
+
 	std::vector<Vec2> vertexes;
 	vertexes.push_back( A );
 	vertexes.push_back( B );
@@ -507,9 +513,9 @@ bool Polygon2D::EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polyg
 	LineSegment3 BC( B3D, C3D );
 	LineSegment3 CA( C3D, A3D );
 
-	DebugAddWorldArrow( AB, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( BC, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( CA, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( AB, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( BC, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( CA, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 
 	return true;
 }
@@ -568,6 +574,124 @@ bool Polygon2D::ExpandPenetration( Polygon2D const& poly0, Polygon2D const& poly
 		}
 	}
 	*simplex = Polygon2D( vertexes );
+	return true;
+
+}
+
+void Polygon2D::GetRangeNearInfiniteLine( LineSegment2* edge, Vec2 const& ref0, Vec2 const& ref1, Polygon2D const& poly, float epsilon /*= 0.001f */ )
+{
+	std::vector<Vec2> const& points = poly.m_points;
+	std::vector<Vec2> pointsOnLine;
+	for( size_t pointIndex = 0; pointIndex < points.size(); pointIndex++ )
+	{
+		Vec2 const& currentPoint = points[pointIndex];
+		Vec2 pointOnLine = GetNearestPointOnInfiniteLine2D( currentPoint, ref0, ref1 );
+		if( GetDistanceSquared2D( currentPoint, pointOnLine ) < epsilon )
+		{
+			pointsOnLine.push_back( pointOnLine );
+		}
+
+	}
+	Vec2 normal = ref1 - ref0;
+	normal.Rotate90Degrees();
+	normal.Normalize();
+
+	Vec2 tangent = normal.GetRotated90Degrees();
+
+	FloatRange range = GetRangeOnProjectedAxis( (int)pointsOnLine.size(), &pointsOnLine[0], ref0, normal );
+	edge->startPosition = range.minimum * tangent + ref0;
+	edge->endPosition = range.maximum * tangent + ref0;
+	//GetNearestPointOnInfiniteLine2D( )
+}
+
+void Polygon2D::GetGJKContactEdgeFromPoly( LineSegment2* contactEdge, LineSegment2 const& refEdge, Vec2 const& normal, Polygon2D const& polyToClip )
+{
+	if( refEdge.startPosition.IsAlmostEqual( refEdge.endPosition ) )
+	{
+		contactEdge->startPosition = refEdge.startPosition;
+		contactEdge->endPosition = refEdge.endPosition;
+		return;
+	}
+
+	size_t edgeCount = polyToClip.GetEdgeCount();
+	Vec2 initialValue = Vec2( 99999.f,99999.f );
+	Vec2 min = initialValue;
+	Vec2 max = initialValue;
+	Vec2 tangent = normal.GetRotated90Degrees();
+	for( size_t edgeIndex = 0; edgeIndex < edgeCount; edgeIndex++ )
+	{
+		LineSegment2 currentEdge;
+		polyToClip.GetEdge( &currentEdge.startPosition, &currentEdge.endPosition, edgeIndex );
+
+		//To do
+		if( Polygon2D::ClipSegmentToSegment( currentEdge, refEdge ) )
+		{
+			Vec2 refStartToCurrentStart = currentEdge.startPosition - refEdge.startPosition;
+			Vec2 refStartToCurrentEnd = currentEdge.endPosition - refEdge.startPosition;
+
+			if( DotProduct2D( refStartToCurrentStart, normal ) < 0.f )
+			{
+				if( min.IsAlmostEqual( initialValue ) )
+				{
+					min = currentEdge.startPosition;
+				}
+				if( max.IsAlmostEqual( initialValue ) )
+				{
+					max = currentEdge.startPosition;
+				}
+				Vec2 refStartToMin = min - refEdge.startPosition;
+				Vec2 refStartToMax = max - refEdge.startPosition;
+				if( DotProduct2D( refStartToCurrentStart, tangent ) < DotProduct2D( refStartToMin, tangent ) )
+				{
+					min = currentEdge.startPosition;
+				}
+				if( DotProduct2D( refStartToCurrentStart, tangent ) > DotProduct2D( refStartToMax, tangent ) )
+				{
+					max = currentEdge.startPosition;
+				}
+
+				refStartToMin = min - refEdge.startPosition;
+				refStartToMax = max - refEdge.startPosition;
+				if( DotProduct2D( refStartToCurrentEnd, tangent ) < DotProduct2D( refStartToMin, tangent ) )
+				{
+					min = currentEdge.endPosition;
+				}
+				if( DotProduct2D( refStartToCurrentEnd, tangent ) > DotProduct2D( refStartToMax, tangent ) )
+				{
+					max = currentEdge.endPosition;
+				}
+			}
+		}
+
+	}
+
+	contactEdge->startPosition = min;
+	contactEdge->endPosition = max;
+}
+
+bool Polygon2D::ClipSegmentToSegment( LineSegment2& toClip, LineSegment2 const& refEdge )
+{
+	Vec2 refNormal = refEdge.endPosition - refEdge.startPosition;
+	refNormal.Normalize();
+	
+	float pi = DotProduct2D( toClip.startPosition, refNormal );
+	float pf = DotProduct2D( toClip.endPosition, refNormal );
+	float ri = DotProduct2D( refEdge.startPosition, refNormal );
+	float rf = DotProduct2D( refEdge.endPosition, refNormal );
+
+	float pri = Max( pi, ri );
+	float prf = Min( pf, rf );
+
+	if( pri > prf )
+	{
+		return false;
+	}
+	Vec2 Fi = RangeMap( pi, pf, refEdge.startPosition, refEdge.endPosition, pri );
+	Vec2 Ff = RangeMap( pi, pf, refEdge.startPosition, refEdge.endPosition, prf );
+
+	toClip.startPosition = Fi;
+	toClip.endPosition = Ff;
+
 	return true;
 
 }

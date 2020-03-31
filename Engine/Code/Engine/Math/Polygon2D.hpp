@@ -48,6 +48,9 @@ public:
 	static bool EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex ); //Returns true if it successfully evolved the simplex, else returns false
 	static bool GetGJKContainingSimplex( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* containingSimplex ); //Returns the simplex that contains the origin of the minkowski space, will return false if can't
 	static bool ExpandPenetration( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex );
+	static void GetRangeNearInfiniteLine( LineSegment2* edge, Vec2 const& ref0, Vec2 const& ref1, Polygon2D const& poly, float epsilon = 0.01f ); //Gets min/max points on edge within an epsilon
+	static void GetGJKContactEdgeFromPoly( LineSegment2* contactEdge, LineSegment2 const& refEdge, Vec2 const& normal, Polygon2D const& polyToClip );
+	static bool ClipSegmentToSegment( LineSegment2& toClip, LineSegment2 const& refEdge );
 private:
 
 

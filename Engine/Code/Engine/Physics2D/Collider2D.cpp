@@ -317,7 +317,8 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 		return false;
 	}
 	
-	while(Polygon2D::ExpandPenetration( poly0, poly1, &simplex ) ) {}
+	int expandCounter = 0;
+	while(Polygon2D::ExpandPenetration( poly0, poly1, &simplex ) && expandCounter < 100 ) { expandCounter++; }
 	LineSegment2 closestEdge;
 	size_t closestEdgeIndex = 0;
 	simplex.GetClosestEdge( &closestEdge, origin, &closestEdgeIndex );
@@ -325,13 +326,32 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	Vec2 normal = origin - closestPoint;
 	normal.Normalize();
 	float penetration = GetDistance2D( origin, closestPoint );
-	Vec2 furthestPoint = poly1.GetFurthestPointInDirection( normal );
-	Vec2 contactPoint = closestPoint + furthestPoint;
-	manifold->contactEdge = LineSegment2( closestPoint, closestPoint );
+	Vec2 refPoint = poly1.GetFurthestPointInDirection( normal );
+	Vec2 tangent = normal.GetRotated90Degrees();
+	
+	Vec2 pointOnTangentLine = refPoint + tangent;
+	LineSegment2 referenceEdge;
+	Polygon2D::GetRangeNearInfiniteLine( &referenceEdge, refPoint, pointOnTangentLine, poly1 );
+	
+	LineSegment2 contactEdge;
+	Polygon2D::GetGJKContactEdgeFromPoly( &contactEdge, referenceEdge, normal, poly0 );
+	//Now have infinite line segment with furthestPoint
+
+
+	
+	
+	
+	
+	Vec2 contactPoint = refPoint;
+	manifold->contactEdge = contactEdge;
 	manifold->normal = normal;
 	manifold->penetration = penetration;
 
-	DebugAddWorldArrow( LineSegment3( contactPoint, contactPoint + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldPoint( contactEdge.startPosition, 0.5f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldPoint( contactEdge.endPosition, 0.5f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+//	DebugAddWorldArrow( LineSegment3( contactPoint, contactPoint + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldArrow( LineSegment3( contactEdge.startPosition, contactEdge.startPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldArrow( LineSegment3( contactEdge.endPosition, contactEdge.endPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddWorldBillboardTextf( contactPoint, Vec2(), Rgba8::RED, "Pen: %.2f", penetration );
 	return true;
 }
