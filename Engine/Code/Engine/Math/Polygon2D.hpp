@@ -3,6 +3,8 @@
 #include "Engine/Math/AABB2.hpp"
 #include <vector>
 
+struct LineSegment2;
+
 class Polygon2D
 {
 public:
@@ -24,6 +26,7 @@ public:
 	int GetVertexCount() const;
 	int GetEdgeCount() const;
 	void GetEdge( Vec2* outStart, Vec2* outEnd, size_t edgeIndex ) const;
+	void GetClosestEdge( LineSegment2* edge, Vec2 const& point, size_t* edgeIndex );
 	void GetEdgeNormal( Vec2* edgeNormal, size_t edgeIndex ) const;			//Pointing inwards
 	void GetEdgeNormalOutward( Vec2* edgeNormal, size_t edgeIndex ) const;
 	void GetTriangle( Vec2* outA, Vec2* outB, Vec2* outC, size_t triangleIndex ) const; //Gets a triangle for rendering from the triangle index
@@ -43,7 +46,8 @@ public:
 	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points, unsigned int pointCount );
 	static void CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const& poly1,  Polygon2D* simplex );
 	static bool EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex ); //Returns true if it successfully evolved the simplex, else returns false
-
+	static bool GetGJKContainingSimplex( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* containingSimplex ); //Returns the simplex that contains the origin of the minkowski space, will return false if can't
+	static bool ExpandPenetration( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex );
 private:
 
 

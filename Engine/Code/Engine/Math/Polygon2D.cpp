@@ -4,6 +4,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Math/LineSegment3.hpp"
+#include "Engine/Math/LineSegment2.hpp"
 
 
 Polygon2D::Polygon2D( Vec2 const* points, unsigned int pointCount )
@@ -196,6 +197,40 @@ void Polygon2D::GetEdge( Vec2* outStart, Vec2* outEnd, size_t edgeIndex ) const
 		*outStart = m_points[edgeIndex];
 		*outEnd = m_points[edgeIndex + 1];
 	}
+
+}
+
+void Polygon2D::GetClosestEdge( LineSegment2* edge, Vec2 const& point, size_t* edgeIndex )
+{
+	size_t edgeCount = GetEdgeCount();
+	Vec2 start;
+	Vec2 end;
+
+	GetEdge( &start, &end, 0 );
+
+	LineSegment2 closestEdge( start, end );
+	Vec2 closestPoint = closestEdge.GetNearestPoint( point );
+	float minDistance = GetDistanceSquared2D( closestPoint, point );
+	size_t closestEdgeIndex = 0;
+
+	for( size_t currentEdgeIndex = 1; currentEdgeIndex < edgeCount; currentEdgeIndex++ )
+	{
+		GetEdge( &start, &end, currentEdgeIndex );
+		LineSegment2 currentEdge( start, end );
+		Vec2 currentNearestPoint = currentEdge.GetNearestPoint( point );
+		float currentDistance = GetDistanceSquared2D( currentNearestPoint, point );
+
+		if( currentDistance < minDistance )
+		{
+			minDistance = currentDistance;
+			closestEdge = currentEdge;
+			closestEdgeIndex = currentEdgeIndex;
+		}
+	}
+
+	*edge = closestEdge;
+	*edgeIndex = closestEdgeIndex;
+	return;
 
 }
 
@@ -477,5 +512,63 @@ bool Polygon2D::EvolveGJK( Polygon2D const& poly0, Polygon2D const& poly1, Polyg
 	DebugAddWorldArrow( CA, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 
 	return true;
+}
+
+bool Polygon2D::GetGJKContainingSimplex( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* containingSimplex )
+{
+	Vec2 origin = Vec2( 0.f, 0.f );
+	//Create First Simplex
+	Polygon2D simplex;
+	Polygon2D::CreateInitialGJKSimplex( poly0, poly1, &simplex );
+
+	if( simplex.Contains( origin ) )
+	{
+		*containingSimplex = simplex;
+		return true;
+	}
+
+	while( Polygon2D::EvolveGJK( poly0, poly1, &simplex ) )
+	{
+		if( simplex.Contains( origin ) )
+		{
+			*containingSimplex = simplex;
+			return true;
+		}
+	}
+	containingSimplex = nullptr;
+	return false;
+}
+
+bool Polygon2D::ExpandPenetration( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex )
+{
+	Vec2 origin = Vec2( 0.f, 0.f );
+
+	LineSegment2 currentClosestEdge;
+	size_t closestEdgeIndex = 0;
+	simplex->GetClosestEdge( &currentClosestEdge, origin, &closestEdgeIndex );
+	Vec2 closestPoint = currentClosestEdge.GetNearestPoint( origin );
+	Vec2 normal = closestPoint - origin;
+	normal.Normalize();
+	Vec2 pointToAdd = poly0.GetGJKSupport( poly1, normal );
+
+	if( pointToAdd.IsAlmostEqual( currentClosestEdge.startPosition ) || pointToAdd.IsAlmostEqual( currentClosestEdge.endPosition ) )
+	{
+		return false;
+	}
+
+	std::vector<Vec2> vertexes;
+	size_t edgeCount = simplex->GetEdgeCount();
+	size_t currentEdge = 0;
+	for( currentEdge; currentEdge < edgeCount; currentEdge++ )
+	{
+		vertexes.push_back( simplex->m_points[currentEdge] );
+		if( currentEdge == closestEdgeIndex )
+		{
+			vertexes.push_back( pointToAdd );
+		}
+	}
+	*simplex = Polygon2D( vertexes );
+	return true;
+
 }
 
