@@ -467,3 +467,8 @@ void Vec2::SetFromText( char const* text )
 	y = (float)atof(splitStrings[1].c_str());
 
 }
+
+bool Vec2::IsAlmostEqual( Vec2 const& other, float epsilon /*= 0.001f */ )
+{
+	return AlmostEqualsFloat( x, other.x, epsilon ) && AlmostEqualsFloat( y, other.y, epsilon );
+}
