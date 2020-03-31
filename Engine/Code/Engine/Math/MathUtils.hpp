@@ -47,6 +47,7 @@ const Vec3 TransformPosition3DXY( const Vec3& position, float scaleXY, float Rot
 const Vec3 TransformPosition3DXY( const Vec3& position, const Vec2& iBasisXY, const Vec2& jBasisXY, const Vec2& translationXY );
 
 float RangeMap( float InputMin, float InputMax, float outputMin, float outputMax, float inputScale );
+Vec2 RangeMap( float inputMin, float inputMax, Vec2 outputMin, Vec2 outputMax, float inputScale );
 float Interpolate(float rangeMin, float rangeMax, float rangeScale);
 float Clampf( float rawValue, float inputMin, float inputMax );
 int ClampInt( int rawValue, int inputMin, int inputMax );

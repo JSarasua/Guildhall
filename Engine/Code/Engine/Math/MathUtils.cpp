@@ -221,6 +221,13 @@ float RangeMap( float InputMin, float InputMax, float outputMin, float outputMax
 	return outputValue;
 }
 
+Vec2 RangeMap( float inputMin, float inputMax, Vec2 outputMin, Vec2 outputMax, float inputScale )
+{
+	float scale = (inputScale - inputMin) / ( inputMax - inputMin );
+	Vec2 output = outputMin + scale * (outputMax - outputMin);
+	return output;
+}
+
 float Interpolate( float rangeMin, float rangeMax, float rangeScale )
 {
 	float displacement = rangeMax - rangeMin;
