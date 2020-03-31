@@ -161,7 +161,7 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	Manifold2D manifold = collision.manifold;
 	Vec2 normal = manifold.normal;
 	Vec2 tangent = normal.GetRotatedMinus90Degrees();
-	Vec2 contactPoint = manifold.contactPoint;
+	Vec2 contactPoint = manifold.contactEdge.GetCenter();
 	Rigidbody2D* myRigidbody = collision.me->m_rigidbody;
 	Rigidbody2D* theirRigidbody = collision.them->m_rigidbody;
 

@@ -223,7 +223,7 @@ static bool PolygonVPolygonCollisionCheck( Collider2D const* col0, Collider2D co
 		return true;
 	}
 
-	while( Polygon2D::EvolveNormalDir( poly0, poly1, &simplex ) )
+	while( Polygon2D::EvolveGJK( poly0, poly1, &simplex ) )
 	{
 		if( simplex.Contains( origin ) )
 		{
@@ -232,116 +232,6 @@ static bool PolygonVPolygonCollisionCheck( Collider2D const* col0, Collider2D co
 	}
 
 	return false;
-
-	//EvolveNormalDir
-	//Loop
-		//Call CheckInside
-
-		//Call Evolve
-
-
-
-// 	Vec2 C = poly0.GetGJKSupport( poly1, rightDir ); //
-// 	//Vec2 origin = Vec2( 0.f, 0.f );
-// 	Vec2 CO = C - origin; // CO = -OC
-// 
-// 	Vec2 B = poly0.GetGJKSupport( poly1, -CO );
-// 	Vec2 BO = B - origin;
-// 
-// 	if( DotProduct2D( CO, -BO ) < 0.f )
-// 	{
-// 		return false;
-// 	}
-// 
-// 	Vec2 CB = C - B;
-// 
-// 	//Do Triple cross product expansion
-// 	Vec2 normalDir = Vec2( CrossProduct( CB, CrossProduct( CO, CB ) ) );
-// 	Vec2 A = poly0.GetGJKSupport( poly1, normalDir );
-// 
-// 
-// 	std::vector<Vec2> vertexes;
-// 	vertexes.push_back( A );
-// 	vertexes.push_back( B );
-// 	vertexes.push_back( C );
-// 	Polygon2D GJKTriangle = Polygon2D( vertexes );
-// 
-// 	bool isTriangleFlipped = false;
-// 
-// 	if( !GJKTriangle.IsConvex() )
-// 	{
-// 		isTriangleFlipped = true;
-// 		vertexes.clear();
-// 		vertexes.push_back( C );
-// 		vertexes.push_back( B );
-// 		vertexes.push_back( A );
-// 		GJKTriangle = Polygon2D( vertexes );
-// 		
-// 		if( !GJKTriangle.IsConvex() )
-// 		{
-// 			//Should not occur
-// 			return false;
-// 		}
-// 	}
-// 
-// 	if( GJKTriangle.Contains( origin ) )
-// 	{
-// 		return true;
-// 	}
-// 
-// 	size_t edgeIndex = 0;
-// 	while( edgeIndex < 3 ) //always triangles
-// 	{
-// 
-// 		Vec2 D;
-// 		Vec2 E;
-// 		Vec2 edgeNormal;
-// 		GJKTriangle.GetEdge( &D, &E, edgeIndex );
-// 		GJKTriangle.GetEdgeNormal( &edgeNormal, edgeIndex );
-// 		edgeNormal *= -1.f;
-// 
-// 		Vec2 OD = origin - D;
-// 
-// 		float ODdotNormal = DotProduct2D( OD, edgeNormal );
-// 		if( ODdotNormal > 0.f )
-// 		{
-// 
-// 			C = D;
-// 			B = E;
-// 			
-// 			CO = C - origin; // CO = -OC
-// 			CB = C - B;
-// 
-// 			Vec2 tempNormalDir = Vec2( CrossProduct( CB, CrossProduct( CO, CB ) ) );
-// 			Vec2 F = poly0.GetGJKSupport( poly1, tempNormalDir );
-// 
-// 
-// 			if( F == C || F == B )
-// 			{
-// 				//The normal points outside of the polygon
-// 				return false;
-// 			}
-// 			A = F;
-// 
-// 			break;
-// 		}
-// 
-// 
-// 	}
-// 	
-// 
-// 	//Check if inside
-// 	
-// 	//Create Simplex in counterclockwise winding order
-// 	//Add GetEdgeNormalInward and GetEdgeNormalOutward
-// 	//Add a flip poly points if clockwise
-// 	//Add a make next simplex method given current simplex poly, poly0, and poly1
-// 
-// 
-// 	
-// 
-// 
-// 	return false;
 }
 
 
@@ -368,7 +258,7 @@ bool DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1, Manifold
 
 	manifold->normal = normal;
 	manifold->penetration = penetration;
-	manifold->contactPoint = contact;
+	manifold->contactEdge = LineSegment2( contact, contact );
 
 	return manifold;
 }
@@ -400,7 +290,7 @@ bool DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manif
 	Vec2 contactPoint = discCenter - normal*( discRadius - 0.5f*penetration );
 
 
-	manifold->contactPoint = contactPoint;
+	manifold->contactEdge = LineSegment2( contactPoint, contactPoint );
 	manifold->normal = normal;
 	manifold->penetration = penetration;
 
