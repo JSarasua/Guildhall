@@ -155,6 +155,7 @@ void Game::UpdateGameObjects( float deltaSeconds )
 			{
 				continue;
 			}
+			m_gameObjects[otherGameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
 			if( gameObjectIndex != otherGameObjectIndex )
 			{
 				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
@@ -163,6 +164,7 @@ void Game::UpdateGameObjects( float deltaSeconds )
 				if( collider->Intersects( otherCollider ) )
 				{
 					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
+					m_gameObjects[otherGameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
 				}
 
 			}
