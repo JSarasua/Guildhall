@@ -203,8 +203,6 @@ static bool DiscVPolygonCollisionCheck( Collider2D const* col0, Collider2D const
 
 static bool PolygonVPolygonCollisionCheck( Collider2D const* col0, Collider2D const* col1 )
 {
-	Vec2 rightDir = Vec2( 1.f , 0.f );
-	Vec2 leftDir = Vec2( -1.f, 0.f );
 	Vec2 origin = Vec2( 0.f, 0.f );
 
 	PolygonCollider2D const* polyCol0 = (PolygonCollider2D const*)col0;
@@ -303,5 +301,33 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	UNUSED(col1);
 	UNUSED(manifold);
 
-	return false;
+	Vec2 origin = Vec2( 0.f, 0.f );
+
+	PolygonCollider2D const* polyCol0 = (PolygonCollider2D const*)col0;
+	PolygonCollider2D const* polyCol1 = (PolygonCollider2D const*)col1;
+
+	Polygon2D const& poly0 = polyCol0->GetPolygon();
+	Polygon2D const& poly1 = polyCol1->GetPolygon();
+
+	Polygon2D simplex;
+	//Create First Simplex
+	if( !Polygon2D::GetGJKContainingSimplex( poly0, poly1, &simplex ) )
+	{
+		return false;
+	}
+	
+	while(Polygon2D::ExpandPenetration( poly0, poly1, &simplex ) ) {}
+	LineSegment2 closestEdge;
+	size_t closestEdgeIndex = 0;
+	simplex.GetClosestEdge( &closestEdge, origin, &closestEdgeIndex );
+	Vec2 closestPoint = closestEdge.GetNearestPoint( origin );
+	Vec2 normal = origin - closestPoint;
+	normal.Normalize();
+	float penetration = GetDistance2D( origin, closestPoint );
+
+	manifold->contactEdge = closestEdge;
+	manifold->normal = normal;
+	manifold->penetration = penetration;
+
+	return true;
 }
