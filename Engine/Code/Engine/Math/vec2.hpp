@@ -72,7 +72,7 @@ public:
 	void	Reflect( Vec2 const& normalVector);
 	void	SetFromText( char const* text); //Parse "6,4" or " -.3 , 0.05 " to (x,y)
 
-	bool	IsAlmostEqual( Vec2 const& other, float epsilon = 0.001f );
+	bool	IsAlmostEqual( Vec2 const& other, float epsilon = 0.001f ) const;
 
 };
 

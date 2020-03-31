@@ -468,7 +468,7 @@ void Vec2::SetFromText( char const* text )
 
 }
 
-bool Vec2::IsAlmostEqual( Vec2 const& other, float epsilon /*= 0.001f */ )
+bool Vec2::IsAlmostEqual( Vec2 const& other, float epsilon /*= 0.001f */ ) const
 {
 	return AlmostEqualsFloat( x, other.x, epsilon ) && AlmostEqualsFloat( y, other.y, epsilon );
 }
