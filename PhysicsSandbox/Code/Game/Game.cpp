@@ -19,6 +19,7 @@
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -33,6 +34,7 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	EnableDebugRendering();
 	m_camera = new Camera();
 	m_UICamera = new Camera();
 
@@ -101,6 +103,11 @@ void Game::Render()
 	RenderUI();
 	g_theRenderer->EndCamera( *m_UICamera );
 
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
 }
 
 
@@ -133,33 +140,35 @@ void Game::UpdateGameObjects( float deltaSeconds )
 
 	}
 
+	//Delete
+	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
+	{
+		if( nullptr == m_gameObjects[gameObjectIndex] )
+		{
+			continue;
+		}
+		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
 
-// 	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-// 	{
-// 		if( nullptr == m_gameObjects[gameObjectIndex] )
-// 		{
-// 			continue;
-// 		}
-// 		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
-// 
-// 		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
-// 		{
-// 			if( nullptr == m_gameObjects[otherGameObjectIndex] )
-// 			{
-// 				continue;
-// 			}
-// 			if( gameObjectIndex != otherGameObjectIndex )
-// 			{
-// 				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
-// 				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
-// 
-// 				if( collider->Intersects( otherCollider ) )
-// 				{
-// 					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
-// 				}
-// 			}
-// 		}
-// 	}
+		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
+		{
+			if( nullptr == m_gameObjects[otherGameObjectIndex] )
+			{
+				continue;
+			}
+			if( gameObjectIndex != otherGameObjectIndex )
+			{
+				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
+				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
+
+				if( collider->Intersects( otherCollider ) )
+				{
+					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
+				}
+
+			}
+		}
+		break;
+	}
 
 	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
 	{
@@ -256,11 +265,11 @@ void Game::RenderDebugMouse() const
 	{
 		if( m_isPolyValid )
 		{
-			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::BLUE, 1.f );
+			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::BLUE, 0.1f );
 		}
 		else
 		{
-			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::RED, 1.f );
+			g_theRenderer->DrawLine( m_polygonPoints.back(), m_mousePositionOnMainCamera, Rgba8::RED, 0.1f );
 		}
 	}
 }
@@ -280,20 +289,20 @@ void Game::RenderUI() const
 		isPausedString = Stringf("Game is: Unpaused");
 	}
 
-	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(60.f, 43.f) , 1.f);
-	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(60.f, 42.f) , 1.f);
+	g_theRenderer->DrawTextAtPosition(gravityUIString.c_str(), Vec2(6.f, 4.3f) , 0.1f );
+	g_theRenderer->DrawTextAtPosition("Adjust: +/-", Vec2(6.f, 4.2f) , 0.1f );
 
-	g_theRenderer->DrawTextAtPosition( timeScaleUIString.c_str(), Vec2( 60.f, 40.f ), 1.f );
-	g_theRenderer->DrawTextAtPosition( "Adjust: 8/9", Vec2( 60.f, 39.f ), 1.f );
-	g_theRenderer->DrawTextAtPosition( "0: Reset", Vec2( 60.f, 38.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( timeScaleUIString.c_str(), Vec2( 6.f, 4.f ), 0.1f );
+	g_theRenderer->DrawTextAtPosition( "Adjust: 8/9", Vec2( 6.f, 3.9f ), 0.1f );
+	g_theRenderer->DrawTextAtPosition( "0: Reset", Vec2( 6.f, 3.8f ), 0.1f );
 
-	g_theRenderer->DrawTextAtPosition( isPausedString.c_str(), Vec2( 60.f, 36.f ), 1.f );
-	g_theRenderer->DrawTextAtPosition( "P: Toggle Pause", Vec2( 60.f, 35.f ), 1.f );
+	g_theRenderer->DrawTextAtPosition( isPausedString.c_str(), Vec2( 6.f, 3.6f ), 0.1f );
+	g_theRenderer->DrawTextAtPosition( "P: Toggle Pause", Vec2( 6.f, 3.5f ), 0.1f );
 
 	if( nullptr != m_hoveringOverGameObject )
 	{
 		AABB2 textBox;
-		textBox.SetDimensions( Vec2(30.f, 30.f ) );
+		textBox.SetDimensions( Vec2(3.f, 3.f ) );
 		Vec2 halfDimensions = textBox.GetDimensions() * 0.5f;
 		textBox.SetCenter( m_mousePositionOnUICamera + halfDimensions );
 
@@ -376,27 +385,27 @@ void Game::RenderUI() const
 		float vIncrement = 1.f / 11.f;
 		float currentV = 0.f;
 
-		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		g_theRenderer->DrawAlignedTextAtPosition(currentDragString.c_str(), textBox, 0.1f, Vec2(0.f, currentV) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition(currentFrictionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		g_theRenderer->DrawAlignedTextAtPosition(currentFrictionString.c_str(), textBox, 0.1f, Vec2(0.f, currentV) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition(currentRestitutionString.c_str(), textBox, 1.f, Vec2(0.f, currentV) );
+		g_theRenderer->DrawAlignedTextAtPosition(currentRestitutionString.c_str(), textBox, 0.1f, Vec2(0.f, currentV) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( angularVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( angularVelocityString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( orientationRadiansString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( orientationRadiansString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( currentVerletVelocityString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( currentVelocityString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( currentVelocityString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( positionString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( positionString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( momentString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( momentString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( massString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( massString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 		currentV += vIncrement;
-		g_theRenderer->DrawAlignedTextAtPosition( simModeString.c_str(), textBox, 1.f, Vec2( 0.f, currentV ) );
+		g_theRenderer->DrawAlignedTextAtPosition( simModeString.c_str(), textBox, 0.1f, Vec2( 0.f, currentV ) );
 	}
 
 
@@ -474,7 +483,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			m_camera->SetPosition( Vec3(0.f, 0.f, 0.f ) );
 			//m_camera->m_position = Vec2( 0.f, 0.f );
-			m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
+			m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), -100.f, 100.f );
 			//m_camera->SetProjectionOrthographic( m_defaultCameraHeight );
 		}
 
@@ -631,7 +640,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			if( nullptr == m_draggingGameObject )
 			{
 				Rigidbody2D* rb = m_physics->CreateRigidBody();
-				float randNum = m_rand.RollRandomFloatInRange( 5.f, 15.f );
+				float randNum = m_rand.RollRandomFloatInRange( 0.5f, 1.5f );
 				DiscCollider2D* dc = m_physics->CreateDiscCollider( Vec2( 0.f, 0.f ), randNum );
 				rb->TakeCollider( dc );
 				rb->SetPosition( m_mousePositionOnMainCamera );

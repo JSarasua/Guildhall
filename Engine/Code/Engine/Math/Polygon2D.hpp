@@ -6,6 +6,7 @@
 class Polygon2D
 {
 public:
+	Polygon2D() {}
 	Polygon2D( Vec2 const* points, unsigned int pointCount );
 	Polygon2D( std::vector<Vec2> points );
 
@@ -24,6 +25,7 @@ public:
 	int GetEdgeCount() const;
 	void GetEdge( Vec2* outStart, Vec2* outEnd, size_t edgeIndex ) const;
 	void GetEdgeNormal( Vec2* edgeNormal, size_t edgeIndex ) const;			//Pointing inwards
+	void GetEdgeNormalOutward( Vec2* edgeNormal, size_t edgeIndex ) const;
 	void GetTriangle( Vec2* outA, Vec2* outB, Vec2* outC, size_t triangleIndex ) const; //Gets a triangle for rendering from the triangle index
 	float GetAreaOfTriangle( size_t triangleIndex ) const;
 	Vec2 GetCenterOfTriangle( size_t triangleIndex ) const;
@@ -38,8 +40,9 @@ public:
 
 public:
 	static Polygon2D MakeFromLineLoop( Vec2 const* points, unsigned int pointCount );
-
 	static Polygon2D MakeConvexFromPointCloud( Vec2 const* points, unsigned int pointCount );
+	static void CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const& poly1,  Polygon2D* simplex );
+	static bool EvolveNormalDir( Polygon2D const& poly0, Polygon2D const& poly1, Polygon2D* simplex ); //Returns true if it successfully evolved the simplex, else returns false
 
 private:
 

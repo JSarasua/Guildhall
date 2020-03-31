@@ -13,7 +13,7 @@ constexpr float CLIENT_ASPECT = 16.f/9.f;
 constexpr int INT_MAP_SIZE_X = 70;
 constexpr int INT_MAP_SIZE_Y = 30;
 constexpr int SAFEZONE = 3;
-constexpr float GAME_CAMERA_X = 160.f;
+constexpr float GAME_CAMERA_X = 16.f;
 constexpr float GAME_CAMERA_Y = GAME_CAMERA_X/CLIENT_ASPECT;
 
 

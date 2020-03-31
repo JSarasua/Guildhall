@@ -4,6 +4,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
@@ -46,6 +47,8 @@ void App::Startup()
 	g_theRenderer->StartUp( g_theWindow );
 	g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 
+	DebugRenderSystemStartup( g_theRenderer );
+
 	m_game->Startup();
 	g_theConsole->Startup();
 
@@ -68,6 +71,7 @@ void App::Shutdown()
 	delete g_theRenderer;
 	g_theInput->Shutdown();
 	delete g_theInput;
+	DebugRenderSystemShutdown();
 	g_theConsole->Shutdown();
 	delete g_theConsole;
 }
