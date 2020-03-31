@@ -5,7 +5,8 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Math/LineSegment3.hpp"
 
 typedef bool (*collision_check_cb)( Collider2D const*, Collider2D const* );
 typedef bool (*manifold_cb)( Collider2D const*, Collider2D const*, Manifold2D* );
@@ -324,10 +325,13 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	Vec2 normal = origin - closestPoint;
 	normal.Normalize();
 	float penetration = GetDistance2D( origin, closestPoint );
-
-	manifold->contactEdge = closestEdge;
+	Vec2 furthestPoint = poly1.GetFurthestPointInDirection( normal );
+	Vec2 contactPoint = closestPoint + furthestPoint;
+	manifold->contactEdge = LineSegment2( closestPoint, closestPoint );
 	manifold->normal = normal;
 	manifold->penetration = penetration;
 
+	DebugAddWorldArrow( LineSegment3( contactPoint, contactPoint + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldBillboardTextf( contactPoint, Vec2(), Rgba8::RED, "Pen: %.2f", penetration );
 	return true;
 }
