@@ -317,8 +317,9 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 		return false;
 	}
 	
-	int expandCounter = 0;
-	while(Polygon2D::ExpandPenetration( poly0, poly1, &simplex ) && expandCounter < 100 ) { expandCounter++; }
+
+	while(Polygon2D::ExpandPenetration( poly0, poly1, &simplex ) ){}
+
 	LineSegment2 closestEdge;
 	size_t closestEdgeIndex = 0;
 	simplex.GetClosestEdge( &closestEdge, origin, &closestEdgeIndex );
