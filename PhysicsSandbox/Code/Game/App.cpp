@@ -35,6 +35,8 @@ App::~App() {}
 void App::Startup()
 {
 	Clock::SystemStartup();
+	Clock* masterClock = Clock::GetMaster();
+	masterClock->SetFrameLimits( 0, 0.1 );
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
