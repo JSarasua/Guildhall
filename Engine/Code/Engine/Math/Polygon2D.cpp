@@ -553,6 +553,11 @@ bool Polygon2D::ExpandPenetration( Polygon2D const& poly0, Polygon2D const& poly
 	size_t closestEdgeIndex = 0;
 	simplex->GetClosestEdge( &currentClosestEdge, origin, &closestEdgeIndex );
 	Vec2 closestPoint = currentClosestEdge.GetNearestPoint( origin );
+
+	if( closestPoint.IsAlmostEqual( Vec2( 0.f, 0.f ), 0.01f ) )
+	{
+		return false;
+	}
 	Vec2 normal = closestPoint - origin;
 	normal.Normalize();
 	Vec2 pointToAdd = poly0.GetGJKSupport( poly1, normal );
