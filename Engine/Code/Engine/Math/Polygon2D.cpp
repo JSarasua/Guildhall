@@ -211,7 +211,7 @@ void Polygon2D::GetClosestEdge( LineSegment2* edge, Vec2 const& point, size_t* e
 
 	LineSegment2 closestEdge( start, end );
 	Vec2 closestPoint = closestEdge.GetNearestPoint( point );
-	float minDistance = GetDistanceSquared2D( closestPoint, point );
+	float minDistance = GetDistance2D( closestPoint, point );
 	size_t closestEdgeIndex = 0;
 
 	for( size_t currentEdgeIndex = 1; currentEdgeIndex < edgeCount; currentEdgeIndex++ )
@@ -219,7 +219,7 @@ void Polygon2D::GetClosestEdge( LineSegment2* edge, Vec2 const& point, size_t* e
 		GetEdge( &start, &end, currentEdgeIndex );
 		LineSegment2 currentEdge( start, end );
 		Vec2 currentNearestPoint = currentEdge.GetNearestPoint( point );
-		float currentDistance = GetDistanceSquared2D( currentNearestPoint, point );
+		float currentDistance = GetDistance2D( currentNearestPoint, point );
 
 		if( currentDistance < minDistance )
 		{
