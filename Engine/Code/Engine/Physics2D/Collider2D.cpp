@@ -335,7 +335,15 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	Polygon2D::GetRangeNearInfiniteLine( &referenceEdge, refPoint, pointOnTangentLine, poly1 );
 	
 	LineSegment2 contactEdge;
-	Polygon2D::GetGJKContactEdgeFromPoly( &contactEdge, referenceEdge, normal, poly0 );
+	if( referenceEdge.startPosition.IsAlmostEqual( referenceEdge.endPosition ) )
+	{
+		contactEdge.startPosition = referenceEdge.startPosition - (penetration * normal);
+		contactEdge.endPosition = referenceEdge.startPosition - (penetration * normal);
+	}
+	else
+	{
+		Polygon2D::GetGJKContactEdgeFromPoly( &contactEdge, referenceEdge, normal, poly0 );
+	}
 	//Now have infinite line segment with furthestPoint
 
 
@@ -348,8 +356,8 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	manifold->normal = normal;
 	manifold->penetration = penetration;
 
-	DebugAddWorldPoint( contactEdge.startPosition, 0.5f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldPoint( contactEdge.endPosition, 0.5f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldPoint( contactEdge.startPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldPoint( contactEdge.endPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 //	DebugAddWorldArrow( LineSegment3( contactPoint, contactPoint + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddWorldArrow( LineSegment3( contactEdge.startPosition, contactEdge.startPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddWorldArrow( LineSegment3( contactEdge.endPosition, contactEdge.endPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
