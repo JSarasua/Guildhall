@@ -160,6 +160,8 @@ public:
 	void DrawTexturedObjects( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode );
 	void DrawMeshes( RenderContext* context, Mat44 const& cameraModel, eDebugRenderTo renderTo, eDebugRenderMode renderMode );
 
+	void AddObjectToList( DebugRenderObject* objectToAdd, std::vector<DebugRenderObject*>& listToAddto );
+
 public:
 	RenderContext* m_context;
 	Texture const* m_fontText = nullptr;
@@ -402,6 +404,22 @@ void DebugRenderSystem::DrawMeshes( RenderContext* context, Mat44 const& cameraM
 			}
 		}
 	}
+}
+
+void DebugRenderSystem::AddObjectToList( DebugRenderObject* objectToAdd, std::vector<DebugRenderObject*>& listToAddto )
+{
+	for( size_t listIndex = 0; listIndex < listToAddto.size(); listIndex++ )
+	{
+		if( nullptr == listToAddto[listIndex] )
+		{
+			listToAddto[listIndex] = objectToAdd;
+			return;
+		}
+	}
+
+	listToAddto.push_back( objectToAdd );
+
+	return;
 }
 
 static DebugRenderSystem* s_DebugRenderSystem = nullptr;
@@ -737,7 +755,8 @@ void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& startColor, R
 	{
 		debugObject->m_indices.push_back((uint)vertIndex);
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldPoint( Vec3 const& pos, float size, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -769,7 +788,8 @@ void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& startColor, Rgba8
 	float lineRadius = lineThickness * 0.5f;
 	AppendIndexedVertsCylinder( debugObject->m_vertices, debugObject->m_indices, line.startPosition, lineRadius, line.endPosition, lineRadius, 8U, startColor );
 
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldLine( LineSegment3 const& line, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -801,7 +821,8 @@ void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& startColor, Rgb
 	float flairRadius = lineRadius * 3.f;
 	AppendIndexedVertsCone( debugObject->m_vertices, debugObject->m_indices, startOfFlair, flairRadius, arrow.endPosition, 8U, startColor );
 
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldArrow( LineSegment3 const& arrow, Rgba8 const& color, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -825,7 +846,8 @@ void DebugAddWorldQuad( Vec3 const& p0, Vec3 const& p1, Vec3 const& p2, Vec3 con
 	
 	Vertex_PCU::AppendVerts4Points( debugObject->m_vertices, debugObject->m_indices, p0, p1, p2, p3, startColor );
 
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -842,7 +864,9 @@ void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& startColo
 	debugObject->m_isText = false;
 	debugObject->m_isWireMesh = true;
 	debugObject->m_mesh	= s_DebugRenderSystem->m_cubeMesh;
-	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWorldWireBounds( Transform const& transform, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -870,7 +894,8 @@ void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startC
 
 	debugObject->m_modelMatrix = transform.ToMatrix();
 
-	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -894,7 +919,8 @@ void DebugAddWireMeshToWorld( Mat44 const& modelMatrix, GPUMesh* mesh, Rgba8 sta
 
 	debugObject->m_modelMatrix = modelMatrix;
 
-	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const& endTint, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -912,7 +938,8 @@ void DebugAddWorldBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 const
 	debugObject->m_endColor = endTint;
 	debugObject->m_isWireMesh = false;
 
-	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWorldBasis( Mat44 const& basis, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
@@ -953,7 +980,9 @@ void DebugAddWorldText( Mat44 const& basis, Vec2 pivot, Rgba8 const& startColor,
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldTextf( Mat44 const& basis, Vec2 pivot, Rgba8 const& color, float duration, eDebugRenderMode mode, char const* format, ... )
@@ -1005,7 +1034,8 @@ void DebugAddWorldBillboardText( Vec3 const& origin, Vec2 const& pivot, Rgba8 co
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
 
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddWorldBillboardTextf( Vec3 const& origin, Vec2 const& pivot, Rgba8 const& color, float duration, eDebugRenderMode mode, char const* format, ... )
@@ -1045,7 +1075,9 @@ void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& startColor, 
 	{
 		debugObject->m_indices.push_back((uint)vertIndex);
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenPoint( Vec2 const& pos, float size, Rgba8 const& color, float duration /*= 0.f */ )
@@ -1079,7 +1111,9 @@ void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColor
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenLine( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration /*= 0.f */ )
@@ -1120,7 +1154,9 @@ void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& startColo
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenArrow( Vec2 const& p0, Vec2 const& p1, Rgba8 const& color, float duration /*= 0.f */ )
@@ -1147,7 +1183,9 @@ void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 co
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& color, float duration /*= 0.f */ )
@@ -1173,7 +1211,9 @@ void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const&
 	{
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
-	s_DebugRenderSystem->m_texturedRenderObjects.push_back( debugObject );
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_texturedRenderObjects );
+	//s_DebugRenderSystem->m_texturedRenderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& tint, float duration /*= 0.f */ )
@@ -1214,7 +1254,8 @@ void DebugAddScreenText( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgb
 		debugObject->m_indices.push_back( (uint)vertIndex );
 	}
 
-	s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+	//s_DebugRenderSystem->m_renderObjects.push_back( debugObject );
 }
 
 void DebugAddScreenTextf( Vec4 const& pos, Vec2 const& pivot, float textSize, Rgba8 const& startColor, Rgba8 const& endColor, float duration, char const* format, ... )
@@ -1281,8 +1322,8 @@ void DebugAddScreenBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 cons
 	debugObject->m_modelMatrix.ScaleUniform3D( screenBasisScale );
 	debugObject->m_modelMatrix.SetTranslation3D( pos );
 
-
-	s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugRenderSetScreenHeight( float height )
