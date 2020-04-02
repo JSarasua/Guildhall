@@ -9,6 +9,7 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/FloatRange.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 static float m_fixedTimeFrame = 1.f/120.f;
 
@@ -174,7 +175,6 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		return;
 	}
 
-
 	float penetration = manifold.penetration;
 	float myMassRatio = GetMassRatio( myRigidbody, theirRigidbody );
 	float theirMassRatio = GetMassRatio( theirRigidbody, myRigidbody );
@@ -200,9 +200,9 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	Vec2 myCoM = collision.me->GetCenterOfMass();
 	Vec2 theirCoM = collision.them->GetCenterOfMass();
 
-	//Used if we want to apply impuse closest to the center of mass instead of center. Supposedly makes simulation more stable
-// 	Vec2 myApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( myCoM );
-// 	Vec2 theirApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( theirCoM );
+	//Used if we want to apply impulse closest to the center of mass instead of center. Supposedly makes simulation more stable
+	Vec2 myApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( myCoM );
+	Vec2 theirApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( theirCoM );
 
 	Vec2 rMeToPoint = contactPoint - myCoM;
 	Vec2 rThemToPoint = contactPoint - theirCoM;
@@ -214,18 +214,13 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	float combinedRestituion = collision.me->GetBounceWith( collision.them );
 	float combinedFriction = collision.me->GetFrictionWith( collision.them );
 
-	//Get Impulse direction
-
-
 	
 	eSimulationMode mySimMode = myRigidbody->GetSimulationMode();
 	eSimulationMode theirSimMode = theirRigidbody->GetSimulationMode();
 
-
-
+	Vec2 velocityMeThem = theirVelocity - myVelocity;  //vAB
 	if( mySimMode == DYNAMIC && (theirSimMode == KINEMATIC || theirSimMode == STATIC) )
 	{
-		Vec2 velocityMeThem = theirVelocity - myVelocity;  //vAB
 		float topPieceOfNormalEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, normal );
 
 		float rAPNormalMoment = (DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
@@ -235,10 +230,14 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
-
+		myRigidbody->ApplyImpulseAt( myApplyImpulseLocation, normalImpulse);
+		
+		//For recalculating normal
+		myVelocity = myRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		theirVelocity = theirRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		velocityMeThem = theirVelocity - myVelocity;  //vAB
 
 		float topPieceOfTangentEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, tangent );
-
 		float rAPTangentMoment = (DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent )) / myMoment;
 		//float rBPTangentMoment = (DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent )) / theirMoment;
 
@@ -257,12 +256,10 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			tangentImpulse *= -1.f;
 		}
 
-		myRigidbody->ApplyImpulseAt( contactPoint, normalImpulse);
-		myRigidbody->ApplyImpulseAt( contactPoint, tangentImpulse);
+		myRigidbody->ApplyImpulseAt( myApplyImpulseLocation, tangentImpulse);
 	}
 	else if( (mySimMode == KINEMATIC || mySimMode == STATIC) && theirSimMode == DYNAMIC )
 	{
-		Vec2 velocityMeThem = theirVelocity - myVelocity;  //vAB
 		float topPieceOfNormalEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, normal );
 
 		//float rAPNormalMoment = (DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
@@ -272,10 +269,14 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
-
+		theirRigidbody->ApplyImpulseAt( theirApplyImpulseLocation, -normalImpulse );
+		
+		//For recalculating normal
+		myVelocity = myRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		theirVelocity = theirRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		velocityMeThem = theirVelocity - myVelocity;  //vAB
 
 		float topPieceOfTangentEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, tangent );
-
 		//float rAPTangentMoment = (DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent )) / myMoment;
 		float rBPTangentMoment = (DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent )) / theirMoment;
 
@@ -305,13 +306,11 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 			}
 		}
 
-		theirRigidbody->ApplyImpulseAt( contactPoint, -normalImpulse );
-		theirRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse);
+		theirRigidbody->ApplyImpulseAt( theirApplyImpulseLocation, -tangentImpulse);
 	}
 
 	else if( mySimMode == DYNAMIC && theirSimMode == DYNAMIC )
 	{
-		Vec2 velocityMeThem = theirVelocity - myVelocity;  //vAB
 		float topPieceOfNormalEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, normal );
 
 		float rAPNormalMoment = ( DotProduct2D( rMeToPointPerp, normal ) * DotProduct2D( rMeToPointPerp, normal )) / myMoment;
@@ -321,17 +320,20 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		float normalImpulseMagnitude = topPieceOfNormalEquation / bottomPieceOfNormalEquation;
 		Vec2 normalImpulse = normalImpulseMagnitude * normal;
 
+		myRigidbody->ApplyImpulseAt( myApplyImpulseLocation, normalImpulse );
+		theirRigidbody->ApplyImpulseAt( theirApplyImpulseLocation, -normalImpulse );
 
+		//For recalculating normal
+		myVelocity = myRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		theirVelocity = theirRigidbody->GetImpactVelocityAtPoint( contactPoint );
+		velocityMeThem = theirVelocity - myVelocity;  //vAB
 
 		float topPieceOfTangentEquation = 1.f * (1.f + combinedRestituion) * DotProduct2D( velocityMeThem, tangent );
-
 		float rAPTangentMoment = ( DotProduct2D( rMeToPointPerp, tangent ) * DotProduct2D( rMeToPointPerp, tangent ) ) / myMoment;
 		float rBPTangentMoment = ( DotProduct2D( rThemToPointPerp, tangent ) * DotProduct2D( rThemToPointPerp, tangent ) ) / theirMoment;
-
 		float bottomPieceOfTangentEquation = /*DotProduct2D( tangent, tangent ) **/ (1.f/myMass + 1.f/theirMass) + rAPTangentMoment + rBPTangentMoment;
 		float tangentImpulseMagnitude = topPieceOfTangentEquation / bottomPieceOfTangentEquation;
 		Vec2 tangentImpulse = tangentImpulseMagnitude * tangent;
-
 
 		if( absFloat( tangentImpulseMagnitude ) > absFloat( normalImpulseMagnitude )* combinedFriction )
 		{
@@ -342,12 +344,9 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 		{
 			tangentImpulse *= -1.f;
 		}
-
-		myRigidbody->ApplyImpulseAt( contactPoint, normalImpulse );
-		theirRigidbody->ApplyImpulseAt( contactPoint, -normalImpulse );
 		
-		myRigidbody->ApplyImpulseAt( contactPoint, tangentImpulse );
-		theirRigidbody->ApplyImpulseAt( contactPoint, -tangentImpulse );
+		myRigidbody->ApplyImpulseAt( myApplyImpulseLocation, tangentImpulse );
+		theirRigidbody->ApplyImpulseAt( theirApplyImpulseLocation, -tangentImpulse );
 	}
 }
 

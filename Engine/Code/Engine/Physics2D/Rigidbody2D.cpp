@@ -124,7 +124,7 @@ void Rigidbody2D::SetAngularVelocityRandians( float newAngularVelocity )
 void Rigidbody2D::Translate( Vec2 const& translator )
 {
 	m_worldPosition += translator;
-	m_frameStartPosition = m_worldPosition;
+	//m_frameStartPosition = m_worldPosition;
 }
 
 void Rigidbody2D::SetVelocity( Vec2 const& newVelocity )
@@ -202,9 +202,9 @@ Vec2 Rigidbody2D::GetImpactVelocityAtPoint( Vec2 const& point )
 
 	Vec2 linearVelocityFromRotation = centerToPointTangent * linearSpeedFromRotation;
 
-	Vec2 currentVelocity = GetVerletVelocity() + linearVelocityFromRotation;
-
-	return currentVelocity;
+	//Vec2 currentVelocity = GetVerletVelocity() + linearVelocityFromRotation;
+	Vec2 currentNonVerletVelocity = GetVelocity() + linearVelocityFromRotation;
+	return currentNonVerletVelocity;
 }
 
 void Rigidbody2D::DebugRender( RenderContext* context, Rgba8 const& borderColor, Rgba8 const& fillColor )

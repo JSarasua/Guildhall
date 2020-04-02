@@ -684,7 +684,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		float cameraHeight = m_camera->m_outputSize.y;
 
-		cameraHeight  += (mouseWheelScroll * 10.f);
+		cameraHeight  += (mouseWheelScroll * 2.5f);
 		cameraHeight = Clampf(cameraHeight, 0.5f, 1000.f);
 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
 		//m_camera->SetProjectionOrthographic(cameraHeight);
