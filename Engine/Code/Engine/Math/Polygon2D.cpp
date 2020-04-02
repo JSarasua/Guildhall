@@ -422,13 +422,15 @@ void Polygon2D::CreateInitialGJKSimplex( Polygon2D const& poly0, Polygon2D const
 	LineSegment3 BC ( B3D, C3D );
 	LineSegment3 CA ( C3D, A3D );
 
+
+	//Debug Drawing
 // 	DebugAddWorldArrow( AB, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldArrow( BC, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldArrow( CA, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 // 
 // 	DebugAddWorldPoint( C, 0.1f, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldPoint( B, 0.1f, Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
- 	DebugAddWorldPoint( Vec3(), 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+/* 	DebugAddWorldPoint( Vec3(), 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );*/
 // 	DebugAddWorldPoint( B3D, 1.f, Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 // 	DebugAddWorldPoint( C3D, 1.f, Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
 
