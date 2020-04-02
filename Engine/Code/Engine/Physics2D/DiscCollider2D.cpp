@@ -54,7 +54,9 @@ eOffScreenDirection DiscCollider2D::IsOffScreen( AABB2 const& bounds ) const
 {
 
 	FloatRange discIRange( m_worldPosition.x - m_radius, m_worldPosition.x + m_radius );
+	FloatRange discJRange( m_worldPosition.y - m_radius, m_worldPosition.y + m_radius );
 	FloatRange boundsIRange( bounds.mins.x, bounds.maxs.x );
+	FloatRange boundsJRange( bounds.mins.y, bounds.maxs.y );
 
 	if( discIRange.DoesOverlap( boundsIRange ) )
 	{
@@ -64,9 +66,21 @@ eOffScreenDirection DiscCollider2D::IsOffScreen( AABB2 const& bounds ) const
 	{
 		return LEFTOFSCREEN;
 	}
-	else
+	else if( discIRange.minimum > boundsIRange.maximum )
 	{
 		return RIGHTOFSCREEN;
+	}
+	else if( discJRange.maximum < boundsJRange.minimum )
+	{
+		return BELOWSCREEN;
+	}
+	else if( discJRange.minimum > boundsJRange.maximum )
+	{
+		return ABOVESCREEN;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Could not get a screen direction" );
 	}
 }
 

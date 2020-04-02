@@ -17,7 +17,9 @@ enum eOffScreenDirection
 {
 	ONSCREEN = -1,
 	LEFTOFSCREEN,
-	RIGHTOFSCREEN
+	RIGHTOFSCREEN,
+	ABOVESCREEN,
+	BELOWSCREEN
 };
 
 enum eCollider2DType

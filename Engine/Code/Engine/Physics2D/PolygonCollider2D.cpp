@@ -74,9 +74,21 @@ eOffScreenDirection PolygonCollider2D::IsOffScreen( AABB2 const& bounds ) const
 	{
 		return LEFTOFSCREEN;
 	}
-	else
+	else if( polyBounds.mins.x > bounds.maxs.x )
 	{
 		return RIGHTOFSCREEN;
+	}
+	else if( polyBounds.maxs.y < bounds.mins.y )
+	{
+		return BELOWSCREEN;
+	}
+	else if( polyBounds.mins.y > bounds.maxs.y )
+	{
+		return ABOVESCREEN;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Could not get a screen direction" );
 	}
 }
 
