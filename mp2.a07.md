@@ -13,7 +13,9 @@
 - [x] Apply Impulse using contact points
     - [x] Calculate impulse using the center of the contact edge.
     - [-] When applying impulse, use the point on the edge closest to each body's center of mass.
+	**I tried applying impulse at the center of mass, and it appeared there was no change, so I took it out.
 - [-] To make friction/bounce more stable - calculate normal impulse first, apply it, and then generate tangent impulse, and apply it. 
 
 **Normal can sometimes flip, but it doesn't cause any obvious problem This only happens when the normal is very small
 **Jitters
+

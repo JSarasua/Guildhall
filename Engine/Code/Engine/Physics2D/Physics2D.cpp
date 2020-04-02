@@ -169,6 +169,10 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 	{
 		return;
 	}
+	if( nullptr == myRigidbody->m_collider || nullptr == theirRigidbody->m_collider )
+	{
+		return;
+	}
 
 
 	float penetration = manifold.penetration;
@@ -195,6 +199,10 @@ void Physics2D::ResolveCollision( Collision2D const& collision )
 
 	Vec2 myCoM = collision.me->GetCenterOfMass();
 	Vec2 theirCoM = collision.them->GetCenterOfMass();
+
+	//Used if we want to apply impuse closest to the center of mass instead of center. Supposedly makes simulation more stable
+// 	Vec2 myApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( myCoM );
+// 	Vec2 theirApplyImpulseLocation = manifold.contactEdge.GetNearestPoint( theirCoM );
 
 	Vec2 rMeToPoint = contactPoint - myCoM;
 	Vec2 rThemToPoint = contactPoint - theirCoM;
