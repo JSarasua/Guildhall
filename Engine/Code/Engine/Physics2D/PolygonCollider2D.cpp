@@ -155,7 +155,9 @@ float PolygonCollider2D::CalculateMomentOfATriangle( size_t triangleIndex ) cons
 	
 	float parallelAxisPiece = area * pivotDotProduct; //Added to moment
 
-
+	LineSegment2 abLine = LineSegment2( a, b );
+	Vec2 closestPointToC = abLine.GetNearestPoint( c );
+	float aToClosestPointOnABToC = GetDistance2D( a, closestPointToC );
 
 	Vec2 ac = c - a;
 	Vec2 ab = b - a;
@@ -165,13 +167,16 @@ float PolygonCollider2D::CalculateMomentOfATriangle( size_t triangleIndex ) cons
 	float height = GetProjectedLength2D( ac, abPerp );
 	height = absFloat( height );
 
-	//old equation
-	//float moment = (base*height)/36 * ( (base*base) - (base*area) + (area*area) + (height*height) ); //moment around itself
-	
-	//Equation off of the internet
-	float moment = base * height * height * height /36.f;
-	moment += parallelAxisPiece;
 
+	//new equation
+	float moment = height * (base*base*base) + (height*aToClosestPointOnABToC * (base*base)) + (height * (aToClosestPointOnABToC*aToClosestPointOnABToC) * base) + (base * (height*height*height));
+	moment /= 12.f;
+
+	//Equation off of the internet
+// 	float moment = base * height * height * height /36.f;
+// 	moment += parallelAxisPiece;
+
+	moment += parallelAxisPiece;
 	return moment;
 }
 
