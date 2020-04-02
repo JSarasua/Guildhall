@@ -324,13 +324,9 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	normal.Normalize();
 	float penetration = GetDistance2D( origin, closestPoint );
 
-	if( penetration < 0.001f )
+	if( penetration < 0.01f )
 	{
 		return false;
-	}
-	if( DotProduct2D( normal, Vec2( 0.f, 1.f ) ) > 0.f )
-	{
-		DebugAddWorldArrow( LineSegment3( closestPoint, closestPoint + normal ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 	}
 
 	//To get all points on the reference, make an infinite line with two points on the line
@@ -353,10 +349,6 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 		Polygon2D::GetGJKContactEdgeFromPoly( &contactEdge, referenceEdge, normal, poly0 );
 	}
 	//Now have infinite line segment with furthestPoint
-
-
-	
-	
 	
 	
 	Vec2 contactPoint = refPoint;
@@ -364,13 +356,15 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	manifold->normal = normal;
 	manifold->penetration = penetration;
 
-	DebugAddWorldPoint( contactEdge.startPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldPoint( contactEdge.endPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	
+//DEBUG
+// 	DebugAddWorldPoint( contactEdge.startPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldPoint( contactEdge.endPosition, 0.1f, Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 //	DebugAddWorldArrow( LineSegment3( contactPoint, contactPoint + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( LineSegment3( contactEdge.startPosition, contactEdge.startPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldArrow( LineSegment3( contactEdge.endPosition, contactEdge.endPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldBillboardTextf( contactPoint, Vec2(), Rgba8::RED, "Pen: %.2f", penetration );
-	DebugAddWorldLine( LineSegment3( referenceEdge.startPosition, referenceEdge.endPosition ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddWorldLine( LineSegment3( contactEdge.startPosition, contactEdge.endPosition ), Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( LineSegment3( contactEdge.startPosition, contactEdge.startPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldArrow( LineSegment3( contactEdge.endPosition, contactEdge.endPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldBillboardTextf( contactPoint, Vec2(), Rgba8::RED, "Pen: %.2f", penetration );
+// 	DebugAddWorldLine( LineSegment3( referenceEdge.startPosition, referenceEdge.endPosition ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+// 	DebugAddWorldLine( LineSegment3( contactEdge.startPosition, contactEdge.endPosition ), Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
 	return true;
 }
