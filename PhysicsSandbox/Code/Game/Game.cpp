@@ -802,8 +802,6 @@ void Game::CreateBottomBounds()
 	rb->TakeCollider( pc );
 	rb->SetPosition( bottomBounds.GetCenterOfMass() );
 	rb->SetSimulationMode( STATIC );
-	pc->SetRestitution( 0.f );
-	pc->SetFriction( 1.f );
 	GameObject* gameObject = new GameObject( rb );
 	m_gameObjects.push_back( gameObject );
 }
@@ -816,7 +814,6 @@ void Game::RenderGameObjects()
 		{
 			m_gameObjects[gameObjectIndex]->DebugRender(g_theRenderer);
 		}
-
 	}
 }
 
@@ -852,7 +849,6 @@ void Game::ReleaseDisc()
 		m_draggingGameObject = nullptr;
 		m_draggingOffset = Vec2( 0.f, 0.f );
 	}
-
 }
 
 int Game::GetGameObjectIndex( GameObject* gameObject )
