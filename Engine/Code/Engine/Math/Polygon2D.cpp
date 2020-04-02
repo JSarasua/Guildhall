@@ -591,7 +591,7 @@ void Polygon2D::GetRangeNearInfiniteLine( LineSegment2* edge, Vec2 const& ref0, 
 	{
 		Vec2 const& currentPoint = points[pointIndex];
 		Vec2 pointOnLine = GetNearestPointOnInfiniteLine2D( currentPoint, ref0, ref1 );
-		if( GetDistanceSquared2D( currentPoint, pointOnLine ) < epsilon )
+		if( GetDistance2D( currentPoint, pointOnLine ) < epsilon )
 		{
 			pointsOnLine.push_back( pointOnLine );
 		}
@@ -603,7 +603,7 @@ void Polygon2D::GetRangeNearInfiniteLine( LineSegment2* edge, Vec2 const& ref0, 
 
 	Vec2 tangent = normal.GetRotated90Degrees();
 
-	FloatRange range = GetRangeOnProjectedAxis( (int)pointsOnLine.size(), &pointsOnLine[0], ref0, normal );
+	FloatRange range = GetRangeOnProjectedAxis( (int)pointsOnLine.size(), &pointsOnLine[0], ref0, tangent );
 	edge->startPosition = range.minimum * tangent + ref0;
 	edge->endPosition = range.maximum * tangent + ref0;
 	//GetNearestPointOnInfiniteLine2D( )
@@ -654,9 +654,20 @@ void Polygon2D::GetGJKContactEdgeFromPoly( LineSegment2* contactEdge, LineSegmen
 				{
 					max = currentEdge.startPosition;
 				}
+			}
+			if( DotProduct2D( refStartToCurrentEnd, normal ) < 0.f )
+			{
+				if( min.IsAlmostEqual( initialValue ) )
+				{
+					min = currentEdge.endPosition;
+				}
+				if( max.IsAlmostEqual( initialValue ) )
+				{
+					max = currentEdge.endPosition;
+				}
 
-				refStartToMin = min - refEdge.startPosition;
-				refStartToMax = max - refEdge.startPosition;
+				Vec2 refStartToMin = min - refEdge.startPosition;
+				Vec2 refStartToMax = max - refEdge.startPosition;
 				if( DotProduct2D( refStartToCurrentEnd, tangent ) < DotProduct2D( refStartToMin, tangent ) )
 				{
 					min = currentEdge.endPosition;
@@ -691,8 +702,8 @@ bool Polygon2D::ClipSegmentToSegment( LineSegment2& toClip, LineSegment2 const& 
 	{
 		return false;
 	}
-	Vec2 Fi = RangeMap( pi, pf, refEdge.startPosition, refEdge.endPosition, pri );
-	Vec2 Ff = RangeMap( pi, pf, refEdge.startPosition, refEdge.endPosition, prf );
+	Vec2 Fi = RangeMap( pi, pf, toClip.startPosition, toClip.endPosition, pri );
+	Vec2 Ff = RangeMap( pi, pf, toClip.startPosition, toClip.endPosition, prf );
 
 	toClip.startPosition = Fi;
 	toClip.endPosition = Ff;
