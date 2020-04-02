@@ -42,7 +42,7 @@ private:
 	void RenderUI() const;
 	void CheckButtonPresses( float deltaSeconds );
 
-
+	void CreateBottomBounds();
 
 	void RenderGameObjects();
 	void GrabDiscIfOverlap();

@@ -60,7 +60,7 @@ void Game::Startup()
 	m_mouseDeltaPositions.resize( 5 );
 	m_mouseDeltaTime.resize( 5 );
 	
-
+	CreateBottomBounds();
 
 	g_theRenderer->Setup( m_gameClock );
 }
@@ -139,51 +139,6 @@ void Game::UpdateGameObjects( float deltaSeconds )
 		}
 
 	}
-
-	//Delete
-	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-	{
-		if( nullptr == m_gameObjects[gameObjectIndex] )
-		{
-			continue;
-		}
-		m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
-
-		for( int otherGameObjectIndex = 0; otherGameObjectIndex < m_gameObjects.size(); otherGameObjectIndex++ )
-		{
-			if( nullptr == m_gameObjects[otherGameObjectIndex] )
-			{
-				continue;
-			}
-			m_gameObjects[otherGameObjectIndex]->m_fillColor = Rgba8(255,255,255,128);
-			if( gameObjectIndex != otherGameObjectIndex )
-			{
-				Collider2D* collider = m_gameObjects[gameObjectIndex]->m_rigidbody->m_collider;
-				Collider2D* otherCollider = m_gameObjects[otherGameObjectIndex]->m_rigidbody->m_collider;
-
-				if( collider->Intersects( otherCollider ) )
-				{
-					m_gameObjects[gameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
-					m_gameObjects[otherGameObjectIndex]->m_fillColor = Rgba8(255,0,0,128);
-				}
-
-			}
-		}
-		break;
-	}
-
-	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
-	{
-		if( nullptr == m_gameObjects[gameObjectIndex] )
-		{
-			continue;
-		}
-
-		Vec2 bottomLeft = m_camera->GetOrthoBottomLeft();
-		Vec2 bottomRight = Vec2(m_camera->GetOrthoTopRight().x, m_camera->GetOrthoBottomLeft().y);
-		LineSegment2 bottomCameraLine( bottomLeft, bottomRight );
-	}
-
 }
 
 void Game::UpdateDebugMouse( float deltaSeconds )
@@ -730,7 +685,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float cameraHeight = m_camera->m_outputSize.y;
 
 		cameraHeight  += (mouseWheelScroll * 10.f);
-		cameraHeight = Clampf(cameraHeight, 10.f, 1000.f);
+		cameraHeight = Clampf(cameraHeight, 0.5f, 1000.f);
 		//float newOrienation = GetTurnedToward( orientation, orientationIncremented, 2.f );
 		//m_camera->SetProjectionOrthographic(cameraHeight);
 		Vec2 outputSize = Vec2( cameraHeight * m_camera->GetAspectRatio(), cameraHeight );
@@ -823,6 +778,36 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( controller );
 }
 
+void Game::CreateBottomBounds()
+{
+	Vec2 bottomLeft = m_camera->GetOrthoBottomLeft();
+	Vec2 topRight = m_camera->GetOrthoTopRight();
+	Vec2 offset = Vec2( 0.5f, 0.5f );
+
+	Vec2 bottomLeftBounds = bottomLeft + offset;
+	Vec2 bottomRightBounds = Vec2( topRight.x -offset.x, bottomLeft.y + offset.y );
+	Vec2 topRightBounds = bottomRightBounds + Vec2( 0.f, 0.5f );
+	Vec2 topLeftBounds = bottomLeftBounds + Vec2( 0.f, 0.5f );
+	
+	std::vector<Vec2> polyPoints;
+	polyPoints.push_back( bottomLeftBounds );
+	polyPoints.push_back( bottomRightBounds );
+	polyPoints.push_back( topRightBounds );
+	polyPoints.push_back( topLeftBounds );
+	Polygon2D bottomBounds( polyPoints );
+
+
+	Rigidbody2D* rb = m_physics->CreateRigidBody();
+	PolygonCollider2D* pc = m_physics->CreatePolygonCollider( bottomBounds, Vec2( 0.f, 0.f ) );
+	rb->TakeCollider( pc );
+	rb->SetPosition( bottomBounds.GetCenterOfMass() );
+	rb->SetSimulationMode( STATIC );
+	pc->SetRestitution( 0.f );
+	pc->SetFriction( 1.f );
+	GameObject* gameObject = new GameObject( rb );
+	m_gameObjects.push_back( gameObject );
+}
+
 void Game::RenderGameObjects()
 {
 	for( int gameObjectIndex = 0; gameObjectIndex < m_gameObjects.size(); gameObjectIndex++ )
@@ -895,31 +880,48 @@ void Game::CheckBorderCollisions()
 		{
 			continue;
 		}
-		Rigidbody2D& rigidbody = *gameObject.m_rigidbody;
-		Collider2D& collider = *rigidbody.m_collider;
+// 		Rigidbody2D& rigidbody = *gameObject.m_rigidbody;
+// 		Collider2D& collider = *rigidbody.m_collider;
 
-		Vec2 velocity = rigidbody.GetVelocity();
-
-		if( collider.IsCollidingWithWall( m_bottomCameraBound ) )
-		{
-
-			velocity = Vec2( velocity.x, absFloat(velocity.y ) );
-			rigidbody.SetVelocity( velocity );
-		}
+// 		Vec2 velocity = rigidbody.GetVelocity();
+// 
+// 		if( collider.IsCollidingWithWall( m_bottomCameraBound ) )
+// 		{
+// 
+// 			velocity = Vec2( velocity.x, absFloat(velocity.y ) );
+// 			rigidbody.SetVelocity( velocity );
+// 		}
 
 		eOffScreenDirection direction = gameObject.m_rigidbody->m_collider->IsOffScreen( cameraBounds );
-		Vec2 currentPosition = rigidbody.GetPosition();
-		AABB2 currentColliderBounds = collider.GetBounds();
-		Vec2 colliderIRange = Vec2( currentColliderBounds.maxs.x - currentColliderBounds.mins.x, 0.f );
-		Vec2 offset = cameraIRange + colliderIRange;
+// 		Vec2 currentPosition = rigidbody.GetPosition();
+// 		AABB2 currentColliderBounds = collider.GetBounds();
+// 		Vec2 colliderIRange = Vec2( currentColliderBounds.maxs.x - currentColliderBounds.mins.x, 0.f );
+// 		Vec2 offset = cameraIRange + colliderIRange;
+// 
+// 		if( direction == LEFTOFSCREEN && velocity.x <= 0.f )
+// 		{
+// 			//mark object for destruction
+// 			rigidbody.SetPosition( currentPosition + offset );
+// 		}
+// 		else if( direction == RIGHTOFSCREEN && velocity.x >= 0.f )
+// 		{
+// 			//mark objet for destruction
+// 			rigidbody.SetPosition( currentPosition - offset );
+// 		}
 
-		if( direction == LEFTOFSCREEN && velocity.x <= 0.f )
+		if( direction == LEFTOFSCREEN || direction == RIGHTOFSCREEN || direction == BELOWSCREEN )
 		{
-			rigidbody.SetPosition( currentPosition + offset );
-		}
-		else if( direction == RIGHTOFSCREEN && velocity.x >= 0.f )
-		{
-			rigidbody.SetPosition( currentPosition - offset );
+			if( m_draggingGameObject == m_gameObjects[objectIndex] )
+			{
+				m_draggingGameObject = nullptr;
+			}
+			if( m_hoveringOverGameObject == m_gameObjects[objectIndex] )
+			{
+				m_hoveringOverGameObject = nullptr;
+			}
+
+			delete m_gameObjects[objectIndex];
+			m_gameObjects[objectIndex] = nullptr;
 		}
 	}
 }
