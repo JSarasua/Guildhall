@@ -298,10 +298,6 @@ bool DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manif
 }
 bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold )
 {
-	UNUSED(col0);
-	UNUSED(col1);
-	UNUSED(manifold);
-
 	Vec2 origin = Vec2( 0.f, 0.f );
 
 	PolygonCollider2D const* polyCol0 = (PolygonCollider2D const*)col0;
@@ -327,18 +323,30 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	Vec2 normal = origin - closestPoint;
 	normal.Normalize();
 	float penetration = GetDistance2D( origin, closestPoint );
+
+	if( penetration < 0.001f )
+	{
+		return false;
+	}
+	if( DotProduct2D( normal, Vec2( 0.f, 1.f ) ) > 0.f )
+	{
+		DebugAddWorldArrow( LineSegment3( closestPoint, closestPoint + normal ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	}
+
+	//To get all points on the reference, make an infinite line with two points on the line
 	Vec2 refPoint = poly1.GetFurthestPointInDirection( normal );
 	Vec2 tangent = normal.GetRotated90Degrees();
-	
 	Vec2 pointOnTangentLine = refPoint + tangent;
-	LineSegment2 referenceEdge;
-	Polygon2D::GetRangeNearInfiniteLine( &referenceEdge, refPoint, pointOnTangentLine, poly1 );
 	
+	LineSegment2 referenceEdge;
+	Polygon2D::GetRangeNearInfiniteLine( &referenceEdge, refPoint, pointOnTangentLine, poly1, 0.01f );
+	
+	//Early out check if poly1 is only hitting poly0 with 1 point
 	LineSegment2 contactEdge;
 	if( referenceEdge.startPosition.IsAlmostEqual( referenceEdge.endPosition ) )
 	{
 		contactEdge.startPosition = referenceEdge.startPosition - (penetration * normal);
-		contactEdge.endPosition = referenceEdge.startPosition - (penetration * normal);
+		contactEdge.endPosition = contactEdge.startPosition;
 	}
 	else
 	{
@@ -362,5 +370,7 @@ bool PolygonVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Ma
 	DebugAddWorldArrow( LineSegment3( contactEdge.startPosition, contactEdge.startPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddWorldArrow( LineSegment3( contactEdge.endPosition, contactEdge.endPosition + normal ), Rgba8::GREEN, 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddWorldBillboardTextf( contactPoint, Vec2(), Rgba8::RED, "Pen: %.2f", penetration );
+	DebugAddWorldLine( LineSegment3( referenceEdge.startPosition, referenceEdge.endPosition ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+	DebugAddWorldLine( LineSegment3( contactEdge.startPosition, contactEdge.endPosition ), Rgba8::BLUE, 0.f, DEBUG_RENDER_ALWAYS );
 	return true;
 }
