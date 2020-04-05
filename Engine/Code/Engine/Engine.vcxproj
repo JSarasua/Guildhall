@@ -168,6 +168,7 @@
     <ClCompile Include="Core\Tags.cpp" />
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Core\Vertex_PCU.cpp" />
+    <ClCompile Include="Core\Vertex_PCUTBN.cpp" />
     <ClCompile Include="Core\XmlUtils.cpp" />
     <ClCompile Include="Input\AnalogJoystick.cpp" />
     <ClCompile Include="Input\InputSystem.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Core\Tags.hpp" />
     <ClInclude Include="Core\Time.hpp" />
     <ClInclude Include="Core\Vertex_PCU.hpp" />
+    <ClInclude Include="Core\Vertex_PCUTBN.hpp" />
     <ClInclude Include="Core\XmlUtils.hpp" />
     <ClInclude Include="Input\AnalogJoystick.hpp" />
     <ClInclude Include="Input\InputSystem.hpp" />

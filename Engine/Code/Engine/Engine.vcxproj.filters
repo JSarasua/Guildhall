@@ -232,6 +232,9 @@
     <ClCompile Include="Math\LineSegment3.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Vertex_PCUTBN.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -455,6 +458,9 @@
     </ClInclude>
     <ClInclude Include="Math\LineSegment3.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Vertex_PCUTBN.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
