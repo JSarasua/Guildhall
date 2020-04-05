@@ -16,9 +16,12 @@
 struct vs_input_t 
 {
 	// we are not defining our own input data; 
-	float3 position      : POSITION; 
-	float4 color         : COLOR; 
-	float2 uv            : TEXCOORD; 
+	float3 position     : POSITION; 
+	float4 color        : COLOR; 
+	float2 uv           : TEXCOORD; 
+
+	//lighting
+	float3 normal		: NORMAL;
 }; 
 
 static float SHIFT = 0.75f;
@@ -73,10 +76,13 @@ SamplerState sSampler : register(s0);		// sampler are rules on how to sample col
 // for passing data from vertex to fragment (v-2-f)
 struct v2f_t 
 {
-	float4 position : SV_POSITION; 
-	float4 color : COLOR; 
-	float2 uv : UV; 
-	float3 worldPosition : WORLDPOS;
+	float4 position			: SV_POSITION; 
+	float4 color			: COLOR; 
+	float2 uv				: UV; 
+
+
+	float3 worldPosition	: WORLDPOS;
+	float3 worldNormal		: WORLD_NORMAL;
 }; 
 
 float RangeMap( float val, float inMin, float inMax, float outMin, float outMax )
@@ -92,22 +98,25 @@ v2f_t VertexFunction( vs_input_t input )
 {
 	v2f_t v2f = (v2f_t)0;
 
-	// forward vertex input onto the next stage
-	v2f.position = float4( input.position, 1.0f ); 
-	v2f.color = input.color * TINT; 
-	v2f.uv = input.uv; 
-
-	float4 worldPos = float4( input.position, 1);
-
-	v2f.worldPosition = worldPos.xyz;
 
 
 	//Need to add a normal in with same operations vs_input_t should be replaced to hold a normal and named Vertex_PCUTBN
-	float4 modelPos = mul(MODEL, worldPos);
-	float4 cameraPos = mul(VIEW, modelPos);
+	float4 localPos = float4( input.position, 1);
+	float4 worldPos = mul(MODEL, localPos);
+	float4 cameraPos = mul(VIEW, worldPos);
 	float4 clipPos = mul(PROJECTION, cameraPos);	// might have a w (usually 1 for now)
 
+	//normal is currently in model/local space
+	float4 localNormal = float4( input.normal, 0.f );
+	float4 worldNormal = mul( MODEL, localNormal );
+
+
+	// forward vertex input onto the next stage
 	v2f.position = clipPos;
+	v2f.color = input.color * TINT; 
+	v2f.uv = input.uv; 
+	v2f.worldPosition = worldPos.xyz;
+	vwf.worldNormal = worldNormal.xyz;
 
 	return v2f;
 }
@@ -119,8 +128,30 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-	float4 color = tDiffuse.Sample( sSampler, input.uv );
-	return color * input.color;
+	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
+	float3 surfaceColor = (input.color * textureColor).xyz; //tint our texture color
+	float3 surfaceAlpha = (input.color.a * textureColor.a);
+
+	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
+
+	float3 surfaceNormal = normalize( input.worldNormal );
+
+	//Added in dot3 factor
+	float3 lightPosition = LIGHT.worldPosition;
+	float3 dirToLight = normalize( lightPosition - input.worldPosition );
+	float3 dot3 = max( 0.f, dot( dirToLight, surfaceNormal ) );
+
+	diffuse += dot3;
+
+	diffuse = min( float3( 1, 1, 1 ), diffuse );
+	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
+	float3 finalColor = diffuse * surfaceColor;
+	
+	return float4( finalColor, surfaceAlpha );
+	
+	//old way
+	//float4 color = tDiffuse.Sample( sSampler, input.uv );
+	//return color * input.color;
 
 
 	//new way
