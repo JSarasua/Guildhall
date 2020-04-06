@@ -1,6 +1,9 @@
+#include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/vec2.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include <vector>
 
 struct BufferAttribute;
 
@@ -16,6 +19,11 @@ public:
 	Vec3 normal;
 
 	static BufferAttribute const LAYOUT[];
+
+public:
+	static void AppendIndexedVertsCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, float cubeHalfHeight = 1.f );
+	static void AppendIndexedVertsSphere( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, float sphereRadius = 1.f );
+	static void AppendVerts4Points( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 const& p0, Vec3 const& p1, Vec3 const& p2, Vec3 const& p3, Rgba8 const& color, AABB2 const& uvs = AABB2() );
 
 public:
 	~Vertex_PCUTBN() {}
