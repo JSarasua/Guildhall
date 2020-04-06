@@ -23,11 +23,40 @@ void GPUMesh::UpdateVertices( unsigned int vertexCount, void const* vertexData, 
 {
 	UNUSED( vertexStride );
 	UNUSED( layout );
-	m_vertexCount = vertexCount;
-	Vertex_PCU* vertexes = (Vertex_PCU*)vertexData;
-	size_t bufferTotalByteSize = vertexCount * sizeof( Vertex_PCU );
-	size_t elementSize = sizeof( Vertex_PCU );
-	m_vertices->Update( vertexes, bufferTotalByteSize, elementSize );
+
+	if( nullptr == layout )
+	{
+		m_vertices->m_bufferAttribute = Vertex_PCU::LAYOUT;
+		m_vertexCount = vertexCount;
+		Vertex_PCU* vertexes = (Vertex_PCU*)vertexData;
+		size_t bufferTotalByteSize = vertexCount * sizeof( Vertex_PCU );
+		size_t elementSize = sizeof( Vertex_PCU );
+		m_vertices->Update( vertexes, bufferTotalByteSize, elementSize );
+	}
+	else
+	{
+		m_vertices->m_bufferAttribute = layout;
+		if( layout == Vertex_PCU::LAYOUT )
+		{
+			m_vertexCount = vertexCount;
+			Vertex_PCU* vertexes = (Vertex_PCU*)vertexData;
+			size_t bufferTotalByteSize = vertexCount * sizeof( Vertex_PCU );
+			size_t elementSize = sizeof( Vertex_PCU );
+			m_vertices->Update( vertexes, bufferTotalByteSize, elementSize );
+		}
+		else if( layout == Vertex_PCUTBN::LAYOUT )
+		{
+			m_vertexCount = vertexCount;
+			Vertex_PCUTBN* vertexes = (Vertex_PCUTBN*)vertexData;
+			size_t bufferTotalByteSize = vertexCount * sizeof( Vertex_PCUTBN );
+			size_t elementSize = sizeof( Vertex_PCUTBN );
+			m_vertices->Update( vertexes, bufferTotalByteSize, elementSize );
+		}
+		else
+		{
+			ERROR_AND_DIE( "Invalid Layout" );
+		}
+	}
 }
 
 void GPUMesh::UpdateIndices( unsigned int indexCount, unsigned int const* indices )
