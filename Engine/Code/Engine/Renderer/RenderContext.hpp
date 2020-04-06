@@ -1,5 +1,7 @@
 #pragma once
+#include "Engine/Math/Vec4.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include <vector>
 #include <string>
@@ -38,6 +40,20 @@ struct ModelData
 {
 	Mat44 model;
 	float tint[4];
+};
+
+struct light_t
+{
+	Vec3 position;
+	float pad00;
+	Vec3 color;
+	float intensity;
+};
+
+struct LightData
+{
+	Vec4 ambientLight;
+	light_t light;
 };
 
 enum class Viewport
@@ -113,8 +129,8 @@ public:
 	void BeginCamera( Camera& camera );
 	void EndCamera( const Camera& camera );
 
-	void Draw( int numVertexes, int vertexOffset = 0 );
-	void DrawIndexed( int numIndices, int indexOffset = 0, int vertexOffset = 0 );
+	void Draw( int numVertexes, int vertexOffset = 0, BufferAttribute const* layout = Vertex_PCU::LAYOUT );
+	void DrawIndexed( int numIndices, int indexOffset = 0, int vertexOffset = 0, BufferAttribute const* layout = Vertex_PCU::LAYOUT );
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
 	void DrawIndexedVertexArray( std::vector<Vertex_PCU> const& vertexes, std::vector<uint> const& indices );
@@ -134,6 +150,19 @@ public:
 	void SetModelTint( Rgba8 const& tint );
 	void SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
 
+	//Lighting
+	void SetAmbientColor( Rgba8 const& color );
+	void SetAmbientIntensity( float intensity );
+	void SetAmbientLight( Rgba8 const& color, float intensity );
+	//disabling Intensity means SetAmbientLight( Rgba8::WHITE, 1.f );
+
+	//assume one light for now
+	void EnableLight( uint lightIndex, light_t const& lightInfo );
+	//pointLight...
+	void DisableLight( uint lightIndex );
+	//Disable means set light intensity to 0.f
+
+	//Backbuffer
 	Texture* GetBackBuffer();
 
 	Texture* CreateDepthStencilTarget();
@@ -201,6 +230,7 @@ public:
 
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
+	RenderBuffer* m_lightUBO = nullptr;
 
 	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
 	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;
@@ -212,6 +242,11 @@ public:
 	IDXGIDebug* m_debug           = nullptr;
 
 	ID3D11RasterizerState* m_rasterState = nullptr;
+
+	Vec4 m_ambientLight;
+	std::vector<light_t> m_lights;
+
+	bool m_isLightingEnabled = false;
 };
 
 

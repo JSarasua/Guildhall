@@ -396,6 +396,11 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode, eDepthWriteMode wri
 
 void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 {
+	if( nullptr == ubo )
+	{
+		return;
+	}
+
 	ID3D11Buffer* uboHandle = ubo->GetHandle();
 
 	m_context->VSSetConstantBuffers( slot, 1, &uboHandle );
@@ -443,6 +448,56 @@ void RenderContext::SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint
 
 
 	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
+void RenderContext::SetAmbientColor( Rgba8 const& color )
+{
+	float ambientLight[4];
+	color.ToFloatArray( ambientLight );
+	m_ambientLight.x = ambientLight[0];
+	m_ambientLight.y = ambientLight[1];
+	m_ambientLight.z = ambientLight[2];
+}
+
+void RenderContext::SetAmbientIntensity( float intensity )
+{
+	m_ambientLight.w = intensity;
+}
+
+void RenderContext::SetAmbientLight( Rgba8 const& color, float intensity )
+{
+	float ambientLight[4];
+	color.ToFloatArray( ambientLight );
+	m_ambientLight.x = ambientLight[0];
+	m_ambientLight.y = ambientLight[1];
+	m_ambientLight.z = ambientLight[2];
+	m_ambientLight.w = intensity;
+}
+
+void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )
+{
+	m_lights[lightIndex] = lightInfo;
+
+	LightData lightData;
+	lightData.ambientLight = m_ambientLight;
+	lightData.light = lightInfo;
+
+	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
+
+	m_isLightingEnabled = true;
+}
+
+void RenderContext::DisableLight( uint lightIndex )
+{
+	m_lights[lightIndex].intensity = 0.f;
+
+	LightData lightData;
+	lightData.ambientLight = m_ambientLight;
+	lightData.light = m_lights[lightIndex];
+
+	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
+
+	m_isLightingEnabled = false;
 }
 
 Texture* RenderContext::GetBackBuffer()
@@ -826,6 +881,7 @@ void RenderContext::BeginCamera( Camera& camera )
 	Mat44 identity;
 	SetModelMatrix(identity);
 	BindUniformBuffer( 2, m_modelUBO );
+	BindUniformBuffer( 3, m_lightUBO );
 }
 
 void RenderContext::EndCamera( const Camera& camera )
@@ -836,18 +892,40 @@ void RenderContext::EndCamera( const Camera& camera )
 	m_isDrawing = false;
 }
 
-void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */ )
+void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */, BufferAttribute const* layout )
 {
 	// So at this point, I need to describe the Vertex Format to the shader
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
+
+	switch( m_isLightingEnabled )
+	{
+		case true: 
+			inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCUTBN::LAYOUT );
+			break;
+		case false: 
+			inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+			break;
+	};
+
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes, vertexOffset );
 }
 
-void RenderContext::DrawIndexed( int numIndices, int indexOffset, int vertexOffset /*= 0 */ )
+void RenderContext::DrawIndexed( int numIndices, int indexOffset, int vertexOffset /*= 0 */, BufferAttribute const* layout )
 {
-	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
+
+	switch( m_isLightingEnabled )
+	{
+	case true:
+		inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCUTBN::LAYOUT );
+		break;
+	case false:
+		inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
+		break;
+	};
+
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->DrawIndexed( numIndices, indexOffset, vertexOffset );
