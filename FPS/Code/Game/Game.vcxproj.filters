@@ -80,5 +80,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\InvertColor.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Phong.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
