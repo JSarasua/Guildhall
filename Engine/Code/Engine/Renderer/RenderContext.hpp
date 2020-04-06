@@ -245,8 +245,6 @@ public:
 
 	Vec4 m_ambientLight;
 	std::vector<light_t> m_lights;
-
-	bool m_isLightingEnabled = false;
 };
 
 

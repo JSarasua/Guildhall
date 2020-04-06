@@ -58,10 +58,7 @@ public:
 class VertexBuffer : public RenderBuffer
 {
 public:
-	VertexBuffer( RenderContext* context, eRenderMemoryHint memHint )
-		: RenderBuffer( context, VERTEX_BUFFER_BIT, memHint ),
-		m_bufferAttribute(Vertex_PCU::LAYOUT)
-	{}
+	VertexBuffer( RenderContext* context, eRenderMemoryHint memHint, uint stride, BufferAttribute const* layout = Vertex_PCU::LAYOUT );
 
 public:
 	BufferAttribute const* m_bufferAttribute = nullptr;

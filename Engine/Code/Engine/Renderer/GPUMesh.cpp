@@ -6,7 +6,7 @@
 
 GPUMesh::GPUMesh( RenderContext* context )
 {
-	m_vertices = new VertexBuffer( context, MEMORY_HINT_DYNAMIC );
+	m_vertices = new VertexBuffer( context, MEMORY_HINT_DYNAMIC, sizeof( Vertex_PCU ), Vertex_PCU::LAYOUT );
 	m_indices = new IndexBuffer( context, MEMORY_HINT_DYNAMIC );
 }
 

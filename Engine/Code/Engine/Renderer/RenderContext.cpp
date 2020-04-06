@@ -83,7 +83,7 @@ void RenderContext::StartUp(Window* window)
 	m_defaultShader = GetOrCreateShader( "Data/Shaders/Default.hlsl" );
 	CreateDefaultRasterState();
 
-	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC );
+	m_immediateVBO = new VertexBuffer( this, MEMORY_HINT_DYNAMIC, sizeof(Vertex_PCU), Vertex_PCU::LAYOUT );
 	m_immediateIBO = new IndexBuffer( this, MEMORY_HINT_DYNAMIC );
 
 	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
@@ -483,8 +483,6 @@ void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )
 	lightData.light = lightInfo;
 
 	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
-
-	m_isLightingEnabled = true;
 }
 
 void RenderContext::DisableLight( uint lightIndex )
@@ -496,8 +494,6 @@ void RenderContext::DisableLight( uint lightIndex )
 	lightData.light = m_lights[lightIndex];
 
 	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
-
-	m_isLightingEnabled = false;
 }
 
 Texture* RenderContext::GetBackBuffer()
@@ -897,16 +893,6 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */, BufferAttr
 	// So at this point, I need to describe the Vertex Format to the shader
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
 
-	switch( m_isLightingEnabled )
-	{
-		case true: 
-			inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCUTBN::LAYOUT );
-			break;
-		case false: 
-			inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
-			break;
-	};
-
 	m_context->IASetInputLayout( inputLayout );
 
 	m_context->Draw( numVertexes, vertexOffset );
@@ -915,16 +901,6 @@ void RenderContext::Draw( int numVertexes, int vertexOffset /*= 0 */, BufferAttr
 void RenderContext::DrawIndexed( int numIndices, int indexOffset, int vertexOffset /*= 0 */, BufferAttribute const* layout )
 {
 	ID3D11InputLayout* inputLayout = m_currentShader->GetOrCreateInputLayout( layout );
-
-	switch( m_isLightingEnabled )
-	{
-	case true:
-		inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCUTBN::LAYOUT );
-		break;
-	case false:
-		inputLayout = m_currentShader->GetOrCreateInputLayout( Vertex_PCU::LAYOUT );
-		break;
-	};
 
 	m_context->IASetInputLayout( inputLayout );
 

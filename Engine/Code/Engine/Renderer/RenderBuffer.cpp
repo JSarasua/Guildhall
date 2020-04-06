@@ -177,3 +177,10 @@ void IndexBuffer::Update( std::vector<uint> const& indices )
 {
 	Update( (uint)indices.size(), &indices[0] );
 }
+
+VertexBuffer::VertexBuffer( RenderContext* context, eRenderMemoryHint memHint, uint stride, BufferAttribute const* layout )
+	: RenderBuffer( context, VERTEX_BUFFER_BIT, memHint ),
+	m_bufferAttribute( layout )
+{
+	m_elementByteSize = stride;
+}
