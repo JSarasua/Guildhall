@@ -24,6 +24,9 @@ struct CameraData
 {
 	Mat44 projection;
 	Mat44 view;
+	Vec3 cameraPosition;
+
+	float pad00;
 };
 
 

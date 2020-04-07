@@ -90,6 +90,8 @@ void Game::Startup()
 	m_light->color = Vec3(1.f, 1.f, 1.f);
 	m_light->intensity = 1.f;
 	m_light->position = m_camera.GetPosition();
+	m_light->specularFactor = 0.f;
+	m_light->specularPower = 2.f;
 }
 
 void Game::Shutdown()

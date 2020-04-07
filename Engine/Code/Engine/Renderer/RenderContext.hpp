@@ -48,6 +48,10 @@ struct light_t
 	float pad00;
 	Vec3 color;
 	float intensity;
+	float specularFactor = 1.f;
+	float specularPower = 1.f;
+
+	Vec2 pad01;
 };
 
 struct LightData

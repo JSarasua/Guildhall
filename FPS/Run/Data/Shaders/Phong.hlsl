@@ -37,6 +37,9 @@ cbuffer camera_constants : register(b1)
 //	float2 orthoMax;
 	float4x4 PROJECTION; // CAMERA_TO_CLIP_TRANSFORM in the model view projection
 	float4x4 VIEW;
+	float3 CAMERAPOSITION;
+
+	float pad00;
 };
 
 cbuffer model : register(b2)
@@ -53,6 +56,10 @@ struct light_t
 
 	float3 color;
 	float intensity;
+	float specularFactor;
+	float specularPower;
+
+	float2 pad01;
 };
 
 cbuffer lightConstants : register(b3)
@@ -83,6 +90,7 @@ struct v2f_t
 
 	float3 worldPosition	: WORLDPOS;
 	float3 worldNormal		: WORLD_NORMAL;
+	float3 cameraPosition	: CAMERAPOS;
 }; 
 
 float RangeMap( float val, float inMin, float inMax, float outMin, float outMax )
@@ -143,7 +151,17 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	dot3 *= (LIGHT.color * LIGHT.intensity);
 
 	diffuse += dot3;
-	
+
+	//specular
+	float3 incidentVector = -dirToLight;
+	float3 incidentReflect = reflect( incidentVector, surfaceNormal );
+	float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
+	float specular = LIGHT.specularFactor * pow( dot(incidentReflect, directionToEye), LIGHT.specularPower);
+	//specular = 0.f;
+
+
+	diffuse += specular;
+
 	diffuse = min( float3( 1, 1, 1 ), diffuse );
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	float3 finalColor = diffuse * surfaceColor;

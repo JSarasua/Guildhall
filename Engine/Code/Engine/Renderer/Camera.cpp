@@ -244,6 +244,7 @@ void Camera::UpdateCameraUBO()
 	CameraData camData;
 	camData.projection = GetProjection();
 	camData.view = GetViewMatrix();
+	camData.cameraPosition = GetPosition();
 	//camData.view = Mat44::CreateTranslation3D( -GetPosition() );
 
 	m_cameraUBO->Update( &camData, sizeof( camData ), sizeof( camData ) );
