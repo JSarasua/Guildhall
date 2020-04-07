@@ -14,8 +14,8 @@ public:
 	Rgba8 tint;
 	Vec2 uvTexCoords;
 
-	// Vec3 tangent;
-	// Vec3 bitangent;
+	Vec3 tangent;
+	Vec3 bitangent;
 	Vec3 normal;
 
 	static BufferAttribute const LAYOUT[];

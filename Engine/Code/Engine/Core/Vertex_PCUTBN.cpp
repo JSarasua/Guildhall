@@ -6,6 +6,8 @@ BufferAttribute const Vertex_PCUTBN::LAYOUT[] ={
 	BufferAttribute( "POSITION",	BUFFER_FORMAT_VEC3,      		offsetof( Vertex_PCUTBN, position ) ),
 	BufferAttribute( "COLOR",		BUFFER_FORMAT_R8G8B8A8_UNORM, 	offsetof( Vertex_PCUTBN, tint ) ),
 	BufferAttribute( "TEXCOORD",    BUFFER_FORMAT_VEC2,      		offsetof( Vertex_PCUTBN, uvTexCoords ) ),
+	BufferAttribute( "TANGENT",		BUFFER_FORMAT_VEC3,				offsetof( Vertex_PCUTBN, tangent ) ),
+	BufferAttribute( "BITANGENT",		BUFFER_FORMAT_VEC3,				offsetof( Vertex_PCUTBN, bitangent ) ),
 	BufferAttribute( "NORMAL",		BUFFER_FORMAT_VEC3,				offsetof( Vertex_PCUTBN, normal ) ),
 	BufferAttribute() // end - terminator element; 
 };
@@ -19,61 +21,68 @@ void Vertex_PCUTBN::AppendIndexedVertsCube( std::vector<Vertex_PCUTBN>& masterVe
 	Vec2 tLeft( 0.f, 1.f );
 	Vec2 bRight( 1.f, 0.f );
 
+	Vec3 frontNormal	= Vec3( 0.f, 0.f, 1.f );
+	Vec3 rightNormal	= Vec3( 1.f, 0.f, 0.f );
+	Vec3 backNormal		= Vec3( 0.f, 0.f, -1.f );
+	Vec3 leftNormal		= Vec3( -1.f, 0.f, 0.f );
+	Vec3 upNormal		= Vec3( 0.f, 1.f, 0.f );
+	Vec3 downNormal		= Vec3( 0.f, -1.f, 0.f );
+
 	Vertex_PCUTBN cubeVerts[24] =
 	{
 		//Front Quad
-		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft, Vec3( -c, -c, c ) ),	//0
-		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bRight, Vec3( c, -c, c ) ),		//1
-		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tRight, Vec3( c, c, c ) ),		//2
+		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft,  frontNormal ),	//0
+		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bRight, frontNormal ),		//1
+		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tRight, frontNormal ),		//2
 
 		//Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft ),	//0
 		//Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tRight ),	//2
-		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tLeft, Vec3( -c, c, c ) ),		//3
+		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tLeft, frontNormal ),		//3
 
 		//Right Quad
-		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft, Vec3( c, -c, c ) ),		//4
-		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bRight, Vec3( c, -c, -c ) ),		//5
-		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight, Vec3( c, c, -c ) ),		//6
+		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft,	rightNormal ),		//4
+		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bRight, rightNormal ),		//5
+		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight, rightNormal ),		//6
 
 		//Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft ),	//4
 		//Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//6
-		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tLeft, Vec3( c, c, c ) ),		//7
+		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tLeft, rightNormal ),		//7
 
 		//Back Quad
-		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bLeft, Vec3( c, -c, -c ) ),		//8
-		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bRight, Vec3( -c, -c, -c ) ),		//9
-		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,		tRight, Vec3( -c, c, -c ) ),		//10
+		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bLeft,	backNormal ),		//8
+		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bRight, backNormal ),		//9
+		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,		tRight, backNormal ),		//10
 
 		//Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,	bLeft ),		//8
 		//Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,	tRight ),		//10
-		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tLeft, Vec3( c, c, -c ) ),		//11
+		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tLeft, backNormal ),		//11
 
 		//Left Quad
-		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft, Vec3( -c, -c, -c ) ),		//12
-		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bRight, Vec3( -c, -c, c ) ),		//13
-		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tRight, Vec3( -c, c, c ) ),			//14
+		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft,	leftNormal ),		//12
+		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bRight, leftNormal ),		//13
+		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tRight, leftNormal ),			//14
 
 		//Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//12
 		//Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tRight ),	//14
-		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,		tLeft, Vec3( -c, c, -c ) ),		//15
+		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,		tLeft, leftNormal ),		//15
 
 		//Top Quad
-		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft, Vec3( -c, c, c ) ),		//16
-		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		bRight, Vec3( c, c, c ) ),		//17
-		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight, Vec3( c, c, -c ) ),		//18
+		Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft,	upNormal ),		//16
+		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		bRight, upNormal ),		//17
+		Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight, upNormal ),		//18
 
 		//Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft ),	//16
 		//Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//18
-		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,			tLeft, Vec3( -c, c, -c ) ),		//19
+		Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,			tLeft, upNormal ),		//19
 
 		//Bottom Quad
-		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft, Vec3( -c, -c, -c ) ),		//20
-		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bRight, Vec3( c, -c, -c ) ),		//21
-		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		tRight, Vec3( c, -c, c ) ),		//22
+		Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft,	downNormal ),		//20
+		Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,		bRight, downNormal ),		//21
+		Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		tRight, downNormal),		//22
 
 		//Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//20
 		//Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		tRight ),	//22
-		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		tLeft, Vec3( -c, -c, c ) )			//23
+		Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		tLeft, downNormal )			//23
 	};
 
 	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
