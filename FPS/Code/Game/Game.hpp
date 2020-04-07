@@ -11,6 +11,8 @@ class Shader;
 class GPUMesh;
 class Clock;
 
+struct light_t;
+
 
 enum PowerUps
 {
@@ -45,6 +47,7 @@ private:
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
 	IntVec2 GetCurrentMapBounds() const;
+	void SetLightPosition( Vec3 const& pos );
 
 private:
 	Mat44 m_cubeModelMatrix;
@@ -67,6 +70,9 @@ private:
 	Texture* m_screenTexture = nullptr;
 
 	Shader* m_invertShader = nullptr;
+	Shader* m_litShader = nullptr;
+
+	light_t* m_light = nullptr;
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;

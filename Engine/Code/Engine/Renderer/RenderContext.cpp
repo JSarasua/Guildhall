@@ -138,6 +138,9 @@ void RenderContext::Shutdown()
 	delete m_modelUBO;
 	m_frameUBO = nullptr;
 
+	delete m_lightUBO;
+	m_lightUBO = nullptr;
+
 	delete m_sampPoint;
 	m_sampPoint = nullptr;
 
@@ -249,14 +252,20 @@ void RenderContext::DrawMesh( GPUMesh* mesh )
 
 	BindVertexBuffer( mesh->GetVertexBuffer() );
 
+	LightData lightData;
+	lightData.ambientLight = m_ambientLight;
+	lightData.light = m_lights[0];
+
+	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
+
 	if( nullptr != mesh->GetIndexBuffer() )
 	{
 		BindIndexBuffer( mesh->GetIndexBuffer() );
-		DrawIndexed( mesh->GetIndexCount() );
+		DrawIndexed( mesh->GetIndexCount(), 0, 0, mesh->m_vertices->m_bufferAttribute );
 	}
 	else
 	{
-		Draw( mesh->m_vertexCount, 0 );
+		Draw( mesh->m_vertexCount, 0, mesh->m_vertices->m_bufferAttribute );
 	}
 
 }
@@ -321,7 +330,7 @@ void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 	}
 	m_lastVBOHandle = vboHandle;
 
-	uint stride = sizeof(Vertex_PCU); // how far from one vertex to next
+	uint stride = (uint)vbo->m_elementByteSize; // how far from one vertex to next
 	uint offset = 0;	// how far into buffer we start
 
 
@@ -468,9 +477,9 @@ void RenderContext::SetAmbientLight( Rgba8 const& color, float intensity )
 {
 	float ambientLight[4];
 	color.ToFloatArray( ambientLight );
-	m_ambientLight.x = ambientLight[0];
-	m_ambientLight.y = ambientLight[1];
-	m_ambientLight.z = ambientLight[2];
+	m_ambientLight.x = ambientLight[0] / 255.f;
+	m_ambientLight.y = ambientLight[1] / 255.f;
+	m_ambientLight.z = ambientLight[2] / 255.f;
 	m_ambientLight.w = intensity;
 }
 
@@ -481,8 +490,6 @@ void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
 	lightData.light = lightInfo;
-
-	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
 }
 
 void RenderContext::DisableLight( uint lightIndex )
@@ -492,8 +499,6 @@ void RenderContext::DisableLight( uint lightIndex )
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
 	lightData.light = m_lights[lightIndex];
-
-	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
 }
 
 Texture* RenderContext::GetBackBuffer()
@@ -871,13 +876,19 @@ void RenderContext::BeginCamera( Camera& camera )
 	if( nullptr == m_modelUBO )
 	{
 		m_modelUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+	}
 
+	if( nullptr == m_lightUBO )
+	{
+		m_lightUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 	}
 
 	Mat44 identity;
 	SetModelMatrix(identity);
 	BindUniformBuffer( 2, m_modelUBO );
 	BindUniformBuffer( 3, m_lightUBO );
+
+
 }
 
 void RenderContext::EndCamera( const Camera& camera )

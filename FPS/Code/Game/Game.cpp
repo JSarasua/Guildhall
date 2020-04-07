@@ -45,24 +45,37 @@ void Game::Startup()
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
+	m_litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
 	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 1.f, 0.5f, -12.f ) );
 	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
 
 	m_cubeMesh = new GPUMesh( g_theRenderer );
-	std::vector<Vertex_PCU> cubeVerts;
-	std::vector<uint> cubeIndices;
+// 	std::vector<Vertex_PCU> cubeVerts;
+// 	std::vector<uint> cubeIndices;
+// 	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+// 	m_cubeMesh->UpdateVertices( cubeVerts );
+// 	m_cubeMesh->UpdateIndices( cubeIndices );
 
-	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+	std::vector<Vertex_PCUTBN> cubeVerts;
+	std::vector<uint> cubeIndices;
+	Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
 	m_cubeMesh->UpdateVertices( cubeVerts );
 	m_cubeMesh->UpdateIndices( cubeIndices );
 
+
+
+
 	m_sphereMesh = new GPUMesh( g_theRenderer );
-	std::vector<Vertex_PCU> sphereVerts;
+// 	std::vector<Vertex_PCU> sphereVerts;
+// 	std::vector<uint> sphereIndices;
+// 	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3(0.f, 0.f, 0.f), 1.f, 64, 64, Rgba8::WHITE );
+// 	m_sphereMesh->UpdateVertices( sphereVerts );
+// 	m_sphereMesh->UpdateIndices( sphereIndices );
+
+	std::vector<Vertex_PCUTBN> sphereVerts;
 	std::vector<uint> sphereIndices;
-
-
-	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3(0.f, 0.f, 0.f), 1.f, 64, 64, Rgba8::WHITE );
+	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
 	m_sphereMesh->UpdateVertices( sphereVerts );
 	m_sphereMesh->UpdateIndices( sphereIndices );
 
@@ -72,6 +85,11 @@ void Game::Startup()
 	g_theRenderer->Setup( m_gameClock );
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
+
+	m_light = new light_t();
+	m_light->color = Vec3(1.f, 1.f, 1.f);
+	m_light->intensity = 1.f;
+	m_light->position = m_camera.GetPosition();
 }
 
 void Game::Shutdown()
@@ -95,11 +113,10 @@ void Game::Update()
 		m_currentTime = 0.f;
 	}
 	Rgba8 clearColor;
+
 	clearColor.g = 0;
-	clearColor.b = 0;
-	float colorVal = m_currentTime * 45.f;
-	clearColor.r = (unsigned char)colorVal;
-	clearColor.b = (unsigned char)colorVal;
+	clearColor.r = 10;
+	clearColor.b = 10;
 
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
@@ -144,7 +161,10 @@ void Game::Render()
 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
 
 
-	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theRenderer->DisableLight( 0 );
+	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.2f );
+	g_theRenderer->EnableLight( 0, *m_light );
+	g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
@@ -238,7 +258,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
 	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
 
+	if( qKey.WasJustPressed() )
+	{
+		SetLightPosition( m_camera.GetPosition() );
+	}
 
 	if( f11Key.WasJustPressed() )
 	{
@@ -423,6 +448,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 IntVec2 Game::GetCurrentMapBounds() const
 {
 	return m_world->getCurrentMapBounds();
+}
+
+void Game::SetLightPosition( Vec3 const& pos )
+{
+	m_light->position = pos;
 }
 
 void Game::RenderDevConsole()

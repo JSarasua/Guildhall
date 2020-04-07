@@ -244,7 +244,7 @@ public:
 	ID3D11RasterizerState* m_rasterState = nullptr;
 
 	Vec4 m_ambientLight;
-	std::vector<light_t> m_lights;
+	light_t m_lights[8];
 };
 
 

@@ -51,7 +51,7 @@ struct light_t
 	float3 worldPosition;
 	float pad00; //not required
 
-	float3 color
+	float3 color;
 	float intensity;
 };
 
@@ -98,8 +98,6 @@ v2f_t VertexFunction( vs_input_t input )
 {
 	v2f_t v2f = (v2f_t)0;
 
-
-
 	//Need to add a normal in with same operations vs_input_t should be replaced to hold a normal and named Vertex_PCUTBN
 	float4 localPos = float4( input.position, 1);
 	float4 worldPos = mul(MODEL, localPos);
@@ -109,6 +107,7 @@ v2f_t VertexFunction( vs_input_t input )
 	//normal is currently in model/local space
 	float4 localNormal = float4( input.normal, 0.f );
 	float4 worldNormal = mul( MODEL, localNormal );
+	worldNormal = normalize( worldNormal );
 
 
 	// forward vertex input onto the next stage
@@ -116,7 +115,7 @@ v2f_t VertexFunction( vs_input_t input )
 	v2f.color = input.color * TINT; 
 	v2f.uv = input.uv; 
 	v2f.worldPosition = worldPos.xyz;
-	vwf.worldNormal = worldNormal.xyz;
+	v2f.worldNormal = worldNormal.xyz;
 
 	return v2f;
 }
@@ -130,48 +129,29 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
 	float3 surfaceColor = (input.color * textureColor).xyz; //tint our texture color
-	float3 surfaceAlpha = (input.color.a * textureColor.a);
+	float surfaceAlpha = (input.color.a * textureColor.a);
 
 	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
 
 	float3 surfaceNormal = normalize( input.worldNormal );
 
 	//Added in dot3 factor
+	
 	float3 lightPosition = LIGHT.worldPosition;
 	float3 dirToLight = normalize( lightPosition - input.worldPosition );
 	float3 dot3 = max( 0.f, dot( dirToLight, surfaceNormal ) );
+	dot3 *= (LIGHT.color * LIGHT.intensity);
 
 	diffuse += dot3;
-
+	
 	diffuse = min( float3( 1, 1, 1 ), diffuse );
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	float3 finalColor = diffuse * surfaceColor;
 	
-	return float4( finalColor, surfaceAlpha );
+	return float4( finalColor.xyz, surfaceAlpha );
+	
 	
 	//old way
 	//float4 color = tDiffuse.Sample( sSampler, input.uv );
 	//return color * input.color;
-
-
-	//new way
-	/*
-	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
-	float3 surfaceColor = (input.Color * textureColor).xyz;
-	float3 surfaceAlpha = (input.Color.a)
-	
-		
-	float3 diffuse = AMBIENT.xyz * AMBIENT.w;
-	float3 surfaceNormal = ???;
-	float3 lightPosition = LIGHT.worldPosition;
-	float3 dirToLight = normalize( lightPosition - input.worldPosition );
-
-	float dot3 = max( 0.f, dot( dirToLight, surfaceNormal ) );
-	diffuse += dot3;
-
-	diffuse = saturate(diffuse);
-
-	float3 finalColor = (input.color.a * textureColor.a );
-	return float4( finalColor, surfaceAlpha );
-	*/
 }

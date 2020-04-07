@@ -61,6 +61,8 @@ bool Shader::CreateFromFile( std::string const& filename )
 	m_vertexStage.Compile( m_owner, filename, source, fileSize, SHADER_TYPE_VERTEX );
 	m_fragmentStage.Compile( m_owner, filename, source, fileSize, SHADER_TYPE_FRAGMENT );
 
+	m_filename = filename;
+	
 	delete[] source;
 
 	return m_vertexStage.IsValid() && m_fragmentStage.IsValid();
@@ -124,7 +126,7 @@ ID3D11InputLayout* Shader::GetOrCreateInputLayout(  BufferAttribute const*  layo
 	ID3D11Device* device = m_owner->m_device;
 	device->CreateInputLayout( 
 		&vertexDescription[0], 
-		3,
+		(uint)vertexDescription.size(),
 		m_vertexStage.GetByteCode(),
 		m_vertexStage.GetByteCodeLength(),
 		&m_inputLayout );
