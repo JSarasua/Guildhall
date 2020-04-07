@@ -140,7 +140,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float surfaceAlpha = (input.color.a * textureColor.a);
 
 	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-
+	
 	float3 surfaceNormal = normalize( input.worldNormal );
 
 	//Added in dot3 factor
@@ -152,21 +152,25 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
 	diffuse += dot3;
 
+
 	//specular
 	float3 incidentVector = -dirToLight;
 	float3 incidentReflect = reflect( incidentVector, surfaceNormal );
 	float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
-	float specular = LIGHT.specularFactor * pow( dot(incidentReflect, directionToEye), LIGHT.specularPower);
+	float specular = LIGHT.specularFactor * pow( max( 0.f,  dot(incidentReflect, directionToEye) ), LIGHT.specularPower);
 	//specular = 0.f;
 
 
-	diffuse += specular;
-
+	diffuse.xyz += specular;
 	diffuse = min( float3( 1, 1, 1 ), diffuse );
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
-	float3 finalColor = diffuse * surfaceColor;
 	
+	float3 finalColor = diffuse * surfaceColor;
+	//normalize(incidentReflect);
+	//float3 finalColor = directionToEye.xyz;
+
 	return float4( finalColor.xyz, surfaceAlpha );
+
 	
 	
 	//old way
