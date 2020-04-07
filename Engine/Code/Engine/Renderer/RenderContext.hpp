@@ -46,6 +46,7 @@ struct light_t
 {
 	Vec3 position;
 	float pad00;
+	
 	Vec3 color;
 	float intensity;
 	float specularFactor = 1.f;
