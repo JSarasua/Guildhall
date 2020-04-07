@@ -88,9 +88,9 @@ void Game::Startup()
 
 	m_light = new light_t();
 	m_light->color = Vec3(1.f, 1.f, 1.f);
-	m_light->intensity = 1.f;
+	m_light->intensity = 0.5f;
 	m_light->position = m_camera.GetPosition();
-	m_light->specularFactor = 0.f;
+	m_light->specularFactor = 0.5f;
 	m_light->specularPower = 2.f;
 }
 
@@ -145,26 +145,26 @@ void Game::Render()
 
 	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);
 
-	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
-	g_theRenderer->SetBlendMode(BlendMode::SOLID);
-	g_theRenderer->BindTexture(tex);
-	g_theRenderer->BindShader(m_invertShader);
-	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255, 255, 255, 128 ));
-
-	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-	g_theRenderer->BindShader( (Shader*)nullptr );
-	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
-
-
-	tex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PlayerTankBase.png" );
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
-	g_theRenderer->BindTexture( tex );
-	g_theRenderer->BindShader( m_invertShader );
-	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
+	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
+// 	g_theRenderer->SetBlendMode(BlendMode::SOLID);
+// 	g_theRenderer->BindTexture(tex);
+// 	g_theRenderer->BindShader(m_invertShader);
+// 	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255, 255, 255, 128 ));
+// 
+// 	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+// 	g_theRenderer->BindShader( (Shader*)nullptr );
+// 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
+// 
+// 
+// 
+// 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+ 	g_theRenderer->BindTexture( tex );
+// 	g_theRenderer->BindShader( m_invertShader );
+// 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
 
 
 	g_theRenderer->DisableLight( 0 );
-	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.2f );
+	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.f );
 	g_theRenderer->EnableLight( 0, *m_light );
 	g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
