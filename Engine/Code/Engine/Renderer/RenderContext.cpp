@@ -330,7 +330,7 @@ void RenderContext::BindVertexBuffer( VertexBuffer* vbo )
 	}
 	m_lastVBOHandle = vboHandle;
 
-	uint stride = (uint)vbo->m_elementByteSize; // how far from one vertex to next
+	uint stride = (uint)vbo->GetElementStrideInBytes(); // how far from one vertex to next
 	uint offset = 0;	// how far into buffer we start
 
 

@@ -184,3 +184,8 @@ VertexBuffer::VertexBuffer( RenderContext* context, eRenderMemoryHint memHint, u
 {
 	m_elementByteSize = stride;
 }
+
+size_t VertexBuffer::GetElementStrideInBytes() const
+{
+	return m_elementByteSize;
+}

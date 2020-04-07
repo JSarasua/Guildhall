@@ -60,6 +60,9 @@ class VertexBuffer : public RenderBuffer
 public:
 	VertexBuffer( RenderContext* context, eRenderMemoryHint memHint, uint stride, BufferAttribute const* layout = Vertex_PCU::LAYOUT );
 
+	size_t GetElementStrideInBytes() const;
+
+
 public:
 	BufferAttribute const* m_bufferAttribute = nullptr;
 
