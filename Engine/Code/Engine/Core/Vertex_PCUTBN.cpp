@@ -227,7 +227,7 @@ void Vertex_PCUTBN::AppendIndexedVertsSphere( std::vector<Vertex_PCUTBN>& master
 
 	for( size_t vertexIndex = 0; vertexIndex < vertexList.size(); vertexIndex++ )
 	{
-		masterVertexList.push_back( Vertex_PCUTBN( vertexList[vertexIndex], Rgba8::WHITE, uvList[vertexIndex], normalList[vertexIndex]/*, tangentList[vertexIndex], bitangentList[vertexIndex]*/ ) );
+		masterVertexList.push_back( Vertex_PCUTBN( vertexList[vertexIndex], Rgba8::WHITE, uvList[vertexIndex], normalList[vertexIndex], tangentList[vertexIndex], bitangentList[vertexIndex] ) );
 	}
 	//	masterVertexList.insert( masterVertexList.end(), vertexList.begin(), vertexList.end() );
 	masterIndexList.insert( std::end( masterIndexList ), std::begin( indicesList ), std::end( indicesList ) );
