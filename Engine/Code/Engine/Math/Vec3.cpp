@@ -283,7 +283,7 @@ Vec3 Vec3::GetClamped( float maxLength ) const
 Vec3 Vec3::GetNormalized() const
 {
 	float length = GetLength();
-	Vec3 normalizedVec;
+	Vec3 normalizedVec = *this;
 
 	if( length != 0.f )
 	{
