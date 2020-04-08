@@ -265,6 +265,8 @@ Vertex_PCUTBN::Vertex_PCUTBN( Vertex_PCUTBN const& copyFrom )
 	, tint( copyFrom.tint )
 	, uvTexCoords( copyFrom.uvTexCoords )
 	, normal( copyFrom.normal )
+	, tangent( copyFrom.tangent )
+	, bitangent( copyFrom.bitangent )
 {}
 
 Vertex_PCUTBN::Vertex_PCUTBN( Vec3 const& position, Rgba8 const& tint, Vec2 const& uvTexCoords, Vec3 const& normal )
