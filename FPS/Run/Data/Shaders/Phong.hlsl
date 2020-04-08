@@ -66,6 +66,9 @@ cbuffer lightConstants : register(b3)
 {
 	float4 AMBIENT;
 	light_t LIGHT;
+	float3 ATTENUATION;
+
+	float pad01;
 }
 
 
@@ -149,6 +152,10 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 dirToLight = normalize( lightPosition - input.worldPosition );
 	float3 dot3 = max( 0.f, dot( dirToLight, surfaceNormal ) );
 	dot3 *= (LIGHT.color * LIGHT.intensity);
+
+	float3 distanceToLight = length( lightPosition - input.worldPosition );
+	float att3 = min( 1.f, 1.f / (ATTENUATION.x + ATTENUATION.y*distanceToLight + ATTENUATION.z*distanceToLight*distanceToLight ) );
+	dot3 *= att3;
 
 	diffuse += dot3;
 

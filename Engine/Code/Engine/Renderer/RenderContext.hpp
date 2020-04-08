@@ -59,6 +59,9 @@ struct LightData
 {
 	Vec4 ambientLight;
 	light_t light;
+	Vec3 attenuation = Vec3( 0.f, 0.f, 1.f );
+
+	float pad00;
 };
 
 enum class Viewport
@@ -157,6 +160,7 @@ public:
 
 	//Lighting
 	Vec4 GetAmbientLight() const;
+	Vec3 GetAttenuation() const;
 
 	void SetAmbientColor( Rgba8 const& color );
 	void SetAmbientIntensity( float intensity );
@@ -168,6 +172,8 @@ public:
 	//pointLight...
 	void DisableLight( uint lightIndex );
 	//Disable means set light intensity to 0.f
+
+	void ToggleAttenuation();
 
 	//Backbuffer
 	Texture* GetBackBuffer();
@@ -252,6 +258,7 @@ public:
 
 	Vec4 m_ambientLight;
 	light_t m_lights[8];
+	Vec3 m_attenuation = Vec3( 0.f, 1.f, 0.f );
 };
 
 

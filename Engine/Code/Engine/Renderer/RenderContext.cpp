@@ -255,6 +255,7 @@ void RenderContext::DrawMesh( GPUMesh* mesh )
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
 	lightData.light = m_lights[0];
+	lightData.attenuation = m_attenuation;
 
 	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
 
@@ -464,6 +465,11 @@ Vec4 RenderContext::GetAmbientLight() const
 	return m_ambientLight;
 }
 
+Vec3 RenderContext::GetAttenuation() const
+{
+	return m_attenuation;
+}
+
 void RenderContext::SetAmbientColor( Rgba8 const& color )
 {
 	float ambientLight[4];
@@ -504,6 +510,28 @@ void RenderContext::DisableLight( uint lightIndex )
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
 	lightData.light = m_lights[lightIndex];
+}
+
+void RenderContext::ToggleAttenuation()
+{
+	if( m_attenuation.x == 1.f )
+	{
+		m_attenuation.x = 0.f;
+		m_attenuation.y = 1.f;
+		m_attenuation.z = 0.f;
+	}
+	else if( m_attenuation.y == 1.f )
+	{
+		m_attenuation.x = 0.f;
+		m_attenuation.y = 0.f;
+		m_attenuation.z = 1.f;
+	}
+	else if( m_attenuation.z == 1.f )
+	{
+		m_attenuation.x = 1.f;
+		m_attenuation.y = 0.f;
+		m_attenuation.z = 0.f;
+	}
 }
 
 Texture* RenderContext::GetBackBuffer()

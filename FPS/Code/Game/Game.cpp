@@ -137,6 +137,8 @@ void Game::Update()
 	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
 	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
+
+	DebugAddWorldPoint( m_light->position, Rgba8::RED, 0.f );
 }
 
 void Game::Render()
@@ -159,7 +161,7 @@ void Game::Render()
 // 
 // 
 // 
-// 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+ 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
  	g_theRenderer->BindTexture( tex );
 // 	g_theRenderer->BindShader( m_invertShader );
 // 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
@@ -262,6 +264,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
 	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
+	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
+	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 
 	if( qKey.WasJustPressed() )
 	{
@@ -337,7 +341,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( lBracketKey.WasJustPressed() )
 	{
-		DebugAddScreenArrow( Vec2( 100.f, 100.f ), Vec2( 200.f, 250. ), Rgba8::RED, Rgba8::BLUE, 10.f );
+		
 	}
 	if( rBracketKey.IsPressed() )
 	{
@@ -370,8 +374,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( tKey.WasJustPressed() )
 	{
-		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
-		DebugAddWorldBasis( cameraModel, Rgba8::WHITE, Rgba8::GREEN, 10.f, DEBUG_RENDER_USE_DEPTH );
+		g_theRenderer->ToggleAttenuation();
 	}
 	if( gKey.WasJustPressed() )
 	{
@@ -392,6 +395,22 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
 		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 45.f, DEBUG_RENDER_USE_DEPTH );
+	}
+	if( plusKey.IsPressed() )
+	{
+		float currentLightIntensity = m_light->intensity;
+
+		float newLightIntensity = currentLightIntensity + 0.5f * deltaSeconds;
+		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
+		m_light->intensity = newLightIntensity;
+	}
+	if( minusKey.IsPressed() )
+	{
+		float currentLightIntensity = m_light->intensity;
+
+		float newLightIntensity = currentLightIntensity - 0.5f * deltaSeconds;
+		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
+		m_light->intensity = newLightIntensity;
 	}
 
 	Vec3 translator;

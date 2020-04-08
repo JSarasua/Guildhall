@@ -36,6 +36,8 @@ const unsigned char PERIOD_KEY		= VK_OEM_PERIOD;
 const unsigned char BACKSLASH_KEY	= VK_OEM_5;
 const unsigned char SINGLEQUOTE_KEY	= VK_OEM_7;
 const unsigned char F11_KEY			= VK_F11;
+const unsigned char PLUS_KEY		= VK_OEM_PLUS;
+const unsigned char MINUS_KEY		= VK_OEM_MINUS;
 
 InputSystem::InputSystem()
 {

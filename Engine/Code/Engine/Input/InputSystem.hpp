@@ -35,6 +35,8 @@ extern const unsigned char PERIOD_KEY;
 extern const unsigned char BACKSLASH_KEY;
 extern const unsigned char SINGLEQUOTE_KEY;
 extern const unsigned char F11_KEY;
+extern const unsigned char PLUS_KEY;
+extern const unsigned char MINUS_KEY;
 
 class Window;
 struct IntVec2;
