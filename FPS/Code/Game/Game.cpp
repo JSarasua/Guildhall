@@ -45,7 +45,16 @@ void Game::Startup()
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
 	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
-	m_litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
+	Shader* litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
+	Shader* normalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Normals.hlsl" );
+	Shader* tangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Tangents.hlsl" );
+	Shader* bitangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Bitangents.hlsl" );
+
+	m_shaders.push_back( litShader );
+	m_shaders.push_back( normalShader );
+	m_shaders.push_back( tangentShader );
+	m_shaders.push_back( bitangentShader );
+
 	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 1.f, 0.5f, -12.f ) );
 	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
@@ -150,6 +159,7 @@ void Game::Render()
 	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);
 
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
+	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
 // 	g_theRenderer->SetBlendMode(BlendMode::SOLID);
 // 	g_theRenderer->BindTexture(tex);
 // 	g_theRenderer->BindShader(m_invertShader);
@@ -161,15 +171,18 @@ void Game::Render()
 // 
 // 
 // 
+
  	g_theRenderer->SetBlendMode( BlendMode::SOLID );
  	g_theRenderer->BindTexture( tex );
+	g_theRenderer->BindNormal( normalTex );
 // 	g_theRenderer->BindShader( m_invertShader );
 // 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
 
 
 	g_theRenderer->DisableLight( 0 );
 	g_theRenderer->EnableLight( 0, *m_light );
-	g_theRenderer->BindShader( m_litShader );
+	//g_theRenderer->BindShader( m_litShader );
+	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
@@ -202,6 +215,30 @@ void Game::RenderCircleOfSpheres()
 		nextModelMatrix.RotateYDegrees( degreeIncrements );
 		nextModelMatrix.TransformBy( m_circleOfSpheresModelMatrix );
 		m_circleOfSpheresModelMatrix = nextModelMatrix;
+	}
+}
+
+void Game::IncrementShader()
+{
+	m_currentShaderIndex++;
+	if( m_currentShaderIndex >= m_shaders.size() )
+	{
+		m_currentShaderIndex = 0;
+	}
+}
+
+void Game::DecrementShader()
+{
+	if( m_currentShaderIndex == 0 )
+	{
+		if( !m_shaders.empty() )
+		{
+			m_currentShaderIndex = m_shaders.size() - 1;
+		}
+	}
+	else
+	{
+		m_currentShaderIndex--;
 	}
 }
 
@@ -268,6 +305,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
 	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
+	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
+	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 
 	if( qKey.WasJustPressed() )
 	{
@@ -372,6 +411,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
 		m_light->specularPower = newSpecularPower;
+	}
+	if( commaKey.WasJustPressed() )
+	{
+		DecrementShader();
+	}
+	if( periodKey.WasJustPressed() )
+	{
+		IncrementShader();
 	}
 	if( rKey.WasJustPressed() )
 	{

@@ -3,6 +3,7 @@
 #include "GameCommon.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include <vector>
 
 
 class Player;
@@ -39,6 +40,8 @@ public:
 
 private:
 
+	void IncrementShader();
+	void DecrementShader();
 
 	void CheckCollisions();
 	void UpdateEntities( float deltaSeconds );
@@ -70,7 +73,10 @@ private:
 	Texture* m_screenTexture = nullptr;
 
 	Shader* m_invertShader = nullptr;
-	Shader* m_litShader = nullptr;
+
+	std::vector<Shader*> m_shaders;
+	size_t m_currentShaderIndex = 0;
+
 
 	light_t* m_light = nullptr;
 

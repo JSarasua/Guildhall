@@ -147,61 +147,9 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
-	float4 textureNormal = tNormal.Sample( sSampler, input.uv );
-	float3 surfaceColor = (input.color * textureColor).xyz; //tint our texture color
-	float surfaceAlpha = (input.color.a * textureColor.a);
+	float3 worldBitangent = normalize( input.worldBitangent );
+	worldBitangent.x = RangeMap( worldBitangent.x, -1.f, 1.f, 0.f, 1.f );
+	worldBitangent.y = RangeMap( worldBitangent.y, -1.f, 1.f, 0.f, 1.f );
 
-	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-	
-	
-	float3 surfaceNormal = textureNormal.xyz;
-	surfaceNormal.x = RangeMap( surfaceNormal.x, 0.f, 1.f, -1.f, 1.f );
-	surfaceNormal.y = RangeMap( surfaceNormal.y, 0.f, 1.f, -1.f, 1.f );
-	
-	
-
-	float3 normal = normalize( input.worldNormal );
-	float3 tangent = normalize( input.worldTangent );
-	float3 bitangent = normalize( input.worldBitangent );
-
-	float3x3 tbn = float3x3( tangent, bitangent, normal );
-	float3 worldNormal = mul( surfaceNormal, tbn );
-	//Added in dot3 factor
-	
-	float3 lightPosition = LIGHT.worldPosition;
-	float3 dirToLight = normalize( lightPosition - input.worldPosition );
-	float3 dot3 = max( 0.f, dot( dirToLight, worldNormal ) );
-	dot3 *= (LIGHT.color * LIGHT.intensity);
-
-	float distanceToLight = length( lightPosition - input.worldPosition );
-	float att3 = min( 1.f, 1.f / (ATTENUATION.x + ATTENUATION.y*distanceToLight + ATTENUATION.z*distanceToLight*distanceToLight ) );
-	dot3 *= att3;
-
-	diffuse += dot3;
-
-
-	//specular
-	float3 incidentVector = -dirToLight;
-	float3 incidentReflect = reflect( incidentVector, worldNormal );
-	float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
-	float specular = LIGHT.specularFactor * pow( max( 0.f,  dot(incidentReflect, directionToEye) ), LIGHT.specularPower);
-	//specular = 0.f;
-
-
-	diffuse.xyz += specular;
-	diffuse = min( float3( 1, 1, 1 ), diffuse );
-	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
-	
-	float3 finalColor = diffuse * surfaceColor;
-	//normalize(incidentReflect);
-	//float3 finalColor = directionToEye.xyz;
-
-	return float4( finalColor.xyz, surfaceAlpha );
-
-	
-	
-	//old way
-	//float4 color = tDiffuse.Sample( sSampler, input.uv );
-	//return color * input.color;
+	return float4( worldBitangent.xyz, 1.f );
 }
