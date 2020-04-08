@@ -30,4 +30,5 @@ public:
 	Vertex_PCUTBN() {}
 	Vertex_PCUTBN( Vertex_PCUTBN const& copyFrom );
 	explicit Vertex_PCUTBN( Vec3 const& position, Rgba8 const& tint, Vec2 const& uvTexCoords, Vec3 const& normal );
+	explicit Vertex_PCUTBN( Vec3 const& position, Rgba8 const& tint, Vec2 const& uvTexCoords, Vec3 const& normal, Vec3 const& tangent, Vec3 const& bitangent );
 };
