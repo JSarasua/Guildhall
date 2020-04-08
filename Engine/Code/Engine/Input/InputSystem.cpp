@@ -38,6 +38,7 @@ const unsigned char SINGLEQUOTE_KEY	= VK_OEM_7;
 const unsigned char F11_KEY			= VK_F11;
 const unsigned char PLUS_KEY		= VK_OEM_PLUS;
 const unsigned char MINUS_KEY		= VK_OEM_MINUS;
+const unsigned char SEMICOLON_KEY	= VK_OEM_1;
 
 InputSystem::InputSystem()
 {

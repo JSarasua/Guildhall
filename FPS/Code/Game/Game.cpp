@@ -266,6 +266,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
+	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
+	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
 
 	if( qKey.WasJustPressed() )
 	{
@@ -339,14 +341,37 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
 		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
 	}
-	if( lBracketKey.WasJustPressed() )
+	if( lBracketKey.IsPressed() )
 	{
-		
+		float currentSpecularFactor = m_light->specularFactor;
+
+		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
+		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
+		m_light->specularFactor = newSpecularFactor;
 	}
 	if( rBracketKey.IsPressed() )
 	{
-		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
-		DebugAddScreenBasis( cameraModel, Rgba8::WHITE, Rgba8::WHITE, 0.f );
+		float currentSpecularFactor = m_light->specularFactor;
+
+		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
+		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
+		m_light->specularFactor = newSpecularFactor;
+	}
+	if( semiColonKey.IsPressed() )
+	{
+		float currentSpecularPower = m_light->specularPower;
+
+		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
+		newSpecularPower = Max( newSpecularPower, 1.f );
+		m_light->specularPower = newSpecularPower;
+	}
+	if( singleQuoteKey.IsPressed() )
+	{
+		float currentSpecularPower = m_light->specularPower;
+
+		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
+		newSpecularPower = Max( newSpecularPower, 1.f );
+		m_light->specularPower = newSpecularPower;
 	}
 	if( rKey.WasJustPressed() )
 	{
