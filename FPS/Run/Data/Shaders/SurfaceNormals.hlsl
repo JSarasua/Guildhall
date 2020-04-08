@@ -147,7 +147,20 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
-	float3 worldNormal = normalize( input.worldNormal );
+	float4 textureNormal = tNormal.Sample( sSampler, input.uv );
+	float3 surfaceNormal = textureNormal.xyz;
+	surfaceNormal.x = RangeMap( surfaceNormal.x, 0.f, 1.f, -1.f, 1.f );
+	surfaceNormal.y = RangeMap( surfaceNormal.y, 0.f, 1.f, -1.f, 1.f );
+
+
+
+
+	float3 normal = normalize( input.worldNormal );
+	float3 tangent = normalize( input.worldTangent );
+	float3 bitangent = normalize( input.worldBitangent );
+
+	float3x3 tbn = float3x3( tangent, bitangent, normal );
+	float3 worldNormal = mul( surfaceNormal, tbn );
 	worldNormal.x = RangeMap( worldNormal.x, -1.f, 1.f, 0.f, 1.f );
 	worldNormal.y = RangeMap( worldNormal.y, -1.f, 1.f, 0.f, 1.f );
 
