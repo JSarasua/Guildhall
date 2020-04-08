@@ -156,6 +156,8 @@ public:
 	void SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
 
 	//Lighting
+	Vec4 GetAmbientLight() const;
+
 	void SetAmbientColor( Rgba8 const& color );
 	void SetAmbientIntensity( float intensity );
 	void SetAmbientLight( Rgba8 const& color, float intensity );

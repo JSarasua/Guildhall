@@ -459,6 +459,11 @@ void RenderContext::SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint
 	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
 }
 
+Vec4 RenderContext::GetAmbientLight() const
+{
+	return m_ambientLight;
+}
+
 void RenderContext::SetAmbientColor( Rgba8 const& color )
 {
 	float ambientLight[4];

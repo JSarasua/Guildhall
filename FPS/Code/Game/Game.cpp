@@ -92,6 +92,8 @@ void Game::Startup()
 	m_light->position = m_camera.GetPosition();
 	m_light->specularFactor = 0.5f;
 	m_light->specularPower = 2.f;
+
+	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.5f );
 }
 
 void Game::Shutdown()
@@ -164,7 +166,6 @@ void Game::Render()
 
 
 	g_theRenderer->DisableLight( 0 );
-	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.f );
 	g_theRenderer->EnableLight( 0, *m_light );
 	g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
@@ -311,19 +312,28 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num8Key.WasJustPressed() )
 	{
-		DebugAddWorldWireSphere( m_camera.GetPosition(), 1.f, Rgba8::RED, Rgba8::GREEN, 10.f, DEBUG_RENDER_XRAY );
-
-	}
-	if( num9Key.WasJustPressed() )
-	{
 		Transform transform = m_camera.GetTransform();
 		transform.SetNonUniformScale( Vec3( 1.f, 1.f, 5.f ) );
 		DebugAddWorldWireBounds( transform, Rgba8::BLUE, Rgba8::RED, 10.f, DEBUG_RENDER_ALWAYS );
+
 	}
-	if( num0Key.WasJustPressed() )
+	if( num9Key.IsPressed() )
 	{
-		Vec4 pos( 1.f, 1.f, -20.f, -20.f );
-		DebugAddScreenTextf( pos, Vec2( 1.f, 1.f ), 20.f, Rgba8::RED, Rgba8::GREEN, 10.f, "Screen Text Location: %.1f, %.1f, %.1f, %.1f", pos.x, pos.y, pos.z, pos.w );
+		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
+		float currentAmbientIntensity = currentAmbientLight.w;
+
+		float newAmbientIntensity = currentAmbientIntensity - ( 0.5f*deltaSeconds );
+		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
+		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
+	}
+	if( num0Key.IsPressed() )
+	{
+		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
+		float currentAmbientIntensity = currentAmbientLight.w;
+
+		float newAmbientIntensity = currentAmbientIntensity + (0.5f*deltaSeconds);
+		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
+		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
 	}
 	if( lBracketKey.WasJustPressed() )
 	{
