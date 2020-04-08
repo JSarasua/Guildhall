@@ -185,6 +185,7 @@ public:
 	Shader*		GetOrCreateShader( char const* filename );
 	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
 	void BindTexture( const Texture* constTex  );
+	void BindNormal( const Texture* constTex );
 	void BindSampler( Sampler const* constSampler );
 	void SetBlendMode( BlendMode blendMode );
 	void CreateBlendModes();
@@ -240,6 +241,7 @@ public:
 
 	Sampler* m_sampPoint = nullptr;
 	Texture* m_texWhite = nullptr;
+	Texture* m_defaultNormalTex = nullptr;
 
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;

@@ -90,6 +90,7 @@ void RenderContext::StartUp(Window* window)
 
 	m_sampPoint = new Sampler( this, SAMPLER_POINT );
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
+	m_defaultNormalTex = CreateTextureFromColor( Rgba8( 128, 128, 255 ) );
 
 	CreateBlendModes();
 }
@@ -734,6 +735,19 @@ void RenderContext::BindTexture( const Texture* constTex )
 }
 
 
+
+void RenderContext::BindNormal( const Texture* constTex )
+{
+	Texture* texture = const_cast<Texture*>(constTex);
+	if( nullptr == constTex )
+	{
+		texture = m_defaultNormalTex;
+	}
+
+	TextureView* shaderResourceView = texture->GetOrCreateShaderResourceView();
+	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetAsSRV();
+	m_context->PSSetShaderResources( 1, 1, &srvHandle ); //srv
+}
 
 void RenderContext::BindSampler( Sampler const* constSampler )
 {
