@@ -381,7 +381,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( yKey.WasJustPressed() )
 	{
 		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
-		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 5.f, DEBUG_RENDER_USE_DEPTH );
+		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 45.f, DEBUG_RENDER_USE_DEPTH );
 	}
 
 	Vec3 translator;
