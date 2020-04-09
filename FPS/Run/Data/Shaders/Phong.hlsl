@@ -186,9 +186,14 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 incidentVector = -dirToLight;
 	float3 incidentReflect = reflect( incidentVector, worldNormal );
 	float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
-	float specular = SPECULARFACTOR * pow( max( 0.f,  dot(incidentReflect, directionToEye) ), SPECULARPOWER);
+
+	//Used to solve bug where low specular power could cause the light to be seen from opposite side of sphere
+	float incidentCosAngle = dot( worldNormal, dirToLight );
+	//-.25f and 0.1 are arbitrary values
+	float specularValue = smoothstep( -.25f, 0.1f, incidentCosAngle ) * dot(incidentReflect, directionToEye);
+
+	float specular = SPECULARFACTOR * pow( max( 0.f,  specularValue ), SPECULARPOWER);
 	specular *= att3;
-	//specular = 0.f;
 
 
 	diffuse.xyz += specular;
