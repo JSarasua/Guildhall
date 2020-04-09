@@ -25,7 +25,7 @@ extern RenderContext* g_theRenderer;
 extern InputSystem* g_theInput;
 
 
-
+light_t Game::m_light;
 
 Game::Game()
 {
@@ -98,14 +98,19 @@ void Game::Startup()
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 
-	m_light = new light_t();
-	m_light->color = Vec3(1.f, 1.f, 1.f);
-	m_light->intensity = 0.5f;
-	m_light->position = m_camera.GetPosition();
-	m_light->specularFactor = 0.5f;
-	m_light->specularPower = 2.f;
+
+	m_light.color = Vec3(1.f, 1.f, 1.f);
+	m_light.intensity = 0.5f;
+	m_light.position = m_camera.GetPosition();
+	m_light.specularFactor = 0.5f;
+	m_light.specularPower = 2.f;
 
 	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.5f );
+
+	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
+	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
+	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
+
 }
 
 void Game::Shutdown()
@@ -152,7 +157,7 @@ void Game::Update()
 	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
-	DebugAddWorldPoint( m_light->position, Rgba8::RED, 0.f );
+	DebugAddWorldPoint( m_light.position, Rgba8::RED, 0.f );
 
 	//<,> cycle shader output name of shader
 	//9,0 be able to adjust global ambient light output ambient light intensity
@@ -168,9 +173,9 @@ void Game::Update()
 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
 	float ambientIntensity = ambientLight.w;
 	Vec3 attenuation = g_theRenderer->GetAttenuation();
-	float lightIntensity = m_light->intensity;
-	float specularFactor = m_light->specularFactor;
-	float specularPower = m_light->specularPower;
+	float lightIntensity = m_light.intensity;
+	float specularFactor = m_light.specularFactor;
+	float specularPower = m_light.specularPower;
 
 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
@@ -225,7 +230,7 @@ void Game::Render()
 
 
 	g_theRenderer->DisableLight( 0 );
-	g_theRenderer->EnableLight( 0, *m_light );
+	g_theRenderer->EnableLight( 0, m_light );
 	//g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
@@ -261,6 +266,37 @@ void Game::RenderCircleOfSpheres()
 		nextModelMatrix.TransformBy( m_circleOfSpheresModelMatrix );
 		m_circleOfSpheresModelMatrix = nextModelMatrix;
 	}
+}
+
+bool Game::SetAmbientColor( const EventArgs* args )
+{
+	Rgba8 ambientColor = args->GetValue( "color", Rgba8::WHITE );
+	g_theRenderer->SetAmbientColor( ambientColor );
+
+	return true;
+}
+
+bool Game::SetAttenuation( const EventArgs* args )
+{
+	Vec3 attenuation = args->GetValue( "attenuation", Vec3( 0.f, 1.f, 0.f ) );
+	g_theRenderer->SetAttenuation( attenuation );
+
+	return true;
+}
+
+bool Game::SetLightColor( const EventArgs* args )
+{
+	Rgba8 lightColor = args->GetValue( "color", Rgba8::WHITE );
+
+	float lightColorAsFloats[4];
+	lightColor.ToFloatArray( lightColorAsFloats );
+
+
+	Vec3 lightColorAsVec3 = Vec3( lightColorAsFloats[0], lightColorAsFloats[1], lightColorAsFloats[2]);
+	lightColorAsVec3 /= 255.f;
+	Game::m_light.color = lightColorAsVec3;
+
+	return true;
 }
 
 void Game::IncrementShader()
@@ -302,11 +338,11 @@ void Game::UpdateLightPosition( float deltaSeconds )
 
 	if( m_isLightFollowingCamera )
 	{
-		m_light->position = m_camera.GetPosition();
+		m_light.position = m_camera.GetPosition();
 	}
 	else if( m_isLightAnimated )
 	{
-		m_light->position = m_lightAnimatedPosition;
+		m_light.position = m_lightAnimatedPosition;
 	}
 }
 
@@ -454,35 +490,35 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( lBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = m_light->specularFactor;
+		float currentSpecularFactor = m_light.specularFactor;
 
 		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		m_light->specularFactor = newSpecularFactor;
+		m_light.specularFactor = newSpecularFactor;
 	}
 	if( rBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = m_light->specularFactor;
+		float currentSpecularFactor = m_light.specularFactor;
 
 		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		m_light->specularFactor = newSpecularFactor;
+		m_light.specularFactor = newSpecularFactor;
 	}
 	if( semiColonKey.IsPressed() )
 	{
-		float currentSpecularPower = m_light->specularPower;
+		float currentSpecularPower = m_light.specularPower;
 
 		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
-		m_light->specularPower = newSpecularPower;
+		m_light.specularPower = newSpecularPower;
 	}
 	if( singleQuoteKey.IsPressed() )
 	{
-		float currentSpecularPower = m_light->specularPower;
+		float currentSpecularPower = m_light.specularPower;
 
 		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
-		m_light->specularPower = newSpecularPower;
+		m_light.specularPower = newSpecularPower;
 	}
 	if( commaKey.WasJustPressed() )
 	{
@@ -494,25 +530,25 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f5Key.WasJustPressed() )
 	{
-		m_light->position = Vec3( 0.f, 0.f, 0.f );
+		m_light.position = Vec3( 0.f, 0.f, 0.f );
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = false;
 	}
 	if( f6Key.WasJustPressed() )
 	{
-		m_light->position = m_camera.GetPosition();
+		m_light.position = m_camera.GetPosition();
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = false;
 	}
 	if( f7Key.WasJustPressed() )
 	{
-		m_light->position = m_camera.GetPosition();
+		m_light.position = m_camera.GetPosition();
 		m_isLightFollowingCamera = true;
 		m_isLightAnimated = false;
 	}
 	if( f8Key.WasJustPressed() )
 	{
-		m_light->position = m_lightAnimatedPosition;
+		m_light.position = m_lightAnimatedPosition;
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = true;
 	}
@@ -567,19 +603,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( plusKey.IsPressed() )
 	{
-		float currentLightIntensity = m_light->intensity;
+		float currentLightIntensity = m_light.intensity;
 
 		float newLightIntensity = currentLightIntensity + 0.5f * deltaSeconds;
 		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
-		m_light->intensity = newLightIntensity;
+		m_light.intensity = newLightIntensity;
 	}
 	if( minusKey.IsPressed() )
 	{
-		float currentLightIntensity = m_light->intensity;
+		float currentLightIntensity = m_light.intensity;
 
 		float newLightIntensity = currentLightIntensity - 0.5f * deltaSeconds;
 		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
-		m_light->intensity = newLightIntensity;
+		m_light.intensity = newLightIntensity;
 	}
 
 	Vec3 translator;
@@ -652,7 +688,7 @@ IntVec2 Game::GetCurrentMapBounds() const
 
 void Game::SetLightPosition( Vec3 const& pos )
 {
-	m_light->position = pos;
+	m_light.position = pos;
 }
 
 void Game::RenderDevConsole()

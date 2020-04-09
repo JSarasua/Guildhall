@@ -3,6 +3,8 @@
 #include "GameCommon.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include <vector>
 
 
@@ -37,6 +39,10 @@ public:
 	void Update();
 	void Render();
 	void RenderCircleOfSpheres();
+
+	static bool SetAmbientColor(const EventArgs* args);
+	static bool SetAttenuation(const EventArgs* args);
+	static bool SetLightColor(const EventArgs* args);
 
 private:
 
@@ -79,7 +85,6 @@ private:
 	size_t m_currentShaderIndex = 0;
 
 
-	light_t* m_light = nullptr;
 	bool m_isLightFollowingCamera = false;
 	bool m_isLightAnimated = false;
 
@@ -90,6 +95,8 @@ private:
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
 public:
+	static light_t m_light;
+	
 	Rgba8 m_clearColor = Rgba8::BLACK;
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
