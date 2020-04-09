@@ -101,7 +101,7 @@ Vec3 const Vec3::MakeFromSphericalDegrees( float thetaDegrees, float phiDegrees,
 	Vec3 newVec;
 	newVec.x = radius * CosDegrees( phiDegrees ) * CosDegrees( thetaDegrees );
 	newVec.y = radius * SinDegrees( phiDegrees );
-	newVec.z = radius * CosDegrees( phiDegrees ) * SinDegrees( thetaDegrees );
+	newVec.z = -radius * CosDegrees( phiDegrees ) * SinDegrees( thetaDegrees );
 	return newVec;
 }
 
