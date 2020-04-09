@@ -176,7 +176,7 @@ void Vertex_PCUTBN::AppendIndexedVertsSphere( std::vector<Vertex_PCUTBN>& master
 	for( float latitudeDegrees = 90.f/* - phiIncrements*/; latitudeDegrees > -90.001f; latitudeDegrees -= phiIncrements )
 	{
 
-		for( float longitudeDegrees = 360.f; longitudeDegrees >= 0.f; longitudeDegrees -= thetaIncrements )
+		for( float longitudeDegrees = 0; longitudeDegrees <= 360.f; longitudeDegrees += thetaIncrements )
 		{
 			Vec3 currentPoint = Vec3::MakeFromSphericalDegrees( longitudeDegrees, latitudeDegrees, sphereRadius );
 			
@@ -186,7 +186,7 @@ void Vertex_PCUTBN::AppendIndexedVertsSphere( std::vector<Vertex_PCUTBN>& master
 			tangent.y = 0.f;
 			tangent.z = -CosDegrees( longitudeDegrees );
 
-			Vec3 bitangent = CrossProduct( tangent, normal );
+			Vec3 bitangent = CrossProduct( normal, tangent );
 
 			vertexList.push_back( currentPoint );
 			normalList.push_back( normal );
@@ -236,19 +236,19 @@ void Vertex_PCUTBN::AppendIndexedVertsSphere( std::vector<Vertex_PCUTBN>& master
 
 void Vertex_PCUTBN::AppendVerts4Points( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 const& p0, Vec3 const& p1, Vec3 const& p2, Vec3 const& p3, Rgba8 const& color, AABB2 const& uvs /*= AABB2() */ )
 {
-	Vec3 p0Top1 = p1 - p0;
-	Vec3 p0Top3 = p3 - p0;
-	Vec3 normal = CrossProduct( p0Top1, p0Top3 );
+	Vec3 tangent = (p1 - p0).GetNormalized();
+	Vec3 bitangent = (p3 - p0).GetNormalized();
+	Vec3 normal = CrossProduct( tangent, bitangent );
 
 	uint currentIndex = (uint)masterIndexList.size();
 
-	masterVertexList.push_back( Vertex_PCUTBN( p0, color, uvs.mins, normal ) );
-	masterVertexList.push_back( Vertex_PCUTBN( p1, color, Vec2( uvs.maxs.x, uvs.mins.y ), normal ) );
-	masterVertexList.push_back( Vertex_PCUTBN( p2, color, uvs.maxs, normal ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p0, color, uvs.mins, normal, tangent, bitangent ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p1, color, Vec2( uvs.maxs.x, uvs.mins.y ), normal, tangent, bitangent ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p2, color, uvs.maxs, normal, tangent, bitangent ) );
 
-	masterVertexList.push_back( Vertex_PCUTBN( p0, color, uvs.mins, normal ) );
-	masterVertexList.push_back( Vertex_PCUTBN( p2, color, uvs.maxs, normal ) );
-	masterVertexList.push_back( Vertex_PCUTBN( p3, color, Vec2( uvs.mins.x, uvs.maxs.y ), normal ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p0, color, uvs.mins, normal, tangent, bitangent ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p2, color, uvs.maxs, normal, tangent, bitangent ) );
+	masterVertexList.push_back( Vertex_PCUTBN( p3, color, Vec2( uvs.mins.x, uvs.maxs.y ), normal, tangent, bitangent ) );
 
 
 	masterIndexList.push_back( currentIndex );
