@@ -186,7 +186,8 @@ void Game::Update()
 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
 	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
 	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
-	m_quadModelMatrix.RotateZDegrees( 35.f * dt );
+	m_sphereModelMatrix.RotateYDegrees( -15.f * dt );
+	//m_quadModelMatrix.RotateZDegrees( 35.f * dt ); //if you want the quad to rotate
 
 	Mat44 newCircleOfSpheresRotation;
 	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
@@ -198,18 +199,12 @@ void Game::Update()
 	lightColor *= 255.f;
 	Rgba8 lightRGBA8Color = Rgba8( (unsigned char)lightColor.x, (unsigned char)lightColor.y, (unsigned char)lightColor.z );
 
-	DebugAddWorldPoint( m_light.position, lightRGBA8Color, 0.f );
+	if( !m_isLightFollowingCamera )
+	{
+		DebugAddWorldPoint( m_light.position, lightRGBA8Color, 0.f );
+	}
 
-	//<,> cycle shader output name of shader
-	//9,0 be able to adjust global ambient light output ambient light intensity
-	//T: toggle attenuation output attenuation
-	//-,+: Adjust light intensity
-	//[,]: Adjust specular factor
-	//;,': Adjust specular power
-	// F5: Set Light to origin
-	// F6: Set Light to camera's location
-	// F7: Toggle Light following camera
-	// F8: Animated. Light follows a fixed path through environment
+
 
 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
 	float ambientIntensity = ambientLight.w;
@@ -236,7 +231,7 @@ void Game::Update()
 	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
 	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
-	std::string attenuationStr = Stringf("T Toggle Attenuation (Constant, Linear, Quadratic): (%.0f, %.0f, %.0f)", attenuation.x, attenuation.y, attenuation.z );
+	std::string attenuationStr = Stringf("T Toggle Attenuation (Constant, Linear, Quadratic): (%.2f, %.2f, %.2f)", attenuation.x, attenuation.y, attenuation.z );
 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
 	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
 	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
@@ -246,19 +241,19 @@ void Game::Update()
 	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
 
-	DebugAddScreenTextf( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleShaderStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleRenderTextureStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleNormalTextureStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, ambientIntensityStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, attenuationStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightIntensityStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularFactorStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularPowerStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, gammaStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleNormalTextureStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, ambientIntensityStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, attenuationStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIntensityStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularFactorStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularPowerStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, gammaStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAtOriginStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightToCameraStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightFollowCameraStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
 }
 
 void Game::Render()

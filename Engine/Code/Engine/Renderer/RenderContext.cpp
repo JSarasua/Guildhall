@@ -513,9 +513,9 @@ void RenderContext::SetAmbientColor( Rgba8 const& color )
 {
 	float ambientLight[4];
 	color.ToFloatArray( ambientLight );
-	m_ambientLight.x = ambientLight[0];
-	m_ambientLight.y = ambientLight[1];
-	m_ambientLight.z = ambientLight[2];
+	m_ambientLight.x = ambientLight[0] / 255.f;
+	m_ambientLight.y = ambientLight[1] / 255.f;
+	m_ambientLight.z = ambientLight[2] / 255.f;
 }
 
 void RenderContext::SetAmbientIntensity( float intensity )
