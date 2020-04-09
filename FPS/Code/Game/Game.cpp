@@ -157,7 +157,11 @@ void Game::Update()
 	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
-	DebugAddWorldPoint( m_light.position, Rgba8::RED, 0.f );
+	Vec3 lightColor = m_light.color;
+	lightColor *= 255.f;
+	Rgba8 lightRGBA8Color = Rgba8( (unsigned char)lightColor.x, (unsigned char)lightColor.y, (unsigned char)lightColor.z );
+
+	DebugAddWorldPoint( m_light.position, lightRGBA8Color, 0.f );
 
 	//<,> cycle shader output name of shader
 	//9,0 be able to adjust global ambient light output ambient light intensity
@@ -206,7 +210,7 @@ void Game::Render()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
-	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);
+/*	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);*/
 
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
