@@ -202,26 +202,6 @@ void App::CheckButtonPresses()
 		//HandleQuitRequested();
 	}
 
-	if( g_theInput->GetKeyStates( 0x70 ).WasJustPressed() ) //F1
-	{
-		m_debugGameMode = !m_debugGameMode;
-	}
-
-	if( g_theInput->GetKeyStates( 0x72 ).WasJustPressed() ) //F3
-	{
-		m_noClip = !m_noClip;
-	}
-
-	if( g_theInput->GetKeyStates( 0x73 ).WasJustPressed() ) //F4
-	{
-		m_debugCameraMode = !m_debugCameraMode;
-	}
-
-	if( g_theInput->GetKeyStates( 0x77 ).WasJustPressed() ) //F8
-	{
-		g_theApp->RestartGame();
-	}
-
 	if( g_theInput->GetKeyStates( 'P' ).WasJustPressed() )
 	{
 		m_isPaused = !m_isPaused;
