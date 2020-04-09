@@ -15,6 +15,7 @@
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb_image.h"
@@ -187,6 +188,7 @@ void RenderContext::UpdateFrameTime()
 	FrameData framedata;
 	framedata.systemTime = currentTime;
 	framedata.systemDeltaTime = dt;
+	framedata.gamma = m_gamma;
 
 	m_frameUBO->Update( &framedata, sizeof(framedata), sizeof(framedata) );
 }
@@ -471,6 +473,11 @@ Vec3 RenderContext::GetAttenuation() const
 	return m_attenuation;
 }
 
+float RenderContext::GetGamma() const
+{
+	return m_gamma;
+}
+
 void RenderContext::SetAmbientColor( Rgba8 const& color )
 {
 	float ambientLight[4];
@@ -493,6 +500,12 @@ void RenderContext::SetAmbientLight( Rgba8 const& color, float intensity )
 	m_ambientLight.y = ambientLight[1] / 255.f;
 	m_ambientLight.z = ambientLight[2] / 255.f;
 	m_ambientLight.w = intensity;
+}
+
+void RenderContext::SetGamma( float newGamma )
+{
+	m_gamma = newGamma;
+	m_gamma = Max( m_gamma, 1.f );
 }
 
 void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )

@@ -62,6 +62,8 @@ private:
 private:
 	Mat44 m_cubeModelMatrix;
 	Mat44 m_circleOfSpheresModelMatrix;
+	Mat44 m_quadModelMatrix;
+	Mat44 m_sphereModelMatrix;
 	int m_numberOfCirclingCubes = 0;
 
 	Clock* m_gameClock = nullptr;
@@ -77,6 +79,7 @@ private:
 	Player* m_player = nullptr;
 	GPUMesh* m_cubeMesh = nullptr;
 	GPUMesh* m_sphereMesh = nullptr;
+	GPUMesh* m_quadMesh = nullptr;
 	Texture* m_screenTexture = nullptr;
 
 	Shader* m_invertShader = nullptr;

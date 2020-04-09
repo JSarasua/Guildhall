@@ -30,6 +30,7 @@ cbuffer time_constants : register(b0)	//Index 0 is time
 {
 	float SYSTEM_TIME_SECONDS;
 	float SYSTEM_TIME_DELTA_SECONDS;
+	float GAMMA;
 };
 
 cbuffer camera_constants : register(b1)
@@ -148,6 +149,7 @@ v2f_t VertexFunction( vs_input_t input )
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
+	textureColor = pow( max(0.f, textureColor), GAMMA );
 	float4 textureNormal = tNormal.Sample( sSampler, input.uv );
 	float3 surfaceColor = (input.color * textureColor).xyz; //tint our texture color
 	float surfaceAlpha = (input.color.a * textureColor.a);
@@ -197,6 +199,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 finalColor = diffuse * surfaceColor;
 	//normalize(incidentReflect);
 	//float3 finalColor = directionToEye.xyz;
+	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
 
 	return float4( finalColor.xyz, surfaceAlpha );
 

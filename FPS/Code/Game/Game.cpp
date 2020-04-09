@@ -29,8 +29,6 @@ light_t Game::m_light;
 
 Game::Game()
 {
-
-
 	//m_world = new World(this);
 }
 
@@ -44,7 +42,6 @@ void Game::Startup()
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 160.f, 90.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
-	//m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 	Shader* litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
 	Shader* normalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Normals.hlsl" );
@@ -58,16 +55,13 @@ void Game::Startup()
 	m_shaders.push_back( bitangentShader );
 	m_shaders.push_back( surfaceNormalShader );
 
-	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 1.f, 0.5f, -12.f ) );
+	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
+	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
+	m_quadModelMatrix = Mat44::CreateTranslation3D( Vec3( -4.f, 0.f, -10.f ) );
 	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
 
 	m_cubeMesh = new GPUMesh( g_theRenderer );
-// 	std::vector<Vertex_PCU> cubeVerts;
-// 	std::vector<uint> cubeIndices;
-// 	AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
-// 	m_cubeMesh->UpdateVertices( cubeVerts );
-// 	m_cubeMesh->UpdateIndices( cubeIndices );
 
 	std::vector<Vertex_PCUTBN> cubeVerts;
 	std::vector<uint> cubeIndices;
@@ -76,14 +70,7 @@ void Game::Startup()
 	m_cubeMesh->UpdateIndices( cubeIndices );
 
 
-
-
 	m_sphereMesh = new GPUMesh( g_theRenderer );
-// 	std::vector<Vertex_PCU> sphereVerts;
-// 	std::vector<uint> sphereIndices;
-// 	AppendIndexedVertsSphere( sphereVerts, sphereIndices, Vec3(0.f, 0.f, 0.f), 1.f, 64, 64, Rgba8::WHITE );
-// 	m_sphereMesh->UpdateVertices( sphereVerts );
-// 	m_sphereMesh->UpdateIndices( sphereIndices );
 
 	std::vector<Vertex_PCUTBN> sphereVerts;
 	std::vector<uint> sphereIndices;
@@ -91,13 +78,29 @@ void Game::Startup()
 	m_sphereMesh->UpdateVertices( sphereVerts );
 	m_sphereMesh->UpdateIndices( sphereIndices );
 
+	m_quadMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCUTBN> quadVerts;
+	std::vector<uint> quadIndices;
+	Vertex_PCUTBN::AppendVerts4Points( quadVerts, 
+		quadIndices, 
+		Vec3(-1.f, -1.f, 0.f), 
+		Vec3( 1.f, -1.f, 0.f), 
+		Vec3( 1.f, 1.f, 0 ), 
+		Vec3( -1.f, 1.f, 0.f ), 
+		Rgba8::WHITE, 
+		AABB2(0.f, 0.f, 1.f, 1.f ) );
+
+	m_quadMesh->UpdateVertices( quadVerts );
+	m_quadMesh->UpdateIndices( quadIndices );
+
+
+
 	m_gameClock = new Clock();
 	m_gameClock->SetParent( Clock::GetMaster() );
 
 	g_theRenderer->Setup( m_gameClock );
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
-
 
 	m_light.color = Vec3(1.f, 1.f, 1.f);
 	m_light.intensity = 0.5f;
@@ -110,7 +113,6 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
-
 }
 
 void Game::Shutdown()
@@ -120,6 +122,9 @@ void Game::Shutdown()
 
 	delete m_sphereMesh;
 	m_sphereMesh = nullptr;
+
+	delete m_quadMesh;
+	m_quadMesh = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -150,6 +155,9 @@ void Game::Update()
 
 
 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
+	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
+	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
+	m_quadModelMatrix.RotateZDegrees( 35.f * dt );
 
 	Mat44 newCircleOfSpheresRotation;
 	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
@@ -180,6 +188,7 @@ void Game::Update()
 	float lightIntensity = m_light.intensity;
 	float specularFactor = m_light.specularFactor;
 	float specularPower = m_light.specularPower;
+	float gamma = g_theRenderer->GetGamma();
 
 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
@@ -187,6 +196,7 @@ void Game::Update()
 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
 	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
 	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
+	std::string gammaStr = Stringf("G,H Adjust Gamma: %.2f", gamma );
 	std::string lightAtOriginStr = Stringf( "F5 Set Light to Origin" );
 	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
 	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
@@ -198,10 +208,11 @@ void Game::Update()
 	DebugAddScreenTextf( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightIntensityStr.c_str() );
 	DebugAddScreenTextf( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularFactorStr.c_str() );
 	DebugAddScreenTextf( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularPowerStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, gammaStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
 }
 
 void Game::Render()
@@ -210,35 +221,26 @@ void Game::Render()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
-/*	g_theRenderer->DrawAABB2(AABB2(Vec2(2.5f,0.25f), Vec2( 9.5f, 6.5f )), Rgba8::GREEN, 0.25f);*/
-
 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
-// 	g_theRenderer->SetBlendMode(BlendMode::SOLID);
-// 	g_theRenderer->BindTexture(tex);
-// 	g_theRenderer->BindShader(m_invertShader);
-// 	g_theRenderer->DrawAABB2Filled(AABB2(Vec2(3.25f,1.f), Vec2( 6.f, 3.75f )), Rgba8(255, 255, 255, 128 ));
-// 
-// 	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-// 	g_theRenderer->BindShader( (Shader*)nullptr );
-// 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( 6.f, 1.f ), Vec2( 8.75f, 3.75f ) ), Rgba8( 255, 255, 255 ) );
-// 
-// 
-// 
+
 
  	g_theRenderer->SetBlendMode( BlendMode::SOLID );
  	g_theRenderer->BindTexture( tex );
 	g_theRenderer->BindNormal( normalTex );
-// 	g_theRenderer->BindShader( m_invertShader );
-// 	g_theRenderer->DrawAABB2Filled( AABB2( Vec2( -0.5f, -0.5f ), Vec2( 0.5f, 0.5f ) ), Rgba8( 255, 255, 255, 128 ), -10.f );
 
 
 	g_theRenderer->DisableLight( 0 );
 	g_theRenderer->EnableLight( 0, m_light );
-	//g_theRenderer->BindShader( m_litShader );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
 	g_theRenderer->DrawMesh( m_cubeMesh );
+
+	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
+	g_theRenderer->DrawMesh( m_quadMesh );
+
+	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
 
 	RenderCircleOfSpheres();
 
@@ -252,7 +254,6 @@ void Game::Render()
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
-
 }
 
 
@@ -295,7 +296,6 @@ bool Game::SetLightColor( const EventArgs* args )
 	float lightColorAsFloats[4];
 	lightColor.ToFloatArray( lightColorAsFloats );
 
-
 	Vec3 lightColorAsVec3 = Vec3( lightColorAsFloats[0], lightColorAsFloats[1], lightColorAsFloats[2]);
 	lightColorAsVec3 /= 255.f;
 	Game::m_light.color = lightColorAsVec3;
@@ -332,10 +332,11 @@ void Game::UpdateLightPosition( float deltaSeconds )
 	m_lightAnimatedTheta += deltaSeconds * 45.f;
 	m_lightAnimatedPhi += deltaSeconds * 90.f;
 
-	Vec2 xzLightPath = Vec2::MakeFromPolarDegrees( m_lightAnimatedTheta, 5.f );
+	Vec2 xzLightPath = Vec2::MakeFromPolarDegrees( m_lightAnimatedTheta, 6.f );
 	float yLight = SinDegrees( m_lightAnimatedPhi );
 
 	m_lightAnimatedPosition = Vec3( xzLightPath.x, yLight, xzLightPath.y );
+	m_lightAnimatedPosition.z *= 0.5f;
 	m_lightAnimatedPosition.z += -10.f;
 	m_lightAnimatedPosition.x *= 2.f;
 
@@ -411,6 +412,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
+	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
 	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
@@ -470,9 +472,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num8Key.WasJustPressed() )
 	{
 		Transform transform = m_camera.GetTransform();
-		transform.SetNonUniformScale( Vec3( 1.f, 1.f, 5.f ) );
-		DebugAddWorldWireBounds( transform, Rgba8::BLUE, Rgba8::RED, 10.f, DEBUG_RENDER_ALWAYS );
 
+		DebugAddWireMeshToWorld( transform.ToMatrix(), m_sphereMesh, Rgba8::WHITE, Rgba8::WHITE, 15.f, DEBUG_RENDER_ALWAYS );
 	}
 	if( num9Key.IsPressed() )
 	{
@@ -532,6 +533,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		IncrementShader();
 	}
+	if( gKey.IsPressed() )
+	{
+		float currentGamma = g_theRenderer->GetGamma();
+		float newGamma = currentGamma - 2.f * deltaSeconds;
+		g_theRenderer->SetGamma( newGamma );
+	}
+	if( hKey.IsPressed() )
+	{
+		float currentGamma = g_theRenderer->GetGamma();
+		float newGamma = currentGamma + 2.f * deltaSeconds;
+		g_theRenderer->SetGamma( newGamma );
+	}
 	if( f5Key.WasJustPressed() )
 	{
 		m_light.position = Vec3( 0.f, 0.f, 0.f );
@@ -567,8 +580,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		endPos += startPos;
 		LineSegment3 line = LineSegment3( startPos, endPos );
 		DebugAddWorldLine( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
-		//DebugAddWorldPoint( startPos, 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
-		//DebugAddWorldPoint( endPos, 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
 	}
 	if( fKey.WasJustPressed() )
 	{
@@ -584,21 +595,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( tKey.WasJustPressed() )
 	{
 		g_theRenderer->ToggleAttenuation();
-	}
-	if( gKey.WasJustPressed() )
-	{
-		Vec3 p0 = Vec3( -1.f,-1.f, -1.f );
-		Vec3 p1 = Vec3( 1.f, -1.f, -1.f );
-		Vec3 p2 = Vec3( 1.f, 3.f, -2.f );
-		Vec3 p3 = Vec3( -1.f, 3.f, -2.f );
-
-		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
-		p0 = cameraModel.TransformPosition3D( p0 );
-		p1 = cameraModel.TransformPosition3D( p1 );
-		p2 = cameraModel.TransformPosition3D( p2 );
-		p3 = cameraModel.TransformPosition3D( p3 );
-
-		DebugAddWorldQuad( p0, p1, p2, p3, Rgba8::GREEN, Rgba8::RED, 5.f, DEBUG_RENDER_XRAY );
 	}
 	if( yKey.WasJustPressed() )
 	{
@@ -675,9 +671,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 
 	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
-// 	Vec2 mousePos = g_theInput->GetMouseNormalizedPos();
-// 	mousePos.x -= 0.5f;
-// 	mousePos.y -= 0.5f;
 
 	rotator.x -= mouseChange.y * 0.1f;
 	rotator.y -= mouseChange.x * 0.1f;

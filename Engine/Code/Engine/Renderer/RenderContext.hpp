@@ -32,8 +32,8 @@ struct FrameData
 {
 	float systemTime;
 	float systemDeltaTime;
-
-	float padding[2];
+	float gamma;
+	float padding[1];
 };
 
 struct ModelData
@@ -161,10 +161,12 @@ public:
 	//Lighting
 	Vec4 GetAmbientLight() const;
 	Vec3 GetAttenuation() const;
+	float GetGamma() const;
 
 	void SetAmbientColor( Rgba8 const& color );
 	void SetAmbientIntensity( float intensity );
 	void SetAmbientLight( Rgba8 const& color, float intensity );
+	void SetGamma( float newGamma );
 	//disabling Intensity means SetAmbientLight( Rgba8::WHITE, 1.f );
 
 	//assume one light for now
@@ -262,6 +264,7 @@ public:
 	Vec4 m_ambientLight;
 	light_t m_lights[8];
 	Vec3 m_attenuation = Vec3( 0.f, 1.f, 0.f );
+	float m_gamma = 2.2f;
 };
 
 
