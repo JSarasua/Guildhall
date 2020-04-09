@@ -18,6 +18,7 @@
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Renderer/Shader.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -140,6 +141,8 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
+	UpdateLightPosition( dt );
+
 
 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
 
@@ -150,6 +153,46 @@ void Game::Update()
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
 	DebugAddWorldPoint( m_light->position, Rgba8::RED, 0.f );
+
+	//<,> cycle shader output name of shader
+	//9,0 be able to adjust global ambient light output ambient light intensity
+	//T: toggle attenuation output attenuation
+	//-,+: Adjust light intensity
+	//[,]: Adjust specular factor
+	//;,': Adjust specular power
+	// F5: Set Light to origin
+	// F6: Set Light to camera's location
+	// F7: Toggle Light following camera
+	// F8: Animated. Light follows a fixed path through environment
+
+	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
+	float ambientIntensity = ambientLight.w;
+	Vec3 attenuation = g_theRenderer->GetAttenuation();
+	float lightIntensity = m_light->intensity;
+	float specularFactor = m_light->specularFactor;
+	float specularPower = m_light->specularPower;
+
+	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
+	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
+	std::string attenuationStr = Stringf("T Toggle Attenuation (Constant, Linear, Quadratic): (%.0f, %.0f, %.0f)", attenuation.x, attenuation.y, attenuation.z );
+	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
+	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
+	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
+	std::string lightAtOriginStr = Stringf( "F5 Set Light to Origin" );
+	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
+	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
+	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
+
+	DebugAddScreenTextf( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleShaderStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, ambientIntensityStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, attenuationStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightIntensityStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularFactorStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularPowerStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
 }
 
 void Game::Render()
@@ -244,6 +287,29 @@ void Game::DecrementShader()
 	}
 }
 
+void Game::UpdateLightPosition( float deltaSeconds )
+{
+	m_lightAnimatedTheta += deltaSeconds * 45.f;
+	m_lightAnimatedPhi += deltaSeconds * 90.f;
+
+	Vec2 xzLightPath = Vec2::MakeFromPolarDegrees( m_lightAnimatedTheta, 5.f );
+	float yLight = SinDegrees( m_lightAnimatedPhi );
+
+	m_lightAnimatedPosition = Vec3( xzLightPath.x, yLight, xzLightPath.y );
+	m_lightAnimatedPosition.z += -10.f;
+	m_lightAnimatedPosition.x *= 2.f;
+
+
+	if( m_isLightFollowingCamera )
+	{
+		m_light->position = m_camera.GetPosition();
+	}
+	else if( m_isLightAnimated )
+	{
+		m_light->position = m_lightAnimatedPosition;
+	}
+}
+
 void Game::CheckCollisions()
 {}
 
@@ -284,6 +350,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
+	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
+	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
+	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
@@ -422,6 +492,31 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		IncrementShader();
 	}
+	if( f5Key.WasJustPressed() )
+	{
+		m_light->position = Vec3( 0.f, 0.f, 0.f );
+		m_isLightFollowingCamera = false;
+		m_isLightAnimated = false;
+	}
+	if( f6Key.WasJustPressed() )
+	{
+		m_light->position = m_camera.GetPosition();
+		m_isLightFollowingCamera = false;
+		m_isLightAnimated = false;
+	}
+	if( f7Key.WasJustPressed() )
+	{
+		m_light->position = m_camera.GetPosition();
+		m_isLightFollowingCamera = true;
+		m_isLightAnimated = false;
+	}
+	if( f8Key.WasJustPressed() )
+	{
+		m_light->position = m_lightAnimatedPosition;
+		m_isLightFollowingCamera = false;
+		m_isLightAnimated = true;
+	}
+
 	if( rKey.WasJustPressed() )
 	{
 		Vec3 startPos = m_camera.GetPosition();

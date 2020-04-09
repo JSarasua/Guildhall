@@ -42,6 +42,7 @@ private:
 
 	void IncrementShader();
 	void DecrementShader();
+	void UpdateLightPosition( float deltaSeconds );
 
 	void CheckCollisions();
 	void UpdateEntities( float deltaSeconds );
@@ -79,6 +80,12 @@ private:
 
 
 	light_t* m_light = nullptr;
+	bool m_isLightFollowingCamera = false;
+	bool m_isLightAnimated = false;
+
+	float m_lightAnimatedTheta = 0.f;
+	float m_lightAnimatedPhi = 0.f;
+	Vec3 m_lightAnimatedPosition;
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
