@@ -174,6 +174,7 @@ public:
 	//Disable means set light intensity to 0.f
 
 	void ToggleAttenuation();
+	void SetAttenuation( Vec3 const& attenuation );
 
 	//Backbuffer
 	Texture* GetBackBuffer();

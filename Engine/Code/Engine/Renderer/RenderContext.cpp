@@ -533,6 +533,17 @@ void RenderContext::ToggleAttenuation()
 		m_attenuation.y = 0.f;
 		m_attenuation.z = 0.f;
 	}
+	else
+	{
+		m_attenuation.x = 1.f;
+		m_attenuation.y = 0.f;
+		m_attenuation.z = 0.f;
+	}
+}
+
+void RenderContext::SetAttenuation( Vec3 const& attenuation )
+{
+	m_attenuation = attenuation;
 }
 
 Texture* RenderContext::GetBackBuffer()
