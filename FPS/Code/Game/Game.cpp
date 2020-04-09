@@ -48,12 +48,41 @@ void Game::Startup()
 	Shader* tangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Tangents.hlsl" );
 	Shader* bitangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Bitangents.hlsl" );
 	Shader* surfaceNormalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/SurfaceNormals.hlsl" );
-
 	m_shaders.push_back( litShader );
 	m_shaders.push_back( normalShader );
 	m_shaders.push_back( tangentShader );
 	m_shaders.push_back( bitangentShader );
 	m_shaders.push_back( surfaceNormalShader );
+
+
+	Texture* couchTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/example_colour.png" );
+	Texture* stoneTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/stone_diffuse.png" );
+	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test.png" );
+	Texture* chiTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
+	Texture* tileDiffuseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_diffuse.png" );
+	Texture* tileGlossTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_gloss.png" );
+	Texture* woodCrateTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/woodcrate.png" );
+	m_renderTextures.push_back( nullptr );
+	m_renderTextures.push_back( couchTexture );
+	m_renderTextures.push_back( stoneTexture );
+	m_renderTextures.push_back( testTexture );
+	m_renderTextures.push_back( chiTexture );
+	m_renderTextures.push_back( tileDiffuseTexture );
+	m_renderTextures.push_back( tileGlossTexture );
+	m_renderTextures.push_back( woodCrateTexture );
+
+	Texture* normalCouchTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/example_normal.png" );
+	Texture* normalStoneTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/stone_normal.png" );
+	Texture* normalTileTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_normal.png" );
+	Texture* normalTestSphereTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test_normal.png" );
+	m_normalTextures.push_back( nullptr );
+	m_normalTextures.push_back( normalCouchTexture );
+	m_normalTextures.push_back( normalStoneTexture );
+	m_normalTextures.push_back( testTexture );
+	m_normalTextures.push_back( chiTexture );
+	m_normalTextures.push_back( normalTileTexture );
+	m_normalTextures.push_back( normalTestSphereTexture );
+
 
 	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
 	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
@@ -105,8 +134,8 @@ void Game::Startup()
 	m_light.color = Vec3(1.f, 1.f, 1.f);
 	m_light.intensity = 0.5f;
 	m_light.position = m_camera.GetPosition();
-	m_light.specularFactor = 0.5f;
-	m_light.specularPower = 2.f;
+
+	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
 
 	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.5f );
 
@@ -186,11 +215,26 @@ void Game::Update()
 	float ambientIntensity = ambientLight.w;
 	Vec3 attenuation = g_theRenderer->GetAttenuation();
 	float lightIntensity = m_light.intensity;
-	float specularFactor = m_light.specularFactor;
-	float specularPower = m_light.specularPower;
+	float specularFactor = g_theRenderer->GetSpecularFactor();
+	float specularPower = g_theRenderer->GetSpecularPower();
 	float gamma = g_theRenderer->GetGamma();
 
+
+	std::string renderTextureFilePathStr;
+	std::string normalTextureFilepathStr;
+
+	if( nullptr != m_renderTextures[m_currentRenderTextureIndex] )
+	{
+		renderTextureFilePathStr = m_renderTextures[m_currentRenderTextureIndex]->GetFilePath();
+	}
+	if( nullptr != m_normalTextures[m_currentNormalTextureIndex] )
+	{
+		normalTextureFilepathStr = m_normalTextures[m_currentNormalTextureIndex]->GetFilePath();
+	}
+
 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
+	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
+	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
 	std::string attenuationStr = Stringf("T Toggle Attenuation (Constant, Linear, Quadratic): (%.0f, %.0f, %.0f)", attenuation.x, attenuation.y, attenuation.z );
 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
@@ -203,16 +247,18 @@ void Game::Update()
 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
 
 	DebugAddScreenTextf( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleShaderStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, ambientIntensityStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, attenuationStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightIntensityStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularFactorStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularPowerStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, gammaStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
-	DebugAddScreenTextf( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleRenderTextureStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, cycleNormalTextureStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, ambientIntensityStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, attenuationStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightIntensityStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularFactorStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, specularPowerStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, gammaStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAtOriginStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightToCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightFollowCameraStr.c_str() );
+	DebugAddScreenTextf( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), Rgba8::WHITE, lightAnimatedStr.c_str() );
 }
 
 void Game::Render()
@@ -221,13 +267,13 @@ void Game::Render()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
-	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
-	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
+// 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
+// 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
 
 
  	g_theRenderer->SetBlendMode( BlendMode::SOLID );
- 	g_theRenderer->BindTexture( tex );
-	g_theRenderer->BindNormal( normalTex );
+ 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
+	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
 
 
 	g_theRenderer->DisableLight( 0 );
@@ -327,6 +373,54 @@ void Game::DecrementShader()
 	}
 }
 
+void Game::IncrementRenderTexture()
+{
+	m_currentRenderTextureIndex++;
+	if( m_currentRenderTextureIndex >= m_renderTextures.size() )
+	{
+		m_currentRenderTextureIndex = 0;
+	}
+}
+
+void Game::DecrementRenderTexture()
+{
+	if( m_currentRenderTextureIndex == 0 )
+	{
+		if( !m_renderTextures.empty() )
+		{
+			m_currentRenderTextureIndex = m_renderTextures.size() - 1;
+		}
+	}
+	else
+	{
+		m_currentRenderTextureIndex--;
+	}
+}
+
+void Game::IncrementNormalTexture()
+{
+	m_currentNormalTextureIndex++;
+	if( m_currentNormalTextureIndex >= m_normalTextures.size() )
+	{
+		m_currentNormalTextureIndex = 0;
+	}
+}
+
+void Game::DecrementNormalTexture()
+{
+	if( m_currentNormalTextureIndex == 0 )
+	{
+		if( !m_normalTextures.empty() )
+		{
+			m_currentNormalTextureIndex = m_normalTextures.size() - 1;
+		}
+	}
+	else
+	{
+		m_currentNormalTextureIndex--;
+	}
+}
+
 void Game::UpdateLightPosition( float deltaSeconds )
 {
 	m_lightAnimatedTheta += deltaSeconds * 45.f;
@@ -415,6 +509,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
 	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
+	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
+	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
+	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
+	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
@@ -495,35 +593,35 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( lBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = m_light.specularFactor;
+		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
 
 		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		m_light.specularFactor = newSpecularFactor;
+		g_theRenderer->SetSpecularFactor( newSpecularFactor );
 	}
 	if( rBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = m_light.specularFactor;
+		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
 
 		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		m_light.specularFactor = newSpecularFactor;
+		g_theRenderer->SetSpecularFactor( newSpecularFactor );
 	}
 	if( semiColonKey.IsPressed() )
 	{
-		float currentSpecularPower = m_light.specularPower;
+		float currentSpecularPower = g_theRenderer->GetSpecularPower();
 
 		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
-		m_light.specularPower = newSpecularPower;
+		g_theRenderer->SetSpecularPower( newSpecularPower );
 	}
 	if( singleQuoteKey.IsPressed() )
 	{
-		float currentSpecularPower = m_light.specularPower;
+		float currentSpecularPower = g_theRenderer->GetSpecularPower();
 
 		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
-		m_light.specularPower = newSpecularPower;
+		g_theRenderer->SetSpecularPower( newSpecularPower );
 	}
 	if( commaKey.WasJustPressed() )
 	{
@@ -532,6 +630,22 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( periodKey.WasJustPressed() )
 	{
 		IncrementShader();
+	}
+	if( vKey.WasJustPressed() )
+	{
+		DecrementNormalTexture();
+	}
+	if( bKey.WasJustPressed() )
+	{
+		IncrementNormalTexture();
+	}
+	if( nKey.WasJustPressed() )
+	{
+		DecrementRenderTexture();
+	}
+	if( mKey.WasJustPressed() )
+	{
+		IncrementRenderTexture();
 	}
 	if( gKey.IsPressed() )
 	{
@@ -605,16 +719,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		float currentLightIntensity = m_light.intensity;
 
-		float newLightIntensity = currentLightIntensity + 0.5f * deltaSeconds;
-		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
+		float newLightIntensity = currentLightIntensity + 2.f * deltaSeconds;
+		newLightIntensity = Max( newLightIntensity, 0.f );
 		m_light.intensity = newLightIntensity;
 	}
 	if( minusKey.IsPressed() )
 	{
 		float currentLightIntensity = m_light.intensity;
 
-		float newLightIntensity = currentLightIntensity - 0.5f * deltaSeconds;
-		newLightIntensity = Clampf( newLightIntensity, 0.f, 1.f );
+		float newLightIntensity = currentLightIntensity - 2.f * deltaSeconds;
+		newLightIntensity = Max( newLightIntensity, 0.f );
 		m_light.intensity = newLightIntensity;
 	}
 

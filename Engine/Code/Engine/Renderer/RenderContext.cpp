@@ -407,6 +407,27 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode, eDepthWriteMode wri
 	m_context->OMSetDepthStencilState( m_depthStencilState, 0 );
 }
 
+void RenderContext::UpdateModelData()
+{
+	if( nullptr == m_modelUBO )
+	{
+		m_modelUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+	}
+
+	ModelData modelData;
+	modelData.model = m_modelMatrix;
+	modelData.specularFactor = m_specularFactor;
+	modelData.specularPower = m_specularPower;
+
+	m_modelTint.ToFloatArray( modelData.tint );
+	modelData.tint[0] /= 255.f;
+	modelData.tint[1] /= 255.f;
+	modelData.tint[2] /= 255.f;
+	modelData.tint[3] /= 255.f;
+
+	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+}
+
 void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 {
 	if( nullptr == ubo )
@@ -422,45 +443,55 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 
 void RenderContext::SetModelMatrix( Mat44 const& model, Rgba8 const& tint )
 {
-	ModelData modelData;
-	modelData.model = model;
+	m_modelMatrix = model;
+	m_modelTint = tint;
 
-	float tintFloatArray[4];
-	tint.ToFloatArray( tintFloatArray );
-	tint.ToFloatArray( modelData.tint );
-	modelData.tint[0] /= 255.f;
-	modelData.tint[1] /= 255.f;
-	modelData.tint[2] /= 255.f;
-	modelData.tint[3] /= 255.f;
-
-	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+	UpdateModelData();
 }
 
 void RenderContext::SetModelTint( Rgba8 const& tint )
 {
-	float tintFloatArray[4];
-	tint.ToFloatArray( tintFloatArray );
+	m_modelTint = tint;
 
-	ModelData modelData;
-	tint.ToFloatArray( modelData.tint );
-	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+	UpdateModelData();
 }
 
 void RenderContext::SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint )
 {
-	ModelData modelData;
-	modelData.model = model;
+	m_modelMatrix = model;
+	m_modelTint = tint;
 
-	float tintFloatArray[4];
-	tint.ToFloatArray( tintFloatArray );
-	tint.ToFloatArray( modelData.tint );
-	modelData.tint[0] /= 255.f;
-	modelData.tint[1] /= 255.f;
-	modelData.tint[2] /= 255.f;
-	modelData.tint[3] /= 255.f;
+	UpdateModelData();
+}
 
+void RenderContext::SetSpecularFactorAndPower( float specularFactor, float specularPower )
+{
+	m_specularFactor = specularFactor;
+	m_specularPower = specularPower;
 
-	m_modelUBO->Update( &modelData, sizeof( modelData ), sizeof( modelData ) );
+	UpdateModelData();
+}
+
+void RenderContext::SetSpecularFactor( float specularFactor )
+{
+	m_specularFactor = specularFactor;
+	UpdateModelData();
+}
+
+void RenderContext::SetSpecularPower( float specularPower )
+{
+	m_specularPower = specularPower;
+	UpdateModelData();
+}
+
+float RenderContext::GetSpecularFactor() const
+{
+	return m_specularFactor;
+}
+
+float RenderContext::GetSpecularPower() const
+{
+	return m_specularPower;
 }
 
 Vec4 RenderContext::GetAmbientLight() const

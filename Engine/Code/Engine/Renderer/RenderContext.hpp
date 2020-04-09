@@ -40,6 +40,11 @@ struct ModelData
 {
 	Mat44 model;
 	float tint[4];
+
+	float specularFactor = 1.f;
+	float specularPower = 1.f;
+
+	Vec2 pad01;
 };
 
 struct light_t
@@ -49,10 +54,6 @@ struct light_t
 	
 	Vec3 color;
 	float intensity;
-	float specularFactor = 1.f;
-	float specularPower = 1.f;
-
-	Vec2 pad01;
 };
 
 struct LightData
@@ -154,9 +155,16 @@ public:
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 
 	void SetDepth( eDepthCompareMode compareMode, eDepthWriteMode writeMode = eDepthWriteMode::WRITE_ALL );
+	void UpdateModelData();
 	void SetModelMatrix( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
 	void SetModelTint( Rgba8 const& tint );
 	void SetModelMatrixAndTint( Mat44 const& model, Rgba8 const& tint = Rgba8::WHITE );
+	void SetSpecularFactorAndPower( float specularFactor, float specularPower );
+	void SetSpecularFactor( float specularFactor );
+	void SetSpecularPower( float specularPower );
+
+	float GetSpecularFactor() const;
+	float GetSpecularPower() const;
 
 	//Lighting
 	Vec4 GetAmbientLight() const;
@@ -178,7 +186,6 @@ public:
 	void ToggleAttenuation();
 	void SetAttenuation( Vec3 const& attenuation );
 
-	//Backbuffer
 	Texture* GetBackBuffer();
 
 	Texture* CreateDepthStencilTarget();
@@ -265,6 +272,11 @@ public:
 	light_t m_lights[8];
 	Vec3 m_attenuation = Vec3( 0.f, 1.f, 0.f );
 	float m_gamma = 2.2f;
+
+	Mat44 m_modelMatrix;
+	Rgba8 m_modelTint;
+	float m_specularFactor = 1.f;
+	float m_specularPower = 1.f;
 };
 
 

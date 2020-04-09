@@ -48,6 +48,9 @@ cbuffer model : register(b2)
 {
 	float4x4 MODEL;
 	float4 TINT;
+
+	float SPECULARFACTOR;
+	float SPECULARPOWER;
 };
 
 //NEW
@@ -58,10 +61,6 @@ struct light_t
 
 	float3 color;
 	float intensity;
-	float specularFactor;
-	float specularPower;
-
-	float2 pad01;
 };
 
 cbuffer lightConstants : register(b3)
@@ -187,7 +186,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 incidentVector = -dirToLight;
 	float3 incidentReflect = reflect( incidentVector, worldNormal );
 	float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
-	float specular = LIGHT.specularFactor * pow( max( 0.f,  dot(incidentReflect, directionToEye) ), LIGHT.specularPower);
+	float specular = SPECULARFACTOR * pow( max( 0.f,  dot(incidentReflect, directionToEye) ), SPECULARPOWER);
 	specular *= att3;
 	//specular = 0.f;
 

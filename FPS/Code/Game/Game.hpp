@@ -48,6 +48,11 @@ private:
 
 	void IncrementShader();
 	void DecrementShader();
+	void IncrementRenderTexture();
+	void DecrementRenderTexture();
+	void IncrementNormalTexture();
+	void DecrementNormalTexture();
+
 	void UpdateLightPosition( float deltaSeconds );
 
 	void CheckCollisions();
@@ -85,7 +90,12 @@ private:
 	Shader* m_invertShader = nullptr;
 
 	std::vector<Shader*> m_shaders;
+	std::vector<Texture*> m_renderTextures;
+	std::vector<Texture*> m_normalTextures;
+
 	size_t m_currentShaderIndex = 0;
+	size_t m_currentRenderTextureIndex = 0;
+	size_t m_currentNormalTextureIndex = 0;
 
 
 	bool m_isLightFollowingCamera = false;

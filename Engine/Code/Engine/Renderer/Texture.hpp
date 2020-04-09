@@ -25,6 +25,7 @@ public:
 	bool IsFileInTexture( std::string filePath );
 	RenderContext* GetRenderContext();
 	float GetAspectRatio() const;
+	std::string GetFilePath() const;
 
 private:
 	RenderContext* m_owner		= nullptr;

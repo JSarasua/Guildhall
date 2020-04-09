@@ -64,6 +64,11 @@ float Texture::GetAspectRatio() const
 	return aspectRatio;
 }
 
+std::string Texture::GetFilePath() const
+{
+	return m_filePath;
+}
+
 Texture::~Texture()
 {
 	delete m_renderTargetView;
