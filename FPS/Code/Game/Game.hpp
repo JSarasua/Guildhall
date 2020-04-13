@@ -16,7 +16,14 @@ class Clock;
 
 struct light_t;
 
+struct fresnel_t
+{
+	Vec3 color;
+	float power;
+	float factor;
 
+	Vec3 pad00;
+};
 enum PowerUps
 {
 	RAPID_FIRE,

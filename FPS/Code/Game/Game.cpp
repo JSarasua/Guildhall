@@ -283,6 +283,26 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
+
+
+	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
+	fresnel_t fresnel;
+	fresnel.color = Vec3( 0.f, 1.f, 0.f );
+	fresnel.power = 16.f;
+	fresnel.factor = 1.f;
+
+	g_theRenderer->SetMaterialData( &fresnel, sizeof(fresnel) );
+	Shader* fresnelShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Fresnel.hlsl" );
+	g_theRenderer->BindShader( fresnelShader );
+	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+
+
+
+
+	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
 
 	RenderDevConsole();

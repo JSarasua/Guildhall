@@ -162,6 +162,7 @@ public:
 	void BindVertexBuffer( VertexBuffer* vbo );
 	void BindIndexBuffer( IndexBuffer* ibo );
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
+	void SetMaterialData( void const* data, size_t dataSize );
 
 	void SetDepth( eDepthCompareMode compareMode, eDepthWriteMode writeMode = eDepthWriteMode::WRITE_ALL );
 	void UpdateModelData();
@@ -266,6 +267,7 @@ public:
 	RenderBuffer* m_frameUBO = nullptr;
 	RenderBuffer* m_modelUBO = nullptr;
 	RenderBuffer* m_lightUBO = nullptr;
+	RenderBuffer* m_ubo = nullptr;
 
 	ID3D11BlendState* m_alphaBlendStateHandle = nullptr;
 	ID3D11BlendState* m_additiveBlendStateHandle = nullptr;

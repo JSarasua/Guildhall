@@ -88,6 +88,7 @@ void RenderContext::StartUp(Window* window)
 	m_immediateIBO = new IndexBuffer( this, MEMORY_HINT_DYNAMIC );
 
 	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
+	m_ubo = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 
 	m_sampPoint = new Sampler( this, SAMPLER_POINT );
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
@@ -142,6 +143,9 @@ void RenderContext::Shutdown()
 
 	delete m_lightUBO;
 	m_lightUBO = nullptr;
+
+	delete m_ubo;
+	m_ubo = nullptr;
 
 	delete m_sampPoint;
 	m_sampPoint = nullptr;
@@ -434,6 +438,11 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 
 	m_context->VSSetConstantBuffers( slot, 1, &uboHandle );
 	m_context->PSSetConstantBuffers( slot, 1, &uboHandle );
+}
+
+void RenderContext::SetMaterialData( void const* data, size_t dataSize )
+{
+	m_ubo->Update( data, dataSize, dataSize );
 }
 
 void RenderContext::SetModelMatrix( Mat44 const& model, Rgba8 const& tint )
@@ -992,6 +1001,7 @@ void RenderContext::BeginCamera( Camera& camera )
 	SetModelMatrix(identity);
 	BindUniformBuffer( 2, m_modelUBO );
 	BindUniformBuffer( 3, m_lightUBO );
+	BindUniformBuffer( 5, m_ubo );
 
 
 }
