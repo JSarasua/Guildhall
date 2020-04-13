@@ -712,7 +712,7 @@ Texture* RenderContext::CreateTextureFromFile(const char* filePath)
 
 	// Check if the load was successful
 	GUARANTEE_OR_DIE( imageData, Stringf( "Failed to load image \"%s\"", imageFilePath ));
-	GUARANTEE_OR_DIE( numComponents == 4 && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
+	GUARANTEE_OR_DIE( (numComponents == 4 || numComponents == 3 || numComponents == 1) && imageTexelSizeX > 0 && imageTexelSizeY > 0, Stringf( "ERROR loading image \"%s\" (Bpp=%i, size=%i,%i)", imageFilePath, numComponents, imageTexelSizeX, imageTexelSizeY ) );
 
 	D3D11_TEXTURE2D_DESC desc;
 	desc.Width = imageTexelSizeX;
@@ -814,6 +814,19 @@ void RenderContext::BindNormal( const Texture* constTex )
 	TextureView* shaderResourceView = texture->GetOrCreateShaderResourceView();
 	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetAsSRV();
 	m_context->PSSetShaderResources( 1, 1, &srvHandle ); //srv
+}
+
+void RenderContext::BindDataTexture( uint slot, Texture const* constTex )
+{
+	Texture* texture = const_cast<Texture*>(constTex);
+	if( nullptr == constTex )
+	{
+		texture = m_defaultNormalTex;
+	}
+
+	TextureView* shaderResourceView = texture->GetOrCreateShaderResourceView();
+	ID3D11ShaderResourceView* srvHandle = shaderResourceView->GetAsSRV();
+	m_context->PSSetShaderResources( slot, 1, &srvHandle ); //srv
 }
 
 void RenderContext::BindSampler( Sampler const* constSampler )

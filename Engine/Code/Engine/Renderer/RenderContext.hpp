@@ -207,6 +207,7 @@ public:
 	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
 	void BindTexture( const Texture* constTex  );
 	void BindNormal( const Texture* constTex );
+	void BindDataTexture( uint slot, Texture const* constTex );
 	void BindSampler( Sampler const* constSampler );
 	void SetBlendMode( BlendMode blendMode );
 	void CreateBlendModes();

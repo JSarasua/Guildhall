@@ -270,16 +270,34 @@ void Game::Render()
  	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
 
+	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
+	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
+	dissolve_t dissolveData;
+	dissolveData.amount = m_dissolveAmount;
+	dissolveData.edgeColor = Vec3( 1.f, 0.f, 1.f );
+	dissolveData.edgeWidth = 0.1f;
+
+	g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
 
 	g_theRenderer->DisableLight( 0 );
 	g_theRenderer->EnableLight( 0, m_light );
-	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
+	g_theRenderer->BindShader( dissolveShader );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
+	g_theRenderer->BindDataTexture( 8, noiseTexture );
 	g_theRenderer->DrawMesh( m_cubeMesh );
+
+
+// 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+// 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
+// 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
+	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
 	g_theRenderer->DrawMesh( m_quadMesh );
 
+	g_theRenderer->BindShader( dissolveShader );
+	g_theRenderer->BindDataTexture( 8, noiseTexture );
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
@@ -528,6 +546,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
 	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
+	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
+	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
@@ -535,6 +555,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 
+	if( uKey.IsPressed() )
+	{
+		m_dissolveAmount -= 0.5f * deltaSeconds;
+		m_dissolveAmount = Clampf( m_dissolveAmount, 0.f, 1.f );
+	}
+	if( iKey.IsPressed() )
+	{
+		m_dissolveAmount += 0.5f * deltaSeconds;
+		m_dissolveAmount = Clampf( m_dissolveAmount, 0.f, 1.f );
+	}
 	if( qKey.WasJustPressed() )
 	{
 		SetLightPosition( m_camera.GetPosition() );

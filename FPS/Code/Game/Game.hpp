@@ -24,6 +24,15 @@ struct fresnel_t
 
 	Vec3 pad00;
 };
+
+struct dissolve_t
+{
+	float amount;
+	float edgeWidth;
+	Vec3 edgeColor;
+
+	Vec3 pad00;
+};
 enum PowerUps
 {
 	RAPID_FIRE,
@@ -114,6 +123,8 @@ private:
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
+
+	float m_dissolveAmount = 0.5;
 public:
 	static light_t m_light;
 	

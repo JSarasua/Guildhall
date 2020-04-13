@@ -81,9 +81,18 @@ cbuffer lightConstants : register(b3)
 	float pad01;
 }
 
+struct dissolve_t
+{
+	float amount; //(0 to 1)
+	float edgeWidth;
+	float3 edgeColor;
+
+	float3 pad00;
+};
+
 cbuffer materialConstants : register(b5)
 {
-	float DISSOLVE_AMMOUNT;
+	dissolve_t DISSOLVE;
 }
 
 
@@ -94,7 +103,7 @@ Texture2D <float4> tDiffuse	: register(t0);	// color of the surface
 Texture2D <float4> tNormal : register(t1);
 
 //User defined
-Texture2D <float4> tPattern : register(t8);
+Texture2D <float> tPattern : register(t8);
 SamplerState sSampler : register(s0);		// sampler are rules on how to sample color per pixel
 
 //--------------------------------------------------------------------------------------
@@ -164,8 +173,18 @@ v2f_t VertexFunction( vs_input_t input )
 // is being drawn to the first bound color target.
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
+	float edgeWidth = DISSOLVE.edgeWidth;
+	float dissolveAmount = DISSOLVE.amount;
+	float3 dissolveEdgeColor = DISSOLVE.edgeColor;
+
+	float range = 1.f + edgeWidth;
+	float minDissolve = -edgeWidth + range * dissolveAmount;
+	float maxDissolve = minDissolve + edgeWidth;
 	float height = tPattern.Sample( sSampler, input.uv );
-	clip( height - DISSOLVE_AMOUNT );
+	clip( height - minDissolve );
+	float dissolveLerpValue = (height - minDissolve)/(maxDissolve - minDissolve);
+	dissolveLerpValue = clamp( dissolveLerpValue, 0.f, 1.f );
+
 
 	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
 	textureColor = pow( max(0.f, textureColor), GAMMA );
@@ -226,6 +245,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	
 	float3 finalColor = diffuse * surfaceColor;
+	finalColor = lerp( dissolveEdgeColor, finalColor, dissolveLerpValue );
 	//normalize(incidentReflect);
 	//float3 finalColor = directionToEye.xyz;
 	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
