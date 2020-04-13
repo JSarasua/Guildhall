@@ -141,7 +141,6 @@ void App::Update()
 	CheckController();
 
 	m_game->Update();
-
 }
 
 
