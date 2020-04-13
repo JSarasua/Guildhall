@@ -255,12 +255,7 @@ void RenderContext::DrawMesh( GPUMesh* mesh )
 
 	BindVertexBuffer( mesh->GetVertexBuffer() );
 
-	LightData lightData;
-	lightData.ambientLight = m_ambientLight;
-	lightData.light = m_lights[0];
-	lightData.attenuation = m_attenuation;
-
-	m_lightUBO->Update( &lightData, sizeof( lightData ), sizeof( lightData ) );
+	UpdateLightData();
 
 	if( nullptr != mesh->GetIndexBuffer() )
 	{
@@ -542,19 +537,27 @@ void RenderContext::SetGamma( float newGamma )
 void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )
 {
 	m_lights[lightIndex] = lightInfo;
-
-	LightData lightData;
-	lightData.ambientLight = m_ambientLight;
-	lightData.light = lightInfo;
 }
 
 void RenderContext::DisableLight( uint lightIndex )
 {
 	m_lights[lightIndex].intensity = 0.f;
+}
 
+void RenderContext::UpdateLightData()
+{
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
-	lightData.light = m_lights[lightIndex];
+	lightData.attenuation = m_attenuation;
+
+	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
+	{
+		lightData.light[lightIndex] = m_lights[lightIndex];
+	}
+	
+	size_t sizeOfLightData = sizeof( lightData );
+	m_lightUBO->Update( &lightData, sizeOfLightData, sizeOfLightData );
+
 }
 
 void RenderContext::ToggleAttenuation()

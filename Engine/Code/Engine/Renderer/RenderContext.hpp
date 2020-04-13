@@ -49,17 +49,26 @@ struct ModelData
 
 struct light_t
 {
-	Vec3 position;
+	Vec3 position = Vec3();
 	float pad00;
 	
-	Vec3 color;
-	float intensity;
+	Vec3 color = Vec3();
+	float intensity = 0.f;
+
+	Vec3 direction = Vec3();
+	float isDirectional = 0.f;
+
+	float cosInnerAngle = 0.f;
+	float cosOuterAngle = 0.f;
+
+	Vec2 pad01;
 };
 
+constexpr int MAX_LIGHTS = 8;
 struct LightData
 {
 	Vec4 ambientLight;
-	light_t light;
+	light_t light[MAX_LIGHTS];
 	Vec3 attenuation = Vec3( 0.f, 0.f, 1.f );
 
 	float pad00;
@@ -182,6 +191,7 @@ public:
 	//pointLight...
 	void DisableLight( uint lightIndex );
 	//Disable means set light intensity to 0.f
+	void UpdateLightData();
 
 	void ToggleAttenuation();
 	void SetAttenuation( Vec3 const& attenuation );
