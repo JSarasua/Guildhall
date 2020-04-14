@@ -5,6 +5,7 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 
 
@@ -68,8 +69,11 @@ private:
 	void DecrementRenderTexture();
 	void IncrementNormalTexture();
 	void DecrementNormalTexture();
+	void IncrementCurrentLight();
+	void DecrementCurrentLight();
 
 	void UpdateLightPosition( float deltaSeconds );
+	void EnableLights();
 
 	void CheckCollisions();
 	void UpdateEntities( float deltaSeconds );
@@ -126,7 +130,9 @@ private:
 
 	float m_dissolveAmount = 0.5;
 public:
-	static light_t m_light;
+	//static light_t m_pointLight;
+	static std::vector<light_t> m_lights;
+	static uint m_currentLightIndex;
 	
 	Rgba8 m_clearColor = Rgba8::BLACK;
 	float m_currentTime = 0.f;

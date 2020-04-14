@@ -25,7 +25,9 @@ extern RenderContext* g_theRenderer;
 extern InputSystem* g_theInput;
 
 
-light_t Game::m_light;
+//light_t Game::m_pointLight;
+std::vector<light_t> Game::m_lights;
+uint Game::m_currentLightIndex = 0;
 
 Game::Game()
 {
@@ -131,9 +133,25 @@ void Game::Startup()
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 
-	m_light.color = Vec3(1.f, 1.f, 1.f);
-	m_light.intensity = 0.5f;
-	m_light.position = m_camera.GetPosition();
+// 	m_pointLight.color = Vec3(1.f, 1.f, 1.f);
+// 	m_pointLight.intensity = 0.5f;
+// 	m_pointLight.position = m_camera.GetPosition();
+
+
+	Vec3 cameraDirection = m_camera.GetDirection();
+	for( uint lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
+	{
+		light_t lightData;
+		lightData.color = Vec3( 1.f, 1.f, 1.f );
+		lightData.intensity = 0.f;
+		lightData.position = m_camera.GetPosition();
+		lightData.cosInnerAngle = -0.98f;
+		lightData.cosOuterAngle = -1.f;
+		lightData.direction = cameraDirection;
+		m_lights.push_back( lightData );
+	}
+	m_lights[0].intensity = 0.5f;
+
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
 
@@ -195,13 +213,28 @@ void Game::Update()
 	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
-	Vec3 lightColor = m_light.color;
-	lightColor *= 255.f;
-	Rgba8 lightRGBA8Color = Rgba8( (unsigned char)lightColor.x, (unsigned char)lightColor.y, (unsigned char)lightColor.z );
 
-	if( !m_isLightFollowingCamera )
+	for( size_t lightIndex = 0; lightIndex < m_lights.size(); lightIndex++ )
 	{
-		DebugAddWorldPoint( m_light.position, lightRGBA8Color, 0.f );
+		Vec3 lightColor = m_lights[lightIndex].color;
+		lightColor *= 255.f;
+		Rgba8 lightRGBA8Color = Rgba8( (unsigned char)lightColor.x, (unsigned char)lightColor.y, (unsigned char)lightColor.z );
+
+		if( !m_isLightFollowingCamera && m_lights[lightIndex].intensity >= 0.0001f )
+		{
+			if( m_lights[lightIndex].isDirectional == 1.f )
+			{
+				Vec3 startPosition = m_lights[lightIndex].position;
+				Vec3 direction = m_lights[lightIndex].direction;
+				Vec3 endPosition = startPosition + direction;
+				LineSegment3 lightDir( startPosition, endPosition );
+				DebugAddWorldArrow( lightDir, lightRGBA8Color, 0.f );
+			}
+			else
+			{
+				DebugAddWorldPoint( m_lights[lightIndex].position, lightRGBA8Color, 0.f );
+			}
+		}
 	}
 
 
@@ -209,7 +242,7 @@ void Game::Update()
 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
 	float ambientIntensity = ambientLight.w;
 	Vec3 attenuation = g_theRenderer->GetAttenuation();
-	float lightIntensity = m_light.intensity;
+	float lightIntensity = m_lights[m_currentLightIndex].intensity;
 	float specularFactor = g_theRenderer->GetSpecularFactor();
 	float specularPower = g_theRenderer->GetSpecularPower();
 	float gamma = g_theRenderer->GetGamma();
@@ -227,6 +260,8 @@ void Game::Update()
 		normalTextureFilepathStr = m_normalTextures[m_currentNormalTextureIndex]->GetFilePath();
 	}
 
+	light_t const& currentLight = m_lights[m_currentLightIndex];
+
 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
 	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
 	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
@@ -240,6 +275,8 @@ void Game::Update()
 	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
 	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
+	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
+	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
 
 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
@@ -254,6 +291,8 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightToCameraStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightFollowCameraStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
 }
 
 void Game::Render()
@@ -280,7 +319,8 @@ void Game::Render()
 	g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
 
 	g_theRenderer->DisableLight( 0 );
-	g_theRenderer->EnableLight( 0, m_light );
+	EnableLights();
+	//g_theRenderer->EnableLight( 0, m_pointLight );
 	g_theRenderer->BindShader( dissolveShader );
 	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
 	g_theRenderer->BindDataTexture( 8, noiseTexture );
@@ -317,9 +357,10 @@ void Game::Render()
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
 
-
+	//Shader* triPlanarShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TriPlanar.hlsl" );
 
 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	//g_theRenderer->BindShader( triPlanarShader );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
 
@@ -371,13 +412,14 @@ bool Game::SetAttenuation( const EventArgs* args )
 bool Game::SetLightColor( const EventArgs* args )
 {
 	Rgba8 lightColor = args->GetValue( "color", Rgba8::WHITE );
+	uint lightIndex = args->GetValue( "index", 0 );
 
 	float lightColorAsFloats[4];
 	lightColor.ToFloatArray( lightColorAsFloats );
 
 	Vec3 lightColorAsVec3 = Vec3( lightColorAsFloats[0], lightColorAsFloats[1], lightColorAsFloats[2]);
 	lightColorAsVec3 /= 255.f;
-	Game::m_light.color = lightColorAsVec3;
+	Game::m_lights[lightIndex].color = lightColorAsVec3;
 
 	return true;
 }
@@ -454,6 +496,28 @@ void Game::DecrementNormalTexture()
 	}
 }
 
+void Game::IncrementCurrentLight()
+{
+	m_currentLightIndex++;
+	if( m_currentLightIndex >= MAX_LIGHTS )
+	{
+		m_currentLightIndex = 0;
+	}
+}
+
+void Game::DecrementCurrentLight()
+{
+	if( m_currentLightIndex == 0 )
+	{
+		m_currentLightIndex = MAX_LIGHTS - 1;
+
+	}
+	else
+	{
+		m_currentLightIndex--;
+	}
+}
+
 void Game::UpdateLightPosition( float deltaSeconds )
 {
 	m_lightAnimatedTheta += deltaSeconds * 45.f;
@@ -470,11 +534,20 @@ void Game::UpdateLightPosition( float deltaSeconds )
 
 	if( m_isLightFollowingCamera )
 	{
-		m_light.position = m_camera.GetPosition();
+		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
+		m_lights[m_currentLightIndex].direction = m_camera.GetDirection();
 	}
 	else if( m_isLightAnimated )
 	{
-		m_light.position = m_lightAnimatedPosition;
+		m_lights[m_currentLightIndex].position = m_lightAnimatedPosition;
+	}
+}
+
+void Game::EnableLights()
+{
+	for( size_t lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
+	{
+		g_theRenderer->EnableLight( (uint)lightIndex, m_lights[lightIndex] );
 	}
 }
 
@@ -548,6 +621,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
 	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
 	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
+	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
+	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
+	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
+	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
@@ -555,6 +632,40 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 
+	if( jKey.WasJustPressed() )
+	{
+		DecrementCurrentLight();
+	}
+	if( kKey.WasJustPressed() )
+	{
+		IncrementCurrentLight();
+	}
+	if( zKey.WasJustPressed() )
+	{
+		m_lights[m_currentLightIndex].direction = m_camera.GetDirection();
+		if( m_lights[m_currentLightIndex].isDirectional == 1.f )
+		{
+			m_lights[m_currentLightIndex].isDirectional = 0.f;
+		}
+		else
+		{
+			m_lights[m_currentLightIndex].isDirectional = 1.f;
+		}
+
+	}
+	if( xKey.WasJustPressed() )
+	{
+		if( m_lights[m_currentLightIndex].cosOuterAngle == -1.f )
+		{
+			m_lights[m_currentLightIndex].cosInnerAngle = 0.98f;
+			m_lights[m_currentLightIndex].cosOuterAngle = 0.96f;
+		}
+		else
+		{
+			m_lights[m_currentLightIndex].cosInnerAngle = -0.98f;
+			m_lights[m_currentLightIndex].cosOuterAngle = -1.f;
+		}
+	}
 	if( uKey.IsPressed() )
 	{
 		m_dissolveAmount -= 0.5f * deltaSeconds;
@@ -575,14 +686,37 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		g_theWindow->ToggleBorder();
 	}
 
-	if( num1Key.WasJustPressed() )
+	if( num1Key.IsPressed() )
 	{
-		DebugAddWorldPoint( m_camera.GetPosition(), 0.1f, Rgba8::RED, Rgba8::GREEN, 15.f, DEBUG_RENDER_ALWAYS );
+		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
+		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
+		float range = currentInnerCosTheta - currentOuterCosTheta;
+
+		float max = 1.f;
+		float min = -1.f + range;
+
+		float newInnerCosTheta = currentInnerCosTheta - 0.5f * deltaSeconds;
+		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
+		float newOuterCosTheta = newInnerCosTheta - range;
+
+		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
+		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
 	}
-	if( num2Key.WasJustPressed() )
+	if( num2Key.IsPressed() )
 	{
-		Vec3 cameraPos = m_camera.GetPosition();
-		DebugAddWorldBillboardTextf( cameraPos, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_USE_DEPTH, "Billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
+		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
+		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
+		float range = currentInnerCosTheta - currentOuterCosTheta;
+
+		float max = 1.f;
+		float min = -1.f + range;
+
+		float newInnerCosTheta = currentInnerCosTheta + 0.5f * deltaSeconds;
+		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
+		float newOuterCosTheta = newInnerCosTheta - range;
+
+		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
+		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
 	}
 	if( num3Key.WasJustPressed() )
 	{
@@ -706,25 +840,25 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f5Key.WasJustPressed() )
 	{
-		m_light.position = Vec3( 0.f, 0.f, 0.f );
+		m_lights[m_currentLightIndex].position = Vec3( 0.f, 0.f, 0.f );
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = false;
 	}
 	if( f6Key.WasJustPressed() )
 	{
-		m_light.position = m_camera.GetPosition();
+		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = false;
 	}
 	if( f7Key.WasJustPressed() )
 	{
-		m_light.position = m_camera.GetPosition();
+		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
 		m_isLightFollowingCamera = true;
 		m_isLightAnimated = false;
 	}
 	if( f8Key.WasJustPressed() )
 	{
-		m_light.position = m_lightAnimatedPosition;
+		m_lights[m_currentLightIndex].position = m_lightAnimatedPosition;
 		m_isLightFollowingCamera = false;
 		m_isLightAnimated = true;
 	}
@@ -762,19 +896,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( plusKey.IsPressed() )
 	{
-		float currentLightIntensity = m_light.intensity;
+		float currentLightIntensity = m_lights[m_currentLightIndex].intensity;
 
 		float newLightIntensity = currentLightIntensity + 2.f * deltaSeconds;
 		newLightIntensity = Max( newLightIntensity, 0.f );
-		m_light.intensity = newLightIntensity;
+		m_lights[m_currentLightIndex].intensity = newLightIntensity;
 	}
 	if( minusKey.IsPressed() )
 	{
-		float currentLightIntensity = m_light.intensity;
+		float currentLightIntensity = m_lights[m_currentLightIndex].intensity;
 
 		float newLightIntensity = currentLightIntensity - 2.f * deltaSeconds;
 		newLightIntensity = Max( newLightIntensity, 0.f );
-		m_light.intensity = newLightIntensity;
+		m_lights[m_currentLightIndex].intensity = newLightIntensity;
 	}
 
 	Vec3 translator;
@@ -844,7 +978,7 @@ IntVec2 Game::GetCurrentMapBounds() const
 
 void Game::SetLightPosition( Vec3 const& pos )
 {
-	m_light.position = pos;
+	m_lights[m_currentLightIndex].position = pos;
 }
 
 void Game::RenderDevConsole()

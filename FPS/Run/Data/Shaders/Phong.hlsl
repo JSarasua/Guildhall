@@ -183,11 +183,23 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	{
 		float3 lightPosition = LIGHT[lightIndex].worldPosition;
 		float3 dirToLight = normalize( lightPosition - input.worldPosition );
+		float3 lightDirection = LIGHT[lightIndex].direction;
+		float cosThetaInner = LIGHT[lightIndex].cosInnerAngle;
+		float cosThetaOuter = LIGHT[lightIndex].cosOuterAngle;
+		
+		//Check for directional light
+		dirToLight = lerp( dirToLight, -lightDirection, LIGHT[lightIndex].isDirectional );
 		float3 dot3 = max( 0.f, dot( dirToLight, worldNormal ) );
 		dot3 *= (LIGHT[lightIndex].color * LIGHT[lightIndex].intensity);
 
 		float distanceToLight = length( lightPosition - input.worldPosition );
+
 		float att3 = min( 1.f, 1.f / (ATTENUATION.x + ATTENUATION.y*distanceToLight + ATTENUATION.z*distanceToLight*distanceToLight ) );
+		//spot light calculation
+		float cosTheta = dot( normalize( lightDirection ), normalize(input.worldPosition - lightPosition) );
+		float spotLightAttenuation = RangeMap( cosTheta, cosThetaOuter, cosThetaInner, 0.f, 1.f );
+		spotLightAttenuation = saturate( spotLightAttenuation );
+		att3 *= spotLightAttenuation;
 		dot3 *= att3;
 
 		diffuse += dot3;
