@@ -58,6 +58,14 @@ Vec3 Camera::GetPosition()
 	//return m_position;
 }
 
+Vec3 Camera::GetDirection() const
+{
+	Mat44 cameraRotationMatrix = m_transform.ToRotationMatrix();
+	Vec3 cameraDirection = cameraRotationMatrix.TransformVector3D( Vec3( 0.f, 0.f, -1.f ) );
+	cameraDirection.Normalize();
+	return cameraDirection;
+}
+
 // void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
 // {
 // 	m_cameraView.mins = bottomLeft;

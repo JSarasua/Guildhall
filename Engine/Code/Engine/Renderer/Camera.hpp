@@ -52,6 +52,7 @@ public:
 
 
 	Vec3 GetPosition();
+	Vec3 GetDirection() const;
 
 	float GetAspectRatio() const;
 
