@@ -69,16 +69,21 @@ struct light_t
 	//Spot light
 	float cosInnerAngle;
 	float cosOuterAngle;
-	float2 pad01; //not required
+
+	float2 pad01;
+
+	float3 attenuation;
+	
+	float1 pad02; //not required
 };
 
 cbuffer lightConstants : register(b3)
 {
 	float4 AMBIENT;
 	light_t LIGHT[MAX_LIGHTS];
-	float3 ATTENUATION;
+	//float3 ATTENUATION;
 
-	float pad01;
+	//float pad01;
 }
 
 
@@ -194,7 +199,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
 		float distanceToLight = length( lightPosition - input.worldPosition );
 
-		float att3 = min( 1.f, 1.f / (ATTENUATION.x + ATTENUATION.y*distanceToLight + ATTENUATION.z*distanceToLight*distanceToLight ) );
+		float3 attenuation = LIGHT[lightIndex].attenuation;
+		float att3 = min( 1.f, 1.f / (attenuation.x + attenuation.y*distanceToLight + attenuation.z*distanceToLight*distanceToLight ) );
 		//spot light calculation
 		float cosTheta = dot( normalize( lightDirection ), normalize(input.worldPosition - lightPosition) );
 		float spotLightAttenuation = RangeMap( cosTheta, cosThetaOuter, cosThetaInner, 0.f, 1.f );
@@ -220,6 +226,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
 
 		diffuse.xyz += specular;
+
 	}
 
 
@@ -227,8 +234,6 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	
 	float3 finalColor = diffuse * surfaceColor;
-	//normalize(incidentReflect);
-	//float3 finalColor = directionToEye.xyz;
 	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
 
 	return float4( finalColor.xyz, surfaceAlpha );

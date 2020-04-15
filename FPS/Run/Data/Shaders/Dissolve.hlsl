@@ -69,7 +69,12 @@ struct light_t
 	//Spot light
 	float cosInnerAngle;
 	float cosOuterAngle;
-	float2 pad01; //not required
+
+	float2 pad01;
+
+	float3 attenuation;
+
+	float1 pad02; //not required
 };
 
 cbuffer lightConstants : register(b3)
@@ -193,13 +198,13 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float surfaceAlpha = (input.color.a * textureColor.a);
 
 	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
-	
-	
+
+
 	float3 surfaceNormal = textureNormal.xyz;
 	surfaceNormal.x = RangeMap( surfaceNormal.x, 0.f, 1.f, -1.f, 1.f );
 	surfaceNormal.y = RangeMap( surfaceNormal.y, 0.f, 1.f, -1.f, 1.f );
-	
-	
+
+
 
 	float3 normal = normalize( input.worldNormal );
 	float3 tangent = normalize( input.worldTangent );
@@ -208,16 +213,29 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3x3 tbn = float3x3( tangent, bitangent, normal );
 	float3 worldNormal = mul( surfaceNormal, tbn );
 	//Added in dot3 factor
-	
+
 	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
 	{
 		float3 lightPosition = LIGHT[lightIndex].worldPosition;
 		float3 dirToLight = normalize( lightPosition - input.worldPosition );
+		float3 lightDirection = LIGHT[lightIndex].direction;
+		float cosThetaInner = LIGHT[lightIndex].cosInnerAngle;
+		float cosThetaOuter = LIGHT[lightIndex].cosOuterAngle;
+
+		//Check for directional light
+		dirToLight = lerp( dirToLight, -lightDirection, LIGHT[lightIndex].isDirectional );
 		float3 dot3 = max( 0.f, dot( dirToLight, worldNormal ) );
 		dot3 *= (LIGHT[lightIndex].color * LIGHT[lightIndex].intensity);
 
 		float distanceToLight = length( lightPosition - input.worldPosition );
-		float att3 = min( 1.f, 1.f / (ATTENUATION.x + ATTENUATION.y*distanceToLight + ATTENUATION.z*distanceToLight*distanceToLight ) );
+
+		float3 attenuation = LIGHT[lightIndex].attenuation;
+		float att3 = min( 1.f, 1.f / (attenuation.x + attenuation.y*distanceToLight + attenuation.z*distanceToLight*distanceToLight ) );
+		//spot light calculation
+		float cosTheta = dot( normalize( lightDirection ), normalize(input.worldPosition - lightPosition) );
+		float spotLightAttenuation = RangeMap( cosTheta, cosThetaOuter, cosThetaInner, 0.f, 1.f );
+		spotLightAttenuation = saturate( spotLightAttenuation );
+		att3 *= spotLightAttenuation;
 		dot3 *= att3;
 
 		diffuse += dot3;
@@ -238,6 +256,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 
 
 		diffuse.xyz += specular;
+
 	}
 
 
@@ -246,8 +265,6 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	
 	float3 finalColor = diffuse * surfaceColor;
 	finalColor = lerp( dissolveEdgeColor, finalColor, dissolveLerpValue );
-	//normalize(incidentReflect);
-	//float3 finalColor = directionToEye.xyz;
 	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
 
 	return float4( finalColor.xyz, surfaceAlpha );

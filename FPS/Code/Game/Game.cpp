@@ -241,7 +241,7 @@ void Game::Update()
 
 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
 	float ambientIntensity = ambientLight.w;
-	Vec3 attenuation = g_theRenderer->GetAttenuation();
+	Vec3 attenuation = m_lights[m_currentLightIndex].attenuation;
 	float lightIntensity = m_lights[m_currentLightIndex].intensity;
 	float specularFactor = g_theRenderer->GetSpecularFactor();
 	float specularPower = g_theRenderer->GetSpecularPower();
@@ -404,9 +404,15 @@ bool Game::SetAmbientColor( const EventArgs* args )
 bool Game::SetAttenuation( const EventArgs* args )
 {
 	Vec3 attenuation = args->GetValue( "attenuation", Vec3( 0.f, 1.f, 0.f ) );
-	g_theRenderer->SetAttenuation( attenuation );
+	g_theApp->m_game->SetAttenuation( attenuation );
 
 	return true;
+}
+
+void Game::SetAttenuation( Vec3 const& newAttenuation )
+{
+	Vec3& attenuation = m_lights[m_currentLightIndex].attenuation;
+	attenuation = newAttenuation;
 }
 
 bool Game::SetLightColor( const EventArgs* args )
@@ -515,6 +521,35 @@ void Game::DecrementCurrentLight()
 	else
 	{
 		m_currentLightIndex--;
+	}
+}
+
+void Game::ToggleAttenuation()
+{
+	Vec3& attenuation = m_lights[m_currentLightIndex].attenuation;
+	if( attenuation.x == 1.f )
+	{
+		attenuation.x = 0.f;
+		attenuation.y = 1.f;
+		attenuation.z = 0.f;
+	}
+	else if( attenuation.y == 1.f )
+	{
+		attenuation.x = 0.f;
+		attenuation.y = 0.f;
+		attenuation.z = 1.f;
+	}
+	else if( attenuation.z == 1.f )
+	{
+		attenuation.x = 1.f;
+		attenuation.y = 0.f;
+		attenuation.z = 0.f;
+	}
+	else
+	{
+		attenuation.x = 1.f;
+		attenuation.y = 0.f;
+		attenuation.z = 0.f;
 	}
 }
 
@@ -887,7 +922,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( tKey.WasJustPressed() )
 	{
-		g_theRenderer->ToggleAttenuation();
+		ToggleAttenuation();
 	}
 	if( yKey.WasJustPressed() )
 	{

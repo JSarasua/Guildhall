@@ -48,6 +48,9 @@ private:
 	void CheckButtonPresses();
 	void CheckController();
 
+public:
+	Game* m_game = nullptr;
+
 private:
 	bool m_isQuitting = false;
 	bool m_isPaused = false;
@@ -59,7 +62,6 @@ private:
 	bool m_isRightActuallyPressed = false;
 	bool m_isSpaceStillHeld = false;
 	bool m_isOstillHeld = false;
-	Game* m_game = nullptr;
 	float m_previousTime = 0.f;
 	float m_currentTime = 0.f;
 	float m_deltaTime = 0.f;

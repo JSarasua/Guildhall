@@ -503,11 +503,6 @@ Vec4 RenderContext::GetAmbientLight() const
 	return m_ambientLight;
 }
 
-Vec3 RenderContext::GetAttenuation() const
-{
-	return m_attenuation;
-}
-
 float RenderContext::GetGamma() const
 {
 	return m_gamma;
@@ -557,7 +552,6 @@ void RenderContext::UpdateLightData()
 {
 	LightData lightData;
 	lightData.ambientLight = m_ambientLight;
-	lightData.attenuation = m_attenuation;
 
 	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
 	{
@@ -567,39 +561,6 @@ void RenderContext::UpdateLightData()
 	size_t sizeOfLightData = sizeof( lightData );
 	m_lightUBO->Update( &lightData, sizeOfLightData, sizeOfLightData );
 
-}
-
-void RenderContext::ToggleAttenuation()
-{
-	if( m_attenuation.x == 1.f )
-	{
-		m_attenuation.x = 0.f;
-		m_attenuation.y = 1.f;
-		m_attenuation.z = 0.f;
-	}
-	else if( m_attenuation.y == 1.f )
-	{
-		m_attenuation.x = 0.f;
-		m_attenuation.y = 0.f;
-		m_attenuation.z = 1.f;
-	}
-	else if( m_attenuation.z == 1.f )
-	{
-		m_attenuation.x = 1.f;
-		m_attenuation.y = 0.f;
-		m_attenuation.z = 0.f;
-	}
-	else
-	{
-		m_attenuation.x = 1.f;
-		m_attenuation.y = 0.f;
-		m_attenuation.z = 0.f;
-	}
-}
-
-void RenderContext::SetAttenuation( Vec3 const& attenuation )
-{
-	m_attenuation = attenuation;
 }
 
 Texture* RenderContext::GetBackBuffer()

@@ -72,6 +72,9 @@ private:
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
 
+	void ToggleAttenuation();
+	void SetAttenuation( Vec3 const& newAttenuation );
+
 	void UpdateLightPosition( float deltaSeconds );
 	void EnableLights();
 
