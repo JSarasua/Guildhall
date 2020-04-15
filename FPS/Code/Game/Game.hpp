@@ -92,6 +92,7 @@ private:
 	Mat44 m_circleOfSpheresModelMatrix;
 	Mat44 m_quadModelMatrix;
 	Mat44 m_sphereModelMatrix;
+	Mat44 m_triPlanarSphereModelMatrix;
 	int m_numberOfCirclingCubes = 0;
 
 	Clock* m_gameClock = nullptr;

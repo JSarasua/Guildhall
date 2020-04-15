@@ -88,6 +88,7 @@ void Game::Startup()
 
 	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
 	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
+	m_triPlanarSphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 8.f, 0.f, -10.f ) );
 	m_quadModelMatrix = Mat44::CreateTranslation3D( Vec3( -4.f, 0.f, -10.f ) );
 	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
@@ -151,11 +152,24 @@ void Game::Startup()
 		m_lights.push_back( lightData );
 	}
 	m_lights[0].intensity = 0.5f;
+	m_lights[0].position.z -= 2.f;
+
+	m_lights[1].intensity = 0.5;
+	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
+	m_lights[1].position.z += 0.5f;
+	m_lights[1].cosInnerAngle = 0.95f;
+	m_lights[1].cosOuterAngle = 0.93f;
+
+	m_lights[2].intensity = 0.3f;
+	m_lights[2].position = Vec3 ( 0.f, 1.f, -3.f );
+	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
+	m_lights[2].isDirectional = 1.f;
+	m_lights[2].attenuation = Vec3( 1.f, 0.f, 0.f );
 
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
 
-	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.5f );
+	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.f );
 
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
@@ -356,8 +370,26 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
+	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/large_square_pattern_01_diff_1k.png" );
+	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/large_square_pattern_01_nor_1k.png" );
+	Texture* tex1_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test.png"/*"Data/Images/sand_01_diff_1k.png"*/ );
+	Texture* tex1_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/sand_01_nor_1k.png" );
+	Texture* tex2_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_diff_1k.png" );
+	Texture* tex2_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_nor_1k.png" );
 
-	//Shader* triPlanarShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TriPlanar.hlsl" );
+	g_theRenderer->BindDataTexture( 8,  tex0_d );
+	g_theRenderer->BindDataTexture( 9,  tex0_n );
+	g_theRenderer->BindDataTexture( 10, tex1_d );
+	g_theRenderer->BindDataTexture( 11, tex1_n );
+	g_theRenderer->BindDataTexture( 12, tex2_d );
+	g_theRenderer->BindDataTexture( 13, tex2_n );
+
+	Shader* triPlanarShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TriPlanar.hlsl" );
+	g_theRenderer->BindShader( triPlanarShader );
+	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+
+
 
 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
 	//g_theRenderer->BindShader( triPlanarShader );

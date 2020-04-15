@@ -120,3 +120,11 @@ float RangeMap( float val, float inMin, float inMax, float outMin, float outMax 
 	float outRange = outMax - outMin;
 	return ((val - inMin) / inRange) * outRange + outMin;
 }
+
+float3 NormalColorToVector( float3 normalColor )
+{
+	normalColor.x = RangeMap( normalColor.x, 0.f, 1.f, -1.f, 1.f );
+	normalColor.y = RangeMap( normalColor.y, 0.f, 1.f, -1.f, 1.f );
+
+	return normalColor;
+}
