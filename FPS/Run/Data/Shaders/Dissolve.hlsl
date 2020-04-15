@@ -1,3 +1,5 @@
+#include "ShaderUtils.hlsl"
+/*
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -86,19 +88,7 @@ cbuffer lightConstants : register(b3)
 	float pad01;
 }
 
-struct dissolve_t
-{
-	float amount; //(0 to 1)
-	float edgeWidth;
-	float3 edgeColor;
 
-	float3 pad00;
-};
-
-cbuffer materialConstants : register(b5)
-{
-	dissolve_t DISSOLVE;
-}
 
 
 // Textures & Samplers are also a form of constant
@@ -108,7 +98,6 @@ Texture2D <float4> tDiffuse	: register(t0);	// color of the surface
 Texture2D <float4> tNormal : register(t1);
 
 //User defined
-Texture2D <float> tPattern : register(t8);
 SamplerState sSampler : register(s0);		// sampler are rules on how to sample color per pixel
 
 //--------------------------------------------------------------------------------------
@@ -137,6 +126,22 @@ float RangeMap( float val, float inMin, float inMax, float outMin, float outMax 
 	float outRange = outMax - outMin;
 	return ((val - inMin) / inRange) * outRange + outMin;
 }
+*/
+struct dissolve_t
+{
+	float amount; //(0 to 1)
+	float edgeWidth;
+	float3 edgeColor;
+
+	float3 pad00;
+};
+
+cbuffer materialConstants : register(b5)
+{
+	dissolve_t DISSOLVE;
+}
+
+Texture2D <float> tPattern : register(t8);
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader

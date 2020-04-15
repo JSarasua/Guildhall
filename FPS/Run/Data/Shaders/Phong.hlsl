@@ -1,3 +1,5 @@
+#include "ShaderUtils.hlsl"
+/*
 //--------------------------------------------------------------------------------------
 // Stream Input
 // ------
@@ -120,6 +122,8 @@ float RangeMap( float val, float inMin, float inMax, float outMin, float outMax 
 	float outRange = outMax - outMin;
 	return ((val - inMin) / inRange) * outRange + outMin;
 }
+
+*/
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader

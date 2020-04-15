@@ -104,5 +104,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\Triplanar.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\ShaderUtils.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
