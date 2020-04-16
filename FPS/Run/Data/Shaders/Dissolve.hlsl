@@ -129,11 +129,10 @@ float RangeMap( float val, float inMin, float inMax, float outMin, float outMax 
 */
 struct dissolve_t
 {
+	float3 edgeNearColor;
 	float amount; //(0 to 1)
+	float3 edgeFarColor;
 	float edgeWidth;
-	float3 edgeColor;
-
-	float3 pad00;
 };
 
 cbuffer materialConstants : register(b5)
@@ -185,7 +184,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float edgeWidth = DISSOLVE.edgeWidth;
 	float dissolveAmount = DISSOLVE.amount;
-	float3 dissolveEdgeColor = DISSOLVE.edgeColor;
+	float3 dissolveEdgeNearColor = DISSOLVE.edgeNearColor;
+	float3 dissolveEdgeFarColor = DISSOLVE.edgeFarColor;
 
 	float range = 1.f + edgeWidth;
 	float minDissolve = -edgeWidth + range * dissolveAmount;
@@ -269,7 +269,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	
 	float3 finalColor = diffuse * surfaceColor;
-	finalColor = lerp( dissolveEdgeColor, finalColor, dissolveLerpValue );
+	float3 dissolveBlendColor = lerp( dissolveEdgeFarColor, dissolveEdgeNearColor, dissolveLerpValue );
+	finalColor = lerp( dissolveBlendColor, finalColor, dissolveLerpValue );
 	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
 
 	return float4( finalColor.xyz, surfaceAlpha );

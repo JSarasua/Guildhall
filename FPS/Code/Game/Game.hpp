@@ -28,11 +28,10 @@ struct fresnel_t
 
 struct dissolve_t
 {
+	Vec3 edgeNearColor;
 	float amount;
+	Vec3 edgeFarColor;
 	float edgeWidth;
-	Vec3 edgeColor;
-
-	Vec3 pad00;
 };
 enum PowerUps
 {

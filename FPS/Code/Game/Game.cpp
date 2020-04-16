@@ -333,7 +333,8 @@ void Game::Render()
 	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
 	dissolve_t dissolveData;
 	dissolveData.amount = m_dissolveAmount;
-	dissolveData.edgeColor = Vec3( 1.f, 0.f, 1.f );
+	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
+	dissolveData.edgeNearColor = Vec3( 1.f, 1.f, 0.f );
 	dissolveData.edgeWidth = 0.1f;
 
 	g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
