@@ -153,6 +153,7 @@ void Game::Startup()
 	}
 	m_lights[0].intensity = 0.5f;
 	m_lights[0].position.z -= 2.f;
+	m_lights[0].color = Vec3( 0.f, 1.f, 1.f );
 
 	m_lights[1].intensity = 0.5;
 	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
@@ -161,10 +162,11 @@ void Game::Startup()
 	m_lights[1].cosOuterAngle = 0.93f;
 
 	m_lights[2].intensity = 0.3f;
-	m_lights[2].position = Vec3 ( 0.f, 1.f, -3.f );
+	m_lights[2].position = Vec3 ( 0.f, 4.f, -5.f );
 	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
 	m_lights[2].isDirectional = 1.f;
 	m_lights[2].attenuation = Vec3( 1.f, 0.f, 0.f );
+	m_lights[2].color = Vec3( 1.f, 1.f, 0.f );
 
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
@@ -296,6 +298,8 @@ void Game::Update()
 	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
 	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
 	std::string fogColorStr = Stringf( "5,6 Adjust Fog color: %.2f, %.2f, %.2f", fogColor.x, fogColor.y, fogColor.z );
+	std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
+	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
 
 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
@@ -314,6 +318,8 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, fogColorStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
 }
 
 void Game::Render()
@@ -376,7 +382,9 @@ void Game::Render()
 	Shader* fresnelShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Fresnel.hlsl" );
 	g_theRenderer->BindShader( fresnelShader );
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
 	g_theRenderer->DrawMesh( m_sphereMesh );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 
 	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/forrest_ground_01_diff_1k.png" );
 	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/forrest_ground_01_nor_1k.png" );
