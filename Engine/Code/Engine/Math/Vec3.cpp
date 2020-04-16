@@ -294,6 +294,11 @@ Vec3 Vec3::GetNormalized() const
 }
 
 
+bool Vec3::IsAlmostEqual( Vec3 const& other, float epsilon /*= 0.001f */ )
+{
+	return AlmostEqualsFloat( x, other.x, epsilon ) && AlmostEqualsFloat( y, other.y, epsilon ) && AlmostEqualsFloat( z, other.z, epsilon );
+}
+
 //-----------------------------------------------------------------------------------------------
 void Vec3::SetFromText( const char* text )
 {

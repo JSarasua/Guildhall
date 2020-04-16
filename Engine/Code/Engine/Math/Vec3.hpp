@@ -57,6 +57,8 @@ public:
 	Vec3	GetClamped( float maxLength ) const;
 	Vec3	GetNormalized() const;
 
+	bool	IsAlmostEqual( Vec3 const& other, float epsilon = 0.001f );
+
 	void	SetFromText(const char* text);
 
 	/*
