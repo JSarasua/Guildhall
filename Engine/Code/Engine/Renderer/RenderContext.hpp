@@ -33,7 +33,10 @@ struct FrameData
 	float systemTime;
 	float systemDeltaTime;
 	float gamma;
-	float padding[1];
+	float fogNear = 0.f;
+
+	Vec3  fogColor;
+	float fogFar = -1.f;
 };
 
 struct ModelData
@@ -190,6 +193,10 @@ public:
 	//pointLight...
 	void DisableLight( uint lightIndex );
 	//Disable means set light intensity to 0.f
+	
+	void EnableFog( float nearFog, float farFog, Rgba8 const& fogColor );
+	void DisableFog();
+	
 	void UpdateLightData();
 
 	Texture* GetBackBuffer();
@@ -284,6 +291,9 @@ public:
 	Rgba8 m_modelTint;
 	float m_specularFactor = 1.f;
 	float m_specularPower = 1.f;
+	float m_fogNear = 0.f;
+	float m_fogFar = -1.f;
+	Vec3 m_fogColor = Vec3();
 };
 
 

@@ -133,6 +133,12 @@ private:
 	float m_numTilesInViewHorizontally = 0.f;
 
 	float m_dissolveAmount = 0.5;
+
+	float m_fogDistance = 20.f;
+	float m_fogRange = 10.f;
+	Rgba8 m_fogRed = Rgba8( 50, 0, 0 );
+	Rgba8 m_fogBlue = Rgba8( 0, 0, 50 );
+	float m_fogColorLerp = 0.5f;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

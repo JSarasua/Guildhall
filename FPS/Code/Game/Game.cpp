@@ -260,7 +260,9 @@ void Game::Update()
 	float specularFactor = g_theRenderer->GetSpecularFactor();
 	float specularPower = g_theRenderer->GetSpecularPower();
 	float gamma = g_theRenderer->GetGamma();
-
+	float nearFog = g_theRenderer->m_fogNear;
+	float farFog = g_theRenderer->m_fogFar;
+	Vec3 fogColor = g_theRenderer->m_fogColor;
 
 	std::string renderTextureFilePathStr;
 	std::string normalTextureFilepathStr;
@@ -291,6 +293,8 @@ void Game::Update()
 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
 	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
 	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
+	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
+	std::string fogColorStr = Stringf( "5,6 Adjust Fog color: %.2f, %.2f, %.2f", fogColor.x, fogColor.y, fogColor.z );
 
 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
@@ -307,6 +311,8 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, fogColorStr.c_str() );
 }
 
 void Game::Render()
@@ -785,27 +791,57 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
 		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
 	}
-	if( num3Key.WasJustPressed() )
+	if( num3Key.IsPressed() )
 	{
-		AABB2 aabb = DebugGetScreenBounds();
-		Vec2 maxs = aabb.maxs;
-		maxs -= Vec2( 60.f, 80.f );
-		DebugAddScreenPoint( maxs, 50.f, Rgba8::RED, Rgba8::GREEN, 10.f );
+		float fogMin = m_fogRange * 0.5f;
+		float newFogDistance = m_fogDistance - 10.f * deltaSeconds;
+
+		newFogDistance = Max( newFogDistance, fogMin );
+		m_fogDistance = newFogDistance;
+
+		float newNearFog = newFogDistance - fogMin;
+		float newFarFog = newFogDistance + fogMin;
+		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
+		g_theRenderer->EnableFog( newNearFog, newFarFog, lerpColor );
 	}
-	if( num4Key.WasJustPressed() )
+	if( num4Key.IsPressed() )
 	{
-		Mat44 cameraView = m_camera.GetViewMatrix();
-		Vec3 cameraPos = m_camera.GetPosition();
-		MatrixInvertOrthoNormal( cameraView );
-		DebugAddWorldTextf( cameraView, Vec2( 0.5f, 0.5f ), Rgba8::RED, 10.f, DEBUG_RENDER_XRAY, "Non-billboarded text: ( %.2f, %.2f, %.2f )", cameraPos.x, cameraPos.y, cameraPos.z );
+		float fogMin = m_fogRange * 0.5f;
+		float newFogDistance = m_fogDistance + 10.f * deltaSeconds;
+
+		newFogDistance = Max( newFogDistance, fogMin );
+		m_fogDistance = newFogDistance;
+
+		float newNearFog = newFogDistance - fogMin;
+		float newFarFog = newFogDistance + fogMin;
+		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
+		g_theRenderer->EnableFog( newNearFog, newFarFog, lerpColor );
 	}
-	if( num5Key.WasJustPressed() )
+	if( num5Key.IsPressed() )
 	{
-		DebugAddScreenLine( Vec2( 0.f, 0.f ), Vec2( 1920.f, 0.f ), Rgba8::GREEN, Rgba8::BLUE, 10.f );
+		float newFogColorLerp = m_fogColorLerp - 0.5f * deltaSeconds;
+		newFogColorLerp = Clampf( newFogColorLerp, 0.f, 1.f );
+		m_fogColorLerp = newFogColorLerp;
+
+		float fogMin = m_fogRange * 0.5f;
+		float nearFog = m_fogDistance - fogMin;
+		float farFog = m_fogDistance + fogMin;
+
+		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
+		g_theRenderer->EnableFog( nearFog, farFog, lerpColor );
 	}
-	if( num6Key.WasJustPressed() )
+	if( num6Key.IsPressed() )
 	{
-		DebugAddScreenAABB2( AABB2( 10.f, 10.f, 200.f, 200.f ), Rgba8::RED, Rgba8::GREEN, 10.f );
+		float newFogColorLerp = m_fogColorLerp + 0.5f * deltaSeconds;
+		newFogColorLerp = Clampf( newFogColorLerp, 0.f, 1.f );
+		m_fogColorLerp = newFogColorLerp;
+
+		float fogMin = m_fogRange * 0.5f;
+		float nearFog = m_fogDistance - fogMin;
+		float farFog = m_fogDistance + fogMin;
+
+		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
+		g_theRenderer->EnableFog( nearFog, farFog, lerpColor );
 	}
 	if( num7Key.WasJustPressed() )
 	{

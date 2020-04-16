@@ -63,6 +63,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 worldNormal = mul( surfaceNormal, tbn );
 	//Added in dot3 factor
 	
+	
+
 	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
 	{
 		float3 lightPosition = LIGHT[lightIndex].worldPosition;
@@ -107,13 +109,17 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 		diffuse.xyz += specular;
 
 	}
-
+	float distanceToEye = length( CAMERAPOSITION - input.worldPosition );
+	float fogMix = saturate( RangeMap( distanceToEye, FOGNEAR, FOGFAR, 0.f, 1.f ) );
+	
 
 	diffuse = min( float3( 1, 1, 1 ), diffuse );
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	
-	float3 finalColor = diffuse * surfaceColor;
-	finalColor = pow( max( 0.f, finalColor ), 1/GAMMA );
+	float3 litColor = diffuse * surfaceColor;
+	litColor = pow( max( 0.f, litColor ), 1/GAMMA );
 
+	float3 finalColor = lerp( litColor, FOGCOLOR, fogMix );
+	//return float4( distanceToEye.xxx, surfaceAlpha );
 	return float4( finalColor.xyz, surfaceAlpha );
 }

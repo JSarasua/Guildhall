@@ -193,6 +193,9 @@ void RenderContext::UpdateFrameTime()
 	framedata.systemTime = currentTime;
 	framedata.systemDeltaTime = dt;
 	framedata.gamma = m_gamma;
+	framedata.fogNear = m_fogNear;
+	framedata.fogFar = m_fogFar;
+	framedata.fogColor = m_fogColor;
 
 	m_frameUBO->Update( &framedata, sizeof(framedata), sizeof(framedata) );
 }
@@ -546,6 +549,19 @@ void RenderContext::EnableLight( uint lightIndex, light_t const& lightInfo )
 void RenderContext::DisableLight( uint lightIndex )
 {
 	m_lights[lightIndex].intensity = 0.f;
+}
+
+void RenderContext::EnableFog( float nearFog, float farFog, Rgba8 const& fogColor )
+{
+	m_fogNear = nearFog;
+	m_fogFar = farFog;
+	m_fogColor = fogColor.ToVec3();
+}
+
+void RenderContext::DisableFog()
+{
+	m_fogNear = 0.f;
+	m_fogFar = -1.f;
 }
 
 void RenderContext::UpdateLightData()

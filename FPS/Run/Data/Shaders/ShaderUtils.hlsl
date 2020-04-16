@@ -26,11 +26,15 @@ struct vs_input_t
 }; 
 
 static float SHIFT = 0.75f;
-cbuffer time_constants : register(b0)	//Index 0 is time
+cbuffer frame_constants : register(b0)	//Index 0 is time
 {
 	float SYSTEM_TIME_SECONDS;
 	float SYSTEM_TIME_DELTA_SECONDS;
 	float GAMMA;
+	float FOGNEAR;
+
+	float3 FOGCOLOR;
+	float FOGFAR;
 };
 
 cbuffer camera_constants : register(b1)
