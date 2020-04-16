@@ -102,7 +102,8 @@ enum class eDepthCompareMode
 {
 	COMPARE_LESS_THAN_OR_EQUAL,
 	COMPARE_GREATER_THAN,
-	COMPARE_ALWAYS
+	COMPARE_ALWAYS,
+	COMPARE_EQUAL
 };
 
 enum class eDepthWriteMode

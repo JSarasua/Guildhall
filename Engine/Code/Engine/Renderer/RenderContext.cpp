@@ -383,6 +383,10 @@ void RenderContext::SetDepth( eDepthCompareMode compareMode, eDepthWriteMode wri
 			dsDesc.DepthFunc = D3D11_COMPARISON_GREATER;
 			break;
 		}
+		case eDepthCompareMode::COMPARE_EQUAL:
+		{
+			dsDesc.DepthFunc = D3D11_COMPARISON_EQUAL;
+		}
 		default:
 			break;
 	}
