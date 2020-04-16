@@ -53,6 +53,14 @@ const Vec4 Vec4::operator/( float inverseScale ) const
 	return newVec;
 }
 
+void Vec4::operator/=( const float uniformDivisor )
+{
+	x /= uniformDivisor;
+	y /= uniformDivisor;
+	z /= uniformDivisor;
+	w /= uniformDivisor;
+}
+
 void Vec4::SetFromText( const char* text )
 {
 	std::string strText = text;

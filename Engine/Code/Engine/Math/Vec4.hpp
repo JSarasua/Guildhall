@@ -18,6 +18,8 @@ public:
 	const bool	operator!=( Vec4 const& b );
 	const Vec4	operator/( float inverseScale ) const;			// Vec4 / float
 
+	void		operator/=( const float uniformDivisor );
+
 	void	SetFromText(const char* text);
 
 };
