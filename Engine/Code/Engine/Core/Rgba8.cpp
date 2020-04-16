@@ -274,3 +274,48 @@ void Rgba8::ToFloatArray( float* colorArray ) const
 
 	return;
 }
+
+Vec3 Rgba8::ToVec3() const
+{
+	Vec3 color;
+	color.x = (float)r;
+	color.y = (float)g;
+	color.z = (float)b;
+	color /= 255.f;
+
+	return color;
+}
+
+Vec4 Rgba8::ToVec4() const
+{
+	Vec4 color;
+	color.x = (float)r;
+	color.y = (float)g;
+	color.z = (float)b;
+	color.w = (float)a;
+	color /= 255.f;
+
+	return color;
+}
+
+Rgba8 Rgba8::MakeColorFromVec3( Vec3 const& vecColor )
+{
+	Rgba8 color;
+	color.r = (unsigned char)vecColor.x;
+	color.g = (unsigned char)vecColor.y;
+	color.b = (unsigned char)vecColor.z;
+	color.a = 1;
+
+	return color;
+}
+
+Rgba8 Rgba8::MakeColorFromVec4( Vec4 const& vecColor )
+{
+	Rgba8 color;
+	color.r = (unsigned char)vecColor.x;
+	color.g = (unsigned char)vecColor.y;
+	color.b = (unsigned char)vecColor.z;
+	color.a = (unsigned char)vecColor.w;
+
+	return color;
+}

@@ -1,5 +1,6 @@
 #pragma once
-
+#include "Engine/Math/Vec3.hpp"
+#include "Engine/Math/Vec4.hpp"
 
 //-----------------------------------------------------------------------------------------------
 struct Rgba8
@@ -25,7 +26,11 @@ public:
 	void SetFromText(const char* text);
 	void TintColorBy( Rgba8 const& tint );
 	void ToFloatArray( float* colorArray ) const;
+	Vec3 ToVec3() const;
+	Vec4 ToVec4() const;
 
+	static Rgba8 MakeColorFromVec3( Vec3 const& vecColor );
+	static Rgba8 MakeColorFromVec4( Vec4 const& vecColor );
 	static Rgba8 LerpColorTo( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
 	static Rgba8 LerpColorAsHSL( Rgba8 const& startColor, Rgba8 const& endColor, float lerpValue );
 	static void RGBToHSL( Rgba8 const& rgba, float* hsl );
