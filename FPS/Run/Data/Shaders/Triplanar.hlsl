@@ -50,7 +50,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float2 z_uv = frac( input.worldPosition.xy );
 	//z_uv.y = 1.f - z_uv.y;
 	float2 x_uv = frac( input.worldPosition.zy );
-	x_uv.x = 1.f - x_uv.x;
+	//x_uv.x = 1.f - x_uv.x;
 	//x_uv.y = 1.f - x_uv.y;
 	float2 y_uv = frac( input.worldPosition.xz );
 
@@ -84,33 +84,92 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 		float3( 0.f, 1.f, 0.f )
 		);
 
-	z_normal.z *= sign(input.worldNormal.z);
+	z_normal.z *= sign( input.worldNormal.z );
 	//z_color.z *= sign(input.worldNormal.z);
 
-	x_normal = mul(xtbn , x_normal);
-	x_normal.x *= sign(input.worldNormal.x);
+	x_normal = mul( x_normal, xtbn );
+	x_normal.x *= sign( input.worldNormal.x );
 	//x_color.x *= sign(input.worldNormal.x);
 
-	y_normal = mul(ytbn , y_normal);
-	y_normal.y *= sign(input.worldNormal.y);
+	y_normal = mul( y_normal, ytbn );
+	y_normal.y *= sign( input.worldNormal.y );
 	//y_color.y *= sign(input.worldNormal.y);
 
 
-	float4 finalColor 
+	float4 beforeLightingColor 
 		= weights.x * x_color
 		+ weights.y * y_color
 		+ weights.z * z_color;
 
-	float4 finalNormal 
-		= float4(
+	float3 worldNormal 
+		= float3(
 		  weights.x * x_normal
 		+ weights.y * y_normal
 		+ weights.z * z_normal
-		, 1.f );
+		);
 
-	finalNormal = normalize( finalNormal );
+	worldNormal = normalize( worldNormal );
 	//Calculate lighting with normal and color
 
+	float3 diffuse = AMBIENT.xyz * AMBIENT.w;
+	//return finalColor;
 
-	return finalColor;
+	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
+	{
+		float3 lightPosition = LIGHT[lightIndex].worldPosition;
+		float3 dirToLight = normalize( lightPosition - input.worldPosition );
+		float3 lightDirection = LIGHT[lightIndex].direction;
+		float cosThetaInner = LIGHT[lightIndex].cosInnerAngle;
+		float cosThetaOuter = LIGHT[lightIndex].cosOuterAngle;
+
+		//Check for directional light
+		dirToLight = lerp( dirToLight, -lightDirection, LIGHT[lightIndex].isDirectional );
+		float3 dot3 = max( 0.f, dot( dirToLight, worldNormal ) );
+		dot3 *= (LIGHT[lightIndex].color * LIGHT[lightIndex].intensity);
+
+		float distanceToLight = length( lightPosition - input.worldPosition );
+
+		float3 attenuation = LIGHT[lightIndex].attenuation;
+		float att3 = min( 1.f, 1.f / (attenuation.x + attenuation.y*distanceToLight + attenuation.z*distanceToLight*distanceToLight ) );
+		//spot light calculation
+		float cosTheta = dot( normalize( lightDirection ), normalize(input.worldPosition - lightPosition) );
+		float spotLightAttenuation = RangeMap( cosTheta, cosThetaOuter, cosThetaInner, 0.f, 1.f );
+		spotLightAttenuation = saturate( spotLightAttenuation );
+		att3 *= spotLightAttenuation;
+		dot3 *= att3;
+
+		diffuse += dot3;
+
+		//specular
+		float3 incidentVector = -dirToLight;
+		float3 incidentReflect = reflect( incidentVector, worldNormal );
+		float3 directionToEye = normalize(CAMERAPOSITION - input.worldPosition);
+
+		//Used to solve bug where low specular power could cause the light to be seen from opposite side of sphere
+		float incidentCosAngle = dot( worldNormal, dirToLight );
+		//-.25f and 0.1 are arbitrary values
+		float specularValue = smoothstep( -.25f, 0.1f, incidentCosAngle ) * dot(incidentReflect, directionToEye);
+
+		float specular = SPECULARFACTOR * pow( max( 0.f,  specularValue ), SPECULARPOWER);
+		specular *= att3;
+		specular *= LIGHT[lightIndex].intensity;
+
+
+		diffuse.xyz += specular;
+
+	}
+	float distanceToEye = length( CAMERAPOSITION - input.worldPosition );
+	float fogMix = saturate( RangeMap( distanceToEye, FOGNEAR, FOGFAR, 0.f, 1.f ) );
+
+
+	diffuse = min( float3( 1, 1, 1 ), diffuse );
+	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
+
+	float3 litColor = diffuse * beforeLightingColor.xyz;
+	litColor = pow( max( 0.f, litColor ), 1/GAMMA );
+
+	float3 finalColor = lerp( litColor, FOGCOLOR, fogMix );
+	//return float4( distanceToEye.xxx, surfaceAlpha );
+	return float4( finalColor.xyz, beforeLightingColor.w );
+	//return float4( worldNormal.xyz, 1.f );
 }

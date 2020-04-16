@@ -219,6 +219,7 @@ void Game::Update()
 	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
 	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
 	m_sphereModelMatrix.RotateYDegrees( -15.f * dt );
+	m_triPlanarSphereModelMatrix.RotateXDegrees( 30.f * dt );
 	//m_quadModelMatrix.RotateZDegrees( 35.f * dt ); //if you want the quad to rotate
 
 	Mat44 newCircleOfSpheresRotation;
@@ -377,9 +378,9 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
-	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/large_square_pattern_01_diff_1k.png" );
-	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/large_square_pattern_01_nor_1k.png" );
-	Texture* tex1_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test.png"/*"Data/Images/sand_01_diff_1k.png"*/ );
+	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/forrest_ground_01_diff_1k.png" );
+	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/forrest_ground_01_nor_1k.png" );
+	Texture* tex1_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/sand_01_diff_1k.png" );
 	Texture* tex1_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/sand_01_nor_1k.png" );
 	Texture* tex2_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_diff_1k.png" );
 	Texture* tex2_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_nor_1k.png" );
