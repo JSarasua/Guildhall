@@ -39,4 +39,5 @@ Some more adanced shading techniques and more supported lights.
         - *Note, the full range you will be moving through with this effect is not 0 to 1, but `(1 + 2 * dissolve_range)` (why?).  You can think of it kinda like a scroll bar.  Meaning - how does the `dissolve_value` or depth that is 0 to 1 actually affect our dissolve range we're using in the shader?*
 
 - [x] *X07.10: 05%*: Triplanar Shader
+- [x] *X07.11: 05%*: Projected Texture Effect
 - [x] *X07.13: 03%*: Fresnel or Highlight Shader
