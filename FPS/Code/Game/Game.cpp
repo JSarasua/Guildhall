@@ -227,8 +227,8 @@ void Game::Update()
 	Mat44 newCircleOfSpheresRotation;
 	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
 	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
-	newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
-	m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
+	//newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
+	//m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
 
 	for( size_t lightIndex = 0; lightIndex < m_lights.size(); lightIndex++ )
@@ -300,6 +300,7 @@ void Game::Update()
 	std::string fogColorStr = Stringf( "5,6 Adjust Fog color: %.2f, %.2f, %.2f", fogColor.x, fogColor.y, fogColor.z );
 	std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
 	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
+	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
 
 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
@@ -320,6 +321,7 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, fogColorStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
 }
 
 void Game::Render()
@@ -405,12 +407,42 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
-
-
 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
-	//g_theRenderer->BindShader( triPlanarShader );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
+
+
+	//Projection
+	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
+	g_theRenderer->BindDataTexture( 14, projectionTexture );
+	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
+ 	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
+ 	MatrixInvertOrthoNormal( lightView0 );
+
+	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
+	Mat44 viewMatrix = m_camera.GetViewMatrix();
+	newProjectionMatrix.TransformBy( lightView0 );
+
+	projection_t projectionData;
+	projectionData.projection = newProjectionMatrix;
+	projectionData.position = m_lights[0].position;
+	projectionData.strength = 1.f;
+
+
+	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
+	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
+	g_theRenderer->BindShader( projectionShader );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
+	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
+	g_theRenderer->DrawMesh( m_cubeMesh );
+	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
+	g_theRenderer->DrawMesh( m_quadMesh );
+	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+	RenderCircleOfSpheres();
+
 
 	RenderDevConsole();
 
@@ -428,16 +460,16 @@ void Game::Render()
 void Game::RenderCircleOfSpheres()
 {
 	float degreeIncrements = 360.f / (float)m_numberOfCirclingCubes;
-
+	Mat44 circleOfSpheres = m_circleOfSpheresModelMatrix;
 	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )
 	{
-		g_theRenderer->SetModelMatrix( m_circleOfSpheresModelMatrix );
+		g_theRenderer->SetModelMatrix( circleOfSpheres );
 		g_theRenderer->DrawMesh( m_sphereMesh );
 
 		Mat44 nextModelMatrix;
 		nextModelMatrix.RotateYDegrees( degreeIncrements );
-		nextModelMatrix.TransformBy( m_circleOfSpheresModelMatrix );
-		m_circleOfSpheresModelMatrix = nextModelMatrix;
+		nextModelMatrix.TransformBy( circleOfSpheres );
+		circleOfSpheres = nextModelMatrix;
 	}
 }
 

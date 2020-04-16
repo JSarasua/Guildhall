@@ -33,6 +33,18 @@ struct dissolve_t
 	Vec3 edgeFarColor;
 	float edgeWidth;
 };
+
+struct projection_t
+{
+	Mat44 projection;
+
+	Vec3 position;
+	//float pad00;
+
+	//Vec3 normal;
+	float strength;
+};
+
 enum PowerUps
 {
 	RAPID_FIRE,
