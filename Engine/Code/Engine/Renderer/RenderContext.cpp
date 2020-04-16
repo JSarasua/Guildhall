@@ -450,6 +450,7 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 void RenderContext::SetMaterialData( void const* data, size_t dataSize )
 {
 	m_ubo->Update( data, dataSize, dataSize );
+	BindUniformBuffer( 5, m_ubo );
 }
 
 void RenderContext::SetModelMatrix( Mat44 const& model, Rgba8 const& tint )
