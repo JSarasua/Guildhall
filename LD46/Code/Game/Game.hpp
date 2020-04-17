@@ -73,6 +73,9 @@ public:
 	static bool SetLightColor(const EventArgs* args);
 
 private:
+	void AddScreenShake( float screenShakeIntensityToAdd );
+	void UpdateScreenShake( float deltaSeconds );
+
 
 	void IncrementShader();
 	void DecrementShader();

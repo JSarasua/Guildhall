@@ -2,13 +2,14 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Math/Vec3.hpp"
 #include "Engine/Math/AABB2.hpp"
-
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/Transform.hpp"
+
 
 class Texture;
 class RenderBuffer;
 class RenderContext;
+class RandomNumberGenerator;
 
 struct Rgba8;
 
@@ -46,10 +47,11 @@ public:
 	void Translate( const Vec3& translation );
 	void TranslateRelativeToView( Vec3 const& translation );
 	void RotatePitchRollYawDegrees( Vec3 const& rotator );
-	void Translate2D( const Vec2& cameraDisplacement ); //Should be replaced soon
 	void UpdateCameraUBO();
 
-
+	void UpdateScreenShake( RandomNumberGenerator& rand );
+	void SetScreenShakeIntensity( float newIntensity );
+	float GetCurrentScreenShakeIntensity() const;
 
 	Vec3 GetPosition();
 	Vec3 GetDirection() const;
@@ -79,6 +81,9 @@ public:
 	Texture* GetColorTarget() const;
 
 public:
+	Vec3 m_screenShakeOffset;
+	float m_screenShakeIntensity = 0.f;
+
 	Mat44 m_view;
 	Mat44 m_projection;
 
@@ -94,6 +99,4 @@ public:
 	Texture* m_depthStencilTarget = nullptr;
 	float m_clearDepth = 1.f;
 	float m_clearStencil = 0.f;
-
-	Vec3 m_position;
 };

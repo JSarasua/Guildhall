@@ -206,16 +206,17 @@ void Game::Update()
 	clearColor.g = 0;
 	clearColor.r = 10;
 	clearColor.b = 10;
-
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
+	//m_camera.SetScreenShakeIntensity( 0.1f );
+	UpdateScreenShake( dt );
+	
 	if( !g_theConsole->IsOpen() )
 	{
 		CheckButtonPresses( dt );
 	}
 
 	UpdateLightPosition( dt );
-
 
 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
 	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
@@ -510,6 +511,25 @@ bool Game::SetLightColor( const EventArgs* args )
 	return true;
 }
 
+void Game::AddScreenShake( float screenShakeIntensityToAdd )
+{
+	float screenShake = m_camera.GetCurrentScreenShakeIntensity();
+	screenShake += screenShakeIntensityToAdd;
+	m_camera.SetScreenShakeIntensity( screenShake );
+}
+
+void Game::UpdateScreenShake( float deltaSeconds )
+{
+	m_camera.UpdateScreenShake( m_rand );
+	float screenShake = m_camera.GetCurrentScreenShakeIntensity();
+	screenShake *= 1.f - 2.f * deltaSeconds;//Min(1.f, deltaSeconds);
+	if( AlmostEqualsFloat( screenShake, 0.f, 0.05f ) )
+	{
+		screenShake = 0.f;
+	}
+	m_camera.SetScreenShakeIntensity( screenShake );
+}
+
 void Game::IncrementShader()
 {
 	m_currentShaderIndex++;
@@ -706,6 +726,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
+	const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
+	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
+	const KeyButtonState& f4Key = g_theInput->GetKeyStates( F4_KEY );
 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
@@ -747,6 +771,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 
+	if( f1Key.WasJustPressed() )
+	{
+		AddScreenShake( 0.5f );
+	}
 	if( jKey.WasJustPressed() )
 	{
 		DecrementCurrentLight();

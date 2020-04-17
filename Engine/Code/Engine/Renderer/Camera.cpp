@@ -7,6 +7,7 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/SwapChain.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 
 
 Camera::~Camera()
@@ -21,13 +22,11 @@ Camera::~Camera()
 void Camera::SetPosition( const Vec3& position )
 {
 	m_transform.m_position = position;
-	m_position = position;
 }
 
 void Camera::Translate( const Vec3& translation )
 {
 	m_transform.Translate( translation );
-	m_position += translation;
 }
 
 void Camera::TranslateRelativeToView( Vec3 const& translation )
@@ -48,14 +47,23 @@ void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 
 	float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
 
-	//m_transform.RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
 	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
+}
+
+void Camera::SetScreenShakeIntensity( float newIntensity )
+{
+	m_screenShakeIntensity = newIntensity;
+	m_screenShakeIntensity = Max( m_screenShakeIntensity, 0.f );
+}
+
+float Camera::GetCurrentScreenShakeIntensity() const
+{
+	return m_screenShakeIntensity;
 }
 
 Vec3 Camera::GetPosition()
 {
 	return m_transform.m_position;
-	//return m_position;
 }
 
 Vec3 Camera::GetDirection() const
@@ -66,17 +74,8 @@ Vec3 Camera::GetDirection() const
 	return cameraDirection;
 }
 
-// void Camera::SetOrthoView( const Vec2& bottomLeft, const Vec2& topRight )
-// {
-// 	m_cameraView.mins = bottomLeft;
-// 	m_cameraView.maxs = topRight;
-// 
-// }
 float Camera::GetAspectRatio() const
 {
-	//switch to GetColorTargetSize();
-// 	Vec2 outputSize = GetColorTargetSize();
-// 	return outputSize.x/outputSize.y;
 	if( nullptr == m_colorTarget )
 	{
 		return m_outputSize.x / m_outputSize.y;
@@ -85,7 +84,6 @@ float Camera::GetAspectRatio() const
 	{
 		return m_colorTarget->GetAspectRatio();
 	}
-	//return 16.f/9.f;
 }
 
 
@@ -111,6 +109,7 @@ Vec2 Camera::GetColorTargetSize() const
 	}
 	else
 	{
+		UNIMPLEMENTED();
 		//Implement with 
 		//M_renderContext->GetBackBuffer().GetSize();
 	}
@@ -211,6 +210,7 @@ Vec3 Camera::ClientToWorld( Vec2 client, float ndcZ ) const
 
 Vec3 Camera::WorldToClient( Vec3 worldPos ) const
 {
+	UNIMPLEMENTED();
 	return Vec3( 0.f, 0.f, 0.f );
 }
 
@@ -236,14 +236,11 @@ void Camera::SetClearMode( unsigned int clearFlags, Rgba8 color, float depth /*=
 	m_clearColor = color;
 }
 
-void Camera::Translate2D( const Vec2& cameraDisplacement )
-{
-	m_position += cameraDisplacement;
-}
-
 void Camera::UpdateCameraUBO()
 {
+	Mat44 screenShakeOffset = Mat44::CreateTranslation3D( m_screenShakeOffset );
 	Mat44 cameraModel = m_transform.ToMatrix();
+	cameraModel.TransformBy( screenShakeOffset );
 	m_view = cameraModel;
 	MatrixInvertOrthoNormal( m_view );
 
@@ -253,7 +250,20 @@ void Camera::UpdateCameraUBO()
 	camData.projection = GetProjection();
 	camData.view = GetViewMatrix();
 	camData.cameraPosition = GetPosition();
-	//camData.view = Mat44::CreateTranslation3D( -GetPosition() );
 
 	m_cameraUBO->Update( &camData, sizeof( camData ), sizeof( camData ) );
+}
+
+void Camera::UpdateScreenShake( RandomNumberGenerator& rand )
+{
+	float newOffsetX = rand.RollRandomFloatZeroToOneInclusive();
+	float newOffsetY = rand.RollRandomFloatZeroToOneInclusive();
+	float newOffsetZ = rand.RollRandomFloatZeroToOneInclusive();
+
+	Vec3 newScreenShakeOffset = Vec3( newOffsetX, newOffsetY, newOffsetZ );
+	newScreenShakeOffset -= Vec3( 0.5f, 0.5f, 0.5f );
+	newScreenShakeOffset *= 0.1f;
+	newScreenShakeOffset *= m_screenShakeIntensity;
+
+	m_screenShakeOffset = newScreenShakeOffset;
 }
