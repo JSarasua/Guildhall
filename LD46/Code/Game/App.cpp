@@ -98,26 +98,6 @@ bool App::HandleQuitRequested()
 	return true;
 }
 
-bool App::IsUpArrowPressed()
-{
-	return m_isUpArrowPressed;
-}
-
-bool App::IsLeftArrowPressed()
-{
-	return m_isLeftArrowPressed;
-}
-
-bool App::IsRightArrowPressed()
-{
-	return m_isRightArrowPressed;
-}
-
-bool App::IsSlowed()
-{
-	return m_isSlowed;
-}
-
 bool App::IsNoClipping()
 {
 	return m_noClip;
@@ -199,29 +179,6 @@ void App::CheckButtonPresses()
 	{
 		g_theEventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
 		//HandleQuitRequested();
-	}
-
-	if( g_theInput->GetKeyStates( 'P' ).WasJustPressed() )
-	{
-		m_isPaused = !m_isPaused;
-	}
-
-	if( g_theInput->GetKeyStates( 'T' ).IsPressed() )
-	{
-		m_isSlowed = true;
-	}
-	else if( g_theInput->GetKeyStates( 'T' ).WasJustReleased() )
-	{
-		m_isSlowed = false;
-	}
-
-	if( g_theInput->GetKeyStates( 'Y' ).IsPressed() )
-	{
-		m_isSpedUp = true;
-	}
-	else if( g_theInput->GetKeyStates( 'Y' ).WasJustReleased() )
-	{
-		m_isSpedUp = false;
 	}
 }
 

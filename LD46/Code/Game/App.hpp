@@ -25,11 +25,6 @@ public:
 	bool HandleKeyReleased( unsigned char keyCode );
 	bool HandleQuitRequested();
 
-	bool IsUpArrowPressed();
-	bool IsLeftArrowPressed();
-	bool IsRightArrowPressed();
-	bool IsSlowed();
-
 	bool IsNoClipping();
 
 	void BeginFrame();
@@ -52,19 +47,7 @@ public:
 	Game* m_game = nullptr;
 
 private:
-	bool m_isQuitting = false;
-	bool m_isPaused = false;
-	bool m_isSlowed = false;
-	bool m_isUpArrowPressed = false;
-	bool m_isLeftArrowPressed = false;
-	bool m_isRightArrowPressed = false;
-	bool m_isLeftActuallyPressed = false;
-	bool m_isRightActuallyPressed = false;
-	bool m_isSpaceStillHeld = false;
-	bool m_isOstillHeld = false;
-	float m_previousTime = 0.f;
-	float m_currentTime = 0.f;
-	float m_deltaTime = 0.f;
+ 	bool m_isQuitting = false;
 
 	bool m_debugGameMode = false;
 	bool m_debugCameraMode = false;

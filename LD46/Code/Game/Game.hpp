@@ -140,9 +140,6 @@ private:
 	float m_lightAnimatedPhi = 0.f;
 	Vec3 m_lightAnimatedPosition;
 
-	float m_numTilesInViewVertically = 0.f;
-	float m_numTilesInViewHorizontally = 0.f;
-
 	float m_dissolveAmount = 0.5;
 
 	float m_fogDistance = 20.f;
