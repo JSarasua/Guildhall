@@ -210,6 +210,7 @@ void Game::Update()
 
 	//m_camera.SetScreenShakeIntensity( 0.1f );
 	UpdateScreenShake( dt );
+	UpdateCamera( dt );
 	
 	if( !g_theConsole->IsOpen() )
 	{
@@ -511,6 +512,21 @@ bool Game::SetLightColor( const EventArgs* args )
 	return true;
 }
 
+void Game::Jump( float jumpIntensity )
+{
+	Vec3 cameraPosition = m_camera.GetPosition();
+	
+	if( AlmostEqualsFloat( cameraPosition.y, 0.f ) )
+	{
+		AddYVelocity( jumpIntensity * 15.f );
+	}
+}
+
+void Game::AddYVelocity( float yVelocityToAdd )
+{
+	m_cameraYVelocity += yVelocityToAdd;
+}
+
 void Game::AddScreenShake( float screenShakeIntensityToAdd )
 {
 	float screenShake = m_camera.GetCurrentScreenShakeIntensity();
@@ -696,7 +712,12 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+	m_cameraYVelocity -= 10.f * deltaSeconds;
+	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
+	Vec3 currentCameraPosition = m_camera.GetPosition();
+	currentCameraPosition.y += m_cameraYVelocity * deltaSeconds;
+	currentCameraPosition.y = Max( 0.f, currentCameraPosition.y );
+	m_camera.SetPosition( currentCameraPosition );
 }
 
 void Game::RenderGame()
@@ -1106,9 +1127,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		translator.y +=  10.f * deltaSeconds;
 	}
-	if( spaceKey.IsPressed() )
+	if( spaceKey.WasJustPressed() )
 	{
-		translator.y -=  10.f * deltaSeconds;
+		Jump( 1.f );
 	}
 
 	if( shiftKey.IsPressed() )

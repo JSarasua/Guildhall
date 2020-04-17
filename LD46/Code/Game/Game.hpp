@@ -73,6 +73,8 @@ public:
 	static bool SetLightColor(const EventArgs* args);
 
 private:
+	void Jump( float jumpIntensity ); //0 to 1
+	void AddYVelocity( float yVelocityToAdd );
 	void AddScreenShake( float screenShakeIntensityToAdd );
 	void UpdateScreenShake( float deltaSeconds );
 
@@ -150,6 +152,8 @@ private:
 	Rgba8 m_fogRed = Rgba8( 50, 0, 0 );
 	Rgba8 m_fogBlue = Rgba8( 0, 0, 50 );
 	float m_fogColorLerp = 0.5f;
+
+	float m_cameraYVelocity = -10.f;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
