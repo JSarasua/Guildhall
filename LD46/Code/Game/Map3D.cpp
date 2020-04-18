@@ -57,11 +57,12 @@ void Map3D::UpdateTiles( float deltaSeconds )
 
 void Map3D::UpdateEntities( float deltaSeconds )
 {
+	AddGravity( deltaSeconds );
+	CheckForCollisions();
+
 	m_player->Update( deltaSeconds );
 	m_companion->Update( deltaSeconds );
 
-	AddGravity( deltaSeconds );
-	CheckForCollisions();
 }
 
 void Map3D::AddGravity( float deltaSeconds )
@@ -112,13 +113,13 @@ void Map3D::CheckForCollisions()
 
 	if( playerPosition.y <= 0.f )
 	{
-		m_player->m_velocity.y = 0.f;
+		m_player->m_velocity.y = Max( 0.f, m_player->m_velocity.y );
 		m_player->m_transform.m_position.y = 0.f;
 	}
 
 	if( companionPosition.y <= 0.f )
 	{
-		m_companion->m_velocity.y = 0.f;
+		m_companion->m_velocity.y = Max( 0.f, m_companion->m_velocity.y );
 		m_player->m_transform.m_position.y = 0.f;
 	}
 }

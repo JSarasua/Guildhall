@@ -30,7 +30,7 @@ void Companion3D::Startup()
 	m_mesh->UpdateVertices( sphereVerts );
 	m_mesh->UpdateIndices( sphereIndices );
 
-	m_transform.m_position = Vec3( 0.f, 2.f, -5.f );
+	m_transform.m_position = Vec3( 0.f, 15.f, -5.f );
 }
 
 void Companion3D::Update( float deltaSeconds )

@@ -40,8 +40,10 @@ private:
 
 	void CheckForCollisions();
 
-private:
+public:
 	Player3D* m_player = nullptr;
+
+private:
 	Companion3D* m_companion = nullptr;
 	std::vector<Tile> m_tiles;
 

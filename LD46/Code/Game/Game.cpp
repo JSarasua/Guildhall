@@ -20,6 +20,7 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Game/Map3D.hpp"
+#include "Game/Player3D.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -447,12 +448,17 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
-	m_cameraYVelocity -= 10.f * deltaSeconds;
-	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
-	Vec3 currentCameraPosition = m_camera.GetPosition();
-	currentCameraPosition.y += m_cameraYVelocity * deltaSeconds;
-	currentCameraPosition.y = Max( 0.f, currentCameraPosition.y );
-	m_camera.SetPosition( currentCameraPosition );
+	Vec3 cameraOffset = Vec3(0.f, 0.f, 5.f );
+	m_camera.m_cameraOffset = cameraOffset;
+	Transform playerTransform = m_map->m_player->m_transform;
+	m_camera.m_transform = playerTransform;
+
+// 	m_cameraYVelocity -= 10.f * deltaSeconds;
+// 	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
+// 	Vec3 currentCameraPosition = m_camera.GetPosition();
+// 	currentCameraPosition.y += m_cameraYVelocity * deltaSeconds;
+// 	currentCameraPosition.y = Max( 0.f, currentCameraPosition.y );
+// 	m_camera.SetPosition( currentCameraPosition );
 }
 
 void Game::RenderGame()
@@ -835,63 +841,63 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_lights[m_currentLightIndex].intensity = newLightIntensity;
 	}
 
-	Vec3 translator;
-
-	if( wKey.IsPressed() )
-	{
-		translator.z -=  10.f * deltaSeconds;
-	}
-	if( sKey.IsPressed() )
-	{
-		translator.z +=  10.f * deltaSeconds;
-	}
-	if( aKey.IsPressed() )
-	{
-		translator.x -=  10.f * deltaSeconds;
-	}
-	if( dKey.IsPressed() )
-	{
-		translator.x +=  10.f * deltaSeconds;
-	}
-	if( cKey.IsPressed() )
-	{
-		translator.y +=  10.f * deltaSeconds;
-	}
-	if( spaceKey.WasJustPressed() )
-	{
-		Jump( 1.f );
-	}
-
-	if( shiftKey.IsPressed() )
-	{
-		translator *= 2.f;
-	}
-
-	m_camera.TranslateRelativeToView( translator );
-
-	Vec3 rotator;
-	if( upArrow.IsPressed() )
-	{
-		rotator.x += 10.f * deltaSeconds;
-	}
-	if( downArrow.IsPressed() )
-	{
-		rotator.x -= 10.f * deltaSeconds;
-	}
-	if( leftArrow.IsPressed() )
-	{
-		rotator.y += 10.f * deltaSeconds;
-	}
-	if( rightArrow.IsPressed() )
-	{
-		rotator.y -= 10.f * deltaSeconds;
-	}
-
-	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
-
-	rotator.x -= mouseChange.y * 0.1f;
-	rotator.y -= mouseChange.x * 0.1f;
-	m_camera.RotatePitchRollYawDegrees( rotator );
+// 	Vec3 translator;
+// 
+// 	if( wKey.IsPressed() )
+// 	{
+// 		translator.z -=  10.f * deltaSeconds;
+// 	}
+// 	if( sKey.IsPressed() )
+// 	{
+// 		translator.z +=  10.f * deltaSeconds;
+// 	}
+// 	if( aKey.IsPressed() )
+// 	{
+// 		translator.x -=  10.f * deltaSeconds;
+// 	}
+// 	if( dKey.IsPressed() )
+// 	{
+// 		translator.x +=  10.f * deltaSeconds;
+// 	}
+// 	if( cKey.IsPressed() )
+// 	{
+// 		translator.y +=  10.f * deltaSeconds;
+// 	}
+// 	if( spaceKey.WasJustPressed() )
+// 	{
+// 		Jump( 1.f );
+// 	}
+// 
+// 	if( shiftKey.IsPressed() )
+// 	{
+// 		translator *= 2.f;
+// 	}
+// 
+// 	m_camera.TranslateRelativeToView( translator );
+// 
+// 	Vec3 rotator;
+// 	if( upArrow.IsPressed() )
+// 	{
+// 		rotator.x += 10.f * deltaSeconds;
+// 	}
+// 	if( downArrow.IsPressed() )
+// 	{
+// 		rotator.x -= 10.f * deltaSeconds;
+// 	}
+// 	if( leftArrow.IsPressed() )
+// 	{
+// 		rotator.y += 10.f * deltaSeconds;
+// 	}
+// 	if( rightArrow.IsPressed() )
+// 	{
+// 		rotator.y -= 10.f * deltaSeconds;
+// 	}
+// 
+// 	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
+// 
+// 	rotator.x -= mouseChange.y * 0.1f;
+// 	rotator.y -= mouseChange.x * 0.1f;
+// 	m_camera.RotatePitchRollYawDegrees( rotator );
 
 }
 

@@ -15,6 +15,8 @@ public:
 
 	float GetRadius() const;
 	Vec3 const& GetPosition() const;
+	void CheckButtonPresses(float deltaSeconds);
+
 
 public:
 	Vec3 m_velocity;

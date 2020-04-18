@@ -238,9 +238,11 @@ void Camera::SetClearMode( unsigned int clearFlags, Rgba8 color, float depth /*=
 
 void Camera::UpdateCameraUBO()
 {
+	Mat44 cameraOffset = Mat44::CreateTranslation3D( m_cameraOffset );
 	Mat44 screenShakeOffset = Mat44::CreateTranslation3D( m_screenShakeOffset );
 	Mat44 cameraModel = m_transform.ToMatrix();
 	cameraModel.TransformBy( screenShakeOffset );
+	cameraModel.TransformBy( cameraOffset );
 	m_view = cameraModel;
 	MatrixInvertOrthoNormal( m_view );
 

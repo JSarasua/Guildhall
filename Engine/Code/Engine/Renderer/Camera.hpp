@@ -84,6 +84,8 @@ public:
 	Vec3 m_screenShakeOffset;
 	float m_screenShakeIntensity = 0.f;
 
+	Vec3 m_cameraOffset;
+
 	Mat44 m_view;
 	Mat44 m_projection;
 
