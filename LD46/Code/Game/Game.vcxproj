@@ -182,24 +182,30 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Companion3D.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCommon.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Map3D.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player3D.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp" />
     <ClInclude Include="CommonColors.hpp" />
+    <ClInclude Include="Companion3D.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="Map.hpp" />
+    <ClInclude Include="Map3D.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Player3D.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>

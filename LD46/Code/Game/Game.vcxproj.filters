@@ -37,6 +37,15 @@
     <ClCompile Include="Player.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Map3D.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Player3D.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Companion3D.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -67,6 +76,15 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Map3D.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Player3D.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Companion3D.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

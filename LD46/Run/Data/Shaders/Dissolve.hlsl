@@ -191,7 +191,7 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float minDissolve = -edgeWidth + range * dissolveAmount;
 	float maxDissolve = minDissolve + edgeWidth;
 	float height = tPattern.Sample( sSampler, input.uv );
-	clip( height - minDissolve );
+	//clip( height - minDissolve );
 	float dissolveLerpValue = (height - minDissolve)/(maxDissolve - minDissolve);
 	dissolveLerpValue = clamp( dissolveLerpValue, 0.f, 1.f );
 

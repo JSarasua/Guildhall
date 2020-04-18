@@ -86,39 +86,20 @@ void Game::Startup()
 	m_normalTextures.push_back( normalTestSphereTexture );
 
 
-	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
 	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
-	m_triPlanarSphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 8.f, 0.f, -10.f ) );
-	m_quadModelMatrix = Mat44::CreateTranslation3D( Vec3( -4.f, 0.f, -10.f ) );
-	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
-	m_numberOfCirclingCubes = 18;
-
-	m_cubeMesh = new GPUMesh( g_theRenderer );
-
-	std::vector<Vertex_PCUTBN> cubeVerts;
-	std::vector<uint> cubeIndices;
-	Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
-	m_cubeMesh->UpdateVertices( cubeVerts );
-	m_cubeMesh->UpdateIndices( cubeIndices );
 
 
-	m_sphereMesh = new GPUMesh( g_theRenderer );
 
-	std::vector<Vertex_PCUTBN> sphereVerts;
-	std::vector<uint> sphereIndices;
-	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
-	m_sphereMesh->UpdateVertices( sphereVerts );
-	m_sphereMesh->UpdateIndices( sphereIndices );
 
 	m_quadMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCUTBN> quadVerts;
 	std::vector<uint> quadIndices;
 	Vertex_PCUTBN::AppendVerts4Points( quadVerts, 
 		quadIndices, 
-		Vec3(-1.f, -1.f, 0.f), 
-		Vec3( 1.f, -1.f, 0.f), 
-		Vec3( 1.f, 1.f, 0 ), 
-		Vec3( -1.f, 1.f, 0.f ), 
+		Vec3(-100.f, -1.f, 100.f), 
+		Vec3( 100.f, -1.f, 100.f), 
+		Vec3( 10.f, -1.f, -100 ), 
+		Vec3( -10.f, -1.f, -100.f ), 
 		Rgba8::WHITE, 
 		AABB2(0.f, 0.f, 1.f, 1.f ) );
 
@@ -134,10 +115,6 @@ void Game::Startup()
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 
-// 	m_pointLight.color = Vec3(1.f, 1.f, 1.f);
-// 	m_pointLight.intensity = 0.5f;
-// 	m_pointLight.position = m_camera.GetPosition();
-
 
 	Vec3 cameraDirection = m_camera.GetDirection();
 	for( uint lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
@@ -146,32 +123,20 @@ void Game::Startup()
 		lightData.color = Vec3( 1.f, 1.f, 1.f );
 		lightData.intensity = 0.f;
 		lightData.position = m_camera.GetPosition();
-		lightData.cosInnerAngle = -0.98f;
+		lightData.cosInnerAngle = -1.f;
 		lightData.cosOuterAngle = -1.f;
 		lightData.direction = cameraDirection;
 		m_lights.push_back( lightData );
 	}
-	m_lights[0].intensity = 0.5f;
+	m_lights[0].intensity = 1.f;
+	m_lights[0].position.y = 5.f;
 	m_lights[0].position.z -= 2.f;
-	m_lights[0].color = Vec3( 0.f, 1.f, 1.f );
-
-	m_lights[1].intensity = 0.5;
-	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
-	m_lights[1].position.z += 0.5f;
-	m_lights[1].cosInnerAngle = 0.95f;
-	m_lights[1].cosOuterAngle = 0.93f;
-
-	m_lights[2].intensity = 0.3f;
-	m_lights[2].position = Vec3 ( 0.f, 4.f, -5.f );
-	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
-	m_lights[2].isDirectional = 1.f;
-	m_lights[2].attenuation = Vec3( 1.f, 0.f, 0.f );
-	m_lights[2].color = Vec3( 1.f, 1.f, 0.f );
+	m_lights[0].color = Vec3( 1.f, 1.f, 1.f );
+	m_lights[0].attenuation = Vec3( 1.f, 0.f, 0.f );
 
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
-
-	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.f );
+	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 1.f );
 
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
@@ -180,12 +145,6 @@ void Game::Startup()
 
 void Game::Shutdown()
 {
-	delete m_cubeMesh;
-	m_cubeMesh = nullptr;
-
-	delete m_sphereMesh;
-	m_sphereMesh = nullptr;
-
 	delete m_quadMesh;
 	m_quadMesh = nullptr;
 }
@@ -219,20 +178,6 @@ void Game::Update()
 
 	UpdateLightPosition( dt );
 
-	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
-	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
-	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
-	m_sphereModelMatrix.RotateYDegrees( -15.f * dt );
-	m_triPlanarSphereModelMatrix.RotateXDegrees( 30.f * dt );
-	//m_quadModelMatrix.RotateZDegrees( 35.f * dt ); //if you want the quad to rotate
-
-	Mat44 newCircleOfSpheresRotation;
-	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
-	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
-	//newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
-	//m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
-
-
 	for( size_t lightIndex = 0; lightIndex < m_lights.size(); lightIndex++ )
 	{
 		Vec3 lightColor = m_lights[lightIndex].color;
@@ -255,8 +200,6 @@ void Game::Update()
 			}
 		}
 	}
-
-
 
 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
 	float ambientIntensity = ambientLight.w;
@@ -332,118 +275,17 @@ void Game::Render()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
 
-// 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
-// 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
 
-
- 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
- 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
-	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
-
-	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
-	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
-	dissolve_t dissolveData;
-	dissolveData.amount = m_dissolveAmount;
-	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
-	dissolveData.edgeNearColor = Vec3( 1.f, 1.f, 0.f );
-	dissolveData.edgeWidth = 0.1f;
-
-	g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
-
-	g_theRenderer->DisableLight( 0 );
 	EnableLights();
-	//g_theRenderer->EnableLight( 0, m_pointLight );
-	g_theRenderer->BindShader( dissolveShader );
-	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
-	g_theRenderer->BindDataTexture( 8, noiseTexture );
-	g_theRenderer->DrawMesh( m_cubeMesh );
 
-
-// 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
-// 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
-// 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
+	Texture* lavaTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/TileableLava.png");
+	g_theRenderer->BindTexture( lavaTexture );
 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
 	g_theRenderer->DrawMesh( m_quadMesh );
 
-	g_theRenderer->BindShader( dissolveShader );
-	g_theRenderer->BindDataTexture( 8, noiseTexture );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-
-
-
-	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
-	fresnel_t fresnel;
-	fresnel.color = Vec3( 0.f, 1.f, 0.f );
-	fresnel.power = 16.f;
-	fresnel.factor = 1.f;
-
-	g_theRenderer->SetMaterialData( &fresnel, sizeof(fresnel) );
-	Shader* fresnelShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Fresnel.hlsl" );
-	g_theRenderer->BindShader( fresnelShader );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
-
-	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/forrest_ground_01_diff_1k.png" );
-	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/forrest_ground_01_nor_1k.png" );
-	Texture* tex1_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/sand_01_diff_1k.png" );
-	Texture* tex1_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/sand_01_nor_1k.png" );
-	Texture* tex2_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_diff_1k.png" );
-	Texture* tex2_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_nor_1k.png" );
-
-	g_theRenderer->BindDataTexture( 8,  tex0_d );
-	g_theRenderer->BindDataTexture( 9,  tex0_n );
-	g_theRenderer->BindDataTexture( 10, tex1_d );
-	g_theRenderer->BindDataTexture( 11, tex1_n );
-	g_theRenderer->BindDataTexture( 12, tex2_d );
-	g_theRenderer->BindDataTexture( 13, tex2_n );
-
-	Shader* triPlanarShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TriPlanar.hlsl" );
-	g_theRenderer->BindShader( triPlanarShader );
-	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
-	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
-	RenderCircleOfSpheres();
-
-
-	//Projection
-	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
-	g_theRenderer->BindDataTexture( 14, projectionTexture );
-	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
- 	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
- 	MatrixInvertOrthoNormal( lightView0 );
-
-	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
-	Mat44 viewMatrix = m_camera.GetViewMatrix();
-	newProjectionMatrix.TransformBy( lightView0 );
-
-	projection_t projectionData;
-	projectionData.projection = newProjectionMatrix;
-	projectionData.position = m_lights[0].position;
-	projectionData.strength = 1.f;
-
-
-	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
-	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
-	g_theRenderer->BindShader( projectionShader );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
-	g_theRenderer->DrawMesh( m_quadMesh );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	RenderCircleOfSpheres();
 
 
 	RenderDevConsole();
@@ -456,23 +298,6 @@ void Game::Render()
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
-}
-
-
-void Game::RenderCircleOfSpheres()
-{
-	float degreeIncrements = 360.f / (float)m_numberOfCirclingCubes;
-	Mat44 circleOfSpheres = m_circleOfSpheresModelMatrix;
-	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )
-	{
-		g_theRenderer->SetModelMatrix( circleOfSpheres );
-		g_theRenderer->DrawMesh( m_sphereMesh );
-
-		Mat44 nextModelMatrix;
-		nextModelMatrix.RotateYDegrees( degreeIncrements );
-		nextModelMatrix.TransformBy( circleOfSpheres );
-		circleOfSpheres = nextModelMatrix;
-	}
 }
 
 bool Game::SetAmbientColor( const EventArgs* args )
@@ -942,9 +767,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num8Key.WasJustPressed() )
 	{
-		Transform transform = m_camera.GetTransform();
-
-		DebugAddWireMeshToWorld( transform.ToMatrix(), m_sphereMesh, Rgba8::WHITE, Rgba8::WHITE, 15.f, DEBUG_RENDER_ALWAYS );
 	}
 	if( num9Key.IsPressed() )
 	{
@@ -1085,8 +907,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( yKey.WasJustPressed() )
 	{
-		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
-		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 45.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( plusKey.IsPressed() )
 	{

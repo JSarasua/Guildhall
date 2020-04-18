@@ -122,8 +122,8 @@ private:
 
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
-	GPUMesh* m_cubeMesh = nullptr;
-	GPUMesh* m_sphereMesh = nullptr;
+	//GPUMesh* m_cubeMesh = nullptr;
+	//GPUMesh* m_sphereMesh = nullptr;
 	GPUMesh* m_quadMesh = nullptr;
 	Texture* m_screenTexture = nullptr;
 
@@ -154,8 +154,8 @@ private:
 	float m_fogColorLerp = 0.5f;
 
 	float m_cameraYVelocity = -10.f;
+
 public:
-	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
 	static uint m_currentLightIndex;
 	
