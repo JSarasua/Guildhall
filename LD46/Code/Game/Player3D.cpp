@@ -93,7 +93,7 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 		Vec3 playerPosition = m_transform.m_position;
 		if( AlmostEqualsFloat( playerPosition.y, 0.f ) )
 		{
-			m_velocity.y += 1000.f * deltaSeconds;
+			m_velocity.y += 500.f * deltaSeconds;
 		}
 	}
 
@@ -123,5 +123,15 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 
 
+}
+
+Transform const& Player3D::GetPlayerTransform() const
+{
+	return m_transform;
+}
+
+void Player3D::SetPosition( Vec3 const& position )
+{
+	m_transform.m_position = position;
 }
 

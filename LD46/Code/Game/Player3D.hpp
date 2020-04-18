@@ -17,6 +17,8 @@ public:
 	Vec3 const& GetPosition() const;
 	void CheckButtonPresses(float deltaSeconds);
 
+	Transform const& GetPlayerTransform() const;
+	void SetPosition( Vec3 const& position );
 
 public:
 	Vec3 m_velocity;
