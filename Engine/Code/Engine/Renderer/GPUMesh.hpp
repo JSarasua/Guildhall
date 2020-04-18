@@ -43,4 +43,6 @@ public:
 	unsigned int m_indexCount = 0;
 	VertexBuffer* m_vertices = nullptr;
 	IndexBuffer* m_indices = nullptr;
+
+	RenderContext* m_renderContext = nullptr;
 };

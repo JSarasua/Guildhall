@@ -6,6 +6,7 @@
 
 GPUMesh::GPUMesh( RenderContext* context )
 {
+	m_renderContext = context;
 	m_vertices = new VertexBuffer( context, MEMORY_HINT_DYNAMIC, sizeof( Vertex_PCU ), Vertex_PCU::LAYOUT );
 	m_indices = new IndexBuffer( context, MEMORY_HINT_DYNAMIC );
 }
@@ -17,6 +18,8 @@ GPUMesh::~GPUMesh()
 
  	delete m_indices;
  	m_indices = nullptr;
+
+	m_renderContext = nullptr;
 }
 
 void GPUMesh::UpdateVertices( unsigned int vertexCount, void const* vertexData, unsigned int vertexStride, BufferAttribute const* layout )
