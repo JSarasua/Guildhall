@@ -13,9 +13,14 @@ public:
 	void Update( float deltaSeconds );
 	void Render();
 
-private:
-	Transform m_transform;
+	float GetRadius() const;
+	Vec3 const& GetPosition() const;
+
+public:
 	Vec3 m_velocity;
+	Transform m_transform;
+
+private:
 
 	GPUMesh* m_mesh = nullptr;
 };

@@ -35,7 +35,7 @@ void Companion3D::Startup()
 
 void Companion3D::Update( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+	m_transform.m_position += m_velocity * deltaSeconds;
 }
 
 void Companion3D::Render()
@@ -43,5 +43,17 @@ void Companion3D::Render()
 	Mat44 modelMatrix = m_transform.ToMatrix();
 	g_theRenderer->SetModelMatrix( modelMatrix );
 	g_theRenderer->DrawMesh( m_mesh );
+}
+
+float Companion3D::GetRadius() const
+{
+	Vec3 scale = m_transform.m_scale;
+	float radius = scale.GetLength();
+	return radius;
+}
+
+Vec3 const& Companion3D::GetPosition() const
+{
+	return m_transform.m_position;
 }
 

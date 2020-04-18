@@ -5,9 +5,11 @@
 #include "Engine/Math/Mat44.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Input/InputSystem.hpp"
 #include <vector>
 
 extern RenderContext* g_theRenderer;
+extern InputSystem* g_theInput;
 
 Player3D::Player3D()
 {
@@ -30,7 +32,7 @@ Player3D::~Player3D()
 
 void Player3D::Update( float deltaSeconds )
 {
-
+	m_transform.m_position += m_velocity * deltaSeconds;
 }
 
 void Player3D::Render()
@@ -38,5 +40,17 @@ void Player3D::Render()
 	Mat44 modelMatrix = m_transform.ToMatrix();
 	g_theRenderer->SetModelMatrix( modelMatrix );
 	g_theRenderer->DrawMesh( m_mesh );
+}
+
+float Player3D::GetRadius() const
+{
+	Vec3 scale = m_transform.m_scale;
+	float radius = scale.GetLength();
+	return radius;
+}
+
+Vec3 const& Player3D::GetPosition() const
+{
+	return m_transform.m_position;
 }
 

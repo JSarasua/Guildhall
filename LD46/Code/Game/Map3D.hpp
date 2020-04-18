@@ -32,8 +32,13 @@ private:
 	void UpdateTiles( float deltaSeconds );
 	void UpdateEntities( float deltaSeconds );
 
+	void AddGravity( float deltaSeconds );
+
+
 	void SpawnTiles();
 	void SpawnEntities();
+
+	void CheckForCollisions();
 
 private:
 	Player3D* m_player = nullptr;
