@@ -46,6 +46,9 @@
     <ClCompile Include="Companion3D.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Golem.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -85,6 +88,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="Companion3D.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Golem.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

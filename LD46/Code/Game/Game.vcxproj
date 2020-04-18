@@ -186,6 +186,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCommon.cpp" />
+    <ClCompile Include="Golem.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Map3D.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
+    <ClInclude Include="Golem.hpp" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="Map3D.hpp" />
     <ClInclude Include="Player.hpp" />

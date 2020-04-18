@@ -3,6 +3,8 @@
 #include "Engine/Math/Vec3.hpp"
 
 class GPUMesh;
+struct Mat44;
+class Golem;
 
 class Player3D
 {
@@ -18,11 +20,14 @@ public:
 	void CheckButtonPresses(float deltaSeconds);
 
 	Transform const& GetPlayerTransform() const;
+	Mat44 GetPlayerHeadMatrix() const;
 	void SetPosition( Vec3 const& position );
 
 public:
 	Vec3 m_velocity;
 	Transform m_transform;
+
+	Golem* m_golem = nullptr;
 
 private:
 

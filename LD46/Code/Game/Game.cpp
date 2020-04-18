@@ -448,10 +448,13 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
-	Vec3 cameraOffset = Vec3(0.f, 0.f, 5.f );
+	Vec3 cameraOffset = Vec3(0.f, 0.f, 20.f );
 	m_camera.m_cameraOffset = cameraOffset;
+
+	Vec3 headTranslation = m_map->m_player->GetPlayerHeadMatrix().GetTranslation3D();
 	Transform playerTransform = m_map->m_player->m_transform;
 	m_camera.m_transform = playerTransform;
+	m_camera.SetPosition( headTranslation );
 
 // 	m_cameraYVelocity -= 10.f * deltaSeconds;
 // 	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
@@ -476,22 +479,22 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+	//const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+	//const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+	//const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+	//const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
-	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
-	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
-	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
-	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
-	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
-	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
-	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	//const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+	//const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
+	//const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
+	//const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+	//const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
+	//const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+	//const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
-	const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
-	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
-	const KeyButtonState& f4Key = g_theInput->GetKeyStates( F4_KEY );
+	//const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
+	//const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
+	//const KeyButtonState& f4Key = g_theInput->GetKeyStates( F4_KEY );
 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );

@@ -7,6 +7,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Game/Golem.hpp"
 #include <vector>
 
 extern RenderContext* g_theRenderer;
@@ -23,25 +24,34 @@ Player3D::Player3D()
 	m_mesh->UpdateIndices( sphereIndices );
 
 	m_transform.m_position = Vec3( 0.f, 0.f, 1.f );
+
+	m_golem = new Golem();
 }
 
 Player3D::~Player3D()
 {
 	delete m_mesh;
 	m_mesh = nullptr;
+
+	delete m_golem;
+	m_golem = nullptr;
 }
 
 void Player3D::Update( float deltaSeconds )
 {
 	CheckButtonPresses( deltaSeconds );
 	m_transform.m_position += m_velocity * deltaSeconds;
+
+	m_golem->Update( deltaSeconds, m_transform );
 }
 
 void Player3D::Render()
 {
-	Mat44 modelMatrix = m_transform.ToMatrix();
-	g_theRenderer->SetModelMatrix( modelMatrix );
-	g_theRenderer->DrawMesh( m_mesh );
+// 	Mat44 modelMatrix = m_transform.ToMatrix();
+// 	g_theRenderer->SetModelMatrix( modelMatrix );
+// 	g_theRenderer->DrawMesh( m_mesh );
+
+	m_golem->Render();
 }
 
 float Player3D::GetRadius() const
@@ -58,10 +68,10 @@ Vec3 const& Player3D::GetPosition() const
 
 void Player3D::CheckButtonPresses( float deltaSeconds )
 {
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+// 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+// 	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+// 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+// 	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
 	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
@@ -128,6 +138,11 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 Transform const& Player3D::GetPlayerTransform() const
 {
 	return m_transform;
+}
+
+Mat44 Player3D::GetPlayerHeadMatrix() const
+{
+	return m_golem->GetHeadMatrix();
 }
 
 void Player3D::SetPosition( Vec3 const& position )
