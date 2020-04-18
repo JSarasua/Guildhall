@@ -8,7 +8,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 
-
+class Map3D;
 class Player;
 class World;
 class Shader;
@@ -154,6 +154,8 @@ private:
 	float m_fogColorLerp = 0.5f;
 
 	float m_cameraYVelocity = -10.f;
+
+	Map3D* m_map = nullptr;
 
 public:
 	static std::vector<light_t> m_lights;

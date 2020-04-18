@@ -1,10 +1,8 @@
 #include "Game/Companion3D.hpp"
-#include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Game/App.hpp"
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
-//#include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include <vector>
@@ -31,6 +29,8 @@ void Companion3D::Startup()
 	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
 	m_mesh->UpdateVertices( sphereVerts );
 	m_mesh->UpdateIndices( sphereIndices );
+
+	m_transform.m_position = Vec3( 0.f, 2.f, -5.f );
 }
 
 void Companion3D::Update( float deltaSeconds )
