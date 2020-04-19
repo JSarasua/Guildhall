@@ -8,6 +8,8 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Golem.hpp"
+#include "Engine/Renderer/SkeletalMeshBone.hpp"
+#include "Engine/Renderer/SkeletalMesh.hpp"
 #include <vector>
 
 extern RenderContext* g_theRenderer;
@@ -56,8 +58,8 @@ void Player3D::Render()
 
 float Player3D::GetRadius() const
 {
-	Vec3 scale = m_transform.m_scale;
-	float radius = scale.GetLength();
+	//Vec3 scale = m_transform.m_scale;
+	float radius = 5.f;
 	return radius;
 }
 
@@ -81,6 +83,7 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 
 
 	Vec3 translator;
+	float chestRotation = 0.f;
 
 	if( wKey.IsPressed() )
 	{
@@ -92,20 +95,26 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 	}
 	if( aKey.IsPressed() )
 	{
-		translator.x -=  10.f * deltaSeconds;
+		//translator.x -=  10.f * deltaSeconds;
+		chestRotation += 180.f * deltaSeconds;
 	}
 	if( dKey.IsPressed() )
 	{
-		translator.x +=  10.f * deltaSeconds;
+		chestRotation -= 180.f * deltaSeconds;
+		//translator.x +=  10.f * deltaSeconds;
 	}
 	if( spaceKey.WasJustPressed() )
 	{
 		Vec3 playerPosition = m_transform.m_position;
-		if( AlmostEqualsFloat( playerPosition.y, 0.f ) )
+		if( AlmostEqualsFloat( playerPosition.y, GetRadius() ) )
 		{
 			m_velocity.y += 500.f * deltaSeconds;
+			m_golem->m_jumpTimer.Reset();
 		}
 	}
+
+	m_transform.RotatePitchRollYawDegrees( 0.f, chestRotation, 0.f );
+	//Transform chestTransform = m_golem->m_golemMesh->m_rootBone->m_transform;
 
 	Mat44 translationMatrix;
 	translationMatrix.RotateZDegrees( m_transform.m_rotationPitchRollYawDegrees.z );
@@ -125,12 +134,14 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 	rotator.x -= mouseChange.y * 0.1f;
 	rotator.y -= mouseChange.x * 0.1f;
 
-	Vec3 rotationPitchRollYaw = m_transform.m_rotationPitchRollYawDegrees;
+	Vec3 rotationPitchRollYaw = m_golem->m_golemMesh->m_headBone->m_transform.m_rotationPitchRollYawDegrees;
 	rotationPitchRollYaw += rotator;
 
 	float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
 
-	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
+	m_golem->m_golemMesh->m_headBone->m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
+
+	//m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 
 
 }
@@ -143,6 +154,11 @@ Transform const& Player3D::GetPlayerTransform() const
 Mat44 Player3D::GetPlayerHeadMatrix() const
 {
 	return m_golem->GetHeadMatrix();
+}
+
+Transform Player3D::GetPlayerHeadTransform() const
+{
+	return m_golem->GetHeadTransform();
 }
 
 void Player3D::SetPosition( Vec3 const& position )

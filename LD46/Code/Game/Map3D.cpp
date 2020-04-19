@@ -71,14 +71,14 @@ void Map3D::AddGravity( float deltaSeconds )
 	float playerPositionY = m_player->GetPosition().y;
 	float companionPositionY = m_companion->GetPosition().y;
 
-	if( playerPositionY > 0.f )
+	if( playerPositionY > m_player->GetRadius() )
 	{
 		m_player->m_velocity.y -= gravity;
 	}
 
 	if( companionPositionY > 0.f )
 	{
-		m_companion->m_velocity.y -= gravity;
+		m_companion->m_velocity.y -= 0.5f * gravity;
 	}
 }
 
@@ -107,15 +107,16 @@ void Map3D::CheckForCollisions()
 		Vec3 playerToCompanion = companionPosition - playerPosition;
 		playerToCompanion.Normalize();
 		Vec3 velocityToAdd = playerToCompanion * 10.f;
+		velocityToAdd.y += 5.f;
 
 		m_companion->m_velocity += velocityToAdd;
 	}
 
-	if( playerPosition.y <= 0.f )
+	if( playerPosition.y <= m_player->GetRadius() )
 	{
 		m_player->m_velocity.y = Max( 0.f, m_player->m_velocity.y );
-		Vec3 playerPosition = m_player->GetPosition();
-		playerPosition.y = 0.f;
+		//Vec3 playerPosition = m_player->GetPosition();
+		playerPosition.y = m_player->GetRadius();
 		m_player->SetPosition( playerPosition );
 	}
 

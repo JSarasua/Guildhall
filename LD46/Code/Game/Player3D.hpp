@@ -21,6 +21,7 @@ public:
 
 	Transform const& GetPlayerTransform() const;
 	Mat44 GetPlayerHeadMatrix() const;
+	Transform GetPlayerHeadTransform() const;
 	void SetPosition( Vec3 const& position );
 
 public:

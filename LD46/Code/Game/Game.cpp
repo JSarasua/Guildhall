@@ -451,10 +451,11 @@ void Game::UpdateCamera( float deltaSeconds )
 	Vec3 cameraOffset = Vec3(0.f, 0.f, 20.f );
 	m_camera.m_cameraOffset = cameraOffset;
 
+	Transform headTransform = m_map->m_player->GetPlayerHeadTransform();
 	Vec3 headTranslation = m_map->m_player->GetPlayerHeadMatrix().GetTranslation3D();
 	Transform playerTransform = m_map->m_player->m_transform;
-	m_camera.m_transform = playerTransform;
-	m_camera.SetPosition( headTranslation );
+	m_camera.m_transform = headTransform;
+	//m_camera.SetPosition( headTranslation );
 
 // 	m_cameraYVelocity -= 10.f * deltaSeconds;
 // 	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
