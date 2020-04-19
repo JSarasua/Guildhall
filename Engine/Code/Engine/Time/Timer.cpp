@@ -23,6 +23,7 @@ void Timer::SetSeconds( double durationSeconds )
 void Timer::Reset()
 {
 	m_startSeconds = m_clock->GetTotalElapsedSeconds();
+	m_isStopped = false;
 }
 
 void Timer::Stop()
