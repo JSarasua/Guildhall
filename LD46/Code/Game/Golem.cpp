@@ -45,17 +45,45 @@ Golem::~Golem()
 
 void Golem::Update( float deltaSeconds, Transform chestTransform )
 {
+	if( currentDistanceTraveled > 360.f )
+	{
+		currentDistanceTraveled -= 360.f;
+	}
+	if( AlmostEqualsFloat( currentDistanceTraveled, 360.f, 5.f ) )
+	{
+		currentDistanceTraveled = 0.f;
+	}
+
 	Vec3 oldChestPosition = m_golemMesh->m_rootBone->m_transform.m_position;
 	m_golemMesh->m_rootBone->m_transform = chestTransform;
 
 	Vec3 chestPosition = chestTransform.m_position;
 	Vec3 verletVelocity = chestPosition - oldChestPosition;
 	float distanceTraveledSinceLastFrame = verletVelocity.GetLength();
+
 	currentDistanceTraveled += distanceTraveledSinceLastFrame;
-	float armRotation = 45.f * SinDegrees(  45.f * currentDistanceTraveled );
-	float legRotation = 30.f * SinDegrees( 45.f * currentDistanceTraveled );
-	float leftElbowRotation = 45.f * SinDegrees( 45.f * currentDistanceTraveled ) + 45.f;
-	float rightElbowRotation = 45.f * SinDegrees( -45.f * currentDistanceTraveled ) + 45.f;
+	float rotationSpeed = 30.f;
+	float transitionSpeed = 10.f;
+	if( AlmostEqualsFloat( distanceTraveledSinceLastFrame, 0.f ) )
+	{
+		float angularDistTo180 = GetShortestAngularDistance( currentDistanceTraveled, 180.f );
+		float angularDistTo0 = GetShortestAngularDistance( currentDistanceTraveled, 0.f );
+		if( angularDistTo0 < angularDistTo180 )
+		{
+			currentDistanceTraveled = GetTurnedToward( currentDistanceTraveled, 0.f, transitionSpeed * deltaSeconds );
+		}
+		else
+		{
+			currentDistanceTraveled = GetTurnedToward( currentDistanceTraveled, 180.f, transitionSpeed * deltaSeconds );
+		}
+	}
+
+	float armRotation = 45.f * SinDegrees(  rotationSpeed * currentDistanceTraveled );
+	float legRotation = 30.f * SinDegrees( rotationSpeed * currentDistanceTraveled );
+	float leftElbowRotation = 45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) + 45.f;
+	float rightElbowRotation = 45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) + 45.f;
+	float leftKneeRotation = -45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) - 45.f;
+	float rightKneeRotation = -45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) - 45.f;
 
 	Vec3 newLeftShoulderRotator = m_leftShoulder->m_transform.m_rotationPitchRollYawDegrees;
 	newLeftShoulderRotator.x = armRotation;
@@ -74,6 +102,12 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 
 	Vec3 newRightHipRotator = m_rightHip->m_transform.m_rotationPitchRollYawDegrees;
 	newRightHipRotator.x = legRotation;
+
+	Vec3 newLeftKneeRotator = m_rightKnee->m_transform.m_rotationPitchRollYawDegrees;
+	newLeftKneeRotator.x = leftKneeRotation;
+
+	Vec3 newRightKneeRotator = m_rightKnee->m_transform.m_rotationPitchRollYawDegrees;
+	newRightKneeRotator.x = rightKneeRotation;
 
 
 	if( m_jumpTimer.IsRunning() )
@@ -98,6 +132,8 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 	m_rightElbow->m_transform.SetRotationFromPitchRollYawDegrees( newRightElbowRotator );
 	m_leftHip->m_transform.SetRotationFromPitchRollYawDegrees( newLeftHipRotator );
 	m_rightHip->m_transform.SetRotationFromPitchRollYawDegrees( newRightHipRotator );
+	m_leftKnee->m_transform.SetRotationFromPitchRollYawDegrees( newLeftKneeRotator );
+	m_rightKnee->m_transform.SetRotationFromPitchRollYawDegrees( newRightKneeRotator );
 
 }
 
@@ -174,6 +210,12 @@ void Golem::CreateSkeleton()
 	Transform upperArmTransform;
 	upperArmTransform.m_position.y -= 1.25f;
 	
+	Transform elbowTransform;
+	elbowTransform.m_position.y -= 0.75f;
+
+	Transform lowerArmTransform;
+	lowerArmTransform.m_position.y -= 1.f;
+
 	Transform leftHipTransform;
 	leftHipTransform.m_position.x -= 0.75f;
 	leftHipTransform.m_position.y -= 1.75f;
@@ -182,11 +224,12 @@ void Golem::CreateSkeleton()
 	rightHipTransform.m_position.x += 0.75f;
 	rightHipTransform.m_position.y -= 1.75f;
 
-	Transform elbowTransform;
-	elbowTransform.m_position.y -= 0.75f;
+	Transform kneeTransform;
+	kneeTransform.m_position.y -= 0.5f;
 
-	Transform lowerArmTransform;
-	lowerArmTransform.m_position.y -= 1.f;
+	Transform lowerLegTransform;
+	lowerLegTransform.m_position.y -= 1.25f;
+
 
 
 	SkeletalMeshBone* root			= new SkeletalMeshBone( m_chestMesh, nullptr, rootTransform );
@@ -203,6 +246,10 @@ void Golem::CreateSkeleton()
 	SkeletalMeshBone* rightHip		= new SkeletalMeshBone( m_hipMesh, root, rightHipTransform );
 	SkeletalMeshBone* leftLeg		= new SkeletalMeshBone( m_legMesh, leftHip, upperArmTransform );
 	SkeletalMeshBone* rightLeg		= new SkeletalMeshBone( m_legMesh, rightHip, upperArmTransform );
+	SkeletalMeshBone* leftKnee		= new SkeletalMeshBone( nullptr, leftLeg, kneeTransform );
+	SkeletalMeshBone* rightKnee		= new SkeletalMeshBone( nullptr, rightLeg, kneeTransform );
+	SkeletalMeshBone* leftLowerLeg	= new SkeletalMeshBone( m_legMesh, leftKnee, lowerLegTransform );
+	SkeletalMeshBone* rightLowerLeg	= new SkeletalMeshBone( m_legMesh, rightKnee, lowerLegTransform );
 
 	m_golemMesh->m_rootBone = root;
 	m_golemMesh->m_headBone = head;
@@ -221,6 +268,10 @@ void Golem::CreateSkeleton()
 	rightElbow->m_childBones.push_back( rightLowerArm );
 	leftHip->m_childBones.push_back( leftLeg );
 	rightHip->m_childBones.push_back( rightLeg );
+	leftLeg->m_childBones.push_back( leftKnee );
+	rightLeg->m_childBones.push_back( rightKnee );
+	leftKnee->m_childBones.push_back( leftLowerLeg );
+	rightKnee->m_childBones.push_back( rightLowerLeg );
 
 	m_leftShoulder = leftShoulder;
 	m_rightShoulder = rightShoulder;
@@ -228,5 +279,7 @@ void Golem::CreateSkeleton()
 	m_rightElbow = rightElbow;
 	m_leftHip = leftHip;
 	m_rightHip = rightHip;
+	m_leftKnee = leftKnee;
+	m_rightKnee = rightKnee;
 }
 
