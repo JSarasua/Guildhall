@@ -182,7 +182,8 @@ void Game::Update()
 		}
 		else
 		{
-			DebugAddScreenTextf( Vec4( 0.9f, 0.9f, 0.f, 0.f ), Vec2( 1.f, 1.f ), 50.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, "Last Until: %.2f", m_gameTimer.GetSecondsRemaining() );
+			DebugAddScreenTextf( Vec4( 0.99f, 0.95f, 0.f, 0.f ), Vec2( 1.f, 1.f ), 15.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, "Last Until: %.2f", m_gameTimer.GetSecondsRemaining() );
+			DebugAddScreenTextf( Vec4( 0.99f, 0.93f, 0.f, 0.f ), Vec2( 1.f, 1.f ), 15.f, Rgba8::RED, Rgba8::RED, 0.f, "Size: %.2f", m_map->m_player->m_golemScale );
 		}
 	}
 
@@ -476,7 +477,7 @@ void Game::UpdateCamera( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 	float golemScale = m_map->m_player->m_golemScale;
-	Vec3 cameraOffset = Vec3(0.f, 0.f, 10.f * golemScale );
+	Vec3 cameraOffset = Vec3(0.f, 0.f, 15.f * golemScale );
 	m_camera.m_cameraOffset = cameraOffset;
 
 	Transform headTransform = m_map->m_player->GetPlayerHeadTransform();
