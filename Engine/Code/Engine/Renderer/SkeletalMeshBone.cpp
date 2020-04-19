@@ -37,12 +37,15 @@ Mat44 SkeletalMeshBone::GetRelativeModelMatrix() const
 
 void SkeletalMeshBone::Render()
 {
-	RenderContext* context = m_mesh->m_renderContext;
-	if( nullptr != context )
+	if( nullptr != m_mesh )
 	{
-		Mat44 modelMatrix = GetRelativeModelMatrix();
-		context->SetModelMatrix( modelMatrix );
-		context->DrawMesh( m_mesh );
+		RenderContext* context = m_mesh->m_renderContext;
+		if( nullptr != context )
+		{
+			Mat44 modelMatrix = GetRelativeModelMatrix();
+			context->SetModelMatrix( modelMatrix );
+			context->DrawMesh( m_mesh );
+		}
 	}
 
 	for( size_t boneIndex = 0; boneIndex < m_childBones.size(); boneIndex++ )
