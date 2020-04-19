@@ -20,10 +20,15 @@ void Transform::RotatePitchRollYawDegrees( float pitch, float roll, float yaw )
 	SetRotationFromPitchRollYawDegrees( newPitch, newRoll, newYaw );
 }
 
+void Transform::RotatePitchRollYawDegrees( Vec3 const& rotator )
+{
+	RotatePitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
+}
+
 void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw )
 {
 	//Clamping may not be necessary
-	pitch = Clampf( pitch, -90.f, 90.f );
+	//pitch = Clampf( pitch, -90.f, 90.f );
 
 	pitch = GetAngleBetweenMinus180And180Degrees( pitch );
 	roll = GetAngleBetweenMinus180And180Degrees( roll );
@@ -32,6 +37,11 @@ void Transform::SetRotationFromPitchRollYawDegrees( float pitch, float roll, flo
 	m_rotationPitchRollYawDegrees.x = pitch;
 	m_rotationPitchRollYawDegrees.y = roll;
 	m_rotationPitchRollYawDegrees.z = yaw;
+}
+
+void Transform::SetRotationFromPitchRollYawDegrees( Vec3 const& rotator )
+{
+	SetRotationFromPitchRollYawDegrees( rotator.x, rotator.y, rotator.z );
 }
 
 void Transform::SetUniformScale( float scale )
