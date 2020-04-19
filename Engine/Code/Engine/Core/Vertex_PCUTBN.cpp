@@ -46,7 +46,7 @@ void Vertex_PCUTBN::AppendIndexedVertsCube( std::vector<Vertex_PCUTBN>& masterVe
 
 		//Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft ),	//4
 		//Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//6
-		Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tLeft, right, back, up ),		//7
+		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, right, back, up ),		//7
 
 		//Back Quad
 		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft,	back, left, up ),		//8
