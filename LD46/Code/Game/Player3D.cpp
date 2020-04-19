@@ -87,11 +87,11 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 
 	if( wKey.IsPressed() )
 	{
-		translator.z -=  10.f * deltaSeconds;
+		translator.z -=  20.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.z +=  10.f * deltaSeconds;
+		translator.z +=  20.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
