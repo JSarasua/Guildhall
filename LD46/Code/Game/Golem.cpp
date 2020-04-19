@@ -61,7 +61,8 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 
 	Vec3 chestPosition = chestTransform.m_position;
 	Vec3 verletVelocity = chestPosition - oldChestPosition;
-	float distanceTraveledSinceLastFrame = verletVelocity.GetLength();
+	Vec2 verletVelocity2D = Vec2( verletVelocity.x, verletVelocity.z );
+	float distanceTraveledSinceLastFrame = verletVelocity2D.GetLength();
 
 	currentDistanceTraveled += distanceTraveledSinceLastFrame;
 	float rotationSpeed = 30.f;
