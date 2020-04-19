@@ -4,6 +4,8 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Renderer/SkeletalMeshBone.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/Shader.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -154,6 +156,13 @@ Transform Golem::GetHeadTransform() const
 	return headTransform;
 }
 
+void Golem::SetupMaterials( SkeletalMeshBone* boneToAddMaterials, Texture* diffuseTex, Texture* normalTex, Shader* shader )
+{
+	boneToAddMaterials->m_diffuseTex = diffuseTex;
+	boneToAddMaterials->m_normalTex = normalTex;
+	boneToAddMaterials->m_shader = shader;
+}
+
 void Golem::CreateMeshes()
 {
 	m_headMesh = new GPUMesh( g_theRenderer );
@@ -230,6 +239,13 @@ void Golem::CreateSkeleton()
 	Transform lowerLegTransform;
 	lowerLegTransform.m_position.y -= 1.25f;
 
+	Texture* headTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/CartoonFireFace.png");
+	Texture* headNormalTex = g_theRenderer->CreateTextureFromColor( Rgba8::WHITE );
+
+	Texture* lavaBody = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/lavaBody.png");
+	Texture* obsidianBody = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/obsidian.png");
+
+	Shader* phongShader = g_theRenderer->GetOrCreateShader("Data/Shaders/Phong.hlsl");
 
 
 	SkeletalMeshBone* root			= new SkeletalMeshBone( m_chestMesh, nullptr, rootTransform );
@@ -250,6 +266,23 @@ void Golem::CreateSkeleton()
 	SkeletalMeshBone* rightKnee		= new SkeletalMeshBone( nullptr, rightLeg, kneeTransform );
 	SkeletalMeshBone* leftLowerLeg	= new SkeletalMeshBone( m_legMesh, leftKnee, lowerLegTransform );
 	SkeletalMeshBone* rightLowerLeg	= new SkeletalMeshBone( m_legMesh, rightKnee, lowerLegTransform );
+
+	SetupMaterials( root			, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( head			, headTexture	, headNormalTex, phongShader );
+	SetupMaterials( leftShoulder	, obsidianBody	, headNormalTex, phongShader );
+	SetupMaterials( rightShoulder	, obsidianBody	, headNormalTex, phongShader );
+	SetupMaterials( leftArm			, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( rightArm		, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( leftLowerArm	, obsidianBody	, headNormalTex, phongShader );
+	SetupMaterials( rightLowerArm	, obsidianBody	, headNormalTex, phongShader );
+	SetupMaterials( leftHip			, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( rightHip		, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( leftLeg			, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( rightLeg		, lavaBody		, headNormalTex, phongShader );
+	SetupMaterials( leftLowerLeg	, obsidianBody	, headNormalTex, phongShader );
+	SetupMaterials( rightLowerLeg	, obsidianBody	, headNormalTex, phongShader );
+
+
 
 	m_golemMesh->m_rootBone = root;
 	m_golemMesh->m_headBone = head;

@@ -3,6 +3,8 @@
 #include <vector>
 
 class GPUMesh;
+class Texture;
+class Shader;
 
 
 class SkeletalMeshBone
@@ -19,6 +21,9 @@ public:
 public:
 	Transform m_transform;
 	GPUMesh* m_mesh = nullptr;
+	Texture* m_diffuseTex = nullptr;
+	Texture* m_normalTex = nullptr;
+	Shader* m_shader = nullptr;
 	SkeletalMeshBone* m_parentBone = nullptr;
 
 	std::vector<SkeletalMeshBone*> m_childBones;

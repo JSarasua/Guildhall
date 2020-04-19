@@ -4,6 +4,8 @@
 #include "Engine/Time/Timer.hpp"
 
 class GPUMesh;
+class Texture;
+class Shader;
 
 class Golem
 {
@@ -16,7 +18,7 @@ public:
 
 	Mat44 GetHeadMatrix() const;
 	Transform GetHeadTransform() const;
-
+	void SetupMaterials( SkeletalMeshBone* boneToAddMaterials, Texture* diffuseTex, Texture* normalTex, Shader* shader );
 	void CreateMeshes();
 	void CreateSkeleton();
 public:

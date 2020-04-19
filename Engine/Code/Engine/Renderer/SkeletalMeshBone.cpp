@@ -1,6 +1,8 @@
 #include "Engine/Renderer/SkeletalMeshBone.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Renderer/Texture.hpp"
+#include "Engine/Renderer/Shader.hpp"
 
 SkeletalMeshBone::SkeletalMeshBone()
 {
@@ -44,6 +46,9 @@ void SkeletalMeshBone::Render()
 		{
 			Mat44 modelMatrix = GetRelativeModelMatrix();
 			context->SetModelMatrix( modelMatrix );
+			context->BindTexture( m_diffuseTex );
+			context->BindNormal( m_normalTex );
+			context->BindShader( m_shader );
 			context->DrawMesh( m_mesh );
 		}
 	}
