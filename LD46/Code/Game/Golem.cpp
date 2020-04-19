@@ -177,6 +177,12 @@ Transform Golem::GetHeadTransform() const
 	return headTransform;
 }
 
+Transform Golem::GetChestTransform() const
+{
+	Transform chestTransform = m_golemMesh->m_rootBone->m_transform;
+	return chestTransform;
+}
+
 void Golem::SetupMaterials( SkeletalMeshBone* boneToAddMaterials, Texture* diffuseTex, Texture* normalTex, Shader* shader )
 {
 	boneToAddMaterials->m_diffuseTex = diffuseTex;

@@ -44,10 +44,10 @@ public:
 	Player3D* m_player = nullptr;
 
 private:
-	Companion3D* m_companion = nullptr;
+	//Companion3D* m_companion = nullptr;
 	std::vector<Tile> m_tiles;
+	std::vector<Companion3D*> m_companions;
 
 	Game* m_game;
 	IntVec2 m_mapSize;
-
 };

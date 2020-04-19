@@ -45,7 +45,7 @@ void Game::Startup()
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 160.f, 90.f ) );
-	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
+	m_camera.SetProjectionPerspective( 60.f, -0.1f, -1000.f );
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 	Shader* litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
 	Shader* normalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Normals.hlsl" );
@@ -112,6 +112,7 @@ void Game::Startup()
 
 	m_gameClock = new Clock();
 	m_gameClock->SetParent( Clock::GetMaster() );
+	m_gameTimer.SetSeconds( m_gameClock, 60.f );
 
 	g_theRenderer->Setup( m_gameClock );
 
@@ -167,6 +168,25 @@ void Game::Update()
 		dt = 0.f;
 	}
 
+	//float currentElapsedTime = (float)m_gameClock->GetTotalElapsedSeconds();
+	if( m_gameTimer.HasElapsed() && !m_map->m_player->m_isDead )
+	{
+		DebugAddScreenText( Vec4( 0.5f, 0.8f, 0.f, 0.f ), Vec2( 0.5f, 0.5f ), 100.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, "You Win!" );
+	}
+	else
+	{
+		if( m_map->m_player->m_isDead )
+		{
+			dt = 0.f;
+			DebugAddScreenText( Vec4( 0.5f, 0.8f, 0.f, 0.f ), Vec2( 0.5f, 0.5f ), 100.f, Rgba8::RED, Rgba8::RED, 0.f, "You're Dead" );
+		}
+		else
+		{
+			DebugAddScreenTextf( Vec4( 0.9f, 0.9f, 0.f, 0.f ), Vec2( 1.f, 1.f ), 50.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, "Last Until: %.2f", m_gameTimer.GetSecondsRemaining() );
+		}
+	}
+
+
 	Rgba8 clearColor;
 
 	clearColor.g = 0;
@@ -176,7 +196,6 @@ void Game::Update()
 
 	//m_camera.SetScreenShakeIntensity( 0.1f );
 	UpdateScreenShake( dt );
-	UpdateCamera( dt );
 	
 	if( !g_theConsole->IsOpen() )
 	{
@@ -186,6 +205,7 @@ void Game::Update()
 	UpdateLightPosition( dt );
 
 	m_map->Update( dt );
+	UpdateCamera( dt );
 }
 
 void Game::Render()
@@ -454,14 +474,20 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
-	Vec3 cameraOffset = Vec3(0.f, 0.f, 20.f );
+	UNUSED( deltaSeconds );
+	float golemScale = m_map->m_player->m_golemScale;
+	Vec3 cameraOffset = Vec3(0.f, 0.f, 10.f * golemScale );
 	m_camera.m_cameraOffset = cameraOffset;
 
 	Transform headTransform = m_map->m_player->GetPlayerHeadTransform();
+	//Transform chestTransform = m_map->m_player->GetPlayerChestTransform();
+	//Mat44 chestMatrix = chestTransform.ToMatrix();
+	//Vec3 headPosition = chestMatrix.TransformPosition3D( 0.5f * headTransform.m_position );
+	//Vec3 chestPosition = chestMatrix.TransformPosition3D( Vec3() );
+
 	Vec3 headTranslation = m_map->m_player->GetPlayerHeadMatrix().GetTranslation3D();
-	Transform playerTransform = m_map->m_player->m_transform;
 	m_camera.m_transform = headTransform;
-	//m_camera.SetPosition( headTranslation );
+	m_camera.SetPosition( headTranslation );
 
 // 	m_cameraYVelocity -= 10.f * deltaSeconds;
 // 	m_cameraYVelocity = Max( -10.f, m_cameraYVelocity );
@@ -805,9 +831,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f8Key.WasJustPressed() )
 	{
-		m_lights[m_currentLightIndex].position = m_lightAnimatedPosition;
-		m_isLightFollowingCamera = false;
-		m_isLightAnimated = true;
+		delete m_map;
+		m_map = new Map3D( IntVec2( 10, 10 ), this );
+		m_map->Startup();
+
+		m_gameTimer.Reset();
 	}
 
 	if( rKey.WasJustPressed() )

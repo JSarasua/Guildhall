@@ -43,8 +43,15 @@ void Player3D::Update( float deltaSeconds )
 {
 	CheckButtonPresses( deltaSeconds );
 	m_transform.m_position += m_velocity * deltaSeconds;
-
+	m_transform.SetUniformScale( m_golemScale );
 	m_golem->Update( deltaSeconds, m_transform );
+
+	m_golemScale -= 0.25f * m_golemScale * deltaSeconds;
+	if( m_golemScale < 0.1f )
+	{
+		m_golemScale = 0.1f;
+		m_isDead = true;
+	}
 }
 
 void Player3D::Render()
@@ -52,14 +59,13 @@ void Player3D::Render()
 // 	Mat44 modelMatrix = m_transform.ToMatrix();
 // 	g_theRenderer->SetModelMatrix( modelMatrix );
 // 	g_theRenderer->DrawMesh( m_mesh );
-
 	m_golem->Render();
 }
 
 float Player3D::GetRadius() const
 {
 	//Vec3 scale = m_transform.m_scale;
-	float radius = 5.f;
+	float radius = 5.f * m_golemScale;
 	return radius;
 }
 
@@ -87,11 +93,11 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 
 	if( wKey.IsPressed() )
 	{
-		translator.z -=  20.f * deltaSeconds;
+		translator.z -=  30.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.z +=  20.f * deltaSeconds;
+		translator.z +=  30.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
@@ -106,9 +112,9 @@ void Player3D::CheckButtonPresses( float deltaSeconds )
 	if( spaceKey.WasJustPressed() )
 	{
 		Vec3 playerPosition = m_transform.m_position;
-		if( AlmostEqualsFloat( playerPosition.y, GetRadius() ) )
+		if( AlmostEqualsFloat( playerPosition.y, GetRadius(), 2.f ) )
 		{
-			m_velocity.y += 500.f * deltaSeconds;
+			m_velocity.y = 50.f;
 			m_golem->m_jumpTimer.Reset();
 		}
 	}
@@ -159,6 +165,11 @@ Mat44 Player3D::GetPlayerHeadMatrix() const
 Transform Player3D::GetPlayerHeadTransform() const
 {
 	return m_golem->GetHeadTransform();
+}
+
+Transform Player3D::GetPlayerChestTransform() const
+{
+	return m_golem->GetChestTransform();
 }
 
 void Player3D::SetPosition( Vec3 const& position )

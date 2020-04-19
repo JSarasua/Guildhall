@@ -18,6 +18,7 @@ public:
 
 	Mat44 GetHeadMatrix() const;
 	Transform GetHeadTransform() const;
+	Transform GetChestTransform() const;
 	void SetupMaterials( SkeletalMeshBone* boneToAddMaterials, Texture* diffuseTex, Texture* normalTex, Shader* shader );
 	void CreateMeshes();
 	void CreateSkeleton();

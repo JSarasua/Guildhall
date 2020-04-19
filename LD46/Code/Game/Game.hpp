@@ -6,6 +6,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Time/Timer.hpp"
 #include <vector>
 
 class Map3D;
@@ -14,6 +15,7 @@ class World;
 class Shader;
 class GPUMesh;
 class Clock;
+
 
 struct light_t;
 
@@ -156,6 +158,9 @@ private:
 	float m_cameraYVelocity = -10.f;
 
 	Map3D* m_map = nullptr;
+
+	Timer m_gameTimer;
+	bool m_gameEnded = false;
 
 public:
 	static std::vector<light_t> m_lights;

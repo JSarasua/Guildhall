@@ -2,11 +2,17 @@
 #include "Game/Player3D.hpp"
 #include "Game/Companion3D.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Game/Game.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 Map3D::Map3D()
 {
 	m_player = new Player3D();
-	m_companion = new Companion3D();
+
+	for( size_t companionIndex = 0; companionIndex < 30; companionIndex++ )
+	{
+		m_companions.push_back( new Companion3D( &m_game->m_rand ) );
+	}
 }
 
 Map3D::Map3D( IntVec2 const& mapSize, Game* game ) : 
@@ -14,12 +20,20 @@ Map3D::Map3D( IntVec2 const& mapSize, Game* game ) :
 	m_mapSize( mapSize )
 {
 	m_player = new Player3D();
-	m_companion = new Companion3D();
+
+	for( size_t companionIndex = 0; companionIndex < 30; companionIndex++ )
+	{
+		m_companions.push_back( new Companion3D( &m_game->m_rand ) );
+	}
+
 }
 
 void Map3D::Startup()
 {
-	m_companion->Startup();
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
+	{
+		m_companions[companionIndex]->Startup();
+	}
 }
 
 void Map3D::Shutdown()
@@ -47,12 +61,16 @@ void Map3D::RenderTiles()
 void Map3D::RenderEntities()
 {
 	m_player->Render();
-	m_companion->Render();
+
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
+	{
+		m_companions[companionIndex]->Render();
+	}
 }
 
 void Map3D::UpdateTiles( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 void Map3D::UpdateEntities( float deltaSeconds )
@@ -61,25 +79,35 @@ void Map3D::UpdateEntities( float deltaSeconds )
 	CheckForCollisions();
 
 	m_player->Update( deltaSeconds );
-	m_companion->Update( deltaSeconds );
 
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
+	{
+		m_companions[companionIndex]->Update( deltaSeconds );
+	}
 }
 
 void Map3D::AddGravity( float deltaSeconds )
 {
-	float gravity = 15.f * deltaSeconds;
+	float gravity = 75.f * deltaSeconds;
 	float playerPositionY = m_player->GetPosition().y;
-	float companionPositionY = m_companion->GetPosition().y;
+
 
 	if( playerPositionY > m_player->GetRadius() )
 	{
 		m_player->m_velocity.y -= gravity;
 	}
 
-	if( companionPositionY > 0.f )
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
 	{
-		m_companion->m_velocity.y -= 0.5f * gravity;
+		float companionPositionY = m_companions[companionIndex]->GetPosition().y;
+
+		if( companionPositionY > 0.f )
+		{
+			m_companions[companionIndex]->m_velocity.y -= 0.25f * gravity;
+		}
 	}
+
+
 }
 
 void Map3D::SpawnTiles()
@@ -94,23 +122,8 @@ void Map3D::SpawnEntities()
 
 void Map3D::CheckForCollisions()
 {
-	float companionRadius = m_companion->GetRadius();
 	float playerRadius = m_player->GetRadius();
-
-	Vec3 companionPosition = m_companion->GetPosition();
 	Vec3 playerPosition = m_player->GetPosition();
-
-	float playerToCompanionLen = GetDistance3D( companionPosition, playerPosition );
-
-	if( playerToCompanionLen < (companionRadius + playerRadius) )
-	{
-		Vec3 playerToCompanion = companionPosition - playerPosition;
-		playerToCompanion.Normalize();
-		Vec3 velocityToAdd = playerToCompanion * 10.f;
-		velocityToAdd.y += 5.f;
-
-		m_companion->m_velocity += velocityToAdd;
-	}
 
 	if( playerPosition.y <= m_player->GetRadius() )
 	{
@@ -120,11 +133,44 @@ void Map3D::CheckForCollisions()
 		m_player->SetPosition( playerPosition );
 	}
 
-	if( companionPosition.y <= 0.f )
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
 	{
-		m_companion->m_velocity.y = Max( 0.f, m_companion->m_velocity.y );
-		m_companion->m_transform.m_position.y = 0.f;
+		Vec3 companionPosition = m_companions[companionIndex]->m_transform.m_position;
+		float companionRadius = m_companions[companionIndex]->GetRadius();
+		float playerToCompanionLen = GetDistance3D( companionPosition, playerPosition );
+
+		if( playerToCompanionLen < (companionRadius + playerRadius) )
+		{
+			if( !(m_companions[companionIndex]->IsDissolving() || m_companions[companionIndex]->IsRespawning()) )
+			{
+				m_companions[companionIndex]->ActivateDissolve();
+				m_companions[companionIndex]->m_velocity.y = Max( 0.f, m_companions[companionIndex]->m_velocity.y );
+				m_companions[companionIndex]->m_transform.m_position.y = 0.f;
+				
+				m_player->m_golemScale += 1.f / m_player->m_golemScale;
+			}
+
+// 			Vec3 playerToCompanion = companionPosition - playerPosition;
+// 			playerToCompanion.Normalize();
+// 			Vec3 velocityToAdd = playerToCompanion * 10.f;
+// 			velocityToAdd.y += 5.f;
+// 
+// 			m_companions[companionIndex]->m_velocity += velocityToAdd;
+		}
+
+		float yCompanionPosition = m_companions[companionIndex]->GetPosition().y;
+		if( yCompanionPosition <= 0.f )
+		{
+			if( !( m_companions[companionIndex]->IsDissolving() || m_companions[companionIndex]->IsRespawning() ) )
+			{
+				m_companions[companionIndex]->ActivateDissolve();
+				m_companions[companionIndex]->m_velocity.y = Max( 0.f, m_companions[companionIndex]->m_velocity.y );
+				m_companions[companionIndex]->m_transform.m_position.y = 0.f;
+			}
+		}
 	}
+
+
 }
 
 Map3D::~Map3D()
@@ -132,8 +178,11 @@ Map3D::~Map3D()
 	delete m_player;
 	m_player = nullptr;
 
-	delete m_companion;
-	m_companion = nullptr;
+	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
+	{
+		delete m_companions[companionIndex];
+		m_companions[companionIndex] = nullptr;
+	}
 
 	m_game = nullptr;
 }

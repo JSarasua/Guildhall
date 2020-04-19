@@ -22,6 +22,7 @@ public:
 	Transform const& GetPlayerTransform() const;
 	Mat44 GetPlayerHeadMatrix() const;
 	Transform GetPlayerHeadTransform() const;
+	Transform GetPlayerChestTransform() const;
 	void SetPosition( Vec3 const& position );
 
 public:
@@ -30,6 +31,9 @@ public:
 
 	Golem* m_golem = nullptr;
 
+
+	float m_golemScale = 3.f;
+	bool m_isDead = false;
 private:
 
 	GPUMesh* m_mesh = nullptr;
