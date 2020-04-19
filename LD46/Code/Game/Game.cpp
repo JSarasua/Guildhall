@@ -161,6 +161,12 @@ void Game::Update()
 	{
 		m_currentTime = 0.f;
 	}
+
+	if( m_isPaused )
+	{
+		dt = 0.f;
+	}
+
 	Rgba8 clearColor;
 
 	clearColor.g = 0;
@@ -530,6 +536,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
 	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
 	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
+	const KeyButtonState& pKey = g_theInput->GetKeyStates( 'P' );
 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
@@ -537,6 +544,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 
+	if( pKey.WasJustPressed() )
+	{
+		m_isPaused = !m_isPaused;
+	}
 	if( f1Key.WasJustPressed() )
 	{
 		AddScreenShake( 0.5f );
