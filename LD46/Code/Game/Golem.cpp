@@ -54,12 +54,20 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 	currentDistanceTraveled += distanceTraveledSinceLastFrame;
 	float armRotation = 45.f * SinDegrees(  45.f * currentDistanceTraveled );
 	float legRotation = 30.f * SinDegrees( 45.f * currentDistanceTraveled );
+	float leftElbowRotation = 45.f * SinDegrees( 45.f * currentDistanceTraveled ) + 45.f;
+	float rightElbowRotation = 45.f * SinDegrees( -45.f * currentDistanceTraveled ) + 45.f;
 
 	Vec3 newLeftShoulderRotator = m_leftShoulder->m_transform.m_rotationPitchRollYawDegrees;
 	newLeftShoulderRotator.x = armRotation;
 
 	Vec3 newRightShoulderRotator = m_rightShoulder->m_transform.m_rotationPitchRollYawDegrees;
 	newRightShoulderRotator.x = -armRotation;
+
+	Vec3 newLeftElbowRotator = m_leftElbow->m_transform.m_rotationPitchRollYawDegrees;
+	newLeftElbowRotator.x = leftElbowRotation;
+
+	Vec3 newRightElbowRotator = m_rightElbow->m_transform.m_rotationPitchRollYawDegrees;
+	newRightElbowRotator.x = rightElbowRotation;
 
 	Vec3 newLeftHipRotator = m_leftHip->m_transform.m_rotationPitchRollYawDegrees;
 	newLeftHipRotator.x = -legRotation;
@@ -86,6 +94,8 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 
 	m_leftShoulder->m_transform.SetRotationFromPitchRollYawDegrees( newLeftShoulderRotator );
 	m_rightShoulder->m_transform.SetRotationFromPitchRollYawDegrees( newRightShoulderRotator );
+	m_leftElbow->m_transform.SetRotationFromPitchRollYawDegrees( newLeftElbowRotator );
+	m_rightElbow->m_transform.SetRotationFromPitchRollYawDegrees( newRightElbowRotator );
 	m_leftHip->m_transform.SetRotationFromPitchRollYawDegrees( newLeftHipRotator );
 	m_rightHip->m_transform.SetRotationFromPitchRollYawDegrees( newRightHipRotator );
 
@@ -127,7 +137,7 @@ void Golem::CreateMeshes()
 	m_shoulderMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCUTBN> shoulderVerts;
 	std::vector<uint> shoulderIndices;
-	Vertex_PCUTBN::AppendIndexedVertsCube( shoulderVerts, shoulderIndices, 0.5f );
+	Vertex_PCUTBN::AppendIndexedVertsCube( shoulderVerts, shoulderIndices, 0.5f, Vec3( 1.f, 0.5f, 1.f ) );
 	m_shoulderMesh->UpdateVertices( shoulderVerts );
 	m_shoulderMesh->UpdateIndices( shoulderIndices );
 
@@ -138,7 +148,7 @@ void Golem::CreateMeshes()
 	m_armMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCUTBN> armVerts;
 	std::vector<uint> armIndices;
-	Vertex_PCUTBN::AppendIndexedVertsCube( armVerts, armIndices, 0.5f, Vec3( 1.f, 3.f, 1.f ) );
+	Vertex_PCUTBN::AppendIndexedVertsCube( armVerts, armIndices, 0.5f, Vec3( 1.f, 1.5f, 1.f ) );
 	m_armMesh->UpdateVertices( armVerts );
 	m_armMesh->UpdateIndices( armIndices );
 
@@ -152,34 +162,47 @@ void Golem::CreateSkeleton()
 	Transform rootTransform;
 	Transform headTransform;
 	headTransform.m_position.y += 2.f;
+
 	Transform leftShoulderTransform;
 	leftShoulderTransform.m_position.x -= 1.75f;
 	leftShoulderTransform.m_position.y += 1.f;
-	//leftShoulderTransform.m_rotationPitchRollYawDegrees.z = -30.f;
+
 	Transform rightShoulderTransform;
 	rightShoulderTransform.m_position.x += 1.75f;
 	rightShoulderTransform.m_position.y += 1.f;
-	//rightShoulderTransform.m_rotationPitchRollYawDegrees.z = 30.f;
-	Transform armTransform;
-	armTransform.m_position.y -= 2.5f;
+	
+	Transform upperArmTransform;
+	upperArmTransform.m_position.y -= 1.25f;
+	
 	Transform leftHipTransform;
-	leftHipTransform.m_position.x -= 1.f;
-	leftHipTransform.m_position.y -= 2.f;
+	leftHipTransform.m_position.x -= 0.75f;
+	leftHipTransform.m_position.y -= 1.75f;
+	
 	Transform rightHipTransform;
-	rightHipTransform.m_position.x += 1.f;
-	rightHipTransform.m_position.y -= 2.f;
+	rightHipTransform.m_position.x += 0.75f;
+	rightHipTransform.m_position.y -= 1.75f;
+
+	Transform elbowTransform;
+	elbowTransform.m_position.y -= 0.75f;
+
+	Transform lowerArmTransform;
+	lowerArmTransform.m_position.y -= 1.f;
 
 
 	SkeletalMeshBone* root			= new SkeletalMeshBone( m_chestMesh, nullptr, rootTransform );
 	SkeletalMeshBone* head			= new SkeletalMeshBone( m_headMesh, root, headTransform );
 	SkeletalMeshBone* leftShoulder	= new SkeletalMeshBone( m_shoulderMesh, root, leftShoulderTransform );
 	SkeletalMeshBone* rightShoulder = new SkeletalMeshBone( m_shoulderMesh, root, rightShoulderTransform );
-	SkeletalMeshBone* leftArm		= new SkeletalMeshBone( m_armMesh, leftShoulder, armTransform );
-	SkeletalMeshBone* rightArm		= new SkeletalMeshBone( m_armMesh, rightShoulder, armTransform );
+	SkeletalMeshBone* leftArm		= new SkeletalMeshBone( m_armMesh, leftShoulder, upperArmTransform );
+	SkeletalMeshBone* rightArm		= new SkeletalMeshBone( m_armMesh, rightShoulder, upperArmTransform );
+	SkeletalMeshBone* leftElbow		= new SkeletalMeshBone( nullptr, leftArm, elbowTransform );
+	SkeletalMeshBone* rightElbow	= new SkeletalMeshBone( nullptr, rightArm, elbowTransform );
+	SkeletalMeshBone* leftLowerArm	= new SkeletalMeshBone( m_armMesh, leftElbow, lowerArmTransform );
+	SkeletalMeshBone* rightLowerArm	= new SkeletalMeshBone( m_armMesh, rightElbow, lowerArmTransform );
 	SkeletalMeshBone* leftHip		= new SkeletalMeshBone( m_hipMesh, root, leftHipTransform );
 	SkeletalMeshBone* rightHip		= new SkeletalMeshBone( m_hipMesh, root, rightHipTransform );
-	SkeletalMeshBone* leftLeg		= new SkeletalMeshBone( m_legMesh, leftHip, armTransform );
-	SkeletalMeshBone* rightLeg		= new SkeletalMeshBone( m_legMesh, rightHip, armTransform );
+	SkeletalMeshBone* leftLeg		= new SkeletalMeshBone( m_legMesh, leftHip, upperArmTransform );
+	SkeletalMeshBone* rightLeg		= new SkeletalMeshBone( m_legMesh, rightHip, upperArmTransform );
 
 	m_golemMesh->m_rootBone = root;
 	m_golemMesh->m_headBone = head;
@@ -192,11 +215,17 @@ void Golem::CreateSkeleton()
 
 	leftShoulder->m_childBones.push_back( leftArm );
 	rightShoulder->m_childBones.push_back( rightArm );
+	leftArm->m_childBones.push_back( leftElbow );
+	rightArm->m_childBones.push_back( rightElbow );
+	leftElbow->m_childBones.push_back( leftLowerArm );
+	rightElbow->m_childBones.push_back( rightLowerArm );
 	leftHip->m_childBones.push_back( leftLeg );
 	rightHip->m_childBones.push_back( rightLeg );
 
 	m_leftShoulder = leftShoulder;
 	m_rightShoulder = rightShoulder;
+	m_leftElbow = leftElbow;
+	m_rightElbow = rightElbow;
 	m_leftHip = leftHip;
 	m_rightHip = rightHip;
 }

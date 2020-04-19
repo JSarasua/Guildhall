@@ -35,6 +35,8 @@ private:
 	SkeletalMeshBone* m_rightShoulder = nullptr;
 	SkeletalMeshBone* m_leftHip = nullptr;
 	SkeletalMeshBone* m_rightHip = nullptr;
+	SkeletalMeshBone* m_leftElbow = nullptr;
+	SkeletalMeshBone* m_rightElbow = nullptr;
 
 	float currentDistanceTraveled = 0.f;
 };
