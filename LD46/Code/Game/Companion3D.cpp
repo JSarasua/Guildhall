@@ -36,6 +36,8 @@ void Companion3D::Startup()
 void Companion3D::Update( float deltaSeconds )
 {
 	m_transform.m_position += m_velocity * deltaSeconds;
+
+	m_velocity -= m_velocity * ( 0.1f * deltaSeconds );
 }
 
 void Companion3D::Render()
