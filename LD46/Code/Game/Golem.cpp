@@ -65,67 +65,87 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 
 	currentDistanceTraveled += distanceTraveledSinceLastFrame;
 	float rotationSpeed = 30.f;
-	float transitionSpeed = 10.f;
-	if( AlmostEqualsFloat( distanceTraveledSinceLastFrame, 0.f ) )
-	{
-		float angularDistTo180 = GetShortestAngularDistance( currentDistanceTraveled, 180.f );
-		float angularDistTo0 = GetShortestAngularDistance( currentDistanceTraveled, 0.f );
-		if( angularDistTo0 < angularDistTo180 )
-		{
-			currentDistanceTraveled = GetTurnedToward( currentDistanceTraveled, 0.f, transitionSpeed * deltaSeconds );
-		}
-		else
-		{
-			currentDistanceTraveled = GetTurnedToward( currentDistanceTraveled, 180.f, transitionSpeed * deltaSeconds );
-		}
-	}
-
-	float armRotation = 45.f * SinDegrees(  rotationSpeed * currentDistanceTraveled );
-	float legRotation = 30.f * SinDegrees( rotationSpeed * currentDistanceTraveled );
-	float leftElbowRotation = 45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) + 45.f;
-	float rightElbowRotation = 45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) + 45.f;
-	float leftKneeRotation = -45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) - 45.f;
-	float rightKneeRotation = -45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) - 45.f;
+	float transitionSpeed = 100.f;
+	float kneeElbowTransitionSpeed = 300.f;
 
 	Vec3 newLeftShoulderRotator = m_leftShoulder->m_transform.m_rotationPitchRollYawDegrees;
-	newLeftShoulderRotator.x = armRotation;
-
 	Vec3 newRightShoulderRotator = m_rightShoulder->m_transform.m_rotationPitchRollYawDegrees;
-	newRightShoulderRotator.x = -armRotation;
-
 	Vec3 newLeftElbowRotator = m_leftElbow->m_transform.m_rotationPitchRollYawDegrees;
-	newLeftElbowRotator.x = leftElbowRotation;
-
 	Vec3 newRightElbowRotator = m_rightElbow->m_transform.m_rotationPitchRollYawDegrees;
-	newRightElbowRotator.x = rightElbowRotation;
-
 	Vec3 newLeftHipRotator = m_leftHip->m_transform.m_rotationPitchRollYawDegrees;
-	newLeftHipRotator.x = -legRotation;
-
 	Vec3 newRightHipRotator = m_rightHip->m_transform.m_rotationPitchRollYawDegrees;
-	newRightHipRotator.x = legRotation;
-
 	Vec3 newLeftKneeRotator = m_rightKnee->m_transform.m_rotationPitchRollYawDegrees;
-	newLeftKneeRotator.x = leftKneeRotation;
-
 	Vec3 newRightKneeRotator = m_rightKnee->m_transform.m_rotationPitchRollYawDegrees;
-	newRightKneeRotator.x = rightKneeRotation;
 
-
-	if( m_jumpTimer.IsRunning() )
+	if( AlmostEqualsFloat( distanceTraveledSinceLastFrame, 0.f ) )
 	{
-		if( m_jumpTimer.HasElapsed() )
+		newLeftShoulderRotator.x = GetTurnedToward( newLeftShoulderRotator.x, 0.f, transitionSpeed * deltaSeconds );
+		newLeftShoulderRotator.y = GetTurnedToward( newLeftShoulderRotator.y, 0.f, transitionSpeed * deltaSeconds );
+		newLeftShoulderRotator.z = GetTurnedToward( newLeftShoulderRotator.z, 0.f, transitionSpeed * deltaSeconds );
+
+		newRightShoulderRotator.x = GetTurnedToward( newRightShoulderRotator.x, 0.f, transitionSpeed * deltaSeconds );
+		newRightShoulderRotator.y = GetTurnedToward( newRightShoulderRotator.y, 0.f, transitionSpeed * deltaSeconds );
+		newRightShoulderRotator.z = GetTurnedToward( newRightShoulderRotator.z, 0.f, transitionSpeed * deltaSeconds );
+
+		newLeftElbowRotator.x = GetTurnedToward( newLeftElbowRotator.x, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newLeftElbowRotator.y = GetTurnedToward( newLeftElbowRotator.y, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newLeftElbowRotator.z = GetTurnedToward( newLeftElbowRotator.z, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+
+		newRightElbowRotator.x = GetTurnedToward( newRightElbowRotator.x, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newRightElbowRotator.y = GetTurnedToward( newRightElbowRotator.y, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newRightElbowRotator.z = GetTurnedToward( newRightElbowRotator.z, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+
+		newLeftHipRotator.x = GetTurnedToward( newLeftHipRotator.x, 0.f, transitionSpeed * deltaSeconds );
+		newLeftHipRotator.y = GetTurnedToward( newLeftHipRotator.y, 0.f, transitionSpeed * deltaSeconds );
+		newLeftHipRotator.z = GetTurnedToward( newLeftHipRotator.z, 0.f, transitionSpeed * deltaSeconds );
+
+		newRightHipRotator.x = GetTurnedToward( newRightHipRotator.x, 0.f, transitionSpeed * deltaSeconds );
+		newRightHipRotator.y = GetTurnedToward( newRightHipRotator.y, 0.f, transitionSpeed * deltaSeconds );
+		newRightHipRotator.z = GetTurnedToward( newRightHipRotator.z, 0.f, transitionSpeed * deltaSeconds );
+
+		newLeftKneeRotator.x = GetTurnedToward( newLeftKneeRotator.x, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newLeftKneeRotator.y = GetTurnedToward( newLeftKneeRotator.y, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newLeftKneeRotator.z = GetTurnedToward( newLeftKneeRotator.z, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+
+		newRightKneeRotator.x = GetTurnedToward( newRightKneeRotator.x, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newRightKneeRotator.y = GetTurnedToward( newRightKneeRotator.y, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+		newRightKneeRotator.z = GetTurnedToward( newRightKneeRotator.z, 0.f, kneeElbowTransitionSpeed * deltaSeconds );
+	}
+	else
+	{
+		float armRotation = 45.f * SinDegrees(  rotationSpeed * currentDistanceTraveled );
+		float legRotation = 30.f * SinDegrees( rotationSpeed * currentDistanceTraveled );
+		float leftElbowRotation = 45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) + 45.f;
+		float rightElbowRotation = 45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) + 45.f;
+		float leftKneeRotation = -45.f * SinDegrees( rotationSpeed * currentDistanceTraveled ) - 45.f;
+		float rightKneeRotation = -45.f * SinDegrees( -rotationSpeed * currentDistanceTraveled ) - 45.f;
+
+		newLeftShoulderRotator.x = armRotation;
+		newRightShoulderRotator.x = -armRotation;
+		newLeftElbowRotator.x = leftElbowRotation;
+		newRightElbowRotator.x = rightElbowRotation;
+		newLeftHipRotator.x = -legRotation;
+		newRightHipRotator.x = legRotation;
+		newLeftKneeRotator.x = leftKneeRotation;
+		newRightKneeRotator.x = rightKneeRotation;
+
+
+		if( m_jumpTimer.IsRunning() )
 		{
-			m_jumpTimer.Stop();
-			newLeftShoulderRotator.z = 0.f;
-			newRightShoulderRotator.z = 0.f;
+			if( m_jumpTimer.HasElapsed() )
+			{
+				m_jumpTimer.Stop();
+				newLeftShoulderRotator.z = 0.f;
+				newRightShoulderRotator.z = 0.f;
+			}
+			else
+			{
+				float elapsedTime = (float)m_jumpTimer.GetElapsedSeconds();
+				newLeftShoulderRotator.z = -90.f * SinDegrees( elapsedTime * 360.f );
+				newRightShoulderRotator.z = 90.f * SinDegrees( elapsedTime * 360.f );
+			}
 		}
-		else
-		{
-			float elapsedTime = (float)m_jumpTimer.GetElapsedSeconds();
-			newLeftShoulderRotator.z = -90.f * SinDegrees( elapsedTime * 360.f );
-			newRightShoulderRotator.z = 90.f * SinDegrees( elapsedTime * 360.f );
-		}
+
 	}
 
 	m_leftShoulder->m_transform.SetRotationFromPitchRollYawDegrees( newLeftShoulderRotator );
@@ -136,6 +156,7 @@ void Golem::Update( float deltaSeconds, Transform chestTransform )
 	m_rightHip->m_transform.SetRotationFromPitchRollYawDegrees( newRightHipRotator );
 	m_leftKnee->m_transform.SetRotationFromPitchRollYawDegrees( newLeftKneeRotator );
 	m_rightKnee->m_transform.SetRotationFromPitchRollYawDegrees( newRightKneeRotator );
+
 
 }
 
