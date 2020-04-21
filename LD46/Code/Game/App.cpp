@@ -5,6 +5,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Core/Delegate.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
@@ -24,33 +25,31 @@ App::~App() {}
 
 void App::Startup()
 {
-
 	Clock::SystemStartup();
 
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
-	g_theWindow->SetInputSystem(g_theInput);
-	g_theWindow->SetEventSystem(g_theEventSystem);
-	
+	g_theWindow->SetInputSystem( g_theInput );
+	g_theWindow->SetEventSystem( g_theEventSystem );
+
 	g_theInput->Startup( g_theWindow );
 	g_theInput->PushMouseOptions( MOUSE_MODE_RELATIVE, false, true );
 
 	g_theRenderer = new RenderContext();
-	g_theRenderer->StartUp(g_theWindow);
+	g_theRenderer->StartUp( g_theWindow );
 
 	DebugRenderSystemStartup( g_theRenderer );
-	
+
 	m_game->Startup();
 	g_theConsole->Startup();
 
 	m_devConsoleCamera = new Camera();
-	m_devConsoleCamera->SetColorTarget(nullptr);
+	m_devConsoleCamera->SetColorTarget( nullptr );
 	//m_devConsoleCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
-	m_devConsoleCamera->SetProjectionOrthographic(Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y), 0.f, -100.f );
+	m_devConsoleCamera->SetProjectionOrthographic( Vec2( GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y ), 0.f, -100.f );
 	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
 
-
-	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
+	g_theEventSystem->SubscribeToEvent( "quit", CONSOLECOMMAND, QuitRequested );
 }
 
 void App::Shutdown()
@@ -77,8 +76,6 @@ void App::RunFrame()
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
 }
-
-
 
 bool App::HandleKeyPressed( unsigned char keyCode )
 {

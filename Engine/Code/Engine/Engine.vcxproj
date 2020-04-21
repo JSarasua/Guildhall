@@ -236,6 +236,7 @@
     <ClInclude Include="..\ThirdParty\TinyXML2\tinyxml2.h" />
     <ClInclude Include="Audio\AudioSystem.hpp" />
     <ClInclude Include="Console\DevConsole.hpp" />
+    <ClInclude Include="Core\Delegate.hpp" />
     <ClInclude Include="Core\EngineCommon.hpp" />
     <ClInclude Include="Core\ErrorWarningAssert.hpp" />
     <ClInclude Include="Core\EventSystem.hpp" />

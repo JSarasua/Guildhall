@@ -474,5 +474,8 @@
     <ClInclude Include="Renderer\SkeletalMeshBone.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Delegate.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
