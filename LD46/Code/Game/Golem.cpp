@@ -233,6 +233,7 @@ void Golem::CreateMeshes()
 void Golem::CreateSkeleton()
 {
 	Transform rootTransform;
+
 	Transform headTransform;
 	headTransform.m_position.y += 2.f;
 
@@ -269,10 +270,8 @@ void Golem::CreateSkeleton()
 
 	Texture* headTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/CartoonFireFace.png");
 	Texture* headNormalTex = g_theRenderer->CreateTextureFromColor( Rgba8::WHITE );
-
 	Texture* lavaBody = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/lavaBody.png");
 	Texture* obsidianBody = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/obsidian.png");
-
 	Shader* phongShader = g_theRenderer->GetOrCreateShader("Data/Shaders/Phong.hlsl");
 
 
