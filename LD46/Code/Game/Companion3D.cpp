@@ -7,29 +7,38 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include <vector>
+#include "Engine/Renderer/MeshUtils.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 extern RenderContext* g_theRenderer;
 
-Companion3D::Companion3D( RandomNumberGenerator* rand )
+Companion3D::Companion3D( RandomNumberGenerator* rand, GPUMesh* mesh )
 {
+	m_mesh = mesh;
 	m_rand = rand;
 }
 
 Companion3D::~Companion3D()
 {
-	delete m_mesh;
+	/*delete m_mesh;*/
 	m_mesh = nullptr;
 }
 
 void Companion3D::Startup()
 {
-	m_mesh = new GPUMesh( g_theRenderer );
-
-	std::vector<Vertex_PCUTBN> sphereVerts;
-	std::vector<uint> sphereIndices;
-	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
-	m_mesh->UpdateVertices( sphereVerts );
-	m_mesh->UpdateIndices( sphereIndices );
+// 	m_mesh = new GPUMesh( g_theRenderer );
+// 
+// 	std::vector<Vertex_PCUTBN> vertexes;
+// 	std::vector<uint> indices;
+// 	MeshImportOptions_t options;
+// 	options.m_transform.SetUniformScale( 0.2f );
+// 	LoadOBJToVertexArray( vertexes, indices, "Data/Meshes/teapot.obj", options );
+// 
+// 	std::vector<Vertex_PCUTBN> sphereVerts;
+// 	std::vector<uint> sphereIndices;
+// 	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
+// 	m_mesh->UpdateVertices( vertexes );
+// 	m_mesh->UpdateIndices( indices );
 
 	m_dissolveTimer.SetSeconds( 1.0 );
 	m_respawnTimer.SetSeconds( 2.0 );
@@ -56,6 +65,7 @@ void Companion3D::Render()
 {
 	if( !(m_dissolveTimer.IsRunning() || m_respawnTimer.IsRunning()) )
 	{
+		//DebugAddWorldWireSphere( m_transform.m_position, GetRadius(), Rgba8::WHITE );
 		Mat44 modelMatrix = m_transform.ToMatrix();
 		g_theRenderer->SetModelMatrix( modelMatrix );
 		g_theRenderer->DrawMesh( m_mesh );

@@ -9,7 +9,7 @@ class RandomNumberGenerator;
 class Companion3D
 {
 public:
-	Companion3D( RandomNumberGenerator* rand );
+	Companion3D( RandomNumberGenerator* rand, GPUMesh* mesh );
 	~Companion3D();
 
 	void Startup();

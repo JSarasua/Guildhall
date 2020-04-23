@@ -10,6 +10,7 @@
 #include "Game/Golem.hpp"
 #include "Engine/Renderer/SkeletalMeshBone.hpp"
 #include "Engine/Renderer/SkeletalMesh.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 #include <vector>
 
 extern RenderContext* g_theRenderer;
@@ -56,10 +57,8 @@ void Player3D::Update( float deltaSeconds )
 
 void Player3D::Render()
 {
-// 	Mat44 modelMatrix = m_transform.ToMatrix();
-// 	g_theRenderer->SetModelMatrix( modelMatrix );
-// 	g_theRenderer->DrawMesh( m_mesh );
 	m_golem->Render();
+	//DebugAddWorldWireSphere( m_transform.m_position, GetRadius(), Rgba8::WHITE, 0.f );
 }
 
 float Player3D::GetRadius() const

@@ -4,14 +4,29 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Core/Vertex_PCUTBN.hpp"
+
+extern RenderContext* g_theRenderer;
 
 Map3D::Map3D()
 {
 	m_player = new Player3D();
 
+	m_companionMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCUTBN> vertexes;
+	std::vector<uint> indices;
+	MeshImportOptions_t options;
+	options.m_transform.SetUniformScale( 0.1f );
+	LoadOBJToVertexArray( vertexes, indices, "Data/Meshes/teapot.obj", options );
+
+	m_companionMesh->UpdateVertices( vertexes );
+	m_companionMesh->UpdateIndices( indices );
+
 	for( size_t companionIndex = 0; companionIndex < 30; companionIndex++ )
 	{
-		m_companions.push_back( new Companion3D( &m_game->m_rand ) );
+		m_companions.push_back( new Companion3D( &m_game->m_rand, m_companionMesh ) );
 	}
 }
 
@@ -21,9 +36,19 @@ Map3D::Map3D( IntVec2 const& mapSize, Game* game ) :
 {
 	m_player = new Player3D();
 
+	m_companionMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCUTBN> vertexes;
+	std::vector<uint> indices;
+	MeshImportOptions_t options;
+	options.m_transform.SetUniformScale( 0.1f );
+	LoadOBJToVertexArray( vertexes, indices, "Data/Meshes/teapot.obj", options );
+
+	m_companionMesh->UpdateVertices( vertexes );
+	m_companionMesh->UpdateIndices( indices );
+
 	for( size_t companionIndex = 0; companionIndex < 30; companionIndex++ )
 	{
-		m_companions.push_back( new Companion3D( &m_game->m_rand ) );
+		m_companions.push_back( new Companion3D( &m_game->m_rand, m_companionMesh ) );
 	}
 
 }
@@ -177,6 +202,9 @@ Map3D::~Map3D()
 {
 	delete m_player;
 	m_player = nullptr;
+
+	delete m_companionMesh;
+	m_companionMesh = nullptr;
 
 	for( size_t companionIndex = 0; companionIndex < m_companions.size(); companionIndex++ )
 	{

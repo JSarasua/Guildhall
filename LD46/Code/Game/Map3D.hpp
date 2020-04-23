@@ -2,6 +2,7 @@
 #include <vector>
 #include "Engine/Math/IntVec2.hpp"
 #include "Game/Tile.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 
 class Game;
 class Entity;
@@ -45,6 +46,7 @@ public:
 
 private:
 	//Companion3D* m_companion = nullptr;
+	GPUMesh* m_companionMesh = nullptr;
 	std::vector<Tile> m_tiles;
 	std::vector<Companion3D*> m_companions;
 

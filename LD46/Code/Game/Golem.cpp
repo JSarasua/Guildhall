@@ -6,6 +6,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -193,12 +194,18 @@ void Golem::SetupMaterials( SkeletalMeshBone* boneToAddMaterials, Texture* diffu
 
 void Golem::CreateMeshes()
 {
+	std::vector<Vertex_PCUTBN> vertexes;
+	std::vector<uint> indices;
+	MeshImportOptions_t options;
+	options.m_transform.SetUniformScale( 0.1f );
+	LoadOBJToVertexArray( vertexes, indices, "Data/Meshes/teapot.obj", options );
+
 	m_headMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCUTBN> sphereVerts;
 	std::vector<uint> sphereIndices;
 	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
-	m_headMesh->UpdateVertices( sphereVerts );
-	m_headMesh->UpdateIndices( sphereIndices );
+	m_headMesh->UpdateVertices( vertexes );
+	m_headMesh->UpdateIndices( indices );
 
 	m_chestMesh = new GPUMesh( g_theRenderer );
 	std::vector<Vertex_PCUTBN> cubeVerts;
