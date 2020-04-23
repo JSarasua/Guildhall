@@ -8,6 +8,7 @@ struct Vertex_PCUTBN;
 struct MeshImportOptions_t
 {
 public:
+	Transform m_transform;
 	bool m_hasNormals = false;
 };
 

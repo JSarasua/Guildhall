@@ -3,6 +3,7 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Core/Vertex_PCUTBN.hpp"
 
 void AppendIndexedVertsCube( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float cubeHalfHeight /*= 1.f */ )
 {
@@ -352,10 +353,17 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 	char const* objFile = (char const*)FileReadToNewBuffer( filename, &fileSize );
 	std::vector<std::string> delimetedObj = SplitStringOnDelimeter( objFile, '\n' );
 
+	Mat44 tranform = options.m_transform.ToMatrix();
+
 	std::vector<Vec3> vertexes;
 	std::vector<Vec3> normals;
 	std::vector<Vec2> uvs;
 	size_t delimetedOBJSize = delimetedObj.size();
+
+	std::string currentVertexIndex = "1";
+	std::string currentUVIndex = "1";
+	std::string currentNormalIndex = "1";
+
 	for( size_t lineIndex = 0; lineIndex < delimetedOBJSize; lineIndex++ )
 	{
 		std::string& currentLine = delimetedObj[lineIndex];
@@ -373,6 +381,7 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				std::string dataString = currentLine.substr( 3 );
 				Vec3 vertex;
 				vertex.SetFromText( dataString.c_str(), ' ' );
+				vertex = tranform.TransformPosition3D( vertex );
 				vertexes.push_back( vertex );
 			}
 			else if( secondChar == 'n' )
@@ -390,6 +399,277 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				uvs.push_back( Vec2(uv3D) );
 			}
 
+		}
+		else if( firstChar == 'f' )
+		{
+			std::string dataString = currentLine.substr( 2 );
+			//index_vert/index_normal/index_texture
+			std::vector<std::string> faces = SplitStringOnDelimeter( dataString.c_str(), ' ' );
+			if( faces.back() == "" )
+			{
+				faces.pop_back();
+			}
+			if( faces.size() == 3 )
+			{
+				std::vector<std::string> vertexData0Str = SplitStringOnDelimeter( faces[0].c_str(), '/' );
+				std::vector<std::string> vertexData1Str = SplitStringOnDelimeter( faces[1].c_str(), '/' );
+				std::vector<std::string> vertexData2Str = SplitStringOnDelimeter( faces[2].c_str(), '/' );
+
+				if( vertexData0Str[0] == "" )
+				{
+					vertexData0Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData0Str[0];
+				}
+				if( vertexData0Str[1] == "" )
+				{
+					vertexData0Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData0Str[1];
+				}
+				if( vertexData0Str[2] == "" )
+				{
+					vertexData0Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData0Str[2];
+				}
+
+				if( vertexData1Str[0] == "" )
+				{
+					vertexData1Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData1Str[0];
+				}
+				if( vertexData1Str[1] == "" )
+				{
+					vertexData1Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData1Str[1];
+				}
+				if( vertexData1Str[2] == "" )
+				{
+					vertexData1Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData1Str[2];
+				}
+
+				if( vertexData2Str[0] == "" )
+				{
+					vertexData2Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData2Str[0];
+				}
+				if( vertexData2Str[1] == "" )
+				{
+					vertexData2Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData2Str[1];
+				}
+				if( vertexData2Str[2] == "" )
+				{
+					vertexData2Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData2Str[2];
+				}
+
+
+
+				std::vector<int> vertexData0Int;
+				vertexData0Int.push_back( atoi(vertexData0Str[0].c_str()) );
+				vertexData0Int.push_back( atoi(vertexData0Str[1].c_str()) );
+				vertexData0Int.push_back( atoi(vertexData0Str[2].c_str()) );
+
+				std::vector<int> vertexData1Int;
+				vertexData1Int.push_back( atoi( vertexData1Str[0].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[1].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[2].c_str() ) );
+
+				std::vector<int> vertexData2Int;
+				vertexData2Int.push_back( atoi( vertexData2Str[0].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[1].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[2].c_str() ) );
+
+				Vertex_PCUTBN vertex0 = Vertex_PCUTBN( vertexes[vertexData0Int[0] - 1], Rgba8::WHITE, uvs[vertexData0Int[1] - 1], normals[vertexData0Int[2] - 1] );
+				Vertex_PCUTBN vertex1 = Vertex_PCUTBN( vertexes[vertexData1Int[0] - 1], Rgba8::WHITE, uvs[vertexData1Int[1] - 1], normals[vertexData1Int[2] - 1] );
+				Vertex_PCUTBN vertex2 = Vertex_PCUTBN( vertexes[vertexData2Int[0] - 1], Rgba8::WHITE, uvs[vertexData2Int[1] - 1], normals[vertexData2Int[2] - 1] );
+				masterVertexList.push_back( vertex0 );
+				masterVertexList.push_back( vertex1 );
+				masterVertexList.push_back( vertex2 );
+
+				masterIndexList.push_back( (uint)masterVertexList.size() - 3 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 2 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 1 );
+			}
+			else if( faces.size() == 4 )
+			{
+				std::vector<std::string> vertexData0Str = SplitStringOnDelimeter( faces[0].c_str(), '/' );
+				std::vector<std::string> vertexData1Str = SplitStringOnDelimeter( faces[1].c_str(), '/' );
+				std::vector<std::string> vertexData2Str = SplitStringOnDelimeter( faces[2].c_str(), '/' );
+				std::vector<std::string> vertexData3Str = SplitStringOnDelimeter( faces[3].c_str(), '/' );
+
+				if( vertexData0Str[0] == "" )
+				{
+					vertexData0Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData0Str[0];
+				}
+				if( vertexData0Str[1] == "" )
+				{
+					vertexData0Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData0Str[1];
+				}
+				if( vertexData0Str[2] == "" )
+				{
+					vertexData0Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData0Str[2];
+				}
+
+				if( vertexData1Str[0] == "" )
+				{
+					vertexData1Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData1Str[0];
+				}
+				if( vertexData1Str[1] == "" )
+				{
+					vertexData1Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData1Str[1];
+				}
+				if( vertexData1Str[2] == "" )
+				{
+					vertexData1Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData1Str[2];
+				}
+
+				if( vertexData2Str[0] == "" )
+				{
+					vertexData2Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData2Str[0];
+				}
+				if( vertexData2Str[1] == "" )
+				{
+					vertexData2Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData2Str[1];
+				}
+				if( vertexData2Str[2] == "" )
+				{
+					vertexData2Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData2Str[2];
+				}
+
+				if( vertexData3Str[0] == "" )
+				{
+					vertexData3Str[0] = currentVertexIndex;
+				}
+				else
+				{
+					currentVertexIndex = vertexData3Str[0];
+				}
+				if( vertexData3Str[1] == "" )
+				{
+					vertexData3Str[1] = currentUVIndex;
+				}
+				else
+				{
+					currentUVIndex = vertexData3Str[1];
+				}
+				if( vertexData3Str[2] == "" )
+				{
+					vertexData3Str[2] = currentNormalIndex;
+				}
+				else
+				{
+					currentNormalIndex = vertexData3Str[2];
+				}
+
+				std::vector<int> vertexData0Int;
+				vertexData0Int.push_back( atoi( vertexData0Str[0].c_str() ) );
+				vertexData0Int.push_back( atoi( vertexData0Str[1].c_str() ) );
+				vertexData0Int.push_back( atoi( vertexData0Str[2].c_str() ) );
+
+				std::vector<int> vertexData1Int;
+				vertexData1Int.push_back( atoi( vertexData1Str[0].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[1].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[2].c_str() ) );
+
+				std::vector<int> vertexData2Int;
+				vertexData2Int.push_back( atoi( vertexData2Str[0].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[1].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[2].c_str() ) );
+
+				std::vector<int> vertexData3Int;
+				vertexData3Int.push_back( atoi( vertexData3Str[0].c_str() ) );
+				vertexData3Int.push_back( atoi( vertexData3Str[1].c_str() ) );
+				vertexData3Int.push_back( atoi( vertexData3Str[2].c_str() ) );
+
+				Vertex_PCUTBN vertex0 = Vertex_PCUTBN( vertexes[vertexData0Int[0] - 1], Rgba8::WHITE, uvs[vertexData0Int[1] - 1], normals[vertexData0Int[2] - 1] );
+				Vertex_PCUTBN vertex1 = Vertex_PCUTBN( vertexes[vertexData1Int[0] - 1], Rgba8::WHITE, uvs[vertexData1Int[1] - 1], normals[vertexData1Int[2] - 1] );
+				Vertex_PCUTBN vertex2 = Vertex_PCUTBN( vertexes[vertexData2Int[0] - 1], Rgba8::WHITE, uvs[vertexData2Int[1] - 1], normals[vertexData2Int[2] - 1] );
+				Vertex_PCUTBN vertex3 = Vertex_PCUTBN( vertexes[vertexData3Int[0] - 1], Rgba8::WHITE, uvs[vertexData3Int[1] - 1], normals[vertexData3Int[2] - 1] );
+				
+				masterVertexList.push_back( vertex0 );
+				masterVertexList.push_back( vertex1 );
+				masterVertexList.push_back( vertex2 );
+
+				masterVertexList.push_back( vertex0 );
+				masterVertexList.push_back( vertex2 );
+				masterVertexList.push_back( vertex3 );
+
+				masterIndexList.push_back( (uint)masterVertexList.size() - 6 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 5 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 4 );
+
+				masterIndexList.push_back( (uint)masterVertexList.size() - 3 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 2 );
+				masterIndexList.push_back( (uint)masterVertexList.size() - 1 );
+			}
+			else
+			{
+				ERROR_AND_DIE("Invalid number of vertices in a face");
+			}
 		}
 
 	}
