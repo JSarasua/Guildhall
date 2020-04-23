@@ -241,6 +241,9 @@
     <ClCompile Include="Renderer\SkeletalMeshBone.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Core\FileUtils.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -475,6 +478,9 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Core\Delegate.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\FileUtils.hpp">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

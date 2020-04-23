@@ -54,22 +54,30 @@ const std::vector<std::string> SplitStringOnDelimeter( const char* text, const c
 	std::string textAsString = text;
 	std::vector<std::string> delimetedStrings;
 
-	size_t subStringLength = 0;
+	size_t delimeterPosition = 0;
 	size_t subStringStartIndex = 0;
+	size_t subStringOffset = 0;
 	std::string subString;
 
 
-	subStringLength = textAsString.find( delimeter , subStringStartIndex);
+	delimeterPosition = textAsString.find( delimeter , subStringStartIndex);
 
-	while( subStringLength != std::string::npos ) {
-		subString = textAsString.substr(subStringStartIndex,subStringLength);
+	subStringOffset = delimeterPosition;
+
+	while( delimeterPosition != std::string::npos ) {
+		subString = textAsString.substr(subStringStartIndex, subStringOffset);
+
 		delimetedStrings.push_back(subString);
 
-		subStringStartIndex = subStringLength + 1;
-		subStringLength = textAsString.find( delimeter , subStringStartIndex);
+		subStringStartIndex = delimeterPosition + 1;
+		delimeterPosition = textAsString.find( delimeter , subStringStartIndex);
+		//delimeterPosition += 1;
+		//subStringLength -= subStringStartIndex;
+
+		subStringOffset = delimeterPosition - subStringStartIndex;
 	}
 
-	subString = textAsString.substr(subStringStartIndex,subStringLength);
+	subString = textAsString.substr(subStringStartIndex,delimeterPosition);
 	delimetedStrings.push_back(subString);
 
 	return delimetedStrings;
