@@ -59,7 +59,7 @@ public:
 
 	bool	IsAlmostEqual( Vec3 const& other, float epsilon = 0.001f );
 
-	void	SetFromText(const char* text);
+	void	SetFromText(const char* text, char const& delimeter = ',' );
 
 	/*
 	void	SetAngleRadians( float orientationRadians );

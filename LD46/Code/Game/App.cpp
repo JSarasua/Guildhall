@@ -6,6 +6,8 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Core/Delegate.hpp"
+#include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/StringUtils.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;

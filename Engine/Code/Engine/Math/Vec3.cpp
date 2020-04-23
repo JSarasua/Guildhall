@@ -300,11 +300,11 @@ bool Vec3::IsAlmostEqual( Vec3 const& other, float epsilon /*= 0.001f */ )
 }
 
 //-----------------------------------------------------------------------------------------------
-void Vec3::SetFromText( const char* text )
+void Vec3::SetFromText( const char* text, char const& delimeter )
 {
 	std::string strText = text;
 
-	std::vector<std::string> splitStrings = SplitStringOnDelimeter( text, ',' );
+	std::vector<std::string> splitStrings = SplitStringOnDelimeter( text, delimeter );
 	GUARANTEE_OR_DIE( splitStrings.size() == 3, Stringf( "Vec3 can't construct from improper string \"%s\"", text ) );
 
 	x = (float)atof( splitStrings[0].c_str() );

@@ -1,6 +1,8 @@
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/StringUtils.hpp"
 
 void AppendIndexedVertsCube( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float cubeHalfHeight /*= 1.f */ )
 {
@@ -342,5 +344,54 @@ void AppendIndexedVertsCylinder( std::vector<Vertex_PCU>& masterVertexList, std:
 void AppendIndexedVertsCone( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 const& basePos, float baseRadius, Vec3 const& endPos, uint cuts /*= 16*/, Rgba8 color /*= Rgba8::WHITE */ )
 {
 	AppendIndexedVertsCylinder( masterVertexList, masterIndexList, basePos, baseRadius, endPos, 0.f, cuts, color );
+}
+
+void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, char const* filename, MeshImportOptions_t const& options )
+{
+	size_t fileSize = 0;
+	char const* objFile = (char const*)FileReadToNewBuffer( filename, &fileSize );
+	std::vector<std::string> delimetedObj = SplitStringOnDelimeter( objFile, '\n' );
+
+	std::vector<Vec3> vertexes;
+	std::vector<Vec3> normals;
+	std::vector<Vec2> uvs;
+	size_t delimetedOBJSize = delimetedObj.size();
+	for( size_t lineIndex = 0; lineIndex < delimetedOBJSize; lineIndex++ )
+	{
+		std::string& currentLine = delimetedObj[lineIndex];
+		if( currentLine.length() < 3 )
+		{
+			continue;
+		}
+		char const firstChar = currentLine.at(0);
+		char const secondChar = currentLine.at(1);
+		if( firstChar == 'v' )
+		{
+			if( secondChar == ' ' )
+			{
+				//starting at 3rd char split on space
+				std::string dataString = currentLine.substr( 3 );
+				Vec3 vertex;
+				vertex.SetFromText( dataString.c_str(), ' ' );
+				vertexes.push_back( vertex );
+			}
+			else if( secondChar == 'n' )
+			{
+				std::string dataString = currentLine.substr( 3 );
+				Vec3 normal;
+				normal.SetFromText( dataString.c_str(), ' ' );
+				normals.push_back( normal );
+			}
+			else if( secondChar == 't' )
+			{
+				std::string dataString = currentLine.substr( 3 );
+				Vec3 uv3D;
+				uv3D.SetFromText( dataString.c_str(), ' ' );
+				uvs.push_back( Vec2(uv3D) );
+			}
+
+		}
+
+	}
 }
 

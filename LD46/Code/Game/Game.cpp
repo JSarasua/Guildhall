@@ -40,6 +40,13 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	std::vector<Vertex_PCUTBN> vertexes;
+	std::vector<uint> indices;
+	MeshImportOptions_t options;
+	LoadOBJToVertexArray( vertexes, indices, "Data/Meshes/teapot.obj", options );
+
+
+
 	EnableDebugRendering();
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
