@@ -105,7 +105,7 @@ $RECYCLE.BIN/
 
 # EXAMPLES
 # Don't ignore all files with `obj` extension underneat `build` folder, including subfolders
-# !Protogame/Run/**/*.obj
+!**/Run/**/*.obj
 
 # Ignore all dlls, except dlls extensions files ONLY in `Protogame/Run` folder
 #*.dll 
