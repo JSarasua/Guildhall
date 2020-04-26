@@ -86,20 +86,23 @@ void Game::Startup()
 	m_normalTextures.push_back( normalTestSphereTexture );
 
 
-	m_cubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
+	m_loadedMeshModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
 	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
 	m_triPlanarSphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 8.f, 0.f, -10.f ) );
 	m_quadModelMatrix = Mat44::CreateTranslation3D( Vec3( -4.f, 0.f, -10.f ) );
 	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
 	m_numberOfCirclingCubes = 18;
 
-	m_cubeMesh = new GPUMesh( g_theRenderer );
+	m_loadedMesh = new GPUMesh( g_theRenderer );
 
-	std::vector<Vertex_PCUTBN> cubeVerts;
-	std::vector<uint> cubeIndices;
-	Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
-	m_cubeMesh->UpdateVertices( cubeVerts );
-	m_cubeMesh->UpdateIndices( cubeIndices );
+	std::vector<Vertex_PCUTBN> loadedVerts;
+	std::vector<uint> loadedIndices;
+	MeshImportOptions_t options;
+	options.m_transform.SetUniformScale( 0.1f );
+	LoadOBJToVertexArray( loadedVerts, loadedIndices, "Data/Meshes/teapot.obj", options );
+	//Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
+	m_loadedMesh->UpdateVertices( loadedVerts );
+	m_loadedMesh->UpdateIndices( loadedIndices );
 
 
 	m_sphereMesh = new GPUMesh( g_theRenderer );
@@ -180,8 +183,8 @@ void Game::Startup()
 
 void Game::Shutdown()
 {
-	delete m_cubeMesh;
-	m_cubeMesh = nullptr;
+	delete m_loadedMesh;
+	m_loadedMesh = nullptr;
 
 	delete m_sphereMesh;
 	m_sphereMesh = nullptr;
@@ -217,8 +220,8 @@ void Game::Update()
 	UpdateLightPosition( dt );
 
 
-	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
-	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
+// 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
+// 	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
 	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
 	m_sphereModelMatrix.RotateYDegrees( -15.f * dt );
 	m_triPlanarSphereModelMatrix.RotateXDegrees( 30.f * dt );
@@ -351,10 +354,11 @@ void Game::Render()
 	g_theRenderer->DisableLight( 0 );
 	EnableLights();
 	//g_theRenderer->EnableLight( 0, m_pointLight );
-	g_theRenderer->BindShader( dissolveShader );
-	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
+	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
+	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
 	g_theRenderer->BindDataTexture( 8, noiseTexture );
-	g_theRenderer->DrawMesh( m_cubeMesh );
+	g_theRenderer->DrawMesh( m_loadedMesh );
 
 
 // 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
@@ -413,35 +417,35 @@ void Game::Render()
 
 
 	//Projection
-	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
-	g_theRenderer->BindDataTexture( 14, projectionTexture );
-	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
- 	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
- 	MatrixInvertOrthoNormal( lightView0 );
-
-	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
-	Mat44 viewMatrix = m_camera.GetViewMatrix();
-	newProjectionMatrix.TransformBy( lightView0 );
-
-	projection_t projectionData;
-	projectionData.projection = newProjectionMatrix;
-	projectionData.position = m_lights[0].position;
-	projectionData.strength = 1.f;
-
-
-	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
-	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
-	g_theRenderer->BindShader( projectionShader );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-	g_theRenderer->SetModelMatrix( m_cubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
-	g_theRenderer->DrawMesh( m_quadMesh );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	RenderCircleOfSpheres();
+// 	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
+// 	g_theRenderer->BindDataTexture( 14, projectionTexture );
+// 	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
+//  	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
+//  	MatrixInvertOrthoNormal( lightView0 );
+// 
+// 	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
+// 	Mat44 viewMatrix = m_camera.GetViewMatrix();
+// 	newProjectionMatrix.TransformBy( lightView0 );
+// 
+// 	projection_t projectionData;
+// 	projectionData.projection = newProjectionMatrix;
+// 	projectionData.position = m_lights[0].position;
+// 	projectionData.strength = 1.f;
+// 
+// 
+// 	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
+// 	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
+// 	g_theRenderer->BindShader( projectionShader );
+// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
+// 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
+// 	g_theRenderer->DrawMesh( m_loadedMesh );
+// 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
+// 	g_theRenderer->DrawMesh( m_quadMesh );
+// 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+// 	g_theRenderer->DrawMesh( m_sphereMesh );
+// 	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
+// 	g_theRenderer->DrawMesh( m_sphereMesh );
+// 	RenderCircleOfSpheres();
 
 
 	RenderDevConsole();

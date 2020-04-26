@@ -99,7 +99,7 @@ private:
 	void SetLightPosition( Vec3 const& pos );
 
 private:
-	Mat44 m_cubeModelMatrix;
+	Mat44 m_loadedMeshModelMatrix;
 	Mat44 m_circleOfSpheresModelMatrix;
 	Mat44 m_quadModelMatrix;
 	Mat44 m_sphereModelMatrix;
@@ -117,7 +117,7 @@ private:
 
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
-	GPUMesh* m_cubeMesh = nullptr;
+	GPUMesh* m_loadedMesh = nullptr;
 	GPUMesh* m_sphereMesh = nullptr;
 	GPUMesh* m_quadMesh = nullptr;
 	Texture* m_screenTexture = nullptr;
