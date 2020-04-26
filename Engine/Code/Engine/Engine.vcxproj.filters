@@ -38,6 +38,9 @@
     <Filter Include="Time">
       <UniqueIdentifier>{69c6862b-1ffb-4be0-af27-27dc0c227bfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThirdParty\MikkT">
+      <UniqueIdentifier>{810b3044-56d8-4a5f-863c-19fb234e30a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -243,6 +246,9 @@
     </ClCompile>
     <ClCompile Include="Core\FileUtils.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\MikkT\mikktspace.c">
+      <Filter>ThirdParty\MikkT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -482,6 +488,9 @@
     </ClInclude>
     <ClInclude Include="Core\FileUtils.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ThirdParty\MikkT\mikktspace.h">
+      <Filter>ThirdParty\MikkT</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

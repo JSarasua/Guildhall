@@ -673,5 +673,93 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 		}
 
 	}
+
+	GenerateTangentsForVertexArray( masterVertexList );
+}
+
+int GetNumFaces( SMikkTSpaceContext const* context )
+{
+	std::vector<Vertex_PCUTBN>& vertices = *(std::vector<Vertex_PCUTBN>*)(context->m_pUserData);
+	return (int)vertices.size()/3;
+}
+
+int GetNumberOfVerticesForFace( SMikkTSpaceContext const* pContext, const int iFace )
+{
+	UNUSED( pContext );
+	UNUSED( iFace );
+	return 3;
+}
+
+void GetPositionForFaceVert( SMikkTSpaceContext const* pContext, float fvPosOut[], const int iFace, const int iVert )
+{
+	std::vector<Vertex_PCUTBN>& vertices = *(std::vector<Vertex_PCUTBN>*)(pContext->m_pUserData);
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	//Get our position
+	Vec3 ourPos = vertices[indexInVertexArray].position;
+	fvPosOut[0] = ourPos.x;
+	fvPosOut[1] = ourPos.y;
+	fvPosOut[2] = ourPos.z;
+}
+
+void GetNormalForFaceVert( SMikkTSpaceContext const* pContext, float fvNormOut[], const int iFace, const int iVert )
+{
+	std::vector<Vertex_PCUTBN>& vertices = *(std::vector<Vertex_PCUTBN>*)(pContext->m_pUserData);
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	//Get our position
+	Vec3 ourNorm = vertices[indexInVertexArray].normal;
+	fvNormOut[0] = ourNorm.x;
+	fvNormOut[1] = ourNorm.y;
+	fvNormOut[2] = ourNorm.z;
+}
+
+void GetUVForFaceVert( SMikkTSpaceContext const* pContext, float fvTexcOut[], const int iFace, const int iVert )
+{
+	std::vector<Vertex_PCUTBN>& vertices = *(std::vector<Vertex_PCUTBN>*)(pContext->m_pUserData);
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	//Get our position
+	Vec2 ourUVs = vertices[indexInVertexArray].uvTexCoords;
+	fvTexcOut[0] = ourUVs.x;
+	fvTexcOut[1] = ourUVs.y;
+}
+
+void SetTangent( SMikkTSpaceContext const* pContext, float const fvTangent[], float const fSign, int const iFace, int const iVert )
+{
+	std::vector<Vertex_PCUTBN>& vertices = *(std::vector<Vertex_PCUTBN>*)(pContext->m_pUserData);
+	int indexInVertexArray = iFace * 3 + iVert;
+
+	Vec3 normal = vertices[indexInVertexArray].normal;
+	
+	Vec3 tangent = Vec3( fvTangent[0], fvTangent[1], fvTangent[2] );
+	Vec3 bitangent = CrossProduct( normal, tangent ) * fSign;
+
+
+	vertices[indexInVertexArray].tangent = tangent;
+	vertices[indexInVertexArray].bitangent = bitangent;
+}
+
+void GenerateTangentsForVertexArray( std::vector<Vertex_PCUTBN>& vertices )
+{
+	SMikkTSpaceInterface interface;
+
+	//How MikkT gets info
+	interface.m_getNumFaces = GetNumFaces;
+	interface.m_getNumVerticesOfFace = GetNumberOfVerticesForFace;
+	interface.m_getPosition = GetPositionForFaceVert;
+	interface.m_getNormal = GetNormalForFaceVert;
+	interface.m_getTexCoord = GetUVForFaceVert;
+
+	//How Mikkt gives us info
+	interface.m_setTSpaceBasic = SetTangent;
+	interface.m_setTSpace = nullptr;
+
+	SMikkTSpaceContext context;
+	context.m_pInterface = &interface;
+	context.m_pUserData = &vertices;
+
+	//Run algorithm
+	genTangSpaceDefault( &context );
 }
 
