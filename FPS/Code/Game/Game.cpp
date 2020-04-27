@@ -331,13 +331,13 @@ void Game::Render()
 {
 	g_theRenderer->BeginCamera(m_camera);
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
-	g_theRenderer->SetBlendMode(BlendMode::ADDITIVE);
+	g_theRenderer->SetBlendMode(eBlendMode::ADDITIVE);
 
 // 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
 // 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
 
 
- 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+ 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
  	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
 
@@ -354,7 +354,7 @@ void Game::Render()
 	g_theRenderer->DisableLight( 0 );
 	EnableLights();
 	//g_theRenderer->EnableLight( 0, m_pointLight );
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
 	g_theRenderer->BindDataTexture( 8, noiseTexture );
@@ -364,7 +364,7 @@ void Game::Render()
 // 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
 // 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
 // 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
@@ -377,7 +377,7 @@ void Game::Render()
 
 
 
-	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	fresnel_t fresnel;
 	fresnel.color = Vec3( 0.f, 1.f, 0.f );
@@ -411,7 +411,7 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
 
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
 

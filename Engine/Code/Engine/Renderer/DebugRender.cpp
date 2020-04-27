@@ -593,7 +593,7 @@ void DebugRenderWorldToCamera( Camera* cam )
 
 	context->BeginCamera( *cam );
 	context->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL ); //Change to add if writing to depth buffer for xray mode
-	context->SetBlendMode( BlendMode::ALPHA );
+	context->SetBlendMode( eBlendMode::ALPHA );
 	context->BindTexture( nullptr );
 	context->BindShader( (Shader*)nullptr );
 
@@ -669,7 +669,7 @@ void DebugRenderScreenTo( Texture* output )
 
 	context->BeginCamera( cam );
 	context->SetDepth( eDepthCompareMode::COMPARE_ALWAYS );
-	context->SetBlendMode( BlendMode::ALPHA );
+	context->SetBlendMode( eBlendMode::ALPHA );
 	context->BindTexture( nullptr );
 	context->BindShader( (Shader*)nullptr );
 

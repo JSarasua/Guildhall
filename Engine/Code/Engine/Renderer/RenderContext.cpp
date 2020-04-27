@@ -1,20 +1,21 @@
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Math/AABB2.hpp"
-#include "Engine/Core/StringUtils.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
-#include "Engine/Renderer/SwapChain.hpp"
-#include "Engine/Platform/Window.hpp"
-#include "Engine/Renderer/TextureView.hpp"
-#include "Engine/Renderer/Shader.hpp"
-#include "Engine/Renderer/Sampler.hpp"
-#include "Engine/Renderer/RenderBuffer.hpp"
-#include "Engine/Core/Time.hpp"
-#include "Engine/Renderer/GPUMesh.hpp"
-#include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Time/Clock.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Math/Polygon2D.hpp"
+#include "Engine/Renderer/RenderBuffer.hpp"
+#include "Engine/Renderer/Sampler.hpp"
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include "Engine/Renderer/SwapChain.hpp"
+#include "Engine/Renderer/TextureView.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -295,6 +296,23 @@ void RenderContext::AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexL
 	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.maxs ),tint, uvMaxs ));
 	masterVertexList.push_back( Vertex_PCU( Vec3( Vec2( aabb.mins.x, aabb.maxs.y ) ),tint, Vec2( uvMins.x,uvMaxs.y ) ));
 	
+}
+
+void RenderContext::BindShaderState( ShaderState* shaderState )
+{
+	if( nullptr != shaderState )
+	{
+		SetBlendMode( shaderState->m_blendMode );
+		SetDepth( shaderState->m_compareMode, shaderState->m_writeDepth );
+		SetFrontFaceWindOrder( shaderState->m_windingOrder );
+		SetCullMode( shaderState->m_cullMode );
+		SetFillMode( shaderState->m_fillMode );
+
+
+		Shader* shader = GetOrCreateShader( shaderState->m_shaderFilePath.c_str() );
+		BindShader( shader );
+
+	}
 }
 
 void RenderContext::BindShader( Shader* shader )
@@ -822,17 +840,17 @@ void RenderContext::BindSampler( Sampler const* constSampler )
 	m_context->PSSetSamplers( 0, 1, &samplerHandle );
 }
 
-void RenderContext::SetBlendMode( BlendMode blendMode )
+void RenderContext::SetBlendMode( eBlendMode blendMode )
 {
 	float const zeroes[] ={ 0, 0, 0, 0 };
 
 	switch( blendMode )
 	{
-	case BlendMode::ALPHA: 	m_context->OMSetBlendState( m_alphaBlendStateHandle, zeroes, ~(uint)0 );
+	case eBlendMode::ALPHA: 	m_context->OMSetBlendState( m_alphaBlendStateHandle, zeroes, ~(uint)0 );
 		break;
-	case BlendMode::ADDITIVE: 	m_context->OMSetBlendState( m_additiveBlendStateHandle, zeroes, ~(uint)0 );
+	case eBlendMode::ADDITIVE: 	m_context->OMSetBlendState( m_additiveBlendStateHandle, zeroes, ~(uint)0 );
 		break;
-	case BlendMode::SOLID: 	m_context->OMSetBlendState( m_solidBlendStateHandle, zeroes, ~(uint)0 );
+	case eBlendMode::SOLID: 	m_context->OMSetBlendState( m_solidBlendStateHandle, zeroes, ~(uint)0 );
 		break;
 	default:
 		break;

@@ -13,6 +13,7 @@ class Polygon2D;
 class Window;
 class SwapChain;
 class Shader;
+class ShaderState;
 class RenderBuffer;
 class VertexBuffer;
 class IndexBuffer;
@@ -85,7 +86,7 @@ enum class Viewport
 	FullScreen
 };
 
-enum class BlendMode
+enum class eBlendMode
 {
 	ALPHA,
 	ADDITIVE,
@@ -160,6 +161,7 @@ public:
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
 	void AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexList, const AABB2& aabb, const Rgba8& tint, const Vec2& uvMins, const Vec2& uvMaxs );
 
+	void BindShaderState( ShaderState* shaderState );
 	void BindShader( Shader* shader );
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
@@ -212,7 +214,7 @@ public:
 	void BindNormal( const Texture* constTex );
 	void BindDataTexture( uint slot, Texture const* constTex );
 	void BindSampler( Sampler const* constSampler );
-	void SetBlendMode( BlendMode blendMode );
+	void SetBlendMode( eBlendMode blendMode );
 	void CreateBlendModes();
 	bool IsDrawing() const;
 
