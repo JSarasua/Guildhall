@@ -164,6 +164,7 @@
     <ClCompile Include="Core\EventSystem.cpp" />
     <ClCompile Include="Core\FileUtils.cpp" />
     <ClCompile Include="Core\Image.cpp" />
+    <ClCompile Include="Core\NamedProperties.cpp" />
     <ClCompile Include="Core\NamedStrings.cpp" />
     <ClCompile Include="Core\Rgba8.cpp" />
     <ClCompile Include="Core\StringUtils.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="Renderer\Camera.cpp" />
     <ClCompile Include="Renderer\DebugRender.cpp" />
     <ClCompile Include="Renderer\GPUMesh.cpp" />
+    <ClCompile Include="Renderer\Material.cpp" />
     <ClCompile Include="Renderer\MeshUtils.cpp" />
     <ClCompile Include="Renderer\RenderBuffer.cpp" />
     <ClCompile Include="Renderer\RenderContext.cpp" />
@@ -246,6 +248,7 @@
     <ClInclude Include="Core\EventSystem.hpp" />
     <ClInclude Include="Core\FileUtils.hpp" />
     <ClInclude Include="Core\Image.hpp" />
+    <ClInclude Include="Core\NamedProperties.hpp" />
     <ClInclude Include="Core\NamedStrings.hpp" />
     <ClInclude Include="Core\Rgba8.hpp" />
     <ClInclude Include="Core\StringUtils.hpp" />
@@ -291,6 +294,7 @@
     <ClInclude Include="Renderer\D3D11Common.hpp" />
     <ClInclude Include="Renderer\DebugRender.hpp" />
     <ClInclude Include="Renderer\GPUMesh.hpp" />
+    <ClInclude Include="Renderer\Material.hpp" />
     <ClInclude Include="Renderer\MeshUtils.hpp" />
     <ClInclude Include="Renderer\RenderBuffer.hpp" />
     <ClInclude Include="Renderer\RenderContext.hpp" />

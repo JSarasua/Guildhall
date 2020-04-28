@@ -9,11 +9,13 @@
 #include <vector>
 
 
-class Player;
-class World;
-class Shader;
-class GPUMesh;
 class Clock;
+class GPUMesh;
+class Material;
+class Player;
+class Shader;
+class ShaderState;
+class World;
 
 struct light_t;
 
@@ -150,6 +152,9 @@ private:
 	Rgba8 m_fogRed = Rgba8( 50, 0, 0 );
 	Rgba8 m_fogBlue = Rgba8( 0, 0, 50 );
 	float m_fogColorLerp = 0.5f;
+
+	ShaderState* m_testShaderState = nullptr;
+	Material* m_testMaterial = nullptr;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

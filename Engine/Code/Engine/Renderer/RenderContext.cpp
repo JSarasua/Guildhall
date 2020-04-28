@@ -5,6 +5,7 @@
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Renderer/Material.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Renderer/RenderBuffer.hpp"
 #include "Engine/Renderer/Sampler.hpp"
@@ -308,10 +309,13 @@ void RenderContext::BindShaderState( ShaderState* shaderState )
 		SetCullMode( shaderState->m_cullMode );
 		SetFillMode( shaderState->m_fillMode );
 
+		Shader* shader = shaderState->m_shader;
+		if( nullptr == shaderState->m_shader )
+		{
+			shader = GetOrCreateShader( shaderState->m_shaderFilePath.c_str() );
+		}
 
-		Shader* shader = GetOrCreateShader( shaderState->m_shaderFilePath.c_str() );
 		BindShader( shader );
-
 	}
 }
 
@@ -468,7 +472,44 @@ void RenderContext::BindUniformBuffer( unsigned int slot, RenderBuffer* ubo )
 void RenderContext::SetMaterialData( void const* data, size_t dataSize )
 {
 	m_ubo->Update( data, dataSize, dataSize );
-	BindUniformBuffer( 5, m_ubo );
+	BindMaterialBuffer( m_ubo );
+	//BindUniformBuffer( MATERIALBUFFERSLOT, m_ubo );
+}
+
+void RenderContext::BindMaterialBuffer( RenderBuffer* ubo )
+{
+	BindUniformBuffer( MATERIALBUFFERSLOT, ubo );
+}
+
+void RenderContext::BindMaterial( Material* mat )
+{
+	m_specularFactor = mat->m_specularFactor;
+	m_specularPower = mat->m_specularPower;
+	m_modelTint = mat->m_tint;
+	UpdateModelData();
+
+	BindShaderState( mat->m_shaderState );
+
+	BindTexture( mat->m_diffuseTexture );
+	BindNormal( mat->m_normalTexture );
+
+	std::vector<Texture*>& textures = mat->m_texturePerSlot;
+	for( size_t textureIndex = 0; textureIndex < textures.size(); textureIndex++ )
+	{
+		uint slot = DATATEXTUREOFFSET + (uint)textureIndex;
+		BindDataTexture( slot, textures[textureIndex] );
+	}
+
+	std::vector<Sampler*>& samplers = mat->m_samplersPerSlot;
+	for( size_t samplerIndex = 0; samplerIndex < samplers.size(); samplerIndex++ )
+	{
+		uint slot = (uint)samplerIndex;
+		BindSamplerAt( slot, samplers[samplerIndex] );
+	}
+
+	mat->UpdateUBOIfDirty();
+	BindMaterialBuffer( mat->m_ubo );
+	
 }
 
 void RenderContext::SetModelMatrix( Mat44 const& model, Rgba8 const& tint )
@@ -838,6 +879,17 @@ void RenderContext::BindSampler( Sampler const* constSampler )
 	}
 	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
 	m_context->PSSetSamplers( 0, 1, &samplerHandle );
+}
+
+void RenderContext::BindSamplerAt( uint slot, Sampler const* constSampler )
+{
+	Sampler* sampler = const_cast<Sampler*>(constSampler);
+	if( nullptr == sampler )
+	{
+		sampler = m_sampPoint;
+	}
+	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
+	m_context->PSSetSamplers( slot, 1, &samplerHandle );
 }
 
 void RenderContext::SetBlendMode( eBlendMode blendMode )

@@ -1,24 +1,26 @@
 #pragma once
 #include "Game/Game.hpp"
-#include "App.hpp"
-#include "Game/World.hpp"
-#include "Game/GameCommon.hpp"
-#include "Game/Player.hpp"
-#include "Engine/Math/LineSegment3.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Core/StringUtils.hpp"
-#include "Engine/Input/XboxController.hpp"
-#include "Engine/Input/InputSystem.hpp"
-#include "Engine/Core/EngineCommon.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Math/AABB2.hpp"
-#include "Engine/Renderer/GPUMesh.hpp"
+#include "App.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Time/Clock.hpp"
-#include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/GameCommon.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/LineSegment3.hpp"
+#include "Engine/Renderer/Material.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Renderer/MeshUtils.hpp"
+#include "Game/Player.hpp"
 #include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/ShaderState.hpp"
+#include "Engine/Core/StringUtils.hpp"
+#include "Game/World.hpp"
+#include "Engine/Input/XboxController.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -44,6 +46,28 @@ void Game::Startup()
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 160.f, 90.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
+
+	XmlDocument shaderStateDoc;
+	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );
+	m_testShaderState = new ShaderState( element );
+	m_testMaterial = new Material( g_theRenderer, "" );
+	m_testMaterial->SetShaderStateByName( m_testShaderState );
+
+	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
+	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
+	dissolve_t dissolveData;
+	dissolveData.amount = m_dissolveAmount;
+	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
+	dissolveData.edgeNearColor = Vec3( 1.f, 1.f, 0.f );
+	dissolveData.edgeWidth = 0.1f;
+	
+	m_testMaterial->SetData( dissolveData );
+	m_testMaterial->SetShaderByName( dissolveShader );
+	
+	m_testMaterial->m_texturePerSlot.push_back( noiseTexture );
+
+	//g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
+
 	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
 	Shader* litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
 	Shader* normalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Normals.hlsl" );
@@ -191,6 +215,12 @@ void Game::Shutdown()
 
 	delete m_quadMesh;
 	m_quadMesh = nullptr;
+
+	delete m_testShaderState;
+	m_testShaderState = nullptr;
+
+	delete m_testMaterial;
+	m_testMaterial = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -343,34 +373,41 @@ void Game::Render()
 
 	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
 	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
-	dissolve_t dissolveData;
-	dissolveData.amount = m_dissolveAmount;
-	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
-	dissolveData.edgeNearColor = Vec3( 1.f, 1.f, 0.f );
-	dissolveData.edgeWidth = 0.1f;
+	dissolve_t* dissolveData = m_testMaterial->GetDataAs<dissolve_t>();
 
-	g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
+	dissolveData->amount = m_dissolveAmount;
+	dissolveData->edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
+	dissolveData->edgeNearColor = Vec3( 1.f, 1.f, 0.f );
+	dissolveData->edgeWidth = 0.1f;
+
+	m_testMaterial->SetData( *dissolveData );
+	m_testMaterial->SetDiffuseTexture( m_renderTextures[m_currentRenderTextureIndex] );
+	m_testMaterial->SetNormalTexture( m_normalTextures[m_currentNormalTextureIndex] );
+
+	//g_theRenderer->SetMaterialData( dissolveData, sizeof( *dissolveData ) );
+
 
 	g_theRenderer->DisableLight( 0 );
 	EnableLights();
 	//g_theRenderer->EnableLight( 0, m_pointLight );
-	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
+	//g_theRenderer->SetBlendMode( eBlendMode::SOLID );
+	//g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
+	//g_theRenderer->BindShaderState( m_testShaderState );
+	//g_theRenderer->BindDataTexture( 8, noiseTexture );
+
 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
-	g_theRenderer->BindDataTexture( 8, noiseTexture );
+	g_theRenderer->BindMaterial( m_testMaterial );
 	g_theRenderer->DrawMesh( m_loadedMesh );
 
 
-// 	g_theRenderer->SetBlendMode( BlendMode::SOLID );
-// 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
-// 	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
+
 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
+	//g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
 	g_theRenderer->DrawMesh( m_quadMesh );
 
-	g_theRenderer->BindShader( dissolveShader );
+	//g_theRenderer->BindShader( dissolveShader );
 	g_theRenderer->BindDataTexture( 8, noiseTexture );
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
@@ -926,6 +963,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
 		g_theRenderer->SetSpecularFactor( newSpecularFactor );
+		m_testMaterial->m_specularFactor = newSpecularFactor;
 	}
 	if( rBracketKey.IsPressed() )
 	{
@@ -934,6 +972,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
 		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
 		g_theRenderer->SetSpecularFactor( newSpecularFactor );
+		m_testMaterial->m_specularFactor = newSpecularFactor;
 	}
 	if( semiColonKey.IsPressed() )
 	{
@@ -942,6 +981,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
 		g_theRenderer->SetSpecularPower( newSpecularPower );
+		m_testMaterial->m_specularPower = newSpecularPower;
 	}
 	if( singleQuoteKey.IsPressed() )
 	{
@@ -950,6 +990,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
 		newSpecularPower = Max( newSpecularPower, 1.f );
 		g_theRenderer->SetSpecularPower( newSpecularPower );
+		m_testMaterial->m_specularPower = newSpecularPower;
 	}
 	if( commaKey.WasJustPressed() )
 	{

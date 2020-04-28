@@ -1,33 +1,36 @@
 #pragma once
+#include "Engine/Renderer/Texture.hpp"
 #include "Engine/Math/Vec4.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Core/Vertex_PCUTBN.hpp"
-#include "Engine/Renderer/Texture.hpp"
 #include <vector>
 #include <string>
 
-
-class Sampler;
 class BitmapFont;
+class Clock;
+class GPUMesh;
+class IndexBuffer;
+class Material;
 class Polygon2D;
-class Window;
-class SwapChain;
+class RenderBuffer;
+class Sampler;
 class Shader;
 class ShaderState;
-class RenderBuffer;
+class SwapChain;
 class VertexBuffer;
-class IndexBuffer;
-class GPUMesh;
-class Clock;
+class Window;
 
 struct AABB2;
+struct ID3D11BlendState;
+struct ID3D11Buffer;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
-struct ID3D11Buffer;
-struct ID3D11BlendState;
 struct IDXGIDebug;
 struct ID3D11DepthStencilState;
 struct ID3D11RasterizerState;
+
+constexpr uint DATATEXTUREOFFSET = 8;
+constexpr uint MATERIALBUFFERSLOT = 5;
 
 struct FrameData
 {
@@ -168,6 +171,8 @@ public:
 	void BindIndexBuffer( IndexBuffer* ibo );
 	void BindUniformBuffer( unsigned int slot, RenderBuffer* ubo ); // ubo - uniform buffer object
 	void SetMaterialData( void const* data, size_t dataSize );
+	void BindMaterialBuffer( RenderBuffer* ubo );
+	void BindMaterial( Material* mat );
 
 	void SetDepth( eDepthCompareMode compareMode, eDepthWriteMode writeMode = eDepthWriteMode::WRITE_ALL );
 	void UpdateModelData();
@@ -214,6 +219,7 @@ public:
 	void BindNormal( const Texture* constTex );
 	void BindDataTexture( uint slot, Texture const* constTex );
 	void BindSampler( Sampler const* constSampler );
+	void BindSamplerAt( uint slot, Sampler const* constSampler );
 	void SetBlendMode( eBlendMode blendMode );
 	void CreateBlendModes();
 	bool IsDrawing() const;

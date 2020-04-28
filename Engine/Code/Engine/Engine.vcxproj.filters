@@ -253,6 +253,12 @@
     <ClCompile Include="Renderer\ShaderState.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Core\NamedProperties.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Material.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -496,6 +502,12 @@
       <Filter>ThirdParty\MikkT</Filter>
     </ClInclude>
     <ClInclude Include="Renderer\ShaderState.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NamedProperties.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Material.hpp">
       <Filter>Renderer</Filter>
     </ClInclude>
   </ItemGroup>

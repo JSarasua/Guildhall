@@ -8,6 +8,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{c1cab804-90f0-4c86-9e04-f526d076d395}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ShaderStates">
+      <UniqueIdentifier>{da0e0c03-1253-4fd4-a34c-f67886d685f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -110,5 +113,10 @@
     <FxCompile Include="..\..\Run\Data\Shaders\Projection.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml">
+      <Filter>ShaderStates</Filter>
+    </Xml>
   </ItemGroup>
 </Project>
