@@ -128,7 +128,7 @@ void App::Render()
 	m_game->Render();
 
 	g_theRenderer->BeginCamera(*m_devConsoleCamera);
-	g_theRenderer->SetBlendMode(BlendMode::ALPHA);
+	g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
 	g_theConsole->Render(*g_theRenderer, *m_devConsoleCamera, 0.1f);
 	g_theRenderer->EndCamera(*m_devConsoleCamera);
 }

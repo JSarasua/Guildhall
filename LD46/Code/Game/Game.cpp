@@ -225,7 +225,7 @@ void Game::Render()
 
 	Texture* lavaTexture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/TileableLava.png");
 	g_theRenderer->BindTexture( lavaTexture );
-	g_theRenderer->SetBlendMode( BlendMode::SOLID );
+	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
