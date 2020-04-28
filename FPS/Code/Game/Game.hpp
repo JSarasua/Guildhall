@@ -95,6 +95,7 @@ private:
 	void UpdateEntities( float deltaSeconds );
 	void UpdateCamera( float deltaSeconds );
 	void RenderGame();
+	void RenderProjection();
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
 	IntVec2 GetCurrentMapBounds() const;
@@ -155,6 +156,8 @@ private:
 
 	ShaderState* m_testShaderState = nullptr;
 	Material* m_testMaterial = nullptr;
+
+
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

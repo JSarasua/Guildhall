@@ -113,6 +113,13 @@ void RenderContext::EndFrame()
 
 void RenderContext::Shutdown()
 {
+	GUARANTEE_OR_DIE( m_totalRenderTargetMade == m_renderTargetPool.size(), "Someone is holding onto a rendertarget on shutdown");
+	for( size_t renderTargetIndex = 0; renderTargetIndex < m_renderTargetPool.size(); renderTargetIndex++ )
+	{
+		delete m_renderTargetPool[renderTargetIndex];
+		m_renderTargetPool[renderTargetIndex] = nullptr;
+	}
+
 	for( size_t shaderIndex = 0; shaderIndex < m_shaders.size(); shaderIndex++ )
 	{
 		if( nullptr == m_shaders[shaderIndex] )
@@ -200,6 +207,36 @@ void RenderContext::UpdateFrameTime()
 	framedata.fogColor = m_fogColor;
 
 	m_frameUBO->Update( &framedata, sizeof(framedata), sizeof(framedata) );
+}
+
+Texture* RenderContext::AcquireRenderTargetMatching( Texture* texture )
+{
+	IntVec2 size = texture->GetTexelSize();
+	
+	for( int i = 0; i < (int)m_renderTargetPool.size(); i++ )
+	{
+		Texture* renderTarget = m_renderTargetPool[i];
+		if( renderTarget->GetTexelSize() == size )  {
+			m_renderTargetPool[i] = m_renderTargetPool[ m_renderTargetPool.size() - 1 ];
+			m_renderTargetPool.pop_back();
+			
+			return renderTarget;
+		}
+	}
+
+	m_totalRenderTargetMade++;
+	Texture* newRenderTarget = CreateRenderTarget( size );
+	return newRenderTarget;
+}
+
+void RenderContext::ReleaseRenderTarget( Texture* texture )
+{
+	m_renderTargetPool.push_back( texture );
+}
+
+void RenderContext::CopyTexture( Texture* dest, Texture* source )
+{
+	m_context->CopyResource( dest->GetHandle(), source->GetHandle() );
 }
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
@@ -687,6 +724,34 @@ Texture* RenderContext::CreateDepthStencilTarget()
 
 	m_device->CreateDepthStencilState( &dsDesc, &m_depthStencilState );
 	m_context->OMSetDepthStencilState( m_depthStencilState, 1 );
+
+	return newTexture;
+}
+
+Texture* RenderContext::CreateRenderTarget( IntVec2 texelSize )
+{
+	Texture* backBuffer = m_swapchain->GetBackBuffer();
+	IntVec2 backBufferSize = backBuffer->GetTexelSize();
+
+
+	D3D11_TEXTURE2D_DESC desc;
+	desc.Width = texelSize.x;
+	desc.Height = texelSize.y;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1; // MSAA
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT; // if you do mip-chians, we need this to be GPU/DEFAULT
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+
+	//DirectX Creation
+	ID3D11Texture2D* texHandle = nullptr;
+	m_device->CreateTexture2D( &desc, nullptr, &texHandle );
+
+	Texture* newTexture = new Texture( this, texHandle, nullptr );
 
 	return newTexture;
 }

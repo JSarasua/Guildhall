@@ -161,9 +161,6 @@ void Game::Startup()
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 
-// 	m_pointLight.color = Vec3(1.f, 1.f, 1.f);
-// 	m_pointLight.intensity = 0.5f;
-// 	m_pointLight.position = m_camera.GetPosition();
 
 
 	Vec3 cameraDirection = m_camera.GetDirection();
@@ -207,6 +204,7 @@ void Game::Startup()
 
 void Game::Shutdown()
 {
+
 	delete m_loadedMesh;
 	m_loadedMesh = nullptr;
 
@@ -359,13 +357,14 @@ void Game::Update()
 
 void Game::Render()
 {
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* frameTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	
+	m_camera.SetColorTarget( frameTarget );
+
 	g_theRenderer->BeginCamera(m_camera);
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
 	g_theRenderer->SetBlendMode(eBlendMode::ADDITIVE);
-
-// 	Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
-// 	Texture* normalTex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
-
 
  	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
  	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
@@ -398,7 +397,6 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
 	g_theRenderer->BindMaterial( m_testMaterial );
 	g_theRenderer->DrawMesh( m_loadedMesh );
-
 
 
 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
@@ -452,46 +450,20 @@ void Game::Render()
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
 
-
-	//Projection
-// 	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
-// 	g_theRenderer->BindDataTexture( 14, projectionTexture );
-// 	g_theRenderer->SetBlendMode( BlendMode::ADDITIVE );
-//  	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
-//  	MatrixInvertOrthoNormal( lightView0 );
-// 
-// 	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
-// 	Mat44 viewMatrix = m_camera.GetViewMatrix();
-// 	newProjectionMatrix.TransformBy( lightView0 );
-// 
-// 	projection_t projectionData;
-// 	projectionData.projection = newProjectionMatrix;
-// 	projectionData.position = m_lights[0].position;
-// 	projectionData.strength = 1.f;
-// 
-// 
-// 	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
-// 	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
-// 	g_theRenderer->BindShader( projectionShader );
-// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-// 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
-// 	g_theRenderer->DrawMesh( m_loadedMesh );
-// 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
-// 	g_theRenderer->DrawMesh( m_quadMesh );
-// 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-// 	g_theRenderer->DrawMesh( m_sphereMesh );
-// 	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-// 	g_theRenderer->DrawMesh( m_sphereMesh );
-// 	RenderCircleOfSpheres();
-
-
-	RenderDevConsole();
+	RenderProjection();
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
 
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
+
+	//Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	g_theRenderer->CopyTexture( backbuffer, frameTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( frameTarget );
+
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
@@ -723,6 +695,39 @@ void Game::UpdateCamera( float deltaSeconds )
 void Game::RenderGame()
 {
 	//m_world->Render();
+}
+
+void Game::RenderProjection()
+{
+	//Projection
+	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
+	g_theRenderer->BindDataTexture( 14, projectionTexture );
+	g_theRenderer->SetBlendMode( eBlendMode::ADDITIVE );
+	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
+	MatrixInvertOrthoNormal( lightView0 );
+	
+	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
+	Mat44 viewMatrix = m_camera.GetViewMatrix();
+	newProjectionMatrix.TransformBy( lightView0 );
+	
+	projection_t projectionData;
+	projectionData.projection = newProjectionMatrix;
+	projectionData.position = m_lights[0].position;
+	projectionData.strength = 1.f;
+	
+	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
+	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
+	g_theRenderer->BindShader( projectionShader );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
+	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
+	g_theRenderer->DrawMesh( m_loadedMesh );
+	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
+	g_theRenderer->DrawMesh( m_quadMesh );
+	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
+	g_theRenderer->DrawMesh( m_sphereMesh );
+	RenderCircleOfSpheres();
 }
 
 void Game::RenderUI()

@@ -149,6 +149,12 @@ public:
 	void Setup( Clock* gameClock );
 	void UpdateFrameTime();
 
+	Texture* AcquireRenderTargetMatching( Texture* texture );
+	void ReleaseRenderTarget( Texture* texture );
+	void CopyTexture( Texture* dest, Texture* source );
+	int GetTotalRenderTargetPoolSize() { return m_totalRenderTargetMade; }
+
+
 	void ClearScreen( const Rgba8& clearColor );
 	void ClearDepth( Texture* depthStencilTarget, float depth = 1.f, float stencil = 0.f );
 	void BeginCamera( Camera& camera );
@@ -210,6 +216,8 @@ public:
 	Texture* GetBackBuffer();
 
 	Texture* CreateDepthStencilTarget();
+	Texture* CreateRenderTarget( IntVec2 texelSize );
+
 	Texture* CreateTextureFromColor( Rgba8 color, IntVec2 texelSize = IntVec2( 1, 1 ) );
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
@@ -254,6 +262,8 @@ protected:
 
 private:
 	std::vector<Texture*> m_Textures;
+	std::vector<Texture*> m_renderTargetPool; 
+	int m_totalRenderTargetMade = 0;
 
 	bool m_isDrawing = false;
 
