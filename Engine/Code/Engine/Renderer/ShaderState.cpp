@@ -77,7 +77,7 @@ void ShaderState::SetupFromXML( XmlElement const& element )
 	}
 
 	//Winding order
-	if( windingOrderStr == "CLOCKWISE" )
+	if( windingOrderStr == "WIND_CLOCKWISE" )
 	{
 		m_windingOrder = eFrontFaceWindOrder::CLOCKWISE;
 	}
