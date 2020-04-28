@@ -19,6 +19,7 @@ public:
 	TextureView* GetOrCreateShaderResourceView();
 	TextureView* GetOrCreateDepthStencilView();
 
+	ID3D11Texture2D* GetHandle() const { return m_handle; }
 
 	int GetTextureID() const;
 	const IntVec2& GetTexelSize() const;
