@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Material
+  tint="255,0,255,255"
+  specularFactor="1.0"
+  specularPower="32.0"
+  diffuseTexturePath="Data/Images/chi.png"
+  normalTexturePath="Data/Images/test.png"
+  >
+
+  <Textures>
+    <Texture
+      textureFilePath="Data/Images/noise.png"
+      />
+    <Texture
+      textureFilePath="Data/Images/stone_normal.png"
+      />
+    <Texture
+      textureFilePath="Data/Images/stone_spec.png"
+      />
+  </Textures>
+
+  <Samplers>
+    <Sampler
+      SamplerType="SAMPLER_POINT"
+      SamplerEdgeMode="SAMPLER_WRAP"
+    />
+    <Sampler
+      SamplerType="SAMPLER_BILINEAR"
+      SamplerEdgeMode="SAMPLER_CLAMP"
+    />
+  </Samplers>
+    
+  <ShaderState
+    ShaderFilePath="Data/Shaders/Dissolve.hlsl"
+    BlendMode="SOLID"
+    DepthCompareMode="COMPARE_LESS_THAN_OR_EQUAL"
+    WindingOrder="WIND_COUNTERCLOCKWISE"
+    CullMode="CULL_BACK"
+    FillMode="FILL_SOLID"
+    WriteDepth="true"
+  />
+</Material>

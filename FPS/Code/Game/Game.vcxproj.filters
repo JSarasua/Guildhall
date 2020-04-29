@@ -11,6 +11,9 @@
     <Filter Include="ShaderStates">
       <UniqueIdentifier>{da0e0c03-1253-4fd4-a34c-f67886d685f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{1f004756-735c-41a7-9148-a7b24c9b7329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -117,6 +120,9 @@
   <ItemGroup>
     <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml">
       <Filter>ShaderStates</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Materials\TestMaterial.xml">
+      <Filter>Materials</Filter>
     </Xml>
   </ItemGroup>
 </Project>

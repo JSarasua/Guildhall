@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/XmlUtils.hpp"
 #include <vector>
 
 class RenderBuffer;
@@ -15,7 +16,13 @@ class Material
 public:
 
 	Material( RenderContext* context, char const* materialFilePath );
+	Material( RenderContext* context, XmlElement const& element );
 	~Material();
+
+	void LoadDataFromXML( XmlElement const& element );
+	void LoadTexturesFromXML( XmlElement const& element );
+	void LoadSamplersFromXML( XmlElement const& element );
+	void LoadSamplerFromString( std::string samplerTypeStr, std::string samplerEdgeModeStr );
 
 	void SetShaderByName( Shader* shader );
 	void SetShaderStateByName( ShaderState* shaderState );
@@ -56,6 +63,8 @@ public:
 	}
 
 public:
+	RenderContext* m_context = nullptr;
+
 	ShaderState* m_shaderState = nullptr;
 
 	Rgba8 m_tint = Rgba8::WHITE;

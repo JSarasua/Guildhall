@@ -16,6 +16,7 @@
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Game/Player.hpp"
+#include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/StringUtils.hpp"
@@ -50,11 +51,8 @@ void Game::Startup()
 	XmlDocument shaderStateDoc;
 	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );
 	m_testShaderState = new ShaderState( element );
-	m_testMaterial = new Material( g_theRenderer, "" );
-	m_testMaterial->SetShaderStateByName( m_testShaderState );
+	m_testMaterial = new Material( g_theRenderer, "Data/Materials/TestMaterial.xml" );
 
-	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
-	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
 	dissolve_t dissolveData;
 	dissolveData.amount = m_dissolveAmount;
 	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
@@ -62,9 +60,10 @@ void Game::Startup()
 	dissolveData.edgeWidth = 0.1f;
 	
 	m_testMaterial->SetData( dissolveData );
-	m_testMaterial->SetShaderByName( dissolveShader );
+	//m_testMaterial->SetShaderByName( dissolveShader );
 	
-	m_testMaterial->m_texturePerSlot.push_back( noiseTexture );
+// 	m_testMaterial->m_texturePerSlot.push_back( noiseTexture );
+// 	m_testMaterial->m_samplersPerSlot.push_back( new Sampler( g_theRenderer, SAMPLER_POINT, SAMPLER_WRAP ) );
 
 	//g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
 
@@ -363,54 +362,24 @@ void Game::Render()
 	m_camera.SetColorTarget( frameTarget );
 
 	g_theRenderer->BeginCamera(m_camera);
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
-	g_theRenderer->SetBlendMode(eBlendMode::ADDITIVE);
-
- 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
- 	g_theRenderer->BindTexture( m_renderTextures[m_currentRenderTextureIndex] );
-	g_theRenderer->BindNormal( m_normalTextures[m_currentNormalTextureIndex] );
-
-	Texture* noiseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noise.png" );
-	Shader* dissolveShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Dissolve.hlsl" );
-	dissolve_t* dissolveData = m_testMaterial->GetDataAs<dissolve_t>();
-
-	dissolveData->amount = m_dissolveAmount;
-	dissolveData->edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
-	dissolveData->edgeNearColor = Vec3( 1.f, 1.f, 0.f );
-	dissolveData->edgeWidth = 0.1f;
-
-	m_testMaterial->SetData( *dissolveData );
-	m_testMaterial->SetDiffuseTexture( m_renderTextures[m_currentRenderTextureIndex] );
-	m_testMaterial->SetNormalTexture( m_normalTextures[m_currentNormalTextureIndex] );
-
-	//g_theRenderer->SetMaterialData( dissolveData, sizeof( *dissolveData ) );
-
 
 	g_theRenderer->DisableLight( 0 );
 	EnableLights();
-	//g_theRenderer->EnableLight( 0, m_pointLight );
-	//g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	//g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
-	//g_theRenderer->BindShaderState( m_testShaderState );
-	//g_theRenderer->BindDataTexture( 8, noiseTexture );
+
+	dissolve_t* dissolveData = m_testMaterial->GetDataAs<dissolve_t>();
+	dissolveData->amount = m_dissolveAmount;
+	m_testMaterial->SetData( *dissolveData );
 
 	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
 	g_theRenderer->BindMaterial( m_testMaterial );
 	g_theRenderer->DrawMesh( m_loadedMesh );
 
-
 	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	//g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
-
 	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
 	g_theRenderer->DrawMesh( m_quadMesh );
 
-	//g_theRenderer->BindShader( dissolveShader );
-	g_theRenderer->BindDataTexture( 8, noiseTexture );
 	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
 	g_theRenderer->DrawMesh( m_sphereMesh );
-
-
 
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
