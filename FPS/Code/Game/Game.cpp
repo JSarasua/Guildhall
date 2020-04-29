@@ -431,7 +431,16 @@ void Game::Render()
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
 
+	//Setup camera that is identity
+	// bind a shader for the effect
+	// bind "src" as an input
+	//bind other inputs
 	//Texture* backbuffer = g_theRenderer->GetBackBuffer();
+
+	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
+	g_theRenderer->StartEffect( backbuffer, frameTarget, shaderEffect);
+	g_theRenderer->EndEffect();
+
 	g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( frameTarget );

@@ -152,6 +152,11 @@ public:
 	Texture* AcquireRenderTargetMatching( Texture* texture );
 	void ReleaseRenderTarget( Texture* texture );
 	void CopyTexture( Texture* dest, Texture* source );
+	
+	void ApplyEffect( Texture* dest, Texture* source, Material* mat );
+
+	void StartEffect( Texture* dest, Texture* source, Shader* shader );
+	void EndEffect();
 	int GetTotalRenderTargetPoolSize() { return m_totalRenderTargetMade; }
 
 
@@ -278,6 +283,7 @@ public:
 	Shader* m_currentShader = nullptr;
 	Shader* m_defaultShader = nullptr;
 	std::vector<Shader*> m_shaders;
+	std::vector<ShaderState*> m_shaderStates;
 	VertexBuffer* m_immediateVBO = nullptr;
 	IndexBuffer* m_immediateIBO = nullptr;
 	ID3D11Buffer* m_lastVBOHandle = nullptr;
@@ -296,6 +302,8 @@ public:
 	ID3D11BlendState* m_solidBlendStateHandle = nullptr;
 
 	ID3D11DepthStencilState* m_depthStencilState = nullptr;
+
+	Camera* m_effectCamera = nullptr;
 
 	void* m_debugModule        = nullptr;
 	IDXGIDebug* m_debug           = nullptr;

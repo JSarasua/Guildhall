@@ -96,6 +96,9 @@ void RenderContext::StartUp(Window* window)
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
 	m_defaultNormalTex = CreateTextureFromColor( Rgba8( 128, 128, 255 ) );
 
+	m_effectCamera = new Camera();
+	m_effectCamera->SetClearMode( 0, Rgba8::WHITE );
+
 	CreateBlendModes();
 }
 
@@ -114,6 +117,10 @@ void RenderContext::EndFrame()
 void RenderContext::Shutdown()
 {
 	GUARANTEE_OR_DIE( m_totalRenderTargetMade == m_renderTargetPool.size(), "Someone is holding onto a rendertarget on shutdown");
+	
+	delete m_effectCamera;
+	m_effectCamera = nullptr;
+	
 	for( size_t renderTargetIndex = 0; renderTargetIndex < m_renderTargetPool.size(); renderTargetIndex++ )
 	{
 		delete m_renderTargetPool[renderTargetIndex];
@@ -237,6 +244,22 @@ void RenderContext::ReleaseRenderTarget( Texture* texture )
 void RenderContext::CopyTexture( Texture* dest, Texture* source )
 {
 	m_context->CopyResource( dest->GetHandle(), source->GetHandle() );
+}
+
+void RenderContext::StartEffect( Texture* dest, Texture* source, Shader* shader )
+{
+	m_effectCamera->SetColorTarget( dest );
+	
+	BeginCamera( *m_effectCamera );
+	BindShader( shader );
+	BindTexture( source );
+
+}
+
+void RenderContext::EndEffect()
+{
+	m_context->Draw( 3, 0 );
+	EndCamera( *m_effectCamera );
 }
 
 void RenderContext::ClearScreen( const Rgba8& clearColor )
