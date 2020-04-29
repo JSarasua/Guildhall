@@ -258,6 +258,7 @@ void RenderContext::StartEffect( Texture* dest, Texture* source, Shader* shader 
 
 void RenderContext::EndEffect()
 {
+	m_context->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 	m_context->Draw( 3, 0 );
 	EndCamera( *m_effectCamera );
 }

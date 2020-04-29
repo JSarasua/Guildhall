@@ -1,3 +1,15 @@
+cbuffer frame_constants : register(b0)	//Index 0 is time
+{
+    float SYSTEM_TIME_SECONDS;
+    float SYSTEM_TIME_DELTA_SECONDS;
+    float GAMMA;
+    float FOGNEAR;
+
+    float3 FOGCOLOR;
+    float FOGFAR;
+};
+
+
 // input to the vertex shader - for now, a special input that is the index of the vertex we're drawing
 struct vs_input_t
 {
@@ -39,9 +51,9 @@ static float3 POSITIONS[3] = {
 };
 
 static float2 UVS[3] = {
-    float2( 0.0f,  0.0f ), 
-    float2( 2.0f,  0.0f ), 
-    float2( 0.0f,  2.0f )
+    float2( 0.0f,  1.0f ), 
+    float2( 2.0f,  1.0f ), 
+    float2( 0.0f,  -1.0f )
 };
 
 //--------------------------------------------------------------------------------------
@@ -70,5 +82,6 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of what I'm returning
 {
     float4 color = tDiffuse.Sample( sSampler, input.uv );
-    return color; 
+    float4 inverseColor = float4( float3(1,1,1) - color.xyz, color.w );
+    return inverseColor; 
 }

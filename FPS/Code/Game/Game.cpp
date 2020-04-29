@@ -441,7 +441,7 @@ void Game::Render()
 	g_theRenderer->StartEffect( backbuffer, frameTarget, shaderEffect);
 	g_theRenderer->EndEffect();
 
-	g_theRenderer->CopyTexture( backbuffer, frameTarget );
+	//g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( frameTarget );
 
