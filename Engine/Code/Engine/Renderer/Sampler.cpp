@@ -2,8 +2,25 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/D3D11Common.hpp"
 
-Sampler::Sampler( RenderContext* ctx, eSamplerType type )
+Sampler::Sampler( RenderContext* ctx, eSamplerType type, eSamplerEdgeMode edgeMode )
 {
+	D3D11_TEXTURE_ADDRESS_MODE addressMode;
+	
+	switch( edgeMode )
+	{
+	case SAMPLER_WRAP: addressMode = D3D11_TEXTURE_ADDRESS_WRAP;
+		break;
+	case SAMPLER_MIRROR: addressMode = D3D11_TEXTURE_ADDRESS_MIRROR;
+		break;
+	case SAMPLER_CLAMP: addressMode = D3D11_TEXTURE_ADDRESS_CLAMP;
+		break;
+	case SAMPLER_BORDER: addressMode = D3D11_TEXTURE_ADDRESS_BORDER;
+		break;
+	default:
+		ERROR_AND_DIE( "Invalid Sampler EdgeMode");
+		break;
+	}
+
 	m_handle = nullptr;
 	m_owner = ctx;
 
@@ -18,9 +35,9 @@ Sampler::Sampler( RenderContext* ctx, eSamplerType type )
 	{
 		desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
 	}
-	desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	desc.AddressU = addressMode;
+	desc.AddressV = addressMode;
+	desc.AddressW = addressMode;
 
 	desc.MipLODBias = 0.f;
 	desc.MaxAnisotropy = 0;
@@ -34,8 +51,6 @@ Sampler::Sampler( RenderContext* ctx, eSamplerType type )
 	desc.MaxLOD = 0.f;
 
 	dev->CreateSamplerState( &desc, &m_handle );
-
-
 }
 
 Sampler::~Sampler()
