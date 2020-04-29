@@ -396,7 +396,14 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				std::string dataString = currentLine.substr( 3 );
 				Vec3 uv3D;
 				uv3D.SetFromText( dataString.c_str(), ' ' );
-				uvs.push_back( Vec2(uv3D) );
+				Vec2 uv2D = Vec2( uv3D );
+
+				if( options.m_invertV )
+				{
+					uv2D.y = 1.f - uv2D.y;
+				}
+
+				uvs.push_back( uv2D );
 			}
 
 		}
@@ -510,13 +517,25 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				Vertex_PCUTBN vertex0 = Vertex_PCUTBN( vertexes[vertexData0Int[0] - 1], Rgba8::WHITE, uvs[vertexData0Int[1] - 1], normals[vertexData0Int[2] - 1] );
 				Vertex_PCUTBN vertex1 = Vertex_PCUTBN( vertexes[vertexData1Int[0] - 1], Rgba8::WHITE, uvs[vertexData1Int[1] - 1], normals[vertexData1Int[2] - 1] );
 				Vertex_PCUTBN vertex2 = Vertex_PCUTBN( vertexes[vertexData2Int[0] - 1], Rgba8::WHITE, uvs[vertexData2Int[1] - 1], normals[vertexData2Int[2] - 1] );
-				masterVertexList.push_back( vertex0 );
-				masterVertexList.push_back( vertex1 );
-				masterVertexList.push_back( vertex2 );
+				
+				if( options.m_invertWindingOrder )
+				{
+					masterVertexList.push_back( vertex2 );
+					masterVertexList.push_back( vertex1 );
+					masterVertexList.push_back( vertex0 );
+				}
+				else
+				{
+					masterVertexList.push_back( vertex2 );
+					masterVertexList.push_back( vertex1 );
+					masterVertexList.push_back( vertex0 );
+
+				}
 
 				masterIndexList.push_back( (uint)masterVertexList.size() - 3 );
 				masterIndexList.push_back( (uint)masterVertexList.size() - 2 );
 				masterIndexList.push_back( (uint)masterVertexList.size() - 1 );
+
 			}
 			else if( faces.size() == 4 )
 			{
@@ -650,13 +669,27 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				Vertex_PCUTBN vertex2 = Vertex_PCUTBN( vertexes[vertexData2Int[0] - 1], Rgba8::WHITE, uvs[vertexData2Int[1] - 1], normals[vertexData2Int[2] - 1] );
 				Vertex_PCUTBN vertex3 = Vertex_PCUTBN( vertexes[vertexData3Int[0] - 1], Rgba8::WHITE, uvs[vertexData3Int[1] - 1], normals[vertexData3Int[2] - 1] );
 				
-				masterVertexList.push_back( vertex0 );
-				masterVertexList.push_back( vertex1 );
-				masterVertexList.push_back( vertex2 );
+				if( options.m_invertWindingOrder )
+				{
+					masterVertexList.push_back( vertex2 );
+					masterVertexList.push_back( vertex1 );
+					masterVertexList.push_back( vertex0 );
 
-				masterVertexList.push_back( vertex0 );
-				masterVertexList.push_back( vertex2 );
-				masterVertexList.push_back( vertex3 );
+					masterVertexList.push_back( vertex3 );
+					masterVertexList.push_back( vertex2 );
+					masterVertexList.push_back( vertex0 );
+
+				}
+				else
+				{
+					masterVertexList.push_back( vertex0 );
+					masterVertexList.push_back( vertex1 );
+					masterVertexList.push_back( vertex2 );
+
+					masterVertexList.push_back( vertex0 );
+					masterVertexList.push_back( vertex2 );
+					masterVertexList.push_back( vertex3 );
+				}
 
 				masterIndexList.push_back( (uint)masterVertexList.size() - 6 );
 				masterIndexList.push_back( (uint)masterVertexList.size() - 5 );
@@ -674,7 +707,15 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 
 	}
 
-	GenerateTangentsForVertexArray( masterVertexList );
+	if( options.m_generateNormals )
+	{
+		GenerateNormalsForVertexArray( masterVertexList );
+	}
+
+	if( options.m_generateTangents )
+	{
+		GenerateTangentsForVertexArray( masterVertexList );
+	}
 }
 
 int GetNumFaces( SMikkTSpaceContext const* context )
@@ -761,5 +802,25 @@ void GenerateTangentsForVertexArray( std::vector<Vertex_PCUTBN>& vertices )
 
 	//Run algorithm
 	genTangSpaceDefault( &context );
+}
+
+void GenerateNormalsForVertexArray( std::vector<Vertex_PCUTBN>& vertices )
+{
+	size_t vertexCount = vertices.size();
+	for( size_t vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 3 )
+	{
+		Vec3 pos0 = vertices[vertexIndex].position;
+		Vec3 pos1 = vertices[vertexIndex + 1].position;
+		Vec3 pos2 = vertices[vertexIndex + 2].position;
+
+		Vec3 dir0 = pos1 - pos0;
+		Vec3 dir1 = pos2 - pos1;
+
+		Vec3 normal = CrossProduct( dir0, dir1 );
+
+		vertices[vertexIndex].normal = normal;
+		vertices[vertexIndex + 1].normal = normal;
+		vertices[vertexIndex + 2].normal = normal;
+	}
 }
 
