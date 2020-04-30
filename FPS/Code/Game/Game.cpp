@@ -124,7 +124,7 @@ void Game::Startup()
 	MeshImportOptions_t options;
 	//options.m_transform.SetUniformScale( 0.1f );
 	options.m_invertV = true;
-	options.m_invertWindingOrder = true;
+	options.m_invertWindingOrder = false;
 	options.m_generateNormals = false;
 	options.m_generateTangents = true;
 	LoadOBJToVertexArray( loadedVerts, loadedIndices, "Data/Meshes/SciFi_Fighter.obj", options );

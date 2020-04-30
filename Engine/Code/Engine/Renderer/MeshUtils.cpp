@@ -500,19 +500,23 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 
 
 				std::vector<int> vertexData0Int;
-				vertexData0Int.push_back( absInt( atoi(vertexData0Str[0].c_str()) ) );
-				vertexData0Int.push_back( absInt( atoi(vertexData0Str[1].c_str()) ) );
-				vertexData0Int.push_back( absInt( atoi(vertexData0Str[2].c_str()) ) );
+				vertexData0Int.push_back( atoi(vertexData0Str[0].c_str()) );
+				vertexData0Int.push_back( atoi(vertexData0Str[1].c_str()) );
+				vertexData0Int.push_back( atoi(vertexData0Str[2].c_str()) );
 
 				std::vector<int> vertexData1Int;
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[0].c_str() ) ) );
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[1].c_str() ) ) );
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[2].c_str() ) ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[0].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[1].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[2].c_str() ) );
 
 				std::vector<int> vertexData2Int;
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[0].c_str() ) ) );
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[1].c_str() ) ) );
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[2].c_str() ) ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[0].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[1].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[2].c_str() ) );
+
+				FlipFaceIndexIfNegative( vertexData0Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
+				FlipFaceIndexIfNegative( vertexData1Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
+				FlipFaceIndexIfNegative( vertexData2Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
 
 				Vertex_PCUTBN vertex0 = Vertex_PCUTBN( vertexes[vertexData0Int[0] - 1], Rgba8::WHITE, uvs[vertexData0Int[1] - 1], normals[vertexData0Int[2] - 1] );
 				Vertex_PCUTBN vertex1 = Vertex_PCUTBN( vertexes[vertexData1Int[0] - 1], Rgba8::WHITE, uvs[vertexData1Int[1] - 1], normals[vertexData1Int[2] - 1] );
@@ -645,24 +649,29 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				}
 
 				std::vector<int> vertexData0Int;
-				vertexData0Int.push_back( absInt( atoi( vertexData0Str[0].c_str() ) ) );
-				vertexData0Int.push_back( absInt( atoi( vertexData0Str[1].c_str() ) ) );
-				vertexData0Int.push_back( absInt( atoi( vertexData0Str[2].c_str() ) ) );
+				vertexData0Int.push_back( atoi( vertexData0Str[0].c_str() ) );
+				vertexData0Int.push_back( atoi( vertexData0Str[1].c_str() ) );
+				vertexData0Int.push_back( atoi( vertexData0Str[2].c_str() ) );
 
 				std::vector<int> vertexData1Int;
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[0].c_str() ) ) );
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[1].c_str() ) ) );
-				vertexData1Int.push_back( absInt( atoi( vertexData1Str[2].c_str() ) ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[0].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[1].c_str() ) );
+				vertexData1Int.push_back( atoi( vertexData1Str[2].c_str() ) );
 
 				std::vector<int> vertexData2Int;
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[0].c_str() ) ) );
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[1].c_str() ) ) );
-				vertexData2Int.push_back( absInt( atoi( vertexData2Str[2].c_str() ) ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[0].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[1].c_str() ) );
+				vertexData2Int.push_back( atoi( vertexData2Str[2].c_str() ) );
 
 				std::vector<int> vertexData3Int;
-				vertexData3Int.push_back( absInt( atoi( vertexData3Str[0].c_str() ) ) );
-				vertexData3Int.push_back( absInt( atoi( vertexData3Str[1].c_str() ) ) );
-				vertexData3Int.push_back( absInt( atoi( vertexData3Str[2].c_str() ) ) );
+				vertexData3Int.push_back( atoi( vertexData3Str[0].c_str() ) );
+				vertexData3Int.push_back( atoi( vertexData3Str[1].c_str() ) );
+				vertexData3Int.push_back( atoi( vertexData3Str[2].c_str() ) );
+
+				FlipFaceIndexIfNegative( vertexData0Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
+				FlipFaceIndexIfNegative( vertexData1Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
+				FlipFaceIndexIfNegative( vertexData2Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
+				FlipFaceIndexIfNegative( vertexData3Int, (int)vertexes.size(), (int)uvs.size(), (int)normals.size() );
 
 				Vertex_PCUTBN vertex0 = Vertex_PCUTBN( vertexes[vertexData0Int[0] - 1], Rgba8::WHITE, uvs[vertexData0Int[1] - 1], normals[vertexData0Int[2] - 1] );
 				Vertex_PCUTBN vertex1 = Vertex_PCUTBN( vertexes[vertexData1Int[0] - 1], Rgba8::WHITE, uvs[vertexData1Int[1] - 1], normals[vertexData1Int[2] - 1] );
@@ -822,5 +831,30 @@ void GenerateNormalsForVertexArray( std::vector<Vertex_PCUTBN>& vertices )
 		vertices[vertexIndex + 1].normal = normal;
 		vertices[vertexIndex + 2].normal = normal;
 	}
+}
+
+void FlipFaceIndexIfNegative( std::vector<int>& vertexIndices, int vertexListSize, int uvListSize, int normalListSize )
+{
+	int& vertexIndex = vertexIndices[0];
+	int& uvIndex = vertexIndices[1];
+	int& normalIndex = vertexIndices[2];
+
+	if( vertexIndex < 0 )
+	{
+		vertexIndex = vertexListSize + vertexIndex + 1;
+	}
+
+	if( uvIndex < 0 )
+	{
+		uvIndex = uvListSize + uvIndex + 1;
+	}
+
+	if( normalIndex < 0 )
+	{
+		normalIndex = normalListSize + normalIndex + 1;
+	}
+
+
+
 }
 

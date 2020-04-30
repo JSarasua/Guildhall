@@ -36,3 +36,4 @@ void SetTangent( SMikkTSpaceContext const* pContext,
 	int const iVert);
 void GenerateTangentsForVertexArray( std::vector<Vertex_PCUTBN>& vertices );
 void GenerateNormalsForVertexArray( std::vector<Vertex_PCUTBN>& vertices );
+void FlipFaceIndexIfNegative( std::vector<int>& vertexIndices, int vertexListSize, int uvListSize, int normalListSize );
