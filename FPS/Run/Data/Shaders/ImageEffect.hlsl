@@ -82,6 +82,6 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of what I'm returning
 {
     float4 color = tDiffuse.Sample( sSampler, input.uv );
-    float4 inverseColor = float4( float3(1,1,1) - color.xyz, color.w );
-    return inverseColor; 
+    //float4 inverseColor = float4( float3(1,1,1) - color.xyz, color.w );
+    return color; 
 }
