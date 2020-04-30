@@ -138,6 +138,17 @@ void RenderContext::Shutdown()
 		m_shaders[shaderIndex] = nullptr;
 	}
 	m_defaultShader = nullptr;
+
+	for( size_t shaderStateIndex = 0; shaderStateIndex < m_shaderStates.size(); shaderStateIndex++ )
+	{
+		if( nullptr == m_shaderStates[shaderStateIndex] )
+		{
+			continue;
+		}
+
+		delete m_shaderStates[shaderStateIndex];
+		m_shaderStates[shaderStateIndex] = nullptr;
+	}
 	DX_SAFE_RELEASE( m_rasterState );
 
 	delete m_swapchain;
@@ -360,7 +371,7 @@ void RenderContext::AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexL
 	
 }
 
-void RenderContext::BindShaderState( ShaderState* shaderState )
+void RenderContext::BindShaderStateByName( ShaderState* shaderState )
 {
 	if( nullptr != shaderState )
 	{
@@ -377,6 +388,23 @@ void RenderContext::BindShaderState( ShaderState* shaderState )
 		}
 
 		BindShader( shader );
+	}
+}
+
+void RenderContext::BindShaderStateByName( char const* fileName )
+{
+	for( size_t shaderIndex = 0; shaderIndex < m_shaderStates.size(); shaderIndex++ )
+	{
+		ShaderState* shaderState = m_shaderStates[shaderIndex];
+		if( nullptr != shaderState )
+		{
+			std::string filePathStr = shaderState->m_shaderFilePath;
+			if( filePathStr == fileName )
+			{
+				BindShaderStateByName( shaderState );
+				break;
+			}
+		}
 	}
 }
 
@@ -549,7 +577,7 @@ void RenderContext::BindMaterial( Material* mat )
 	m_modelTint = mat->m_tint;
 	UpdateModelData();
 
-	BindShaderState( mat->m_shaderState );
+	BindShaderStateByName( mat->m_shaderState );
 
 	BindTexture( mat->m_diffuseTexture );
 	BindNormal( mat->m_normalTexture );
@@ -914,6 +942,42 @@ Shader* RenderContext::GetOrCreateShader( char const* filename )
 	m_shaders.push_back( newShader );
 
 	return newShader;
+}
+
+ShaderState* RenderContext::CreateOrGetShaderState( char const* filename )
+{
+	for( size_t shaderStateIndex = 0; shaderStateIndex < m_shaderStates.size(); shaderStateIndex++ )
+	{
+		if( nullptr == m_shaderStates[shaderStateIndex] )
+		{
+			continue;
+		}
+
+		if( m_shaderStates[shaderStateIndex]->m_shaderFilePath == filename )
+		{
+			return m_shaderStates[shaderStateIndex];
+		}
+	}
+
+	ShaderState* newShaderState = new ShaderState( this );
+	newShaderState->SetupFromFile( filename );
+
+	m_shaderStates.push_back( newShaderState );
+
+	return newShaderState;
+}
+
+void RenderContext::AcquireShaderState( ShaderState* shaderState )
+{
+	for( size_t shaderStateIndex = 0; shaderStateIndex < m_shaderStates.size(); shaderStateIndex++ )
+	{
+		if( m_shaderStates[shaderStateIndex] == shaderState )
+		{
+			return;
+		}
+	}
+
+	m_shaderStates.push_back( shaderState );
 }
 
 //-----------------------------------------------------------------------------------------------

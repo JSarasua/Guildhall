@@ -5,12 +5,16 @@
 class ShaderState
 {
 public:
-	ShaderState( XmlElement const& element );
+	ShaderState( RenderContext* context );
+	ShaderState( RenderContext* context, XmlElement const& element );
 	~ShaderState();
 
 	void SetupFromXML( XmlElement const& element );
+	void SetupFromFile( char const* filename );
 
 public:
+	RenderContext* m_context = nullptr;
+
 	Shader* m_shader = nullptr;
 	std::string m_shaderFilePath = "";
 	eBlendMode m_blendMode = eBlendMode::SOLID;

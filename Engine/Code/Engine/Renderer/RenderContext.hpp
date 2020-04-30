@@ -175,7 +175,8 @@ public:
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
 	void AppendVertsFromAABB2( std::vector<Vertex_PCU>& masterVertexList, const AABB2& aabb, const Rgba8& tint, const Vec2& uvMins, const Vec2& uvMaxs );
 
-	void BindShaderState( ShaderState* shaderState );
+	void BindShaderStateByName( ShaderState* shaderState );
+	void BindShaderStateByName( char const* fileName );
 	void BindShader( Shader* shader );
 	void BindShader( char const* filename );
 	void BindVertexBuffer( VertexBuffer* vbo );
@@ -227,7 +228,9 @@ public:
 	//Texture* CreateTextureFromImage(...);
 	Texture*	CreateOrGetTextureFromFile(const char* filePath);
 	Shader*		GetOrCreateShader( char const* filename );
+	ShaderState* CreateOrGetShaderState( char const* filename );
 	BitmapFont* CreateOrGetBitmapFont( const char* bitmapFontFilePathNoExtension );
+	void AcquireShaderState( ShaderState* shaderState );
 	void BindTexture( const Texture* constTex  );
 	void BindNormal( const Texture* constTex );
 	void BindDataTexture( uint slot, Texture const* constTex );

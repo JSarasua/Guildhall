@@ -46,7 +46,7 @@ void Material::LoadDataFromXML( XmlElement const& element )
 	XmlElement const* texturesElement = element.FirstChildElement( "Textures" );
 	XmlElement const* samplersElement = element.FirstChildElement( "Samplers" );
 	XmlElement const* shaderStateElement = element.FirstChildElement( "ShaderState" );
-	m_shaderState = new ShaderState( *shaderStateElement );
+	m_shaderState = new ShaderState(m_context, *shaderStateElement );
 
 	m_tint = ParseXMLAttribute( element, "tint", Rgba8::WHITE );
 	m_specularFactor = ParseXMLAttribute( element, "specularFactor", 1.f );

@@ -1,9 +1,14 @@
 #include "Engine/Renderer/ShaderState.hpp"
 
-ShaderState::ShaderState( XmlElement const& element )
+ShaderState::ShaderState( RenderContext* context, XmlElement const& element )
 {
+	m_context = context;
 	SetupFromXML( element );
+}
 
+ShaderState::ShaderState( RenderContext* context )
+{
+	m_context = context;
 }
 
 ShaderState::~ShaderState()
@@ -26,6 +31,7 @@ void ShaderState::SetupFromXML( XmlElement const& element )
 
 	//Shader
 	m_shaderFilePath = shaderFilePath;
+	m_shader = m_context->GetOrCreateShader( m_shaderFilePath.c_str() );
 
 	//Blend Mode
 	if( blendModeStr == "ALPHA" )
@@ -111,5 +117,12 @@ void ShaderState::SetupFromXML( XmlElement const& element )
 	}
 
 
+}
+
+void ShaderState::SetupFromFile( char const* filename )
+{
+	XmlDocument shaderStateDoc;
+	XmlElement const& element = GetRootElement( shaderStateDoc, filename );
+	SetupFromXML( element );
 }
 

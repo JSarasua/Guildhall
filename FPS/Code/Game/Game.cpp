@@ -50,7 +50,8 @@ void Game::Startup()
 
 	XmlDocument shaderStateDoc;
 	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );
-	m_testShaderState = new ShaderState( element );
+	m_testShaderState = new ShaderState(g_theRenderer, element );
+	g_theRenderer->AcquireShaderState( m_testShaderState );
 	m_testMaterial = new Material( g_theRenderer, "Data/Materials/TestMaterial.xml" );
 
 	dissolve_t dissolveData;
@@ -216,9 +217,6 @@ void Game::Shutdown()
 
 	delete m_quadMesh;
 	m_quadMesh = nullptr;
-
-	delete m_testShaderState;
-	m_testShaderState = nullptr;
 
 	delete m_testMaterial;
 	m_testMaterial = nullptr;
