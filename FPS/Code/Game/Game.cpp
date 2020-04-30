@@ -122,12 +122,12 @@ void Game::Startup()
 	std::vector<Vertex_PCUTBN> loadedVerts;
 	std::vector<uint> loadedIndices;
 	MeshImportOptions_t options;
-	options.m_transform.SetUniformScale( 0.1f );
-	options.m_invertV = false;
-	options.m_invertWindingOrder = false;
+	//options.m_transform.SetUniformScale( 0.1f );
+	options.m_invertV = true;
+	options.m_invertWindingOrder = true;
 	options.m_generateNormals = false;
 	options.m_generateTangents = true;
-	LoadOBJToVertexArray( loadedVerts, loadedIndices, "Data/Meshes/teapot.obj", options );
+	LoadOBJToVertexArray( loadedVerts, loadedIndices, "Data/Meshes/SciFi_Fighter.obj", options );
 	//Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
 	m_loadedMesh->UpdateVertices( loadedVerts );
 	m_loadedMesh->UpdateIndices( loadedIndices );
