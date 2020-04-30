@@ -3,9 +3,9 @@
 <Material
   tint="255,255,255,255"
   specularFactor="1.0"
-  specularPower="32.0"
-  diffuseTexturePath="Data/Images/chi.png"
-  normalTexturePath="Data/Images/test.png"
+  specularPower="8.0"
+  diffuseTexturePath="Data/Images/SF_Fighter-Albedo.jpg"
+  normalTexturePath="Data/Images/SF_Fighter-Normal.jpg"
   >
 
   <Textures>
@@ -22,7 +22,7 @@
 
   <Samplers>
     <Sampler
-      SamplerType="SAMPLER_POINT"
+      SamplerType="SAMPLER_BILINEAR"
       SamplerEdgeMode="SAMPLER_WRAP"
     />
     <Sampler

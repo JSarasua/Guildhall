@@ -123,7 +123,7 @@ void Game::Startup()
 	std::vector<uint> loadedIndices;
 	MeshImportOptions_t options;
 	options.m_transform.SetUniformScale( 0.2f );
-	options.m_invertV = true;
+	options.m_invertV = false;
 	options.m_invertWindingOrder = false;
 	options.m_generateNormals = false;
 	options.m_generateTangents = true;
@@ -189,12 +189,12 @@ void Game::Startup()
 	m_lights[1].cosInnerAngle = 0.95f;
 	m_lights[1].cosOuterAngle = 0.93f;
 
-	m_lights[2].intensity = 0.3f;
+	m_lights[2].intensity = 1.f;
 	m_lights[2].position = Vec3 ( 0.f, 4.f, -5.f );
 	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
 	m_lights[2].isDirectional = 1.f;
 	m_lights[2].attenuation = Vec3( 1.f, 0.f, 0.f );
-	m_lights[2].color = Vec3( 1.f, 1.f, 0.f );
+	m_lights[2].color = Vec3( 1.f, 1.f, 1.f );
 
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
