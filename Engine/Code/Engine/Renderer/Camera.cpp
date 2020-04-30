@@ -217,10 +217,6 @@ Vec3 Camera::WorldToClient( Vec3 worldPos ) const
 void Camera::SetColorTarget( Texture* texture )
 {
 	SetColorTarget( 0, texture );
-// 	if( nullptr != texture )
-// 	{
-// 		m_colorTarget = texture;
-// 	}
 }
 
 void Camera::SetColorTarget( uint index, Texture* texture )
