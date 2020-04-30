@@ -354,6 +354,7 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 	std::vector<std::string> delimetedObj = SplitStringOnDelimeter( objFile, '\n' );
 
 	Mat44 tranform = options.m_transform.ToMatrix();
+	Mat44 rotationTransform = options.m_transform.ToRotationMatrix();
 
 	std::vector<Vec3> vertexes;
 	std::vector<Vec3> normals;
@@ -389,6 +390,7 @@ void LoadOBJToVertexArray( std::vector<Vertex_PCUTBN>& masterVertexList, std::ve
 				std::string dataString = currentLine.substr( 3 );
 				Vec3 normal;
 				normal.SetFromText( dataString.c_str(), ' ' );
+				normal = rotationTransform.TransformVector3D( normal );
 				normals.push_back( normal );
 			}
 			else if( secondChar == 't' )
