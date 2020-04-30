@@ -33,12 +33,21 @@ v2f_t VertexFunction( vs_input_t input )
 	return v2f;
 }
 
+struct fragment_output_t
+{
+	float4 color : SV_Target0;
+	float4 bloom : SV_Target1;
+	float4 normal : SV_Target2;
+	float4 albedo : SV_Target3;
+	float4 tangent : SV_Target4;
+};
+
 //--------------------------------------------------------------------------------------
 // Fragment Shader
 // 
 // SV_Target0 at the end means the float4 being returned
 // is being drawn to the first bound color target.
-float4 FragmentFunction( v2f_t input ) : SV_Target0
+fragment_output_t FragmentFunction( v2f_t input )
 {
 	float4 textureColor = tDiffuse.Sample( sSampler, input.uv );
 	textureColor = pow( max(0.f, textureColor), GAMMA );
@@ -46,7 +55,6 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 surfaceColor = (input.color * textureColor).xyz; //tint our texture color
 	float surfaceAlpha = (input.color.a * textureColor.a);
 
-	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
 	
 	
 	float3 surfaceNormal = textureNormal.xyz;
@@ -63,7 +71,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 	float3 worldNormal = mul( surfaceNormal, tbn );
 	//Added in dot3 factor
 	
-	
+	float3 diffuse = AMBIENT.xyz * AMBIENT.w; // ambient color * ambient intensity
+	float3 specular = float3(0,0,0);
 
 	for( int lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
 	{
@@ -101,25 +110,31 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 		//-.25f and 0.1 are arbitrary values
 		float specularValue = smoothstep( -.25f, 0.1f, incidentCosAngle ) * dot(incidentReflect, directionToEye);
 
-		float specular = SPECULARFACTOR * pow( max( 0.f,  specularValue ), SPECULARPOWER);
-		specular *= att3;
-		specular *= LIGHT[lightIndex].intensity;
+		float specularFactor = SPECULARFACTOR * pow( max( 0.f,  specularValue ), SPECULARPOWER);
+		specularFactor *= att3;
+		specularFactor *= LIGHT[lightIndex].intensity;
 
-
-		diffuse.xyz += specular;
-
+		specular += specularFactor * LIGHT[lightIndex].color;
 	}
 	float distanceToEye = length( CAMERAPOSITION - input.worldPosition );
 	float fogMix = saturate( RangeMap( distanceToEye, FOGNEAR, FOGFAR, 0.f, 1.f ) );
 	
 
-	diffuse = min( float3( 1, 1, 1 ), diffuse );
+	float3 bloom = max( float3(0,0,0), specular - float3(1,1,1));
 	diffuse = saturate( diffuse ); //Saturate clamps to 1 (ask about?)
 	
-	float3 litColor = diffuse * surfaceColor;
+	
+	float3 litColor = diffuse * surfaceColor + specular;
 	litColor = pow( max( 0.f, litColor ), 1/GAMMA );
-
+	
 	float3 finalColor = lerp( litColor, FOGCOLOR, fogMix );
-	//return float4( distanceToEye.xxx, surfaceAlpha );
-	return float4( finalColor.xyz, surfaceAlpha );
+
+	fragment_output_t output;
+	output.color = float4( finalColor.xyz, surfaceAlpha );
+
+	output.bloom = float4( bloom, 1 );
+	output.normal = float4( worldNormal + float3(1,1,1) * 0.5f, 1 );
+	output.tangent = float4( tangent + float3(1,1,1) * 0.5f, 1 );
+	output.albedo = textureColor;
+	return output;
 }

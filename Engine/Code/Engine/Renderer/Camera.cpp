@@ -76,13 +76,13 @@ Vec3 Camera::GetDirection() const
 
 float Camera::GetAspectRatio() const
 {
-	if( nullptr == m_colorTarget )
+	if( nullptr == m_colorTargets[0] )
 	{
 		return m_outputSize.x / m_outputSize.y;
 	}
 	else
 	{
-		return m_colorTarget->GetAspectRatio();
+		return m_colorTargets[0]->GetAspectRatio();
 	}
 }
 
@@ -103,9 +103,9 @@ Vec2 Camera::GetOrthoTopRight() const
 
 Vec2 Camera::GetColorTargetSize() const
 {
-	if( nullptr != m_colorTarget )
+	if( nullptr != m_colorTargets[0] )
 	{
-		return Vec2(m_colorTarget->GetTexelSize());
+		return Vec2(m_colorTargets[0]->GetTexelSize());
 	}
 	else
 	{
@@ -216,15 +216,52 @@ Vec3 Camera::WorldToClient( Vec3 worldPos ) const
 
 void Camera::SetColorTarget( Texture* texture )
 {
-	if( nullptr != texture )
-	{
-		m_colorTarget = texture;
-	}
+	SetColorTarget( 0, texture );
+// 	if( nullptr != texture )
+// 	{
+// 		m_colorTarget = texture;
+// 	}
 }
+
+void Camera::SetColorTarget( uint index, Texture* texture )
+{
+	if( index >= m_colorTargets.size() )
+	{
+		m_colorTargets.resize( index + 1 );
+	}
+
+	m_colorTargets[index] = texture;
+}
+
 
 Texture* Camera::GetColorTarget() const
 {
-	return m_colorTarget;
+	if( m_colorTargets.size() == 0 )
+	{
+		return nullptr;
+	}
+	else
+	{
+		return m_colorTargets[0];
+	}
+
+}
+
+uint Camera::GetColorTargetCount() const
+{
+	return (uint)m_colorTargets.size();
+}
+
+Texture* Camera::GetColorTarget( uint index ) const
+{
+	if( index < m_colorTargets.size() )
+	{
+		return m_colorTargets[index];
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void Camera::SetClearMode( unsigned int clearFlags, Rgba8 color, float depth /*= 0.f*/, unsigned int stencil /*= 0 */ )

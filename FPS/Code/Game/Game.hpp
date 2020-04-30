@@ -146,7 +146,7 @@ private:
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
 
-	float m_dissolveAmount = 0.5;
+	float m_dissolveAmount = 0.f;
 
 	float m_fogDistance = 20.f;
 	float m_fogRange = 10.f;

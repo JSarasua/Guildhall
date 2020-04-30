@@ -122,7 +122,7 @@ void Game::Startup()
 	std::vector<Vertex_PCUTBN> loadedVerts;
 	std::vector<uint> loadedIndices;
 	MeshImportOptions_t options;
-	//options.m_transform.SetUniformScale( 0.1f );
+	options.m_transform.SetUniformScale( 0.2f );
 	options.m_invertV = true;
 	options.m_invertWindingOrder = false;
 	options.m_generateNormals = false;
@@ -181,7 +181,7 @@ void Game::Startup()
 	}
 	m_lights[0].intensity = 0.5f;
 	m_lights[0].position.z -= 2.f;
-	m_lights[0].color = Vec3( 0.f, 1.f, 1.f );
+	m_lights[0].color = Vec3( 1.f, 1.f, 1.f );
 
 	m_lights[1].intensity = 0.5;
 	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
@@ -359,9 +359,17 @@ void Game::Update()
 void Game::Render()
 {
 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-	Texture* frameTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	Texture* bloomTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	Texture* albedoTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	Texture* normalTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	Texture* tangentTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
 	
-	m_camera.SetColorTarget( frameTarget );
+	m_camera.SetColorTarget( 0, colorTarget );
+	m_camera.SetColorTarget( 1, bloomTarget );
+	m_camera.SetColorTarget( 2, normalTarget );
+	m_camera.SetColorTarget( 3, albedoTarget );
+	m_camera.SetColorTarget( 4, tangentTarget );
 
 	g_theRenderer->BeginCamera(m_camera);
 
@@ -421,7 +429,7 @@ void Game::Render()
 	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
 	RenderCircleOfSpheres();
 
-	RenderProjection();
+	//RenderProjection();
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
@@ -436,12 +444,16 @@ void Game::Render()
 	//Texture* backbuffer = g_theRenderer->GetBackBuffer();
 
 	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
-	g_theRenderer->StartEffect( backbuffer, frameTarget, shaderEffect);
+	g_theRenderer->StartEffect( backbuffer, colorTarget, shaderEffect);
 	g_theRenderer->EndEffect();
 
 	//g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
-	g_theRenderer->ReleaseRenderTarget( frameTarget );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	g_theRenderer->ReleaseRenderTarget( bloomTarget );
+	g_theRenderer->ReleaseRenderTarget( albedoTarget );
+	g_theRenderer->ReleaseRenderTarget( normalTarget );
+	g_theRenderer->ReleaseRenderTarget( tangentTarget );
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
@@ -452,6 +464,13 @@ void Game::Render()
 
 void Game::RenderCircleOfSpheres()
 {
+	Texture* couchDiffuse = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
+	Texture* couchNormal = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
+	//Texture* couchSpec = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_spec.png");
+
+	g_theRenderer->BindTexture( couchDiffuse );
+	g_theRenderer->BindNormal( couchNormal );
+
 	float degreeIncrements = 360.f / (float)m_numberOfCirclingCubes;
 	Mat44 circleOfSpheres = m_circleOfSpheresModelMatrix;
 	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )

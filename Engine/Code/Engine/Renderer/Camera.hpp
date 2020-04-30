@@ -4,6 +4,7 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/Transform.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 class Texture;
@@ -38,6 +39,10 @@ public:
 	~Camera();
 
 	void SetColorTarget( Texture* texture );
+	void SetColorTarget( uint index, Texture* texture );
+	uint GetColorTargetCount() const;
+	Texture* GetColorTarget( uint index ) const;
+	
 	void SetClearMode( unsigned int clearFlags, Rgba8 color, float depth = 0.f, unsigned int stencil = 0 );
 
 	//void SetOrthoView( const Vec2& bottomLeft, const Vec2&topRight );
@@ -97,7 +102,8 @@ public:
 	Transform m_transform;
 	Vec2 m_outputSize;
 
-	Texture* m_colorTarget = nullptr;
+	//Texture* m_colorTarget = nullptr;
+	std::vector<Texture*> m_colorTargets;
 	Texture* m_depthStencilTarget = nullptr;
 	float m_clearDepth = 1.f;
 	float m_clearStencil = 0.f;
