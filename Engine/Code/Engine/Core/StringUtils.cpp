@@ -99,8 +99,105 @@ bool SetBoolFromText( const char* text )
 		std::string errorMessage = std::string("Failed to convert: ") + text + std::string("to bool");
 		ERROR_AND_DIE(errorMessage.c_str());
 	}
-
 }
 
+Vec3 GetValueFromString( std::string const& stringValue, Vec3 const& defaultValue )
+{
+	Vec3 returnVec;
+	returnVec.SetFromText( stringValue.c_str() );
 
+	return returnVec;
+}
+
+Vec2 GetValueFromString( std::string const& stringValue, Vec2 const& defaultValue )
+{
+	Vec2 returnVec;
+	returnVec.SetFromText( stringValue.c_str() );
+
+	return returnVec;
+}
+
+IntVec2 GetValueFromString( std::string const& stringValue, IntVec2 const& defaultValue )
+{
+	IntVec2 returnVec;
+	returnVec.SetFromText( stringValue.c_str() );
+
+	return returnVec;
+}
+
+IntRange GetValueFromString( std::string const& stringValue, IntRange const& defaultValue )
+{
+	IntRange returnRange;
+	returnRange.SetFromText( stringValue.c_str() );
+
+	return returnRange;
+}
+
+FloatRange GetValueFromString( std::string const& stringValue, FloatRange const& defaultValue )
+{
+	FloatRange returnRange;
+	returnRange.SetFromText( stringValue.c_str() );
+
+	return returnRange;
+}
+
+Rgba8 GetValueFromString( std::string const& stringValue, Rgba8 const& defaultValue )
+{
+	Rgba8 returnColor;
+	returnColor.SetFromText( stringValue.c_str() );
+
+	return returnColor;
+}
+
+std::string GetValueFromString( std::string const& stringValue, std::string const& )
+{
+	return stringValue;
+}
+
+std::string ToString( Vec3 const& value )
+{
+	std::string vecStr = Stringf( "%f,%f,%f", value.x, value.y, value.z );
+
+	return vecStr;
+}
+
+std::string ToString( Vec2 const& value )
+{
+	std::string vecStr = Stringf( "%f,%f", value.x, value.y );
+
+	return vecStr;
+}
+
+std::string ToString( IntVec2 const& value )
+{
+	std::string vecStr = Stringf( "%i,%i", value.x, value.y );
+
+	return vecStr;
+}
+
+std::string ToString( IntRange const& value )
+{
+	std::string rangeStr = Stringf( "%i~%i", value.minimum, value.maximum );
+
+	return rangeStr;
+}
+
+std::string ToString( FloatRange const& value )
+{
+	std::string rangeStr = Stringf( "%f~%f", value.minimum, value.maximum );
+
+	return rangeStr;
+}
+
+std::string ToString( Rgba8 const& value )
+{
+	std::string colorStr = Stringf( "%c,%c,%c,%c", value.r, value.g, value.b, value.a );
+
+	return colorStr;
+}
+
+std::string ToString( std::string const& value )
+{
+	return value;
+}
 

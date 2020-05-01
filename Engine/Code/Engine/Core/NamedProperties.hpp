@@ -1,7 +1,11 @@
 #pragma once
+#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 #include <string>
 #include <map>
+
+template<typename VALUE_TYPE>
+class TypedProperty;
 
 class TypedPropertyBase
 {
@@ -14,7 +18,7 @@ public:
 	template <typename T>
 	bool Is() const
 	{
-		return GetUniqueID() == TypedProperty<T>::UNIQUE_ID;
+		return GetUniqueID() == TypedProperty<T>::StaticUniqueID();
 	}
 
 };
@@ -24,24 +28,30 @@ class TypedProperty : public TypedPropertyBase
 {
 public:
 	virtual std::string GetAsString() const final { return ToString( m_value ); }
-	virtual void const* GetUniqueID() const final { return UniqueID; }
+	virtual void const* GetUniqueID() const final { return StaticUniqueID(); }
 
 public:
 	VALUE_TYPE m_value;
 
 public:
-	static int s_uniqueIdentifierLocation;
-	static void const*const UNIQUE_ID = &s_uniqueIdentifierLocation;
+	static void const* const StaticUniqueID()
+	{
+		static int s_local = 0;
+		return &s_local;
+	}
 };
 
-//TypedProperty<int>::UNIQUE_ID != TypedProperty<float>::UNIQUE_ID
 
 class NamedProperties
 {
 public:
 	~NamedProperties() 
 	{
-	NEED TO DELETE ALL PROPERTIES HERE
+		for( auto iter : m_keyValuePairs ) {
+			delete iter.second;
+		}
+
+		m_keyValuePairs.clear();
 	}
 
 	void PopulateFromXMLAttributes( XmlElement const& element );
@@ -86,14 +96,11 @@ public:
 	template <typename T>
 	T GetValue( std::string const& keyName, T const& defaultValue ) const
 	{
-		TypedPropertyBase* base = nullptr;
-		auto iter = m_keyValuePairs.find( keyName );
-		if( iter != m_keyValuePairs.end() )
+		TypedPropertyBase* base = FindInMap(keyName);
+		if( nullptr != base )
 		{
-			base = *iter;
-		
 			//works without RTTI enabled, but doesn't work if prop inherits from T
-			if( base->GetUniqueID() == TypedProperty<T>::UNIQUE_ID )
+			if( base->Is<T>() )
 			{
 				TypedProperty<T>* prop = (TypedProperty<T>*)base;
 				return prop->m_value;
@@ -101,7 +108,7 @@ public:
 			else
 			{
 				std::string strValue = base->GetAsString();
-				return GetValueFromString( stValue, defaultValue );
+				return GetValueFromString( strValue, defaultValue );
 			}
 		}
 		else
@@ -111,6 +118,19 @@ public:
 
 	}
 	
+private:
+	TypedPropertyBase* FindInMap( std::string const& key ) const
+	{
+		auto iter = m_keyValuePairs.find( key );
+		if( iter != m_keyValuePairs.end() )
+		{
+			return iter->second;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
 
 private:
 	std::map<std::string, TypedPropertyBase*> m_keyValuePairs;
