@@ -154,6 +154,21 @@ std::string GetValueFromString( std::string const& stringValue, std::string cons
 	return stringValue;
 }
 
+bool GetValueFromString( std::string const& stringValue, bool const& defaultValue )
+{
+	return (bool)atoi( stringValue.c_str() );
+}
+
+int GetValueFromString( std::string const& stringValue, int const& defaultValue )
+{
+	return atoi( stringValue.c_str() );
+}
+
+float GetValueFromString( std::string const& stringValue, float const& defaultValue )
+{
+	return (float)atof( stringValue.c_str() );
+}
+
 std::string ToString( Vec3 const& value )
 {
 	std::string vecStr = Stringf( "%f,%f,%f", value.x, value.y, value.z );
@@ -199,5 +214,26 @@ std::string ToString( Rgba8 const& value )
 std::string ToString( std::string const& value )
 {
 	return value;
+}
+
+std::string ToString( bool const& value )
+{
+	std::string boolStr = Stringf( "%b", value );
+
+	return boolStr;
+}
+
+std::string ToString( int const& value )
+{
+	std::string intStr = Stringf( "%i", value );
+
+	return intStr;
+}
+
+std::string ToString( float const& value )
+{
+	std::string floatStr = Stringf( "%f", value );
+
+	return floatStr;
 }
 

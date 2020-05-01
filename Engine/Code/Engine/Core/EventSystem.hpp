@@ -1,9 +1,11 @@
 #pragma once
+#include "Engine/Core/NamedProperties.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include <string>
 #include <vector>
 
-typedef NamedStrings EventArgs;
+//typedef NamedStrings EventArgs;
+typedef NamedProperties EventArgs;
 typedef bool(*EventCallbackFunctionPtrType)(const EventArgs* args);
 
 enum eEventType

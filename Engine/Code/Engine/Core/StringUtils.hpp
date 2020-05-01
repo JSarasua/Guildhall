@@ -22,7 +22,9 @@ const std::vector<std::string> SplitStringOnDelimeter( const char* text, const c
 bool SetBoolFromText(const char* text);
 
 //GetValueFromString
-
+bool GetValueFromString( std::string const& stringValue, bool const& defaultValue );
+int GetValueFromString( std::string const& stringValue, int const& defaultValue );
+float GetValueFromString( std::string const& stringValue, float const& defaultValue );
 Vec3 GetValueFromString( std::string const& stringValue, Vec3 const& defaultValue );
 Vec2 GetValueFromString( std::string const& stringValue, Vec2 const& defaultValue );
 IntVec2 GetValueFromString( std::string const& stringValue, IntVec2 const& defaultValue );
@@ -32,6 +34,9 @@ Rgba8 GetValueFromString( std::string const& stringValue, Rgba8 const& defaultVa
 std::string GetValueFromString( std::string const& stringValue, std::string const& );
 
 //ToString
+std::string ToString( bool const& value );
+std::string ToString( int const& value );
+std::string ToString( float const& value );
 std::string ToString( Vec3 const& value );
 std::string ToString( Vec2 const& value );
 std::string ToString( IntVec2 const& value );
