@@ -38,8 +38,9 @@ void Game::Startup()
 	m_camera = new Camera();
 	m_UICamera = new Camera();
 
-	m_camera->SetColorTarget( nullptr );
-	m_UICamera->SetColorTarget( nullptr );
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	m_camera->SetColorTarget( backbuffer );
+	m_UICamera->SetColorTarget( backbuffer );
 
 	m_gameClock = new Clock();
 	m_gameClock->SetParent( Clock::GetMaster() );
@@ -92,7 +93,7 @@ void Game::Render()
 	//g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
 	m_camera->SetClearMode( CLEAR_COLOR_BIT, Rgba8( 0, 0, 0, 255 ), 0.f, 0 );
 	g_theRenderer->BeginCamera( *m_camera );
-	g_theRenderer->SetBlendMode( BlendMode::ALPHA );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	RenderDebugMouse();
 	RenderGameObjects();
 	g_theRenderer->EndCamera( *m_camera );
@@ -263,7 +264,7 @@ void Game::RenderUI() const
 		Vec2 halfDimensions = textBox.GetDimensions() * 0.5f;
 		textBox.SetCenter( m_mousePositionOnUICamera + halfDimensions );
 
-		g_theRenderer->SetBlendMode(BlendMode::ALPHA);
+		g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 		g_theRenderer->BindTexture( nullptr );
 		g_theRenderer->DrawAABB2Filled( textBox, Rgba8(0,0,128,128) );
 
