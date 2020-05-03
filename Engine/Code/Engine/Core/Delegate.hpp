@@ -93,6 +93,21 @@ private:
 		}
 	}
 
+	void UnsubscribeObject( sub_t const& sub )
+	{
+		for( uint i = 0; i < m_subscriptions.size(); i++ )
+		{
+			if( nullptr != m_subscriptions[i] )
+			{
+				if( m_subscriptions[i].obj_id == sub.obj_id )
+				{
+					m_subscriptions.erase( m_subscriptions.begin() + i );
+					return;
+				}
+			}
+		}
+	}
+
 private:
 	std::vector<sub_t> m_subscriptions;
 };
