@@ -3,7 +3,7 @@
 <Material
   tint="255,255,255,255"
   specularFactor="1.0"
-  specularPower="8.0"
+  specularPower="64.0"
   diffuseTexturePath="Data/Images/SF_Fighter-Albedo.jpg"
   normalTexturePath="Data/Images/SF_Fighter-Normal.jpg"
   >
@@ -32,7 +32,7 @@
   </Samplers>
     
   <ShaderState
-    ShaderFilePath="Data/Shaders/Dissolve.hlsl"
+    ShaderFilePath="Data/Shaders/Phong.hlsl"
     BlendMode="SOLID"
     DepthCompareMode="COMPARE_LESS_THAN_OR_EQUAL"
     WindingOrder="WIND_COUNTERCLOCKWISE"

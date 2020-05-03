@@ -183,13 +183,13 @@ void Game::Startup()
 	m_lights[0].position.z -= 2.f;
 	m_lights[0].color = Vec3( 1.f, 1.f, 1.f );
 
-	m_lights[1].intensity = 0.5;
+	//m_lights[1].intensity = 0.5;
 	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
 	m_lights[1].position.z += 0.5f;
 	m_lights[1].cosInnerAngle = 0.95f;
 	m_lights[1].cosOuterAngle = 0.93f;
 
-	m_lights[2].intensity = 1.f;
+	//m_lights[2].intensity = 1.f;
 	m_lights[2].position = Vec3 ( 0.f, 4.f, -5.f );
 	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
 	m_lights[2].isDirectional = 1.f;
@@ -256,9 +256,9 @@ void Game::Update()
 	m_triPlanarSphereModelMatrix.RotateXDegrees( 30.f * dt );
 	//m_quadModelMatrix.RotateZDegrees( 35.f * dt ); //if you want the quad to rotate
 
-	Mat44 newCircleOfSpheresRotation;
-	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
-	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
+// 	Mat44 newCircleOfSpheresRotation;
+// 	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
+// 	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
 	//newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
 	//m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
 
@@ -450,6 +450,8 @@ void Game::Render()
 	{
 		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
 		g_theRenderer->EndEffect();
+
+		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
 
 		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
 		g_theRenderer->StartEffect( backbuffer, colorTarget, addEffectShader );

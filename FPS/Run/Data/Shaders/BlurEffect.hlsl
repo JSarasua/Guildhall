@@ -81,7 +81,26 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 // target.
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of what I'm returning
 {
-    float4 color = tDiffuse.Sample( sSampler, input.uv );
-    //float4 inverseColor = float4( float3(1,1,1) - color.xyz, color.w );
-    return color; 
+    float blurSize = 0.05f;
+    float blurIncrement = blurSize * 0.1f;
+    float4 blurColor = float4(0.f,0.f,0.f,0.f);
+    float2 currentUV = input.uv;
+
+    float2 startOfBlurUV = input.uv - ( blurSize * 0.5f );
+    for( float yIndex = 0; yIndex < 11; yIndex++ )
+    {
+        currentUV.y = (blurIncrement * yIndex) + startOfBlurUV.y;
+        for( float xindex = 0; xindex < 11; xindex++ )
+        {
+            currentUV.x = (blurIncrement * xindex) + startOfBlurUV.x;
+            blurColor += tDiffuse.Sample( sSampler, currentUV );
+        }
+    }
+
+    blurColor /= 121.f;
+    return blurColor;
+
+    //float4 color = tDiffuse.Sample( sSampler, input.uv );
+    //return color; 
+
 }
