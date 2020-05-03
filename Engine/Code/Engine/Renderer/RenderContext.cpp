@@ -92,7 +92,7 @@ void RenderContext::StartUp(Window* window)
 	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 	m_ubo = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 
-	m_sampPoint = new Sampler( this, SAMPLER_POINT );
+	m_sampDefault = new Sampler( this, SAMPLER_BILINEAR );
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
 	m_defaultNormalTex = CreateTextureFromColor( Rgba8( 128, 128, 255 ) );
 
@@ -174,8 +174,8 @@ void RenderContext::Shutdown()
 	delete m_ubo;
 	m_ubo = nullptr;
 
-	delete m_sampPoint;
-	m_sampPoint = nullptr;
+	delete m_sampDefault;
+	m_sampDefault = nullptr;
 
 	DX_SAFE_RELEASE( m_alphaBlendStateHandle );
 	DX_SAFE_RELEASE( m_additiveBlendStateHandle );
@@ -1028,7 +1028,7 @@ void RenderContext::BindSampler( Sampler const* constSampler )
 	Sampler* sampler = const_cast<Sampler*>(constSampler);
 	if( nullptr == sampler )
 	{
-		sampler = m_sampPoint;
+		sampler = m_sampDefault;
 	}
 	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
 	m_context->PSSetSamplers( 0, 1, &samplerHandle );
@@ -1039,7 +1039,7 @@ void RenderContext::BindSamplerAt( uint slot, Sampler const* constSampler )
 	Sampler* sampler = const_cast<Sampler*>(constSampler);
 	if( nullptr == sampler )
 	{
-		sampler = m_sampPoint;
+		sampler = m_sampDefault;
 	}
 	ID3D11SamplerState* samplerHandle = sampler->GetHandle();
 	m_context->PSSetSamplers( slot, 1, &samplerHandle );

@@ -291,7 +291,7 @@ public:
 	IndexBuffer* m_immediateIBO = nullptr;
 	ID3D11Buffer* m_lastVBOHandle = nullptr;
 
-	Sampler* m_sampPoint = nullptr;
+	Sampler* m_sampDefault = nullptr;
 	Texture* m_texWhite = nullptr;
 	Texture* m_defaultNormalTex = nullptr;
 
