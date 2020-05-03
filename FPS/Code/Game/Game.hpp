@@ -86,6 +86,7 @@ private:
 	void DecrementCurrentLight();
 
 	void ToggleAttenuation();
+	void ToggleBloom();
 	void SetAttenuation( Vec3 const& newAttenuation );
 
 	void UpdateLightPosition( float deltaSeconds );
@@ -157,7 +158,7 @@ private:
 	ShaderState* m_testShaderState = nullptr;
 	Material* m_testMaterial = nullptr;
 
-
+	bool m_isBloomActive = false;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

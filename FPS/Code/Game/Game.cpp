@@ -236,8 +236,8 @@ void Game::Update()
 	Rgba8 clearColor;
 
 	clearColor.g = 0;
-	clearColor.r = 10;
-	clearColor.b = 10;
+	clearColor.r = 0;
+	clearColor.b = 0;
 
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
@@ -443,14 +443,34 @@ void Game::Render()
 	//bind other inputs
 	//Texture* backbuffer = g_theRenderer->GetBackBuffer();
 
-	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
-	g_theRenderer->StartEffect( backbuffer, colorTarget, shaderEffect);
-	g_theRenderer->EndEffect();
+	Shader* blurEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/BlurEffect.hlsl" );
+	Texture* blurredBloom = g_theRenderer->AcquireRenderTargetMatching( bloomTarget );
+
+	if( m_isBloomActive )
+	{
+		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
+		g_theRenderer->EndEffect();
+
+		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
+		g_theRenderer->StartEffect( backbuffer, colorTarget, addEffectShader );
+		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
+		g_theRenderer->EndEffect();
+	}
+	else
+	{
+		g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	}
+
+
+// 	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
+// 	g_theRenderer->StartEffect( backbuffer, colorTarget, shaderEffect);
+// 	g_theRenderer->EndEffect();
 
 	//g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
+	g_theRenderer->ReleaseRenderTarget( blurredBloom );
 	g_theRenderer->ReleaseRenderTarget( albedoTarget );
 	g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( tangentTarget );
@@ -643,6 +663,11 @@ void Game::ToggleAttenuation()
 		attenuation.y = 0.f;
 		attenuation.z = 0.f;
 	}
+}
+
+void Game::ToggleBloom()
+{
+	m_isBloomActive = !m_isBloomActive;
 }
 
 void Game::UpdateLightPosition( float deltaSeconds )
@@ -1081,7 +1106,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( tKey.WasJustPressed() )
 	{
-		ToggleAttenuation();
+		//ToggleAttenuation();
+		ToggleBloom();
 	}
 	if( yKey.WasJustPressed() )
 	{
