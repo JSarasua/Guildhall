@@ -445,23 +445,43 @@ void Game::Render()
 
 	Shader* blurEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/BlurEffect.hlsl" );
 	Texture* blurredBloom = g_theRenderer->AcquireRenderTargetMatching( bloomTarget );
+// 
+// 	if( m_isBloomActive )
+// 	{
+// 		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
+// 		g_theRenderer->EndEffect();
+// 
+// 		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
+// 
+// 		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
+// 		g_theRenderer->StartEffect( backbuffer, colorTarget, addEffectShader );
+// 		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
+// 		g_theRenderer->EndEffect();
+// 	}
+// 	else
+// 	{
+// 		g_theRenderer->CopyTexture( backbuffer, colorTarget );
+// 	}
 
-	if( m_isBloomActive )
-	{
-		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
-		g_theRenderer->EndEffect();
+	Texture* greyScale = g_theRenderer->AcquireRenderTargetMatching( colorTarget );
+	Shader* greyScaleShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TransformColorEffect.hlsl" );
+	transformColor_t transformColor;
 
-		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
-
-		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
-		g_theRenderer->StartEffect( backbuffer, colorTarget, addEffectShader );
-		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
-		g_theRenderer->EndEffect();
-	}
-	else
-	{
-		g_theRenderer->CopyTexture( backbuffer, colorTarget );
-	}
+	float redGreyScale = 0.2126f;
+	float greenGreyScale = 0.7152f;
+	float blueGreyScale = 0.0722f;
+	Vec3 iBasis = Vec3( redGreyScale, redGreyScale, redGreyScale );
+	Vec3 jBasis = Vec3( greenGreyScale, greenGreyScale, greenGreyScale );
+	Vec3 kBasis = Vec3( blueGreyScale, blueGreyScale, blueGreyScale );
+	transformColor.transformColor.SetBasisVectors3D( iBasis, jBasis, kBasis );
+	transformColor.tint = Vec3( 1.f, 0.f, 0.f );
+	transformColor.tintPower = 0.3f;
+	transformColor.transformPower = 1.f;
+	//transformColor.transformColor.tW = 1.f;
+	g_theRenderer->SetMaterialData( &transformColor, sizeof( transformColor ) );
+	g_theRenderer->StartEffect( greyScale, colorTarget, greyScaleShader );
+	g_theRenderer->EndEffect();
+	g_theRenderer->CopyTexture( backbuffer, greyScale );
 
 
 // 	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
@@ -473,6 +493,7 @@ void Game::Render()
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 	g_theRenderer->ReleaseRenderTarget( bloomTarget );
 	g_theRenderer->ReleaseRenderTarget( blurredBloom );
+	g_theRenderer->ReleaseRenderTarget( greyScale );
 	g_theRenderer->ReleaseRenderTarget( albedoTarget );
 	g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( tangentTarget );

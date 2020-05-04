@@ -47,6 +47,17 @@ struct projection_t
 	float strength;
 };
 
+struct transformColor_t
+{
+	Mat44 transformColor;
+
+	Vec3 tint;
+	float tintPower = 0.f;
+
+	Vec3 pad00;
+	float transformPower = 0.f;
+};
+
 enum PowerUps
 {
 	RAPID_FIRE,

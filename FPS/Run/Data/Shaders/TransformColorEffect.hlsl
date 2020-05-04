@@ -9,6 +9,22 @@ cbuffer frame_constants : register(b0)	//Index 0 is time
     float FOGFAR;
 };
 
+struct transformColor_t
+{
+    float4x4 transformColor;
+
+    float3 tint;
+    float tintPower;
+
+    float3 pad00;
+    float transformPower;
+};
+
+cbuffer materialConstants : register(b5)
+{
+    transformColor_t TRANSFORM;
+}
+
 
 // input to the vertex shader - for now, a special input that is the index of the vertex we're drawing
 struct vs_input_t
@@ -81,27 +97,18 @@ VertexToFragment_t VertexFunction( vs_input_t input )
 // target.
 float4 FragmentFunction( VertexToFragment_t input ) : SV_Target0 // semeantic of what I'm returning
 {
-    float blurSize = 0.05f;
-    float blurIncrement = blurSize * 0.1f;
-    float4 blurColor = float4(0.f,0.f,0.f,0.f);
-    float2 currentUV = input.uv;
+    float4x4 colorTransform = TRANSFORM.transformColor;
+    float4 tint = float4( TRANSFORM.tint, 1.f );
+    float transformPower = TRANSFORM.transformPower;
+    float tintPower = TRANSFORM.tintPower;
 
-    float2 startOfBlurUV = input.uv - ( blurSize * 0.5f );
-    for( float yIndex = 0; yIndex < 11; yIndex++ )
-    {
-        currentUV.y = (blurIncrement * yIndex) + startOfBlurUV.y;
-        for( float xindex = 0; xindex < 11; xindex++ )
-        {
-            currentUV.x = (blurIncrement * xindex) + startOfBlurUV.x;
-            blurColor += tDiffuse.Sample( sSampler, currentUV );
-        }
-    }
+    
+    float4 color = tDiffuse.Sample( sSampler, input.uv );
+    float4 greyScaleColor = mul( colorTransform, color );
+    color = lerp( color, greyScaleColor, transformPower );
+    color = lerp( color, tint, tintPower );
 
-    blurColor /= 121.f;
-    blurColor.w = 1.f;
-    return blurColor;
+    //color = mul( colorTransform, color );
 
-    //float4 color = tDiffuse.Sample( sSampler, input.uv );
-    //return color; 
-
+    return color; 
 }
