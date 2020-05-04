@@ -259,7 +259,7 @@ bool DiscVDiscManifold( Collider2D const* col0, Collider2D const* col1, Manifold
 	manifold->penetration = penetration;
 	manifold->contactEdge = LineSegment2( contact, contact );
 
-	return manifold;
+	return true;
 }
 bool DiscVPolygonManifold( Collider2D const* col0, Collider2D const* col1, Manifold2D* manifold )
 {
