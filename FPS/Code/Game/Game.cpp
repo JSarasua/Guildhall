@@ -475,8 +475,8 @@ void Game::Render()
 	Vec3 kBasis = Vec3( blueGreyScale, blueGreyScale, blueGreyScale );
 	transformColor.transformColor.SetBasisVectors3D( iBasis, jBasis, kBasis );
 	transformColor.tint = Vec3( 1.f, 0.f, 0.f );
-	transformColor.tintPower = 0.3f;
-	transformColor.transformPower = 1.f;
+	transformColor.tintPower = 0.f;
+	transformColor.transformPower = 0.f;
 	//transformColor.transformColor.tW = 1.f;
 	g_theRenderer->SetMaterialData( &transformColor, sizeof( transformColor ) );
 	g_theRenderer->StartEffect( greyScale, colorTarget, greyScaleShader );
