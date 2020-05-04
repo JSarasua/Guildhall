@@ -380,6 +380,16 @@ float Min( float a, float b )
 	return (a<b) ? a : b;
 }
 
+int MaxInt( int a, int b )
+{
+	return (a>b) ? a : b;
+}
+
+int MinInt( int a, int b )
+{
+	return (a<b) ? a : b;
+}
+
 int PositiveMod( int valueToMod, int modBy )
 {
 	int moddedValue = 0;
