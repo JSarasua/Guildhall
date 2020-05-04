@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Physics2D/Manifold2D.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
@@ -76,6 +77,9 @@ public:
 	Rigidbody2D* m_rigidbody = nullptr;
 	PhysicsMaterial m_physicsMaterial;
 	AABB2 m_bounds;
+
+	bool m_isTrigger = false;
+	uint m_ID = 0;
 protected:
 	float m_orientationRadians = 0.f;
 
