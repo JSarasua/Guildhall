@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/NamedProperties.hpp"
 
 class Physics2D;
 class Collider2D;
@@ -60,6 +61,8 @@ public:
 public:
 	Physics2D* m_system;
 	Collider2D* m_collider;
+
+	NamedProperties properties;
 
 
 protected:
