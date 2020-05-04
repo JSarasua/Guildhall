@@ -122,10 +122,7 @@ void Physics2D::DetectCollisions()
 
 			Manifold2D manifold;
 			bool intersects = myCollider->GetManifold(otherCollider, &manifold );
-			if( !intersects )
-			{
-				continue;
-			}
+
 			Collision2D collision;
 
 			if( myCollider->m_type == COLLIDER2D_POLYGON && otherCollider->m_type == COLLIDER2D_DISC )
@@ -143,8 +140,32 @@ void Physics2D::DetectCollisions()
 			collision.manifold = manifold;
 			collision.colliderId = IntVec2( MinInt( myCollider->m_ID, otherCollider->m_ID), MaxInt( myCollider->m_ID, otherCollider->m_ID ) );
 
-			AddCollision( collision );
+			if( !intersects )
+			{
+				RemoveCollision( collision );
+			}
+			else
+			{
+				AddCollision( collision );
+			}
 
+		}
+	}
+}
+
+void Physics2D::RemoveCollision( Collision2D collision )
+{
+	for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
+	{
+		if( m_collisions[collisionIndex].colliderId == collision.colliderId )
+		{
+			//Call end overlap events
+			CallEndOverlapEvents( collision );
+
+			m_collisions[collisionIndex] = m_collisions[ m_collisions.size() - 1];
+			m_collisions.pop_back();
+			
+			break;
 		}
 	}
 }
@@ -156,19 +177,54 @@ void Physics2D::AddCollision( Collision2D collision )
 	
 	if( amITrigger == areTheyTrigger )
 	{
-		if( amITrigger == false )
+		CallOverlapEvents( collision );
+
+		for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
 		{
-			//call collision event
-		}
-		else
-		{
-			//call overlap event
+			if( m_collisions[collisionIndex].colliderId == collision.colliderId )
+			{
+				return;
+			}
 		}
 
 		m_collisions.push_back( collision );
 	}
 
 
+}
+
+void Physics2D::CallOverlapEvents( Collision2D collision )
+{
+	bool amITrigger = collision.me->m_isTrigger;
+	bool areTheyTrigger = collision.them->m_isTrigger;
+	if( amITrigger == areTheyTrigger )
+	{
+		if( amITrigger == false )
+		{
+
+		}
+		else
+		{
+
+		}
+	}
+}
+
+void Physics2D::CallEndOverlapEvents( Collision2D collision )
+{
+	bool amITrigger = collision.me->m_isTrigger;
+	bool areTheyTrigger = collision.them->m_isTrigger;
+	if( amITrigger == areTheyTrigger )
+	{
+		if( amITrigger == false )
+		{
+
+		}
+		else
+		{
+
+		}
+	}
 }
 
 void Physics2D::ResolveCollisions()
@@ -178,7 +234,7 @@ void Physics2D::ResolveCollisions()
 		ResolveCollision(m_collisions[collisionIndex]);
 	}
 
-	m_collisions.clear();
+	//m_collisions.clear();
 }
 
 void Physics2D::ResolveCollision( Collision2D const& collision )

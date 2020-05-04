@@ -25,7 +25,10 @@ public:
 	void ApplyEffectors();
 	void MoveRigidbodies( float deltaSeconds );
 	void DetectCollisions();
+	void RemoveCollision( Collision2D collision );
 	void AddCollision( Collision2D collision );
+	void CallOverlapEvents( Collision2D collision );
+	void CallEndOverlapEvents( Collision2D collision );
 	void ResolveCollisions();
 	void ResolveCollision( Collision2D const& collision );
 	void CleanupDestroyedObjects();
