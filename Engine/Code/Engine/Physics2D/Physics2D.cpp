@@ -2,6 +2,7 @@
 #include "Engine/Physics2D/Collision2D.hpp"
 #include "Engine/Physics2D/Collider2D.hpp"
 #include "Engine/Physics2D/DiscCollider2D.hpp"
+#include "Engine/Math/IntVec2.hpp"
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Math/Polygon2D.hpp"
 #include "Engine/Physics2D/PolygonCollider2D.hpp"
@@ -140,11 +141,34 @@ void Physics2D::DetectCollisions()
 // 				collision.me = myCollider;
 // 				collision.them = otherCollider;
 			collision.manifold = manifold;
+			collision.colliderId = IntVec2( MinInt( myCollider->m_ID, otherCollider->m_ID), MaxInt( myCollider->m_ID, otherCollider->m_ID ) );
 
+			AddCollision( collision );
 
-			m_collisions.push_back(collision);
 		}
 	}
+}
+
+void Physics2D::AddCollision( Collision2D collision )
+{
+	bool amITrigger = collision.me->m_isTrigger;
+	bool areTheyTrigger = collision.them->m_isTrigger;
+	
+	if( amITrigger == areTheyTrigger )
+	{
+		if( amITrigger == false )
+		{
+			//call collision event
+		}
+		else
+		{
+			//call overlap event
+		}
+
+		m_collisions.push_back( collision );
+	}
+
+
 }
 
 void Physics2D::ResolveCollisions()
@@ -448,6 +472,9 @@ DiscCollider2D* Physics2D::CreateDiscCollider( Vec2 localPosition, float radius 
 {
 	DiscCollider2D* dc = new DiscCollider2D(localPosition, Vec2(0.f, 0.f), radius );
 	dc->m_system = this;
+	dc->m_ID = m_nextColliderID;
+	m_nextColliderID++;
+
 	m_colliders.push_back(dc);
 	return dc;
 }
@@ -456,6 +483,9 @@ PolygonCollider2D* Physics2D::CreatePolygonCollider( Polygon2D const& poly, Vec2
 {
 	Vec2 worldPosition = poly.GetCenterOfMass();
 	PolygonCollider2D* pc = new PolygonCollider2D(localPosition, worldPosition, poly );
+	pc->m_ID =  m_nextColliderID;
+	m_nextColliderID++;
+
 	m_colliders.push_back( pc );
 	return pc;
 }

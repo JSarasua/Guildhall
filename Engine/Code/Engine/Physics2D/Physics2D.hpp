@@ -4,6 +4,7 @@
 #include "Engine/Physics2D/Collision2D.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 class Rigidbody2D;
 class DiscCollider2D;
@@ -24,6 +25,7 @@ public:
 	void ApplyEffectors();
 	void MoveRigidbodies( float deltaSeconds );
 	void DetectCollisions();
+	void AddCollision( Collision2D collision );
 	void ResolveCollisions();
 	void ResolveCollision( Collision2D const& collision );
 	void CleanupDestroyedObjects();
@@ -61,4 +63,5 @@ private:
 
 	Timer m_fixedTimeTimer;
 	Clock* m_clock;
+	uint m_nextColliderID = 0;
 };
