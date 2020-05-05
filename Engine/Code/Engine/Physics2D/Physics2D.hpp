@@ -41,8 +41,11 @@ public:
 	float GetFixedDeltaTime() const;
 	void SetFixedDeltaTime( float frameTimeSeconds );
 
-	//factory style create/destroy
+	void EnableLayerInteraction( uint layerIdx0, uint layerIdx1 );
+	void DisableLayerInteraction( uint layerIdx0, uint layerIdx1 );
+	bool DoLayersInteract( uint layerIdx0, uint layerIdx1 );
 
+	//factory style create/destroy
 	Rigidbody2D* CreateRigidBody();
 	void DestroyRigidBody( Rigidbody2D* rb );
 
@@ -62,6 +65,7 @@ private:
 	std::vector<Rigidbody2D*> m_rigidBodies;
 	std::vector<Collider2D*> m_colliders;
 	std::vector<Collision2D> m_collisions;
+	uint m_layerInteractions[32];
 
 	float m_gravity = 10.f;
 

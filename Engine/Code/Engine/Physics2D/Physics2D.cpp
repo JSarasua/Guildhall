@@ -20,6 +20,9 @@ void Physics2D::Startup()
 	g_theEventSystem->SubscribeToEvent( "set_phyics_update", CONSOLECOMMAND, SetPhysicsUpdate );
 
 	m_fixedTimeFrame = 1.f/120.f;
+
+	memset(m_layerInteractions,~0U, sizeof(m_layerInteractions) );
+
 }
 
 void Physics2D::SetClock( Clock* clock )
@@ -140,7 +143,13 @@ void Physics2D::DetectCollisions()
 			collision.manifold = manifold;
 			collision.colliderId = IntVec2( MinInt( myCollider->m_ID, otherCollider->m_ID), MaxInt( myCollider->m_ID, otherCollider->m_ID ) );
 
-			if( !intersects )
+
+			Rigidbody2D* myRb = myCollider->m_rigidbody;
+			Rigidbody2D* theirRB = otherCollider->m_rigidbody;
+			uint myLayer = myRb->GetLayer();
+			uint theirlayer = theirRB->GetLayer();
+			bool doLayersInteract = DoLayersInteract( myLayer, theirlayer );
+			if( !intersects || !doLayersInteract )
 			{
 				RemoveCollision( collision );
 			}
@@ -569,6 +578,23 @@ float Physics2D::GetFixedDeltaTime() const
 void Physics2D::SetFixedDeltaTime( float frameTimeSeconds )
 {
 	m_fixedTimeFrame = frameTimeSeconds;
+}
+
+void Physics2D::EnableLayerInteraction( uint layerIdx0, uint layerIdx1 )
+{
+	m_layerInteractions[layerIdx0] &= ( 1 << layerIdx1 );
+	m_layerInteractions[layerIdx1] &= ( 1 << layerIdx0 );
+}
+
+void Physics2D::DisableLayerInteraction( uint layerIdx0, uint layerIdx1 )
+{
+	m_layerInteractions[layerIdx0] &= ~( 1 << layerIdx1 );
+	m_layerInteractions[layerIdx1] &= ~( 1 << layerIdx0 );
+}
+
+bool Physics2D::DoLayersInteract( uint layerIdx0, uint layerIdx1 )
+{
+	return ( ( m_layerInteractions[layerIdx0] & ( 1 << layerIdx1 ) ) != 0 );
 }
 
 Rigidbody2D* Physics2D::CreateRigidBody()

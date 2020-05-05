@@ -48,6 +48,7 @@ void Game::Startup()
 	m_physics = new Physics2D();
 	m_physics->SetClock( m_gameClock );
 	m_physics->Startup();
+	m_physics->DisableLayerInteraction( 4, 5 );
 
 	//m_camera->SetOutputSize( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ) );
 	m_camera->SetProjectionOrthographic( Vec2( GAME_CAMERA_X, GAME_CAMERA_Y ), 0.f, 1.f );
@@ -431,6 +432,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates('1');
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates('2');
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates('3');
+	const KeyButtonState& num4Key = g_theInput->GetKeyStates('4');
+	const KeyButtonState& num5Key = g_theInput->GetKeyStates('5');
+	const KeyButtonState& num6Key = g_theInput->GetKeyStates('6');
+
 
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);
 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton(RightMouseButton);
@@ -694,6 +699,51 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		else
 		{
 			m_draggingGameObject->m_rigidbody->SetSimulationMode( DYNAMIC );
+		}
+	}
+
+	if( num4Key.WasJustPressed() )
+	{
+		if( !m_isPolyDrawing )
+		{
+			if( nullptr == m_draggingGameObject )
+			{
+
+			}
+			else
+			{
+				m_draggingGameObject->m_rigidbody->SetLayer( 4 );
+			}
+		}
+	}
+
+	if( num5Key.WasJustPressed() )
+	{
+		if( !m_isPolyDrawing )
+		{
+			if( nullptr == m_draggingGameObject )
+			{
+
+			}
+			else
+			{
+				m_draggingGameObject->m_rigidbody->SetLayer( 5 );
+			}
+		}
+	}
+
+	if( num6Key.WasJustPressed() )
+	{
+		if( !m_isPolyDrawing )
+		{
+			if( nullptr == m_draggingGameObject )
+			{
+
+			}
+			else
+			{
+				m_draggingGameObject->m_rigidbody->SetLayer( 6 );
+			}
 		}
 	}
 

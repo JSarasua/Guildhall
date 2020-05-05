@@ -45,7 +45,9 @@ public:
 	void ApplyDragForce();
 
 	void SetDragCoefficient( float dragCoefficient );
-
+	
+	void SetLayer( uint layerIndex );
+	uint GetLayer() const;
 
 	Vec2 GetVelocity();
 	Vec2 GetVerletVelocity();
@@ -90,4 +92,6 @@ protected:
 	float m_angularVelocity = 0.f;		//Radians/Sec
 	float m_frameTorque = 0.f;			//???
 	float m_moment = 0.f;				//Moment of Inertia
+
+	uint m_layerIndex = 0;
 };

@@ -175,6 +175,16 @@ void Rigidbody2D::SetDragCoefficient( float dragCoefficient )
 	m_drag = dragCoefficient;
 }
 
+void Rigidbody2D::SetLayer( uint layerIndex )
+{
+	m_layerIndex = layerIndex;
+}
+
+uint Rigidbody2D::GetLayer() const
+{
+	return m_layerIndex;
+}
+
 Vec2 Rigidbody2D::GetVelocity()
 {
 	return m_velocity;
