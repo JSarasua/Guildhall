@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Physics2D/Collision2D.hpp"
 
 #include <queue>
 #include <vector>
@@ -32,6 +33,14 @@ public:
 public:
 	RandomNumberGenerator m_rand;
 
+	void OnOverlapStart( Collision2D const& collision );
+	void OnOverlapStay( Collision2D const& collision );
+	void OnOverlapEnd( Collision2D const& collision );
+
+	void OnTriggerStart( Collision2D const& collision );
+	void OnTriggerStay( Collision2D const& collision );
+	void OnTriggerEnd( Collision2D const& collision );
+
 private:
 	void CheckCollisions();
 	void UpdateGameObjects( float deltaSeconds );
@@ -43,6 +52,7 @@ private:
 	void CheckButtonPresses( float deltaSeconds );
 
 	void CreateBottomBounds();
+	void CreateTriggerShapes();
 
 	void RenderGameObjects();
 	void GrabDiscIfOverlap();

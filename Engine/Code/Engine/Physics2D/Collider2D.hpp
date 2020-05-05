@@ -5,6 +5,7 @@
 #include "Engine/Physics2D/Rigidbody2D.hpp"
 #include "Engine/Physics2D/PhysicsMaterial.hpp"
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Core/Delegate.hpp"
 
 struct Rgba8;
 struct LineSegment2;
@@ -80,6 +81,10 @@ public:
 
 	bool m_isTrigger = false;
 	uint m_ID = 0;
+
+	Delegate<Collision2D const&> m_onTriggerStart;
+	Delegate<Collision2D const&> m_onTriggerStay;
+	Delegate<Collision2D const&> m_onTriggerLeave;
 protected:
 	float m_orientationRadians = 0.f;
 

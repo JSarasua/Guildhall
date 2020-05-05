@@ -2,6 +2,8 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/NamedProperties.hpp"
+#include "Engine/Core/Delegate.hpp"
+#include "Engine/Physics2D/Collision2D.hpp"
 
 class Physics2D;
 class Collider2D;
@@ -62,13 +64,17 @@ public:
 	Physics2D* m_system;
 	Collider2D* m_collider;
 
-	NamedProperties properties;
+	Delegate<Collision2D const&> m_onOverlapStart;
+	Delegate<Collision2D const&> m_onOverlapStay;
+	Delegate<Collision2D const&> m_onOverlapStop;
 
+	NamedProperties properties;
 
 protected:
 	~Rigidbody2D(); //Destroys the collider
 
 protected:
+
 	bool m_isGarbage = false;
 	Vec2 m_worldPosition;
 	Vec2 m_frameStartPosition;

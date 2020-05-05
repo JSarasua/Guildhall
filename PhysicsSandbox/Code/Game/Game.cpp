@@ -62,6 +62,7 @@ void Game::Startup()
 	m_mouseDeltaTime.resize( 5 );
 	
 	CreateBottomBounds();
+	CreateTriggerShapes();
 
 	g_theRenderer->Setup( m_gameClock );
 }
@@ -111,6 +112,59 @@ void Game::Render()
 	DebugRenderEndFrame();
 }
 
+
+void Game::OnOverlapStart( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Overlap start ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+}
+
+void Game::OnOverlapStay( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Overlap stay ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+}
+
+void Game::OnOverlapEnd( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Overlap end ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+}
+
+void Game::OnTriggerStart( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Trigger start ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+}
+
+void Game::OnTriggerStay( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Trigger stay ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+}
+
+void Game::OnTriggerEnd( Collision2D const& collision )
+{
+	int id1 = collision.colliderId.x;
+	int id2 = collision.colliderId.y;
+	std::string overlapStartStr = Stringf( "Trigger end ID: %i, %i", id1, id2 );
+	DebugAddScreenText( Vec4( 0.f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+}
 
 void Game::CheckCollisions()
 {}
@@ -803,8 +857,40 @@ void Game::CreateBottomBounds()
 	rb->TakeCollider( pc );
 	rb->SetPosition( bottomBounds.GetCenterOfMass() );
 	rb->SetSimulationMode( STATIC );
+
+	rb->m_onOverlapStart.SubscribeMethod( this, &Game::OnOverlapStart );
+	rb->m_onOverlapStay.SubscribeMethod( this, &Game::OnOverlapStay );
+	rb->m_onOverlapStop.SubscribeMethod( this, &Game::OnOverlapEnd );
+
 	GameObject* gameObject = new GameObject( rb );
 	m_gameObjects.push_back( gameObject );
+}
+
+void Game::CreateTriggerShapes()
+{
+	Rigidbody2D* rb0 = m_physics->CreateRigidBody();
+	Rigidbody2D* rb1 = m_physics->CreateRigidBody();
+	DiscCollider2D* dc0 = m_physics->CreateDiscCollider( Vec2(0.f, 0.f), 1.f );
+	DiscCollider2D* dc1 = m_physics->CreateDiscCollider( Vec2(0.f, 0.f), 1.f );
+	dc0->m_isTrigger = true;
+	dc1->m_isTrigger = true;
+
+	dc0->m_onTriggerStart.SubscribeMethod( this, &Game::OnTriggerStart );
+	dc0->m_onTriggerStay.SubscribeMethod( this, &Game::OnTriggerStay );
+	dc0->m_onTriggerLeave.SubscribeMethod( this, &Game::OnTriggerEnd );
+
+	rb0->SetSimulationMode( STATIC );
+	rb1->SetSimulationMode( STATIC );
+
+	rb0->TakeCollider( dc0 );
+	rb1->TakeCollider( dc1 );
+	rb0->SetPosition( Vec2( -4.f, 0.f ) );
+	rb1->SetPosition( Vec2( 4.f, 0.f ) );
+	GameObject* go0 = new GameObject( rb0 );
+	GameObject* go1 = new GameObject( rb1 );
+
+	m_gameObjects.push_back( go0 );
+	m_gameObjects.push_back( go1 );
 }
 
 void Game::RenderGameObjects()

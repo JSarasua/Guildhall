@@ -153,19 +153,40 @@ void Physics2D::DetectCollisions()
 	}
 }
 
-void Physics2D::RemoveCollision( Collision2D collision )
+void Physics2D::RemoveCollision( Collision2D const& collision )
 {
 	for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
 	{
 		if( m_collisions[collisionIndex].colliderId == collision.colliderId )
 		{
 			//Call end overlap events
-			CallEndOverlapEvents( collision );
+			CallOverlapEndEvents( collision );
 
 			m_collisions[collisionIndex] = m_collisions[ m_collisions.size() - 1];
 			m_collisions.pop_back();
 			
 			break;
+		}
+	}
+}
+
+void Physics2D::RemoveCollisionsWithRigidbody( Rigidbody2D* rb )
+{
+	Collider2D* col = rb->m_collider;
+
+	for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
+	{
+		Collider2D* first = m_collisions[collisionIndex].me;
+		Collider2D* second = m_collisions[collisionIndex].them;
+
+		if( nullptr != first && col == first )
+		{
+			RemoveCollision( m_collisions[collisionIndex] );
+		}
+
+		if( nullptr != second && col == second )
+		{
+			RemoveCollision( m_collisions[collisionIndex] );
 		}
 	}
 }
@@ -177,52 +198,95 @@ void Physics2D::AddCollision( Collision2D collision )
 	
 	if( amITrigger == areTheyTrigger )
 	{
-		CallOverlapEvents( collision );
 
 		for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
 		{
 			if( m_collisions[collisionIndex].colliderId == collision.colliderId )
 			{
+				m_collisions[collisionIndex] = collision ;
+				CallOverlapStayEvents( collision );
 				return;
 			}
 		}
 
+		CallOverlapStartEvents( collision );
 		m_collisions.push_back( collision );
 	}
 
 
 }
 
-void Physics2D::CallOverlapEvents( Collision2D collision )
+void Physics2D::CallOverlapStartEvents( Collision2D collision )
 {
 	bool amITrigger = collision.me->m_isTrigger;
 	bool areTheyTrigger = collision.them->m_isTrigger;
+	Collider2D* me = collision.me;
+	Collider2D* them = collision.them;
+
+	Rigidbody2D* myRB = me->m_rigidbody;
+	Rigidbody2D* theirRB = them->m_rigidbody;
+
 	if( amITrigger == areTheyTrigger )
 	{
 		if( amITrigger == false )
 		{
-
+			myRB->m_onOverlapStart.Invoke( collision );
+			theirRB->m_onOverlapStart.Invoke( collision );
 		}
 		else
 		{
-
+			me->m_onTriggerStart.Invoke( collision );
+			them->m_onTriggerLeave.Invoke( collision );
 		}
 	}
 }
 
-void Physics2D::CallEndOverlapEvents( Collision2D collision )
+void Physics2D::CallOverlapStayEvents( Collision2D collision )
 {
 	bool amITrigger = collision.me->m_isTrigger;
 	bool areTheyTrigger = collision.them->m_isTrigger;
+	Collider2D* me = collision.me;
+	Collider2D* them = collision.them;
+
+	Rigidbody2D* myRB = me->m_rigidbody;
+	Rigidbody2D* theirRB = them->m_rigidbody;
+
 	if( amITrigger == areTheyTrigger )
 	{
 		if( amITrigger == false )
 		{
-
+			myRB->m_onOverlapStay.Invoke( collision );
+			theirRB->m_onOverlapStay.Invoke( collision );
 		}
 		else
 		{
+			me->m_onTriggerStay.Invoke( collision );
+			them->m_onTriggerStay.Invoke( collision );
+		}
+	}
+}
 
+void Physics2D::CallOverlapEndEvents( Collision2D collision )
+{
+	bool amITrigger = collision.me->m_isTrigger;
+	bool areTheyTrigger = collision.them->m_isTrigger;
+	Collider2D* me = collision.me;
+	Collider2D* them = collision.them;
+
+	Rigidbody2D* myRB = me->m_rigidbody;
+	Rigidbody2D* theirRB = them->m_rigidbody;
+
+	if( amITrigger == areTheyTrigger )
+	{
+		if( amITrigger == false )
+		{
+			myRB->m_onOverlapStop.Invoke( collision );
+			theirRB->m_onOverlapStop.Invoke( collision );
+		}
+		else
+		{
+			me->m_onTriggerLeave.Invoke( collision );
+			them->m_onTriggerLeave.Invoke( collision );
 		}
 	}
 }

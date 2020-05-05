@@ -233,6 +233,7 @@ void Rigidbody2D::EnableRigidbody()
 void Rigidbody2D::DisableRigidbody()
 {
 	m_isEnabled = false;
+	m_system->RemoveCollisionsWithRigidbody( this );
 }
 
 bool Rigidbody2D::IsEnabled()
