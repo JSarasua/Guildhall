@@ -41,6 +41,8 @@ public:
 	bool OnTriggerStay( Collision2D const& collision );
 	bool OnTriggerEnd( Collision2D const& collision );
 
+	bool TestEventSystem( EventArgs const& args );
+
 private:
 	void CheckCollisions();
 	void UpdateGameObjects( float deltaSeconds );

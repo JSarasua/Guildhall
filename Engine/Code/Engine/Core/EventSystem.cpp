@@ -48,12 +48,26 @@ void EventSystem::FireEvent( const std::string& stringToCall, eEventType eventTy
 		if( m_eventSubscriptions[eventSystemIndex]->m_eventName == stringToCall )
 		{
 			EventCallbackFunctionPtrType functionToCall = m_eventSubscriptions[eventSystemIndex]->m_callbackfunctionPtr;
-			bool isEventUsed = functionToCall(args);
-			wasAnEventCalled = true;
-			if( isEventUsed )
+			if( nullptr != functionToCall )
 			{
-				return;
+				bool isEventUsed = functionToCall( args );
+				wasAnEventCalled = true;
+				if( isEventUsed )
+				{
+					return;
+				}
 			}
+			else
+			{
+				bool isEventUsed = m_eventSubscriptions[eventSystemIndex]->m_delegate.Invoke( *args );
+				wasAnEventCalled = true;
+				if( isEventUsed )
+				{
+					return;
+				}
+			}
+			
+
 		}
 	}
 

@@ -68,15 +68,17 @@ public:
 		Unsubscribe( sub );
 	}
 
-	void Invoke( ARGS const& ...args )
+	bool Invoke( ARGS const& ...args )
 	{
 		for( sub_t& sub : m_subscriptions )
 		{
 			if( sub.callable( args... ) )
 			{
-				return;
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 
@@ -98,17 +100,16 @@ private:
 		}
 	}
 
-	void UnsubscribeObject( sub_t const& sub )
+public:
+	template <typename OBJ_TYPE>
+	void UnsubscribeObject( OBJ_TYPE* obj )
 	{
 		for( uint i = 0; i < m_subscriptions.size(); i++ )
 		{
-			if( nullptr != m_subscriptions[i] )
+			if( m_subscriptions[i].obj_id == obj )
 			{
-				if( m_subscriptions[i].obj_id == sub.obj_id )
-				{
-					m_subscriptions.erase( m_subscriptions.begin() + i );
-					return;
-				}
+				m_subscriptions.erase( m_subscriptions.begin() + i );
+				i--;
 			}
 		}
 	}

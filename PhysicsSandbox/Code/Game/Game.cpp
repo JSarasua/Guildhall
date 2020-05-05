@@ -66,6 +66,16 @@ void Game::Startup()
 	CreateTriggerShapes();
 
 	g_theRenderer->Setup( m_gameClock );
+
+	EventArgs args;
+	args.SetValue("test", 5 );
+	g_theEventSystem->SubscribeMethodToEvent( "fire0", CONSOLECOMMAND, this, &Game::TestEventSystem );
+	g_theEventSystem->SubscribeMethodToEvent( "fire1", CONSOLECOMMAND, this, &Game::TestEventSystem );
+	g_theEventSystem->FireEvent("fire0", CONSOLECOMMAND, &args );
+	g_theEventSystem->FireEvent("fire1", CONSOLECOMMAND, &args );
+	g_theEventSystem->UnsubscribeObject( this );
+	g_theEventSystem->FireEvent( "fire0", CONSOLECOMMAND, &args );
+	g_theEventSystem->FireEvent( "fire1", CONSOLECOMMAND, &args );
 }
 
 void Game::Shutdown()
@@ -170,6 +180,15 @@ bool Game::OnTriggerEnd( Collision2D const& collision )
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Trigger end ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+	return  true;
+}
+
+bool Game::TestEventSystem( EventArgs const& args )
+{
+	int testNum = args.GetValue( "test", 1 );
+	std::string testEventStr = Stringf( "Test event method: %i", testNum );
+	DebugAddScreenText( Vec4( 0.f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::RED, 2.5f, testEventStr.c_str() );
 
 	return  true;
 }
