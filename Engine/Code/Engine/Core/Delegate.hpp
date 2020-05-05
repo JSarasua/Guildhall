@@ -1,7 +1,8 @@
 #pragma once
-#include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 #include <functional>
+
+typedef unsigned int uint;
 
 template <typename ...ARGS>
 class Delegate
@@ -9,8 +10,8 @@ class Delegate
 public:
 	//using means typedef with extra features
 	//ARGS...->extend the list
-	using function_t = std::function<void( ARGS... )>;
-	using c_callback_t = void (*)(ARGS...);
+	using function_t = std::function<bool( ARGS... )>;
+	using c_callback_t = bool (*)(ARGS...);
 
 	struct sub_t // subscription_t
 	{
@@ -44,7 +45,7 @@ public:
 	}
 
 	template <typename OBJ_TYPE>
-	void SubscribeMethod( OBJ_TYPE* obj, void (OBJ_TYPE::* mcb) (ARGS...) )
+	void SubscribeMethod( OBJ_TYPE* obj, bool (OBJ_TYPE::* mcb) (ARGS...) )
 	{
 		sub_t sub;
 		sub.obj_id = obj;
@@ -52,13 +53,13 @@ public:
 
 											//lambda is required here because we need to call the objs method aka obj->mcb()
 											//[=] captures what's to the right
-		sub.callable = [=]( ARGS ...args ) { (obj->*mcb)(args...); };
+		sub.callable = [=]( ARGS ...args ) -> bool { return (obj->*mcb)(args...); };
 
 		Subscribe( sub );
 	}
 
 	template <typename OBJ_TYPE>
-	void UnsubscribeMethod( OBJ_TYPE* obj, void (OBJ_TYPE::* mcb)(ARGS...) )
+	void UnsubscribeMethod( OBJ_TYPE* obj, bool (OBJ_TYPE::* mcb)(ARGS...) )
 	{
 		sub_t sub;
 		sub.obj_id = obj;
@@ -71,7 +72,10 @@ public:
 	{
 		for( sub_t& sub : m_subscriptions )
 		{
-			sub.callable( args... );
+			if( sub.callable( args... ) )
+			{
+				return;
+			}
 		}
 	}
 

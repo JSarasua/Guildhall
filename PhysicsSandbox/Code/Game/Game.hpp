@@ -33,13 +33,13 @@ public:
 public:
 	RandomNumberGenerator m_rand;
 
-	void OnOverlapStart( Collision2D const& collision );
-	void OnOverlapStay( Collision2D const& collision );
-	void OnOverlapEnd( Collision2D const& collision );
+	bool OnOverlapStart( Collision2D const& collision );
+	bool OnOverlapStay( Collision2D const& collision );
+	bool OnOverlapEnd( Collision2D const& collision );
 
-	void OnTriggerStart( Collision2D const& collision );
-	void OnTriggerStay( Collision2D const& collision );
-	void OnTriggerEnd( Collision2D const& collision );
+	bool OnTriggerStart( Collision2D const& collision );
+	bool OnTriggerStay( Collision2D const& collision );
+	bool OnTriggerEnd( Collision2D const& collision );
 
 private:
 	void CheckCollisions();

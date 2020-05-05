@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Core/NamedProperties.hpp"
 #include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/Delegate.hpp"
+// #include "Engine/Core/EngineCommon.hpp"
 #include <string>
 #include <vector>
 
@@ -27,6 +29,13 @@ class EventSystem
 public:
 	void SubscribeToEvent( const std::string& eventName, eEventType eventType, EventCallbackFunctionPtrType functionToCall );
 	void UnsubscribeToEvent(const std::string& eventName);
+
+// 	template <typename OBJ_TYPE>
+// 	void SubscribeMethodToEvent( const std::string& eventName, eEventType eventType, OBJ_TYPE* obj, void (OBJ_TYPE::* mcb) (EventArgs& args) )
+// 	{
+// 
+// 	}
+
 	void FireEvent(const std::string& stringToCall, eEventType eventType, const EventArgs* args );
 
 
@@ -37,5 +46,6 @@ private:
 
 public:
 	std::vector<EventSubscription*> m_eventSubscriptions;
+	//Delegate<EventArgs&> m_delegate;
 
 };

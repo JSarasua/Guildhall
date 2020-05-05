@@ -114,57 +114,64 @@ void Game::Render()
 }
 
 
-void Game::OnOverlapStart( Collision2D const& collision )
+bool Game::OnOverlapStart( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Overlap start ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
+
+	return  true;
 }
 
-void Game::OnOverlapStay( Collision2D const& collision )
+bool Game::OnOverlapStay( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Overlap stay ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
 
+	return  true;
 }
 
-void Game::OnOverlapEnd( Collision2D const& collision )
+bool Game::OnOverlapEnd( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Overlap end ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
 
+	return  true;
 }
 
-void Game::OnTriggerStart( Collision2D const& collision )
+bool Game::OnTriggerStart( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Trigger start ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
 
+	return  true;
 }
 
-void Game::OnTriggerStay( Collision2D const& collision )
+bool Game::OnTriggerStay( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Trigger stay ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
 
+	return  true;
 }
 
-void Game::OnTriggerEnd( Collision2D const& collision )
+bool Game::OnTriggerEnd( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
 	std::string overlapStartStr = Stringf( "Trigger end ID: %i, %i", id1, id2 );
 	DebugAddScreenText( Vec4( 0.f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
 
+	return  true;
 }
 
 void Game::CheckCollisions()
