@@ -42,7 +42,7 @@ public:
 	bool GetDebugGameMode();
 	bool GetDebugCameraMode();
 
-	static bool QuitRequested(const EventArgs* args);
+	bool QuitRequested(const EventArgs& args);
 
 private:
 	void CheckButtonPresses();

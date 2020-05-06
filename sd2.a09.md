@@ -5,8 +5,8 @@ C29.SD2.A09 Render Targets
 - [x] `NamedProperties`
     - [x] Switch `EventArgs` to use `NamedProperties` instead `NamedStrings`
 - [x] Add ability to subscribe methods to your event system. 
-- [x] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
-
+- [-] Add ability to unsubscribe an object from the event system (unsubscribes all methods on that object)
+	**See below note
 - [x] Color Transform (ex: Grayscale) Effect
     - [x] Create/Recycle a color target matching your swapchain's output.
     - [x] Render game as normal
@@ -52,4 +52,6 @@ C29.SD2.A09 Render Targets
              - Blurring secondary output
              - Composite output 
 
+**UnsubscribeObject in Delegate works but UnsubscribeObject in event system will still show up in devconsole even though it won't actually run
+	This is due to failing to remove item from list even though item in list won't run.
 **Have more than 3 color targets because of setting color targets for the camera

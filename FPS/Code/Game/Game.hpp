@@ -85,6 +85,9 @@ public:
 	static bool SetAttenuation(const EventArgs* args);
 	static bool SetLightColor(const EventArgs* args);
 
+	bool TestEventSystem( EventArgs const& args );
+	bool TestEventSystem2( EventArgs const& args );
+
 private:
 
 	void IncrementShader();

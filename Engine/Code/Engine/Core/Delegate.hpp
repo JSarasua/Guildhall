@@ -102,16 +102,21 @@ private:
 
 public:
 	template <typename OBJ_TYPE>
-	void UnsubscribeObject( OBJ_TYPE* obj )
+	bool UnsubscribeObject( OBJ_TYPE* obj )
 	{
+		bool didEraseSub = false;
+
 		for( uint i = 0; i < m_subscriptions.size(); i++ )
 		{
 			if( m_subscriptions[i].obj_id == obj )
 			{
 				m_subscriptions.erase( m_subscriptions.begin() + i );
 				i--;
+				didEraseSub = true;
 			}
 		}
+
+		return didEraseSub;
 	}
 
 private:

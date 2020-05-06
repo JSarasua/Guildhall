@@ -204,6 +204,14 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
+
+	g_theEventSystem->SubscribeMethodToEvent( "testMethod", CONSOLECOMMAND, this, &Game::TestEventSystem );
+	g_theEventSystem->SubscribeMethodToEvent( "testMethod2", CONSOLECOMMAND, this, &Game::TestEventSystem2 );
+
+	g_theEventSystem->UnsubscribeObject( this );
+
+	g_theEventSystem->SubscribeMethodToEvent( "testMethod", CONSOLECOMMAND, this, &Game::TestEventSystem );
+
 }
 
 void Game::Shutdown()
@@ -573,6 +581,22 @@ bool Game::SetLightColor( const EventArgs* args )
 	Vec3 lightColorAsVec3 = Vec3( lightColorAsFloats[0], lightColorAsFloats[1], lightColorAsFloats[2]);
 	lightColorAsVec3 /= 255.f;
 	Game::m_lights[lightIndex].color = lightColorAsVec3;
+
+	return true;
+}
+
+bool Game::TestEventSystem( EventArgs const& args )
+{
+	UNUSED( args );
+	DebugAddScreenTextf( Vec4( 0.5f, 0.5f, 0.f, 0.f), Vec2(), 10.f, Rgba8::GREEN, Rgba8::GREEN, 5.f, "Test Event System" );
+
+	return true;
+}
+
+bool Game::TestEventSystem2( EventArgs const& args )
+{
+	UNUSED( args );
+	DebugAddScreenTextf( Vec4( 0.5f, 0.3f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::GREEN, Rgba8::GREEN, 5.f, "Test Event System 2" );
 
 	return true;
 }

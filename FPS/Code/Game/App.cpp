@@ -50,7 +50,7 @@ void App::Startup()
 	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
 
 
-	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
+	g_theEventSystem->SubscribeMethodToEvent("quit", CONSOLECOMMAND, this, &App::QuitRequested );
 }
 
 void App::Shutdown()
@@ -179,7 +179,7 @@ bool App::GetDebugCameraMode()
 	return m_debugCameraMode;
 }
 
-bool App::QuitRequested( const EventArgs* args )
+bool App::QuitRequested( const EventArgs& args )
 {
 	UNUSED( args );
 	g_theApp->HandleQuitRequested();
