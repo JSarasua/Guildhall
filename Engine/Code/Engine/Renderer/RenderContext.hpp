@@ -158,6 +158,7 @@ public:
 	void StartEffect( Texture* dest, Texture* source, Shader* shader );
 	void EndEffect();
 	int GetTotalRenderTargetPoolSize() { return m_totalRenderTargetMade; }
+	int GetTexturePoolFreeCout() { return (int)m_renderTargetPool.size(); }
 
 
 	void ClearScreen( const Rgba8& clearColor );

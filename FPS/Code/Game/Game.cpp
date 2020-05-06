@@ -317,7 +317,7 @@ void Game::Update()
 	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
 	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
-	std::string attenuationStr = Stringf("T Toggle Attenuation (Constant, Linear, Quadratic): (%.2f, %.2f, %.2f)", attenuation.x, attenuation.y, attenuation.z );
+	std::string attenuationStr = Stringf("T Toggle Bloom: %i", m_isBloomActive );
 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
 	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
 	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
@@ -329,10 +329,13 @@ void Game::Update()
 	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
 	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
 	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
-	std::string fogColorStr = Stringf( "5,6 Adjust Fog color: %.2f, %.2f, %.2f", fogColor.x, fogColor.y, fogColor.z );
-	std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
+	std::string greyScaleStr = Stringf( "5,6 Adjust Greyscale power: %.2f", m_greyscaleAmount );
+	std::string tintAmountStr = Stringf( "7,8 Adjust Tint power: %.2f", m_tintAmount );
+	//std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
 	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
 	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
+	std::string totalRenderTargetsStr = Stringf( "Total Pool Render Targets Made: %i", g_theRenderer->GetTotalRenderTargetPoolSize() );
+	std::string currentRenderTargetFreeCountStr = Stringf( "Current Render Target Pool Size: %i", g_theRenderer->GetTexturePoolFreeCout() );
 
 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
@@ -350,10 +353,15 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, fogColorStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, greyScaleStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, tintAmountStr.c_str() );
+	//DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.53f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, totalRenderTargetsStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.51f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentRenderTargetFreeCountStr.c_str() );
+
+
 }
 
 void Game::Render()
@@ -445,23 +453,26 @@ void Game::Render()
 
 	Shader* blurEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/BlurEffect.hlsl" );
 	Texture* blurredBloom = g_theRenderer->AcquireRenderTargetMatching( bloomTarget );
-// 
-// 	if( m_isBloomActive )
-// 	{
-// 		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
-// 		g_theRenderer->EndEffect();
-// 
-// 		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
-// 
-// 		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
-// 		g_theRenderer->StartEffect( backbuffer, colorTarget, addEffectShader );
-// 		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
-// 		g_theRenderer->EndEffect();
-// 	}
-// 	else
-// 	{
-// 		g_theRenderer->CopyTexture( backbuffer, colorTarget );
-// 	}
+	Texture* transitionTexture = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+
+	if( m_isBloomActive )
+	{
+		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
+		g_theRenderer->EndEffect();
+
+		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
+
+		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
+		g_theRenderer->StartEffect( transitionTexture, colorTarget, addEffectShader );
+		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
+		g_theRenderer->EndEffect();
+	}
+	else
+	{
+		g_theRenderer->CopyTexture( transitionTexture, colorTarget );
+	}
+	g_theRenderer->ReleaseRenderTarget( bloomTarget );
+	g_theRenderer->ReleaseRenderTarget( blurredBloom );
 
 	Texture* greyScale = g_theRenderer->AcquireRenderTargetMatching( colorTarget );
 	Shader* greyScaleShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TransformColorEffect.hlsl" );
@@ -475,12 +486,13 @@ void Game::Render()
 	Vec3 kBasis = Vec3( blueGreyScale, blueGreyScale, blueGreyScale );
 	transformColor.transformColor.SetBasisVectors3D( iBasis, jBasis, kBasis );
 	transformColor.tint = Vec3( 1.f, 0.f, 0.f );
-	transformColor.tintPower = 0.f;
-	transformColor.transformPower = 0.f;
+	transformColor.tintPower = m_tintAmount;
+	transformColor.transformPower = m_greyscaleAmount;
 	//transformColor.transformColor.tW = 1.f;
 	g_theRenderer->SetMaterialData( &transformColor, sizeof( transformColor ) );
-	g_theRenderer->StartEffect( greyScale, colorTarget, greyScaleShader );
+	g_theRenderer->StartEffect( greyScale, transitionTexture, greyScaleShader );
 	g_theRenderer->EndEffect();
+	
 	g_theRenderer->CopyTexture( backbuffer, greyScale );
 
 
@@ -491,12 +503,12 @@ void Game::Render()
 	//g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-	g_theRenderer->ReleaseRenderTarget( bloomTarget );
-	g_theRenderer->ReleaseRenderTarget( blurredBloom );
+
 	g_theRenderer->ReleaseRenderTarget( greyScale );
 	g_theRenderer->ReleaseRenderTarget( albedoTarget );
 	g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( tangentTarget );
+	g_theRenderer->ReleaseRenderTarget( transitionTexture );
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
@@ -659,6 +671,7 @@ void Game::DecrementCurrentLight()
 	}
 }
 
+
 void Game::ToggleAttenuation()
 {
 	Vec3& attenuation = m_lights[m_currentLightIndex].attenuation;
@@ -692,6 +705,8 @@ void Game::ToggleBloom()
 {
 	m_isBloomActive = !m_isBloomActive;
 }
+
+
 
 void Game::UpdateLightPosition( float deltaSeconds )
 {
@@ -954,41 +969,23 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num5Key.IsPressed() )
 	{
-		float newFogColorLerp = m_fogColorLerp - 0.5f * deltaSeconds;
-		newFogColorLerp = Clampf( newFogColorLerp, 0.f, 1.f );
-		m_fogColorLerp = newFogColorLerp;
-
-		float fogMin = m_fogRange * 0.5f;
-		float nearFog = m_fogDistance - fogMin;
-		float farFog = m_fogDistance + fogMin;
-
-		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
-		g_theRenderer->EnableFog( nearFog, farFog, lerpColor );
+		m_greyscaleAmount -= deltaSeconds;
+		m_greyscaleAmount = Clampf( m_greyscaleAmount, 0.f, 1.f );
 	}
 	if( num6Key.IsPressed() )
 	{
-		float newFogColorLerp = m_fogColorLerp + 0.5f * deltaSeconds;
-		newFogColorLerp = Clampf( newFogColorLerp, 0.f, 1.f );
-		m_fogColorLerp = newFogColorLerp;
-
-		float fogMin = m_fogRange * 0.5f;
-		float nearFog = m_fogDistance - fogMin;
-		float farFog = m_fogDistance + fogMin;
-
-		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
-		g_theRenderer->EnableFog( nearFog, farFog, lerpColor );
+		m_greyscaleAmount += deltaSeconds;
+		m_greyscaleAmount = Clampf( m_greyscaleAmount, 0.f, 1.f );
 	}
-	if( num7Key.WasJustPressed() )
+	if( num7Key.IsPressed() )
 	{
-		Texture* tex = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/PlayerTankBase.png");
-		AABB2 aabb(1.f, 0.f, 0.f, 1.f);
-		DebugAddScreenTexturedQuad( AABB2( 500.f, 300.f, 700.f, 500.f ), tex, aabb, Rgba8::WHITE, Rgba8::BLACK, 5.f );
+		m_tintAmount -= deltaSeconds;
+		m_tintAmount = Clampf( m_tintAmount, 0.f, 1.f );
 	}
-	if( num8Key.WasJustPressed() )
+	if( num8Key.IsPressed() )
 	{
-		Transform transform = m_camera.GetTransform();
-
-		DebugAddWireMeshToWorld( transform.ToMatrix(), m_sphereMesh, Rgba8::WHITE, Rgba8::WHITE, 15.f, DEBUG_RENDER_ALWAYS );
+		m_tintAmount += deltaSeconds;
+		m_tintAmount = Clampf( m_tintAmount, 0.f, 1.f );
 	}
 	if( num9Key.IsPressed() )
 	{

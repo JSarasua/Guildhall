@@ -95,6 +95,11 @@ private:
 	void DecrementNormalTexture();
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
+	void IncrementGreyscalePower();
+	void DecrementGreyscalePower();
+	void IncrementTintPower();
+	void DecrementTintPower();
+
 
 	void ToggleAttenuation();
 	void ToggleBloom();
@@ -159,6 +164,8 @@ private:
 	float m_numTilesInViewHorizontally = 0.f;
 
 	float m_dissolveAmount = 0.f;
+	float m_greyscaleAmount = 0.f;
+	float m_tintAmount = 0.f;
 
 	float m_fogDistance = 20.f;
 	float m_fogRange = 10.f;
@@ -170,6 +177,7 @@ private:
 	Material* m_testMaterial = nullptr;
 
 	bool m_isBloomActive = false;
+
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
