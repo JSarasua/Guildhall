@@ -202,25 +202,20 @@ void Physics2D::RemoveCollisionsWithRigidbody( Rigidbody2D* rb )
 
 void Physics2D::AddCollision( Collision2D collision )
 {
-	bool amITrigger = collision.me->m_isTrigger;
-	bool areTheyTrigger = collision.them->m_isTrigger;
-	
-	if( amITrigger == areTheyTrigger )
+
+	for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
 	{
-
-		for( size_t collisionIndex = 0; collisionIndex < m_collisions.size(); collisionIndex++ )
+		if( m_collisions[collisionIndex].colliderId == collision.colliderId )
 		{
-			if( m_collisions[collisionIndex].colliderId == collision.colliderId )
-			{
-				m_collisions[collisionIndex] = collision ;
-				CallOverlapStayEvents( collision );
-				return;
-			}
+			m_collisions[collisionIndex] = collision;
+			CallOverlapStayEvents( collision );
+			return;
 		}
-
-		CallOverlapStartEvents( collision );
-		m_collisions.push_back( collision );
 	}
+
+	CallOverlapStartEvents( collision );
+	m_collisions.push_back( collision );
+
 
 
 }
@@ -235,18 +230,18 @@ void Physics2D::CallOverlapStartEvents( Collision2D collision )
 	Rigidbody2D* myRB = me->m_rigidbody;
 	Rigidbody2D* theirRB = them->m_rigidbody;
 
-	if( amITrigger == areTheyTrigger )
+	if( amITrigger == true )
 	{
-		if( amITrigger == false )
-		{
-			myRB->m_onOverlapStart.Invoke( collision );
-			theirRB->m_onOverlapStart.Invoke( collision );
-		}
-		else
-		{
-			me->m_onTriggerStart.Invoke( collision );
-			them->m_onTriggerLeave.Invoke( collision );
-		}
+		me->m_onTriggerStart.Invoke( collision );
+	}
+	if( areTheyTrigger == true )
+	{
+		them->m_onTriggerStart.Invoke( collision );
+	}
+	if( amITrigger == false && areTheyTrigger == false )
+	{
+		myRB->m_onOverlapStart.Invoke( collision );
+		theirRB->m_onOverlapStart.Invoke( collision );
 	}
 }
 
@@ -260,19 +255,28 @@ void Physics2D::CallOverlapStayEvents( Collision2D collision )
 	Rigidbody2D* myRB = me->m_rigidbody;
 	Rigidbody2D* theirRB = them->m_rigidbody;
 
-	if( amITrigger == areTheyTrigger )
+
+	if( amITrigger == false && areTheyTrigger == false )
 	{
-		if( amITrigger == false )
-		{
-			myRB->m_onOverlapStay.Invoke( collision );
-			theirRB->m_onOverlapStay.Invoke( collision );
-		}
-		else
-		{
-			me->m_onTriggerStay.Invoke( collision );
-			them->m_onTriggerStay.Invoke( collision );
-		}
+		myRB->m_onOverlapStay.Invoke( collision );
+		theirRB->m_onOverlapStay.Invoke( collision );
 	}
+	else if( amITrigger == true && areTheyTrigger == false )
+	{
+		me->m_onTriggerStay.Invoke( collision );
+		//them->m_onTriggerStay.Invoke( collision );
+	}
+	else if( amITrigger == false && areTheyTrigger == true )
+	{
+		//me->m_onTriggerStay.Invoke( collision );
+		them->m_onTriggerStay.Invoke( collision );
+	}
+	else if( amITrigger == true && areTheyTrigger == true )
+	{
+		me->m_onTriggerStay.Invoke( collision );
+		them->m_onTriggerStay.Invoke( collision );
+	}
+
 }
 
 void Physics2D::CallOverlapEndEvents( Collision2D collision )
@@ -285,19 +289,20 @@ void Physics2D::CallOverlapEndEvents( Collision2D collision )
 	Rigidbody2D* myRB = me->m_rigidbody;
 	Rigidbody2D* theirRB = them->m_rigidbody;
 
-	if( amITrigger == areTheyTrigger )
+	if( amITrigger == true )
 	{
-		if( amITrigger == false )
-		{
-			myRB->m_onOverlapStop.Invoke( collision );
-			theirRB->m_onOverlapStop.Invoke( collision );
-		}
-		else
-		{
-			me->m_onTriggerLeave.Invoke( collision );
-			them->m_onTriggerLeave.Invoke( collision );
-		}
+		me->m_onTriggerLeave.Invoke( collision );
 	}
+	if( areTheyTrigger == true )
+	{
+		them->m_onTriggerLeave.Invoke( collision );
+	}
+	if( amITrigger == false && areTheyTrigger == false )
+	{
+		myRB->m_onOverlapStop.Invoke( collision );
+		theirRB->m_onOverlapStop.Invoke( collision );
+	}
+
 }
 
 void Physics2D::ResolveCollisions()
@@ -312,6 +317,10 @@ void Physics2D::ResolveCollisions()
 
 void Physics2D::ResolveCollision( Collision2D const& collision )
 {
+	if( collision.me->m_isTrigger || collision.them->m_isTrigger )
+	{
+		return;
+	}
 	Manifold2D manifold = collision.manifold;
 	Vec2 normal = manifold.normal;
 	Vec2 tangent = normal.GetRotatedMinus90Degrees();
