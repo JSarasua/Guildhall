@@ -128,9 +128,9 @@ bool Game::OnOverlapStart( Collision2D const& collision )
 {
 	int id1 = collision.colliderId.x;
 	int id2 = collision.colliderId.y;
-	std::string overlapStartStr = Stringf( "Overlap start ID: %i, %i", id1, id2 );
+	int testInt = collision.me->m_rigidbody->m_properties.GetValue("test", 1 );
+	std::string overlapStartStr = Stringf( "Overlap start ID: %i, %i, Testing UserData: %i", id1, id2, testInt );
 	DebugAddScreenText( Vec4( 0.f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 1.f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.5f, overlapStartStr.c_str() );
-
 	return  true;
 }
 

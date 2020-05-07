@@ -21,6 +21,8 @@ class Rigidbody2D
 	friend class Physics2D;
 
 public:
+	Rigidbody2D() { m_properties.SetValue("test", 5); }
+
 	void Update( float deltaSeconds );
 	void UpdateRotation( float deltaSeconds );
 	void AddForce( Vec2 const& forceValue );
@@ -70,7 +72,7 @@ public:
 	Delegate<Collision2D const&> m_onOverlapStay;
 	Delegate<Collision2D const&> m_onOverlapStop;
 
-	NamedProperties properties;
+	NamedProperties m_properties;
 
 protected:
 	~Rigidbody2D(); //Destroys the collider
