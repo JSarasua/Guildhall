@@ -24,3 +24,12 @@ extern DevConsole* g_theConsole;
 extern NamedStrings* g_gameConfigBlackboard;
 extern EventSystem* g_theEventSystem;
 extern InputSystem* g_theInput;
+
+
+enum class eYawPitchRollRotationOrder
+{
+	YXZ,
+	ZYX,
+};
+
+extern eYawPitchRollRotationOrder g_currentBases;

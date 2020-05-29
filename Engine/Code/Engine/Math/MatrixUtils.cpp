@@ -46,6 +46,17 @@ Mat44 MakePerspectiveProjectMatrixD3D( float fovDegrees, float aspectRatio, floa
 		0.f,					0.f,	-farZ* q,				-1.f,
 		0.f,					0.f,	nearZ * farZ * q,		0.f
 	};
+
+
+
+// 	float sixteenValuesBasisMajor[16] =
+// 	{
+// 		farZ* q,				0.f,					0.f,					-1.f,
+// 		0.f,					height / aspectRatio,	0.f,					0.f,
+// 		0.f,					0.f,					height,					0.f,
+// 		nearZ * farZ * q,		0.f,					0.f,					0.f
+// 	};
+
 	Mat44 proj( sixteenValuesBasisMajor	);
 	return proj;
 }

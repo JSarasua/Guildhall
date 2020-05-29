@@ -71,6 +71,7 @@ public:
 	void RotateXDegrees( float degreesAboutX );
 	void RotateYDegrees( float degreesAboutY );
 	void RotateZDegrees( float degreesAboutZ );
+	void RotateYawPitchRollDegress( float yaw, float pitch, float roll );
 	void Translate2D( const Vec2& translationXY );
 	void Translate3D( const Vec3& translation3D );
 	void ScaleUniform2D( float uniformScaleXY );

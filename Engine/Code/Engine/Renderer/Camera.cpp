@@ -31,10 +31,16 @@ void Camera::Translate( const Vec3& translation )
 
 void Camera::TranslateRelativeToView( Vec3 const& translation )
 {
+	float yaw = m_transform.m_rotationPitchRollYawDegrees.z;
+	float roll = m_transform.m_rotationPitchRollYawDegrees.y;
+	float pitch = m_transform.m_rotationPitchRollYawDegrees.x;
+
 	Mat44 translationMatrix;
-	translationMatrix.RotateZDegrees( m_transform.m_rotationPitchRollYawDegrees.z );
-	translationMatrix.RotateYDegrees( m_transform.m_rotationPitchRollYawDegrees.y );
-	translationMatrix.RotateXDegrees( m_transform.m_rotationPitchRollYawDegrees.x );
+
+	translationMatrix.RotateYawPitchRollDegress( yaw, pitch, roll );
+// 	translationMatrix.RotateZDegrees( m_transform.m_rotationPitchRollYawDegrees.z );
+// 	translationMatrix.RotateYDegrees( m_transform.m_rotationPitchRollYawDegrees.y );
+// 	translationMatrix.RotateXDegrees( m_transform.m_rotationPitchRollYawDegrees.x );
 
 	Vec3 absoluteTranslation = translationMatrix.TransformPosition3D( translation );
 	Translate( absoluteTranslation );
@@ -45,7 +51,8 @@ void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 	Vec3 rotationPitchRollYaw = m_transform.m_rotationPitchRollYawDegrees;
 	rotationPitchRollYaw += rotator;
 
-	float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
+	//float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
+	float pitch = rotationPitchRollYaw.x;
 
 	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 }
@@ -273,7 +280,20 @@ void Camera::UpdateCameraUBO()
 {
 	Mat44 cameraOffset = Mat44::CreateTranslation3D( m_cameraOffset );
 	Mat44 screenShakeOffset = Mat44::CreateTranslation3D( m_screenShakeOffset );
+
+	Mat44 lookAtDir;
+	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
+	}
+	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+	}
+
 	Mat44 cameraModel = m_transform.ToMatrix();
+	cameraModel.TransformBy( lookAtDir );
+
 	cameraModel.TransformBy( screenShakeOffset );
 	cameraModel.TransformBy( cameraOffset );
 	m_view = cameraModel;

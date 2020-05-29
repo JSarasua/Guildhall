@@ -45,9 +45,10 @@ void Game::Startup()
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
-	m_camera.SetOutputSize( Vec2( 160.f, 90.f ) );
+	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
-
+	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.1f, 100.f );
+	
 	XmlDocument shaderStateDoc;
 	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );
 	m_testShaderState = new ShaderState(g_theRenderer, element );
@@ -927,27 +928,27 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( wKey.IsPressed() )
 	{
-		translator.z -=  10.f * deltaSeconds;
+		translator.x +=  1.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.z +=  10.f * deltaSeconds;
+		translator.x -=  1.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
-		translator.x -=  10.f * deltaSeconds;
+		translator.y +=  1.f * deltaSeconds;
 	}
 	if( dKey.IsPressed() )
 	{
-		translator.x +=  10.f * deltaSeconds;
+		translator.y -=  1.f * deltaSeconds;
 	}
 	if( cKey.IsPressed() )
 	{
-		translator.y +=  10.f * deltaSeconds;
+		translator.z +=  1.f * deltaSeconds;
 	}
 	if( spaceKey.IsPressed() )
 	{
-		translator.y -=  10.f * deltaSeconds;
+		translator.z -=  1.f * deltaSeconds;
 	}
 
 	if( shiftKey.IsPressed() )
@@ -960,25 +961,25 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	Vec3 rotator;
 	if( upArrow.IsPressed() )
 	{
-		rotator.x += 10.f * deltaSeconds;
+		rotator.x += 1.f * deltaSeconds;
 	}
 	if( downArrow.IsPressed() )
 	{
-		rotator.x -= 10.f * deltaSeconds;
+		rotator.x -= 1.f * deltaSeconds;
 	}
 	if( leftArrow.IsPressed() )
 	{
-		rotator.y += 10.f * deltaSeconds;
+		rotator.z += 1.f * deltaSeconds;
 	}
 	if( rightArrow.IsPressed() )
 	{
-		rotator.y -= 10.f * deltaSeconds;
+		rotator.z -= 1.f * deltaSeconds;
 	}
 
 	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
 
-	rotator.x -= mouseChange.y * 0.1f;
-	rotator.y -= mouseChange.x * 0.1f;
+	rotator.x += mouseChange.y * 0.1f;
+	rotator.z -= mouseChange.x * 0.1f;
 	m_camera.RotatePitchRollYawDegrees( rotator );
 
 }

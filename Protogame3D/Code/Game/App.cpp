@@ -14,6 +14,8 @@ const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per
 
 App::App()
 {
+	g_currentBases = eYawPitchRollRotationOrder::ZYX;
+
 	g_theInput = new InputSystem();
 	m_game = new Game();
 	g_theConsole = new DevConsole();

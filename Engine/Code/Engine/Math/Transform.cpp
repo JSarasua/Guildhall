@@ -58,23 +58,31 @@ void Transform::SetNonUniformScale( Vec3 const& scale )
 
 Mat44 Transform::ToMatrix() const
 {
+	float yaw = m_rotationPitchRollYawDegrees.z;
+	float pitch = m_rotationPitchRollYawDegrees.x;
+	float roll = m_rotationPitchRollYawDegrees.y;
 	Mat44 mat;
 	mat.Translate3D( m_position );
-	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
-	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
-	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
+	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
+// 	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
+// 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
+// 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
 	mat.ScaleNonUniform3D( m_scale );
 
 	return mat;
-
 }
 
 Mat44 Transform::ToRotationMatrix() const
 {
+	float yaw = m_rotationPitchRollYawDegrees.z;
+	float pitch = m_rotationPitchRollYawDegrees.x;
+	float roll = m_rotationPitchRollYawDegrees.y;
+
 	Mat44 mat;
-	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
-	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
-	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
+	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
+// 	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
+// 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
+// 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
 
 	return mat;
 }

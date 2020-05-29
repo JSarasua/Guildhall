@@ -1,5 +1,6 @@
 #include "Engine/Math/Mat44.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 
@@ -432,6 +433,31 @@ void Mat44::RotateZDegrees( float degreesAboutZ )
 	jY = nJY;
 	jZ = nJZ;
 	jW = nJW;
+}
+
+void Mat44::RotateYawPitchRollDegress( float yaw, float pitch, float roll )
+{
+	//order is flipped because we are "pushing onto the stack"
+	//Should always be roll, pitch, yaw with differing Rotate methods called
+	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+	{
+		RotateZDegrees( roll );
+		RotateXDegrees( pitch );
+		RotateYDegrees( yaw );
+	}
+	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+	{
+		RotateXDegrees( roll );
+		RotateZDegrees( yaw );
+		RotateYDegrees( pitch );
+	}
+	else
+	{
+		//current
+		RotateZDegrees( roll );
+		RotateYDegrees( pitch );
+		RotateXDegrees( yaw );
+	}
 }
 
 void Mat44::Translate2D( const Vec2& translationXY )

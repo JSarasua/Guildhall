@@ -8,9 +8,9 @@ public:
 	void SetPosition( Vec3 const& pos );
 	void Translate( Vec3 const& translator );
 	void RotatePitchRollYawDegrees( float pitch, float roll, float yaw );
-	void RotatePitchRollYawDegrees( Vec3 const& rotator );
+	void RotatePitchRollYawDegrees( Vec3 const& pitchRollYaw );
 	void SetRotationFromPitchRollYawDegrees( float pitch, float roll, float yaw );
-	void SetRotationFromPitchRollYawDegrees( Vec3 const& rotator );
+	void SetRotationFromPitchRollYawDegrees( Vec3 const& pitchRollYaw );
 	void SetUniformScale( float scale );
 	void SetNonUniformScale( Vec3 const& scale );
 
