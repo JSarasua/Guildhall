@@ -109,53 +109,17 @@ void Game::Startup()
 	m_normalTextures.push_back( normalTileTexture );
 	m_normalTextures.push_back( normalTestSphereTexture );
 
+	m_frontCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 0.5f, 0.5f ) );
+	m_leftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.5f, 2.5f, 0.5f ) );
+	m_frontleftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 2.5f, 0.5f ) );
 
-	m_loadedMeshModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -10.f ) );
-	m_sphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 4.f, 0.f, -10.f ) );
-	m_triPlanarSphereModelMatrix = Mat44::CreateTranslation3D( Vec3( 8.f, 0.f, -10.f ) );
-	m_quadModelMatrix = Mat44::CreateTranslation3D( Vec3( -4.f, 0.f, -10.f ) );
-	m_circleOfSpheresModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.f, 0.f, -20.f ) );
-	m_numberOfCirclingCubes = 18;
+	m_cubeMesh = new GPUMesh( g_theRenderer );
+	std::vector<Vertex_PCUTBN> cubeVerts;
+	std::vector<uint> cubeIndices;
+	Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 0.5f );
 
-	m_loadedMesh = new GPUMesh( g_theRenderer );
-
-	std::vector<Vertex_PCUTBN> loadedVerts;
-	std::vector<uint> loadedIndices;
-	MeshImportOptions_t options;
-	options.m_transform.SetUniformScale( 0.2f );
-	options.m_invertV = false;
-	options.m_invertWindingOrder = false;
-	options.m_generateNormals = false;
-	options.m_generateTangents = true;
-	LoadOBJToVertexArray( loadedVerts, loadedIndices, "Data/Meshes/SciFi_Fighter.obj", options );
-	//Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 1.f );
-	m_loadedMesh->UpdateVertices( loadedVerts );
-	m_loadedMesh->UpdateIndices( loadedIndices );
-
-
-	m_sphereMesh = new GPUMesh( g_theRenderer );
-
-	std::vector<Vertex_PCUTBN> sphereVerts;
-	std::vector<uint> sphereIndices;
-	Vertex_PCUTBN::AppendIndexedVertsSphere( sphereVerts, sphereIndices, 1.f );
-	m_sphereMesh->UpdateVertices( sphereVerts );
-	m_sphereMesh->UpdateIndices( sphereIndices );
-
-	m_quadMesh = new GPUMesh( g_theRenderer );
-	std::vector<Vertex_PCUTBN> quadVerts;
-	std::vector<uint> quadIndices;
-	Vertex_PCUTBN::AppendVerts4Points( quadVerts, 
-		quadIndices, 
-		Vec3(-1.f, -1.f, 0.f), 
-		Vec3( 1.f, -1.f, 0.f), 
-		Vec3( 1.f, 1.f, 0 ), 
-		Vec3( -1.f, 1.f, 0.f ), 
-		Rgba8::WHITE, 
-		AABB2(0.f, 0.f, 1.f, 1.f ) );
-
-	m_quadMesh->UpdateVertices( quadVerts );
-	m_quadMesh->UpdateIndices( quadIndices );
-
+	m_cubeMesh->UpdateVertices( cubeVerts );
+	m_cubeMesh->UpdateIndices( cubeIndices );
 
 
 	m_gameClock = new Clock();
@@ -183,18 +147,6 @@ void Game::Startup()
 	m_lights[0].position.z -= 2.f;
 	m_lights[0].color = Vec3( 1.f, 1.f, 1.f );
 
-	//m_lights[1].intensity = 0.5;
-	m_lights[1].position = m_quadModelMatrix.GetTranslation3D();
-	m_lights[1].position.z += 0.5f;
-	m_lights[1].cosInnerAngle = 0.95f;
-	m_lights[1].cosOuterAngle = 0.93f;
-
-	//m_lights[2].intensity = 1.f;
-	m_lights[2].position = Vec3 ( 0.f, 4.f, -5.f );
-	m_lights[2].direction = Vec3(0.f, -1.f, 0.f );
-	m_lights[2].isDirectional = 1.f;
-	m_lights[2].attenuation = Vec3( 1.f, 0.f, 0.f );
-	m_lights[2].color = Vec3( 1.f, 1.f, 1.f );
 
 
 	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
@@ -204,27 +156,12 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
-
-	g_theEventSystem->SubscribeMethodToEvent( "testMethod", CONSOLECOMMAND, this, &Game::TestEventSystem );
-	g_theEventSystem->SubscribeMethodToEvent( "testMethod2", CONSOLECOMMAND, this, &Game::TestEventSystem2 );
-
-	g_theEventSystem->UnsubscribeObject( this );
-
-	g_theEventSystem->SubscribeMethodToEvent( "testMethod", CONSOLECOMMAND, this, &Game::TestEventSystem );
-
 }
 
 void Game::Shutdown()
 {
-
-	delete m_loadedMesh;
-	m_loadedMesh = nullptr;
-
-	delete m_sphereMesh;
-	m_sphereMesh = nullptr;
-
-	delete m_quadMesh;
-	m_quadMesh = nullptr;
+	delete m_cubeMesh;
+	m_cubeMesh = nullptr;
 
 	delete m_testMaterial;
 	m_testMaterial = nullptr;
@@ -254,120 +191,80 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-	UpdateLightPosition( dt );
+// 	UpdateLightPosition( dt );
+// 
+// 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
+// 	float ambientIntensity = ambientLight.w;
+// 	Vec3 attenuation = m_lights[m_currentLightIndex].attenuation;
+// 	float lightIntensity = m_lights[m_currentLightIndex].intensity;
+// 	float specularFactor = g_theRenderer->GetSpecularFactor();
+// 	float specularPower = g_theRenderer->GetSpecularPower();
+// 	float gamma = g_theRenderer->GetGamma();
+// 	float nearFog = g_theRenderer->m_fogNear;
+// 	float farFog = g_theRenderer->m_fogFar;
+// 	Vec3 fogColor = g_theRenderer->m_fogColor;
+// 
+// 	std::string renderTextureFilePathStr;
+// 	std::string normalTextureFilepathStr;
+// 
+// 	if( nullptr != m_renderTextures[m_currentRenderTextureIndex] )
+// 	{
+// 		renderTextureFilePathStr = m_renderTextures[m_currentRenderTextureIndex]->GetFilePath();
+// 	}
+// 	if( nullptr != m_normalTextures[m_currentNormalTextureIndex] )
+// 	{
+// 		normalTextureFilepathStr = m_normalTextures[m_currentNormalTextureIndex]->GetFilePath();
+// 	}
+// 
+// 	light_t const& currentLight = m_lights[m_currentLightIndex];
 
-
-// 	m_cubeModelMatrix.RotateYDegrees( 45.f * dt );
-// 	m_cubeModelMatrix.RotateXDegrees( 30.f * dt );
-	m_sphereModelMatrix.RotateXDegrees( 30.f * dt );
-	m_sphereModelMatrix.RotateYDegrees( -15.f * dt );
-	m_triPlanarSphereModelMatrix.RotateXDegrees( 30.f * dt );
-	//m_quadModelMatrix.RotateZDegrees( 35.f * dt ); //if you want the quad to rotate
-
-// 	Mat44 newCircleOfSpheresRotation;
-// 	newCircleOfSpheresRotation.RotateYDegrees( 5.f * dt );
-// 	m_circleOfSpheresModelMatrix.RotateYDegrees( 45.f * dt );
-	//newCircleOfSpheresRotation.TransformBy( m_circleOfSpheresModelMatrix );
-	//m_circleOfSpheresModelMatrix = newCircleOfSpheresRotation;
-
-
-	for( size_t lightIndex = 0; lightIndex < m_lights.size(); lightIndex++ )
-	{
-		Vec3 lightColor = m_lights[lightIndex].color;
-		lightColor *= 255.f;
-		Rgba8 lightRGBA8Color = Rgba8( (unsigned char)lightColor.x, (unsigned char)lightColor.y, (unsigned char)lightColor.z );
-
-		if( !m_isLightFollowingCamera && m_lights[lightIndex].intensity >= 0.0001f )
-		{
-			if( m_lights[lightIndex].isDirectional == 1.f )
-			{
-				Vec3 startPosition = m_lights[lightIndex].position;
-				Vec3 direction = m_lights[lightIndex].direction;
-				Vec3 endPosition = startPosition + direction;
-				LineSegment3 lightDir( startPosition, endPosition );
-				DebugAddWorldArrow( lightDir, lightRGBA8Color, 0.f );
-			}
-			else
-			{
-				DebugAddWorldPoint( m_lights[lightIndex].position, lightRGBA8Color, 0.f );
-			}
-		}
-	}
-
-
-
-	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
-	float ambientIntensity = ambientLight.w;
-	Vec3 attenuation = m_lights[m_currentLightIndex].attenuation;
-	float lightIntensity = m_lights[m_currentLightIndex].intensity;
-	float specularFactor = g_theRenderer->GetSpecularFactor();
-	float specularPower = g_theRenderer->GetSpecularPower();
-	float gamma = g_theRenderer->GetGamma();
-	float nearFog = g_theRenderer->m_fogNear;
-	float farFog = g_theRenderer->m_fogFar;
-	Vec3 fogColor = g_theRenderer->m_fogColor;
-
-	std::string renderTextureFilePathStr;
-	std::string normalTextureFilepathStr;
-
-	if( nullptr != m_renderTextures[m_currentRenderTextureIndex] )
-	{
-		renderTextureFilePathStr = m_renderTextures[m_currentRenderTextureIndex]->GetFilePath();
-	}
-	if( nullptr != m_normalTextures[m_currentNormalTextureIndex] )
-	{
-		normalTextureFilepathStr = m_normalTextures[m_currentNormalTextureIndex]->GetFilePath();
-	}
-
-	light_t const& currentLight = m_lights[m_currentLightIndex];
-
-	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
-	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
-	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
-	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
-	std::string attenuationStr = Stringf("T Toggle Bloom: %i", m_isBloomActive );
-	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
-	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
-	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
-	std::string gammaStr = Stringf("G,H Adjust Gamma: %.2f", gamma );
-	std::string lightAtOriginStr = Stringf( "F5 Set Light to Origin" );
-	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
-	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
-	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
-	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
-	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
-	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
-	std::string greyScaleStr = Stringf( "5,6 Adjust Greyscale power: %.2f", m_greyscaleAmount );
-	std::string tintAmountStr = Stringf( "7,8 Adjust Tint power: %.2f", m_tintAmount );
-	//std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
-	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
-	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
-	std::string totalRenderTargetsStr = Stringf( "Total Pool Render Targets Made: %i", g_theRenderer->GetTotalRenderTargetPoolSize() );
-	std::string currentRenderTargetFreeCountStr = Stringf( "Current Render Target Pool Size: %i", g_theRenderer->GetTexturePoolFreeCout() );
-
-	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleNormalTextureStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, ambientIntensityStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, attenuationStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIntensityStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularFactorStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularPowerStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, gammaStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAtOriginStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightToCameraStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightFollowCameraStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, greyScaleStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, tintAmountStr.c_str() );
-	//DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.53f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, totalRenderTargetsStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.51f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentRenderTargetFreeCountStr.c_str() );
+// 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
+// 	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
+// 	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
+// 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
+// 	std::string attenuationStr = Stringf("T Toggle Bloom: %i", m_isBloomActive );
+// 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
+// 	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
+// 	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
+// 	std::string gammaStr = Stringf("G,H Adjust Gamma: %.2f", gamma );
+// 	std::string lightAtOriginStr = Stringf( "F5 Set Light to Origin" );
+// 	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
+// 	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
+// 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
+// 	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
+// 	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
+// 	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
+// 	std::string greyScaleStr = Stringf( "5,6 Adjust Greyscale power: %.2f", m_greyscaleAmount );
+// 	std::string tintAmountStr = Stringf( "7,8 Adjust Tint power: %.2f", m_tintAmount );
+// 	//std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
+// 	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
+// 	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
+// 	std::string totalRenderTargetsStr = Stringf( "Total Pool Render Targets Made: %i", g_theRenderer->GetTotalRenderTargetPoolSize() );
+// 	std::string currentRenderTargetFreeCountStr = Stringf( "Current Render Target Pool Size: %i", g_theRenderer->GetTexturePoolFreeCout() );
+// 
+// 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleNormalTextureStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, ambientIntensityStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, attenuationStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIntensityStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularFactorStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularPowerStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, gammaStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAtOriginStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightToCameraStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightFollowCameraStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, greyScaleStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, tintAmountStr.c_str() );
+// 	//DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.53f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, totalRenderTargetsStr.c_str() );
+// 	DebugAddScreenText( Vec4( 0.01f, 0.51f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentRenderTargetFreeCountStr.c_str() );
 
 
 }
@@ -390,60 +287,20 @@ void Game::Render()
 	g_theRenderer->BeginCamera(m_camera);
 
 	g_theRenderer->DisableLight( 0 );
-	EnableLights();
+	//EnableLights();
 
-	dissolve_t* dissolveData = m_testMaterial->GetDataAs<dissolve_t>();
-	dissolveData->amount = m_dissolveAmount;
-	m_testMaterial->SetData( *dissolveData );
-
-	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
-	g_theRenderer->BindMaterial( m_testMaterial );
-	g_theRenderer->DrawMesh( m_loadedMesh );
-
-	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
-	g_theRenderer->DrawMesh( m_quadMesh );
-
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-
+	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+	g_theRenderer->BindTexture( testTexture );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
-	fresnel_t fresnel;
-	fresnel.color = Vec3( 0.f, 1.f, 0.f );
-	fresnel.power = 16.f;
-	fresnel.factor = 1.f;
+	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
 
-	g_theRenderer->SetMaterialData( &fresnel, sizeof(fresnel) );
-	Shader* fresnelShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Fresnel.hlsl" );
-	g_theRenderer->BindShader( fresnelShader );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_LESS_THAN_OR_EQUAL );
+	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	Texture* tex0_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/forrest_ground_01_diff_1k.png" );
-	Texture* tex0_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/forrest_ground_01_nor_1k.png" );
-	Texture* tex1_d = g_theRenderer->CreateOrGetTextureFromFile( /*"Data/Images/test.png"*/"Data/Images/sand_01_diff_1k.png" );
-	Texture* tex1_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/sand_01_nor_1k.png" );
-	Texture* tex2_d = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_diff_1k.png" );
-	Texture* tex2_n = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/rock_06_nor_1k.png" );
+	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
+	g_theRenderer->DrawMesh( m_cubeMesh );
 
-	g_theRenderer->BindDataTexture( 8,  tex0_d );
-	g_theRenderer->BindDataTexture( 9,  tex0_n );
-	g_theRenderer->BindDataTexture( 10, tex1_d );
-	g_theRenderer->BindDataTexture( 11, tex1_n );
-	g_theRenderer->BindDataTexture( 12, tex2_d );
-	g_theRenderer->BindDataTexture( 13, tex2_n );
-
-	Shader* triPlanarShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TriPlanar.hlsl" );
-	g_theRenderer->BindShader( triPlanarShader );
-	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-
-	g_theRenderer->SetBlendMode( eBlendMode::SOLID );
-	g_theRenderer->BindShader( m_shaders[m_currentShaderIndex] );
-	RenderCircleOfSpheres();
+	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
+	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	//RenderProjection();
 
@@ -453,70 +310,17 @@ void Game::Render()
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
 
-	//Setup camera that is identity
-	// bind a shader for the effect
-	// bind "src" as an input
-	//bind other inputs
-	//Texture* backbuffer = g_theRenderer->GetBackBuffer();
 
-	Shader* blurEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/BlurEffect.hlsl" );
-	Texture* blurredBloom = g_theRenderer->AcquireRenderTargetMatching( bloomTarget );
-	Texture* transitionTexture = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-
-	if( m_isBloomActive )
-	{
-		g_theRenderer->StartEffect( blurredBloom, bloomTarget, blurEffectShader );
-		g_theRenderer->EndEffect();
-
-		//g_theRenderer->CopyTexture( backbuffer, blurredBloom );
-
-		Shader* addEffectShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/AddEffect.hlsl" );
-		g_theRenderer->StartEffect( transitionTexture, colorTarget, addEffectShader );
-		g_theRenderer->BindDataTexture( DATATEXTUREOFFSET, blurredBloom );
-		g_theRenderer->EndEffect();
-	}
-	else
-	{
-		g_theRenderer->CopyTexture( transitionTexture, colorTarget );
-	}
-	g_theRenderer->ReleaseRenderTarget( bloomTarget );
-	g_theRenderer->ReleaseRenderTarget( blurredBloom );
-
-	Texture* greyScale = g_theRenderer->AcquireRenderTargetMatching( colorTarget );
-	Shader* greyScaleShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/TransformColorEffect.hlsl" );
-	transformColor_t transformColor;
-
-	float redGreyScale = 0.2126f;
-	float greenGreyScale = 0.7152f;
-	float blueGreyScale = 0.0722f;
-	Vec3 iBasis = Vec3( redGreyScale, redGreyScale, redGreyScale );
-	Vec3 jBasis = Vec3( greenGreyScale, greenGreyScale, greenGreyScale );
-	Vec3 kBasis = Vec3( blueGreyScale, blueGreyScale, blueGreyScale );
-	transformColor.transformColor.SetBasisVectors3D( iBasis, jBasis, kBasis );
-	transformColor.tint = Vec3( 1.f, 0.f, 0.f );
-	transformColor.tintPower = m_tintAmount;
-	transformColor.transformPower = m_greyscaleAmount;
-	//transformColor.transformColor.tW = 1.f;
-	g_theRenderer->SetMaterialData( &transformColor, sizeof( transformColor ) );
-	g_theRenderer->StartEffect( greyScale, transitionTexture, greyScaleShader );
-	g_theRenderer->EndEffect();
 	
-	g_theRenderer->CopyTexture( backbuffer, greyScale );
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 
-
-// 	Shader* shaderEffect = g_theRenderer->GetOrCreateShader( "Data/Shaders/ImageEffect.hlsl" );
-// 	g_theRenderer->StartEffect( backbuffer, colorTarget, shaderEffect);
-// 	g_theRenderer->EndEffect();
-
-	//g_theRenderer->CopyTexture( backbuffer, frameTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-
-	g_theRenderer->ReleaseRenderTarget( greyScale );
+	g_theRenderer->ReleaseRenderTarget( bloomTarget );
 	g_theRenderer->ReleaseRenderTarget( albedoTarget );
 	g_theRenderer->ReleaseRenderTarget( normalTarget );
 	g_theRenderer->ReleaseRenderTarget( tangentTarget );
-	g_theRenderer->ReleaseRenderTarget( transitionTexture );
+
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
@@ -525,28 +329,7 @@ void Game::Render()
 }
 
 
-void Game::RenderCircleOfSpheres()
-{
-	Texture* couchDiffuse = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_colour.png");
-	Texture* couchNormal = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_normal.png");
-	//Texture* couchSpec = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/example_spec.png");
 
-	g_theRenderer->BindTexture( couchDiffuse );
-	g_theRenderer->BindNormal( couchNormal );
-
-	float degreeIncrements = 360.f / (float)m_numberOfCirclingCubes;
-	Mat44 circleOfSpheres = m_circleOfSpheresModelMatrix;
-	for( float currentDegreeIncrement = 0.f; currentDegreeIncrement < 360.f; currentDegreeIncrement += degreeIncrements )
-	{
-		g_theRenderer->SetModelMatrix( circleOfSpheres );
-		g_theRenderer->DrawMesh( m_sphereMesh );
-
-		Mat44 nextModelMatrix;
-		nextModelMatrix.RotateYDegrees( degreeIncrements );
-		nextModelMatrix.TransformBy( circleOfSpheres );
-		circleOfSpheres = nextModelMatrix;
-	}
-}
 
 bool Game::SetAmbientColor( const EventArgs* args )
 {
@@ -783,39 +566,6 @@ void Game::RenderGame()
 	//m_world->Render();
 }
 
-void Game::RenderProjection()
-{
-	//Projection
-	Texture* projectionTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
-	g_theRenderer->BindDataTexture( 14, projectionTexture );
-	g_theRenderer->SetBlendMode( eBlendMode::ADDITIVE );
-	Mat44 lightView0 = LookAtAndMoveToWorld( m_lights[0].position, m_lights[0].position + m_lights[0].direction, Vec3( 0.f, 1.f, 0.f) );
-	MatrixInvertOrthoNormal( lightView0 );
-	
-	Mat44 newProjectionMatrix = MakePerspectiveProjectMatrixD3D( 30.f, 1.f, -0.1f, -1000.f );
-	Mat44 viewMatrix = m_camera.GetViewMatrix();
-	newProjectionMatrix.TransformBy( lightView0 );
-	
-	projection_t projectionData;
-	projectionData.projection = newProjectionMatrix;
-	projectionData.position = m_lights[0].position;
-	projectionData.strength = 1.f;
-	
-	g_theRenderer->SetMaterialData( &projectionData, sizeof(projectionData) );
-	Shader* projectionShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Projection.hlsl");
-	g_theRenderer->BindShader( projectionShader );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_EQUAL, eDepthWriteMode::WRITE_NONE );
-	g_theRenderer->SetModelMatrix( m_loadedMeshModelMatrix );
-	g_theRenderer->DrawMesh( m_loadedMesh );
-	g_theRenderer->SetModelMatrix( m_quadModelMatrix );
-	g_theRenderer->DrawMesh( m_quadMesh );
-	g_theRenderer->SetModelMatrix( m_sphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	g_theRenderer->SetModelMatrix( m_triPlanarSphereModelMatrix );
-	g_theRenderer->DrawMesh( m_sphereMesh );
-	RenderCircleOfSpheres();
-}
-
 void Game::RenderUI()
 {
 }
@@ -860,7 +610,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
 	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
-	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
 	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
@@ -1152,11 +902,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		//ToggleAttenuation();
 		ToggleBloom();
-	}
-	if( yKey.WasJustPressed() )
-	{
-		Mat44 cameraModel = m_camera.GetCameraModelMatrix();
-		DebugAddWireMeshToWorld( cameraModel, m_sphereMesh, Rgba8::RED, Rgba8::BLUE, 45.f, DEBUG_RENDER_USE_DEPTH );
 	}
 	if( plusKey.IsPressed() )
 	{

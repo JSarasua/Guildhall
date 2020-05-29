@@ -79,7 +79,6 @@ public:
 
 	void Update();
 	void Render();
-	void RenderCircleOfSpheres();
 
 	static bool SetAmbientColor(const EventArgs* args);
 	static bool SetAttenuation(const EventArgs* args);
@@ -98,10 +97,6 @@ private:
 	void DecrementNormalTexture();
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
-	void IncrementGreyscalePower();
-	void DecrementGreyscalePower();
-	void IncrementTintPower();
-	void DecrementTintPower();
 
 
 	void ToggleAttenuation();
@@ -115,19 +110,22 @@ private:
 	void UpdateEntities( float deltaSeconds );
 	void UpdateCamera( float deltaSeconds );
 	void RenderGame();
-	void RenderProjection();
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
 	IntVec2 GetCurrentMapBounds() const;
 	void SetLightPosition( Vec3 const& pos );
 
 private:
-	Mat44 m_loadedMeshModelMatrix;
-	Mat44 m_circleOfSpheresModelMatrix;
-	Mat44 m_quadModelMatrix;
-	Mat44 m_sphereModelMatrix;
-	Mat44 m_triPlanarSphereModelMatrix;
-	int m_numberOfCirclingCubes = 0;
+	Mat44 m_frontCubeModelMatrix;
+	Mat44 m_leftCubeModelMatrix;
+	Mat44 m_frontleftCubeModelMatrix;
+
+	//Mat44 m_loadedMeshModelMatrix;
+	//Mat44 m_circleOfSpheresModelMatrix;
+	//Mat44 m_quadModelMatrix;
+	//Mat44 m_sphereModelMatrix;
+	//Mat44 m_triPlanarSphereModelMatrix;
+	//int m_numberOfCirclingCubes = 0;
 
 	Clock* m_gameClock = nullptr;
 
@@ -140,9 +138,8 @@ private:
 
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
-	GPUMesh* m_loadedMesh = nullptr;
-	GPUMesh* m_sphereMesh = nullptr;
-	GPUMesh* m_quadMesh = nullptr;
+
+	GPUMesh* m_cubeMesh = nullptr;
 	Texture* m_screenTexture = nullptr;
 
 	Shader* m_invertShader = nullptr;
