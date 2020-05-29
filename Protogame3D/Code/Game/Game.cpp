@@ -191,6 +191,9 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
+	DebugAddWorldBasis( Mat44(), 0.f );
+	DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
+
 // 	UpdateLightPosition( dt );
 // 
 // 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
