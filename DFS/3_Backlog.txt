@@ -1,0 +1,33 @@
+-------------------------------------------------------------------------------
+Fields
+-------------------------------------------------------------------------------
+Task Id 	Unique id for sorting, searching, and grouping tasks
+Status 		Current status of this task, see legend
+Estimate 	Estimated time to complete this task, in hours
+Actual 		How much time was actually spent on this task, in hours
+Feature Id 	The feature corresponding to this task
+Description	Sufficient text to fully explain the work to be done
+-------------------------------------------------------------------------------
+Status Codes
+-------------------------------------------------------------------------------
+O Not Started
+/ In Progress
+X Complete
+< Sent to backlog
+> Carried to next sprint
+- Deleted
+-------------------------------------------------------------------------------
+Status Tags
+-------------------------------------------------------------------------------
+* Not originally planned
+! Highest priority
+
+===============================================================================
+BACKLOG
+===============================================================================
+
+Task Id 	Status 		Estimate 	Actual 		Feature Id	Description
+-------------------------------------------------------------------------------
+1			[O]!		1.5			0			1			Description 1
+1.1			[/]			2.0			0			2			Description 2
+2			[X]*		1.0			2.5			1.1			Description 3
