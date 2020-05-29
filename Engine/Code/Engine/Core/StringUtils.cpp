@@ -1,6 +1,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include <stdarg.h>
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 //-----------------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@ bool SetBoolFromText( const char* text )
 
 Vec3 GetValueFromString( std::string const& stringValue, Vec3 const& defaultValue )
 {
+	UNUSED( defaultValue );
 	Vec3 returnVec;
 	returnVec.SetFromText( stringValue.c_str() );
 
@@ -111,6 +113,7 @@ Vec3 GetValueFromString( std::string const& stringValue, Vec3 const& defaultValu
 
 Vec2 GetValueFromString( std::string const& stringValue, Vec2 const& defaultValue )
 {
+	UNUSED( defaultValue );
 	Vec2 returnVec;
 	returnVec.SetFromText( stringValue.c_str() );
 
@@ -119,6 +122,7 @@ Vec2 GetValueFromString( std::string const& stringValue, Vec2 const& defaultValu
 
 IntVec2 GetValueFromString( std::string const& stringValue, IntVec2 const& defaultValue )
 {
+	UNUSED( defaultValue );
 	IntVec2 returnVec;
 	returnVec.SetFromText( stringValue.c_str() );
 
@@ -127,6 +131,7 @@ IntVec2 GetValueFromString( std::string const& stringValue, IntVec2 const& defau
 
 IntRange GetValueFromString( std::string const& stringValue, IntRange const& defaultValue )
 {
+	UNUSED( defaultValue );
 	IntRange returnRange;
 	returnRange.SetFromText( stringValue.c_str() );
 
@@ -135,6 +140,7 @@ IntRange GetValueFromString( std::string const& stringValue, IntRange const& def
 
 FloatRange GetValueFromString( std::string const& stringValue, FloatRange const& defaultValue )
 {
+	UNUSED( defaultValue );
 	FloatRange returnRange;
 	returnRange.SetFromText( stringValue.c_str() );
 
@@ -143,6 +149,7 @@ FloatRange GetValueFromString( std::string const& stringValue, FloatRange const&
 
 Rgba8 GetValueFromString( std::string const& stringValue, Rgba8 const& defaultValue )
 {
+	UNUSED( defaultValue );
 	Rgba8 returnColor;
 	returnColor.SetFromText( stringValue.c_str() );
 
@@ -156,16 +163,19 @@ std::string GetValueFromString( std::string const& stringValue, std::string cons
 
 bool GetValueFromString( std::string const& stringValue, bool const& defaultValue )
 {
+	UNUSED( defaultValue );
 	return (bool)atoi( stringValue.c_str() );
 }
 
 int GetValueFromString( std::string const& stringValue, int const& defaultValue )
 {
+	UNUSED( defaultValue );
 	return atoi( stringValue.c_str() );
 }
 
 float GetValueFromString( std::string const& stringValue, float const& defaultValue )
 {
+	UNUSED( defaultValue );
 	return (float)atof( stringValue.c_str() );
 }
 
