@@ -447,9 +447,9 @@ void Mat44::RotateYawPitchRollDegress( float yaw, float pitch, float roll )
 	}
 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
 	{
-		RotateXDegrees( roll );
 		RotateZDegrees( yaw );
 		RotateYDegrees( pitch );
+		RotateXDegrees( roll );
 	}
 	else
 	{

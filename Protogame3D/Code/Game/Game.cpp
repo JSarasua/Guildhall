@@ -47,7 +47,7 @@ void Game::Startup()
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
-	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.1f, 100.f );
+	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, -0.1f, -100.f );
 	
 	XmlDocument shaderStateDoc;
 	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );

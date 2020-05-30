@@ -1,5 +1,7 @@
 #include "Engine/Math/Transform.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
 
 void Transform::SetPosition( Vec3 const& pos )
 {
@@ -61,6 +63,18 @@ Mat44 Transform::ToMatrix() const
 	float yaw = m_rotationPitchRollYawDegrees.z;
 	float pitch = m_rotationPitchRollYawDegrees.x;
 	float roll = m_rotationPitchRollYawDegrees.y;
+
+	Mat44 lookAtDir;
+	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
+	}
+	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+	}
+	//MatrixInvertOrthoNormal( lookAtDir );
+
 	Mat44 mat;
 	mat.Translate3D( m_position );
 	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
@@ -68,6 +82,7 @@ Mat44 Transform::ToMatrix() const
 // 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
 // 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
 	mat.ScaleNonUniform3D( m_scale );
+	mat.TransformBy( lookAtDir );
 
 	return mat;
 }

@@ -326,6 +326,7 @@ void AppendIndexedVertsCylinder( std::vector<Vertex_PCU>& masterVertexList, std:
 
 	uint startIndex = (uint)masterVertexList.size();
 	//transform
+	//Update worldup
 	Mat44 transform = LookAtAndMoveToWorld( startPos, endPos, Vec3(0.f, 1.f, 0.f ) );
 	for( size_t vertexIndex = 0; vertexIndex < vertexes.size(); vertexIndex++ )
 	{
