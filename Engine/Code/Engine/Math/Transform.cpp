@@ -64,15 +64,15 @@ Mat44 Transform::ToMatrix() const
 	float pitch = m_rotationPitchRollYawDegrees.x;
 	float roll = m_rotationPitchRollYawDegrees.y;
 
-	Mat44 lookAtDir;
-	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
-	{
-		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
-	}
-	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
-	{
-		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
-	}
+// 	Mat44 lookAtDir;
+// 	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+// 	{
+// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
+// 	}
+// 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+// 	{
+// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+// 	}
 	//MatrixInvertOrthoNormal( lookAtDir );
 
 	Mat44 mat;
@@ -82,7 +82,7 @@ Mat44 Transform::ToMatrix() const
 // 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
 // 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
 	mat.ScaleNonUniform3D( m_scale );
-	mat.TransformBy( lookAtDir );
+	//mat.TransformBy( lookAtDir );
 
 	return mat;
 }
@@ -93,22 +93,22 @@ Mat44 Transform::ToRotationMatrix() const
 	float pitch = m_rotationPitchRollYawDegrees.x;
 	float roll = m_rotationPitchRollYawDegrees.y;
 
-	Mat44 lookAtDir;
-	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
-	{
-		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
-	}
-	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
-	{
-		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
-	}
+// 	Mat44 lookAtDir;
+// 	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+// 	{
+// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
+// 	}
+// 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+// 	{
+// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+// 	}
 
 	Mat44 mat;
 	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
 // 	mat.RotateZDegrees( m_rotationPitchRollYawDegrees.z );
 // 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
 // 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
-	mat.TransformBy( lookAtDir );
+/*	mat.TransformBy( lookAtDir );*/
 
 	return mat;
 }
