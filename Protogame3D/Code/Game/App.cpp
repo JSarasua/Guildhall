@@ -49,6 +49,7 @@ void App::Startup()
 	m_devConsoleCamera->SetColorTarget( g_theRenderer->GetBackBuffer() );
 	//m_devConsoleCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
 	m_devConsoleCamera->SetProjectionOrthographic(Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y), 0.f, -100.f );
+	m_devConsoleCamera->m_cameraType = SCREENCAMERA;
 	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
 
 
