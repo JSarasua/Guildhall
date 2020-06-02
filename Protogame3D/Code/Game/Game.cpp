@@ -242,7 +242,7 @@ void Game::Update()
 // 	std::string tintAmountStr = Stringf( "7,8 Adjust Tint power: %.2f", m_tintAmount );
 // 	//std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
 // 	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
-// 	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
+ 	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
 // 	std::string totalRenderTargetsStr = Stringf( "Total Pool Render Targets Made: %i", g_theRenderer->GetTotalRenderTargetPoolSize() );
 // 	std::string currentRenderTargetFreeCountStr = Stringf( "Current Render Target Pool Size: %i", g_theRenderer->GetTexturePoolFreeCout() );
 // 
@@ -266,7 +266,7 @@ void Game::Update()
 // 	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, tintAmountStr.c_str() );
 // 	//DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
 // 	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
+ 	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
 // 	DebugAddScreenText( Vec4( 0.01f, 0.53f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, totalRenderTargetsStr.c_str() );
 // 	DebugAddScreenText( Vec4( 0.01f, 0.51f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentRenderTargetFreeCountStr.c_str() );
 

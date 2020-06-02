@@ -15,7 +15,9 @@ public:
 	void SetNonUniformScale( Vec3 const& scale );
 
 	Mat44 ToMatrix() const;
+	Mat44 ToMatrixWithoutWorldBasis() const;
 	Mat44 ToRotationMatrix() const;
+	Mat44 ToRotationMatrixWithoutWorldBasis() const;
 
 public:
 	Vec3 m_position = Vec3( 0.f, 0.f, 0.f );

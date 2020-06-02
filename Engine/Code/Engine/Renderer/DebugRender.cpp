@@ -657,14 +657,17 @@ void DebugRenderScreenTo( Texture* output )
 	Vec2 max( aspectRatio * screenHeight, screenHeight );
 	cam.SetProjectionOrthographic(max, 0.f, 1000.f );
 	cam.SetPosition( Vec3(0.5f * max) );
+	cam.m_cameraType = SCREENCAMERA;
 
 	std::vector<Vertex_PCU> vertices;
 	std::vector<uint> indices;
 	std::vector<Vertex_PCU> textVertices;
 	std::vector<uint> textIndices;
 
-	s_DebugRenderSystem->AppendIndexedVerts( vertices, indices, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
-	s_DebugRenderSystem->AppendIndexedTextVerts( textVertices, textIndices, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+	Mat44 cameraScreenRotation = cam.GetCameraScreenRotationMatrix();
+
+	s_DebugRenderSystem->AppendIndexedVerts( vertices, indices, cameraScreenRotation, DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+	s_DebugRenderSystem->AppendIndexedTextVerts( textVertices, textIndices, cameraScreenRotation, DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
 
 
 	context->BeginCamera( cam );
@@ -681,10 +684,10 @@ void DebugRenderScreenTo( Texture* output )
 	context->BindTexture( tex );
 	context->DrawIndexedVertexArray( textVertices, textIndices );
 
-	s_DebugRenderSystem->DrawTexturedObjects( context, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+	s_DebugRenderSystem->DrawTexturedObjects( context, cameraScreenRotation, DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
 
 	
-	s_DebugRenderSystem->DrawMeshes( context, cam.GetModelRotationMatrix(), DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
+	s_DebugRenderSystem->DrawMeshes( context, cameraScreenRotation, DEBUG_RENDER_TO_SCREEN, DEBUG_RENDER_ALWAYS );
 	
 	context->EndCamera( cam );
 

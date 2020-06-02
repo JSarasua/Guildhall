@@ -98,20 +98,6 @@ Vec2 Camera::GetOrthoBottomLeft() const
 {
 	Vec3 bottomLeft = ClientToWorld( Vec2(0.f, 0.f), 0.f );
 
-// 	Mat44 lookAtDir;
-// 	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
-// 	}
-// 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
-// 	}
-// 
-// 	MatrixInvertOrthoNormal( lookAtDir );
-// 
-// 	bottomLeft = lookAtDir.TransformPosition3D( bottomLeft );
-
 	Vec2 bottomLeft2D = Vec2( bottomLeft.x, bottomLeft.y );
 	return bottomLeft2D;
 }
@@ -119,19 +105,6 @@ Vec2 Camera::GetOrthoBottomLeft() const
 Vec2 Camera::GetOrthoTopRight() const
 {
 	Vec3 topRight = ClientToWorld( Vec2( 1.f, 1.f ), 0.f );
-
-// 	Mat44 lookAtDir;
-// 	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
-// 	}
-// 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
-// 	}
-// 
-// 	MatrixInvertOrthoNormal( lookAtDir );
-// 	topRight = lookAtDir.TransformPosition3D( topRight );
 
 	Vec2 topRight2D = Vec2( topRight.x, topRight.y );
 	return topRight2D;
@@ -212,6 +185,12 @@ Mat44 Camera::GetCameraModelMatrix() const
 Mat44 Camera::GetModelRotationMatrix() const
 {
 	return m_transform.ToRotationMatrix();
+}
+
+Mat44 Camera::GetCameraScreenRotationMatrix() const
+{
+	return m_transform.ToRotationMatrixWithoutWorldBasis();
+	//return m_transform.ToRotationMatrix();
 }
 
 Mat44 Camera::GetProjectionMatrix() const
@@ -310,18 +289,17 @@ void Camera::UpdateCameraUBO()
 	Mat44 cameraOffset = Mat44::CreateTranslation3D( m_cameraOffset );
 	Mat44 screenShakeOffset = Mat44::CreateTranslation3D( m_screenShakeOffset );
 
-// 	Mat44 lookAtDir;
-// 	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
-// 	}
-// 	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
-// 	{
-// 		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
-// 	}
-
-	Mat44 cameraModel = m_transform.ToMatrix();
-	//cameraModel.TransformBy( lookAtDir );
+	Mat44 cameraModel;
+	
+	if( m_cameraType == WORLDCAMERA )
+	{
+		cameraModel = m_transform.ToMatrix();
+	}
+	else if( m_cameraType == SCREENCAMERA )
+	{
+		cameraModel = m_transform.ToMatrixWithoutWorldBasis();	
+	}
+		
 
 	cameraModel.TransformBy( screenShakeOffset );
 	cameraModel.TransformBy( cameraOffset );

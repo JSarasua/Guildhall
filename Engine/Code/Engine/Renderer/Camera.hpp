@@ -22,6 +22,12 @@ enum eCameraClearBitFlag : unsigned int
 	CLEAR_STENCIL_BIT		= (1 << 2 ),
 };
 
+enum eCameraType
+{
+	WORLDCAMERA,
+	SCREENCAMERA
+};
+
 struct CameraData
 {
 	Mat44 projection;
@@ -78,6 +84,7 @@ public:
 	Mat44 GetViewMatrix() const;
 	Mat44 GetCameraModelMatrix() const;
 	Mat44 GetModelRotationMatrix() const;
+	Mat44 GetCameraScreenRotationMatrix() const;
 	Mat44 GetProjectionMatrix() const;
 	Transform GetTransform() const;
 
@@ -107,4 +114,6 @@ public:
 	Texture* m_depthStencilTarget = nullptr;
 	float m_clearDepth = 1.f;
 	float m_clearStencil = 0.f;
+
+	eCameraType m_cameraType = WORLDCAMERA;
 };
