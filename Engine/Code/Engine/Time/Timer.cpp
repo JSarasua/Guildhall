@@ -56,7 +56,7 @@ bool Timer::HasElapsed() const
 	double currentTime = m_clock->GetTotalElapsedSeconds();
 
 	double secondsRemaining = m_durationSeconds - (currentTime - m_startSeconds);
-	if( secondsRemaining < 0.0 )
+	if( secondsRemaining <= 0.0 )
 	{
 		return true;
 	}

@@ -46,7 +46,7 @@ void Game::Startup()
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
-	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
+	m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
 	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
 	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, -0.1f, -100.f );
 	
@@ -194,7 +194,14 @@ void Game::Update()
 	}
 
 	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
-	DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
+	Mat44 cameraModelMatrix = Mat44();
+	cameraModelMatrix.ScaleUniform3D( 0.01f );
+	Vec3 compassPosition = m_camera.GetPosition();
+	compassPosition += m_camera.GetDirection() * 0.1f;
+
+	cameraModelMatrix.SetTranslation3D( compassPosition );
+	DebugAddWorldBasis( cameraModelMatrix, 0.f, DEBUG_RENDER_ALWAYS );
+	//DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
 
 	//GREY: Playing (UI)
 	//YELLOW: Camera Yaw=X.X	Pitch=X.X	Roll=X.X	xyz=(X.XX, Y.YY, Z.ZZ)
