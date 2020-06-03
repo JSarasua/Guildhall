@@ -1207,7 +1207,7 @@ void RenderContext::BeginCamera( Camera& camera )
 
 	m_isDrawing = true;
 
-	BindShader( m_currentShader );
+	BindShader( (Shader*)nullptr );
 	m_context->RSSetState( m_rasterState );
 	BindUniformBuffer( 0, m_frameUBO );
 	BindTexture( nullptr );
