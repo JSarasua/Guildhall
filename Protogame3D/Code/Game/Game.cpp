@@ -47,6 +47,7 @@ void Game::Startup()
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.1f, -100.f );
+	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
 	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, -0.1f, -100.f );
 	
 	XmlDocument shaderStateDoc;
@@ -192,85 +193,36 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-	DebugAddWorldBasis( Mat44(), 0.f );
+	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
 	DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
 
-// 	UpdateLightPosition( dt );
-// 
-// 	Vec4 ambientLight = g_theRenderer->GetAmbientLight();
-// 	float ambientIntensity = ambientLight.w;
-// 	Vec3 attenuation = m_lights[m_currentLightIndex].attenuation;
-// 	float lightIntensity = m_lights[m_currentLightIndex].intensity;
-// 	float specularFactor = g_theRenderer->GetSpecularFactor();
-// 	float specularPower = g_theRenderer->GetSpecularPower();
-// 	float gamma = g_theRenderer->GetGamma();
-// 	float nearFog = g_theRenderer->m_fogNear;
-// 	float farFog = g_theRenderer->m_fogFar;
-// 	Vec3 fogColor = g_theRenderer->m_fogColor;
-// 
-// 	std::string renderTextureFilePathStr;
-// 	std::string normalTextureFilepathStr;
-// 
-// 	if( nullptr != m_renderTextures[m_currentRenderTextureIndex] )
-// 	{
-// 		renderTextureFilePathStr = m_renderTextures[m_currentRenderTextureIndex]->GetFilePath();
-// 	}
-// 	if( nullptr != m_normalTextures[m_currentNormalTextureIndex] )
-// 	{
-// 		normalTextureFilepathStr = m_normalTextures[m_currentNormalTextureIndex]->GetFilePath();
-// 	}
-// 
-// 	light_t const& currentLight = m_lights[m_currentLightIndex];
+	//GREY: Playing (UI)
+	//YELLOW: Camera Yaw=X.X	Pitch=X.X	Roll=X.X	xyz=(X.XX, Y.YY, Z.ZZ)
+	//RED: iBasis (forward,	+x world-east when identity): (X.XX, Y.YY, Z.ZZ)
+	//GREEN: jBasis (left,	+y world-north when identity):	(X.XX, Y.YY, Z.ZZ)
+	//BLUE: kBasis (up, +z world-up when identity):		(X.XX, Y.YY, Z.ZZ)
 
-// 	std::string cycleShaderStr = Stringf("<,> Cycle Shader: %s", m_shaders[m_currentShaderIndex]->m_filename.c_str() );
-// 	std::string cycleRenderTextureStr = Stringf("N,M Cycle Texture: %s", renderTextureFilePathStr.c_str() );
-// 	std::string cycleNormalTextureStr = Stringf("V,B Cycle Normal Texture: %s", normalTextureFilepathStr.c_str() );
-// 	std::string ambientIntensityStr = Stringf("9,0 Adjust Ambient Intensity: %.2f", ambientIntensity );
-// 	std::string attenuationStr = Stringf("T Toggle Bloom: %i", m_isBloomActive );
-// 	std::string lightIntensityStr = Stringf("-,+ Adjust Light Intensity: %.2f", lightIntensity );
-// 	std::string specularFactorStr = Stringf("[,] Adjust Specular Factor: %.2f", specularFactor );
-// 	std::string specularPowerStr = Stringf(";,' Adjust Specular Power: %.2f", specularPower );
-// 	std::string gammaStr = Stringf("G,H Adjust Gamma: %.2f", gamma );
-// 	std::string lightAtOriginStr = Stringf( "F5 Set Light to Origin" );
-// 	std::string lightToCameraStr = Stringf( "F6 Set Light to Camera Position" );
-// 	std::string lightFollowCameraStr = Stringf( "F7 Set Light to Follow Camera" );
-// 	std::string lightAnimatedStr = Stringf( "F8 Set Light on animated path" );
-// 	std::string currentCosAnglesStr = Stringf( "1,2 Adjust Spotlight Cos Angles: Inner %.2f, Outer %.2f", currentLight.cosInnerAngle, currentLight.cosOuterAngle );
-// 	std::string toggleDirectionalStr = Stringf( "Z Toggle Directional Light: %.0f", currentLight.isDirectional );
-// 	std::string nearFarFogStr = Stringf( "3,4 Adjust Fog: Near %.2f, Far %.2f", nearFog, farFog );
-// 	std::string greyScaleStr = Stringf( "5,6 Adjust Greyscale power: %.2f", m_greyscaleAmount );
-// 	std::string tintAmountStr = Stringf( "7,8 Adjust Tint power: %.2f", m_tintAmount );
-// 	//std::string dissolveStr = Stringf( "U,I Adjust dissolve height: %.2f", m_dissolveAmount );
-// 	std::string lightIndexStr = Stringf( "J,K Cycle current light to adjust: %i", m_currentLightIndex );
- 	std::string projectionNoteStr = Stringf( "Note: Projection follows first light, so use F7 to make it follow camera");
-// 	std::string totalRenderTargetsStr = Stringf( "Total Pool Render Targets Made: %i", g_theRenderer->GetTotalRenderTargetPoolSize() );
-// 	std::string currentRenderTargetFreeCountStr = Stringf( "Current Render Target Pool Size: %i", g_theRenderer->GetTexturePoolFreeCout() );
-// 
-// 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleShaderStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleRenderTextureStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cycleNormalTextureStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, ambientIntensityStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, attenuationStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIntensityStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.83f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularFactorStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.81f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, specularPowerStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.79f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, gammaStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.77f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAtOriginStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.75f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightToCameraStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.73f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightFollowCameraStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.71f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightAnimatedStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.69f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentCosAnglesStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.67f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, toggleDirectionalStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.65f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, nearFarFogStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.63f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, greyScaleStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.61f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, tintAmountStr.c_str() );
-// 	//DebugAddScreenText( Vec4( 0.01f, 0.59f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, dissolveStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.57f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, lightIndexStr.c_str() );
- 	DebugAddScreenText( Vec4( 0.01f, 0.55f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, projectionNoteStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.53f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, totalRenderTargetsStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.51f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 15.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, currentRenderTargetFreeCountStr.c_str() );
+	Vec3 cameraPitchRollYaw = m_camera.GetRotation();
+	Vec3 cameraPosition = m_camera.GetPosition();
+	float yaw = cameraPitchRollYaw.z;
+	float pitch = cameraPitchRollYaw.x;
+	float roll = cameraPitchRollYaw.y;
+	Mat44 cameraBases = m_camera.GetCameraScreenRotationMatrix();
+	Vec3 cameraIBasis = cameraBases.GetIBasis3D();
+	Vec3 cameraJBasis = cameraBases.GetJBasis3D();
+	Vec3 cameraKBasis = cameraBases.GetKBasis3D();
 
+ 	std::string playingUIStr = Stringf( "Playing (UI)");
+	std::string cameraRotationTranslationStr = Stringf( "Camera Yaw = %.1f	Pitch=%.1f	Roll=%.1f	xyz=(%.2f, %.2f, %.2f)", yaw, pitch, roll, cameraPosition.x, cameraPosition.y, cameraPosition.z );;
+	std::string cameraIBasisStr = Stringf( "iBasis (forward, +x world-east when identity): (%.2f, %.2f, %.2f)", cameraIBasis.x, cameraIBasis.y, cameraIBasis.z );
+	std::string cameraJBasisStr = Stringf( "jBasis (left,	+y world-north when identity):	(%.2f, %.2f, %.2f)", cameraJBasis.x, cameraJBasis.y, cameraJBasis.z );
+	std::string cameraKBasisStr = Stringf( "kBasis (up, +z world-up when identity):		(%.2f, %.2f, %.2f)", cameraKBasis.x, cameraKBasis.y, cameraKBasis.z );
 
+ 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, playingUIStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::YELLOW, Rgba8::YELLOW, 0.f, cameraRotationTranslationStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::RED, Rgba8::RED, 0.f, cameraIBasisStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, cameraJBasisStr.c_str() );
+	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, cameraKBasisStr.c_str() );
 }
 
 void Game::Render()
@@ -956,7 +908,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		translator *= 2.f;
 	}
 
-	m_camera.TranslateRelativeToView( translator );
+	m_camera.TranslateRelativeToViewOnlyYaw( translator );
 
 	Vec3 rotator;
 	if( upArrow.IsPressed() )
