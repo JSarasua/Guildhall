@@ -14,6 +14,9 @@
     <Filter Include="Materials">
       <UniqueIdentifier>{1f004756-735c-41a7-9148-a7b24c9b7329}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameConfig">
+      <UniqueIdentifier>{4a0d1909-9c36-4f49-8845-cc57c2e31342}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -138,6 +141,9 @@
     </Xml>
     <Xml Include="..\..\Run\Data\Materials\TestMaterial.xml">
       <Filter>Materials</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\GameConfig.xml">
+      <Filter>GameConfig</Filter>
     </Xml>
   </ItemGroup>
 </Project>

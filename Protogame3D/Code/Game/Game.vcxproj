@@ -326,6 +326,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\Run\Data\GameConfig.xml" />
     <Xml Include="..\..\Run\Data\Materials\TestMaterial.xml" />
     <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml" />
   </ItemGroup>
