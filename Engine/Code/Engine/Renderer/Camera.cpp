@@ -38,9 +38,18 @@ void Camera::TranslateRelativeToView( Vec3 const& translation )
 	Mat44 translationMatrix;
 
 	translationMatrix.RotateYawPitchRollDegress( yaw, pitch, roll );
-// 	translationMatrix.RotateZDegrees( m_transform.m_rotationPitchRollYawDegrees.z );
-// 	translationMatrix.RotateYDegrees( m_transform.m_rotationPitchRollYawDegrees.y );
-// 	translationMatrix.RotateXDegrees( m_transform.m_rotationPitchRollYawDegrees.x );
+
+	Vec3 absoluteTranslation = translationMatrix.TransformPosition3D( translation );
+	Translate( absoluteTranslation );
+}
+
+void Camera::TranslateRelativeToViewOnlyYaw( Vec3 const& translation )
+{
+	float yaw = m_transform.m_rotationPitchRollYawDegrees.z;
+
+	Mat44 translationMatrix;
+	translationMatrix.RotateYawPitchRollDegress( yaw, 0.f, 0.f );
+
 
 	Vec3 absoluteTranslation = translationMatrix.TransformPosition3D( translation );
 	Translate( absoluteTranslation );
@@ -51,8 +60,7 @@ void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 	Vec3 rotationPitchRollYaw = m_transform.m_rotationPitchRollYawDegrees;
 	rotationPitchRollYaw += rotator;
 
-	//float pitch = Clampf( rotationPitchRollYaw.x, -85.f, 85.f );
-	float pitch = rotationPitchRollYaw.x;
+	float pitch = Clampf( rotationPitchRollYaw.x, -89.9f, 89.9f );
 
 	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 }
@@ -71,6 +79,11 @@ float Camera::GetCurrentScreenShakeIntensity() const
 Vec3 Camera::GetPosition()
 {
 	return m_transform.m_position;
+}
+
+Vec3 Camera::GetRotation()
+{
+	return m_transform.m_rotationPitchRollYawDegrees;
 }
 
 Vec3 Camera::GetDirection() const

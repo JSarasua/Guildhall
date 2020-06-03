@@ -57,6 +57,7 @@ public:
 	void SetPosition( const Vec3& position );
 	void Translate( const Vec3& translation );
 	void TranslateRelativeToView( Vec3 const& translation );
+	void TranslateRelativeToViewOnlyYaw( Vec3 const& translation );
 	void RotatePitchRollYawDegrees( Vec3 const& rotator );
 	void UpdateCameraUBO();
 
@@ -65,6 +66,7 @@ public:
 	float GetCurrentScreenShakeIntensity() const;
 
 	Vec3 GetPosition();
+	Vec3 GetRotation();
 	Vec3 GetDirection() const;
 
 	float GetAspectRatio() const;
