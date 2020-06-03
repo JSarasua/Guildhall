@@ -107,6 +107,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
@@ -125,6 +126,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
@@ -147,6 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>
@@ -169,6 +172,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Code/;$(SolutionDir)../Engine/Code/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Copying $(TargetFileName) to $(SolutionDir)Run...</Message>

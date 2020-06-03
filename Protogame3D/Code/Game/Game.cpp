@@ -22,10 +22,12 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/World.hpp"
 #include "Engine/Input/XboxController.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
 extern InputSystem* g_theInput;
+extern AudioSystem* g_theAudio;
 
 
 //light_t Game::m_pointLight;
@@ -551,6 +553,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
@@ -639,6 +642,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( qKey.WasJustPressed() )
 	{
 		SetLightPosition( m_camera.GetPosition() );
+	}
+
+	if( f1Key.WasJustPressed() )
+	{
+		SoundID soundID = g_theAudio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
+		float volume = m_rand.RollRandomFloatInRange( 0.5f, 1.f );
+		float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
+		float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
+
+		g_theAudio->PlaySound( soundID, false, volume, balance, speed );
 	}
 
 	if( f11Key.WasJustPressed() )

@@ -5,9 +5,11 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
+AudioSystem* g_theAudio = nullptr;
 //InputSystem* g_theInput = nullptr;
 
 const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per project!)
@@ -16,6 +18,7 @@ App::App()
 {
 	g_currentBases = eYawPitchRollRotationOrder::ZYX;
 
+	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	m_game = new Game();
 	g_theConsole = new DevConsole();
@@ -54,6 +57,7 @@ void App::Startup()
 
 
 	g_theEventSystem->SubscribeMethodToEvent("quit", CONSOLECOMMAND, this, &App::QuitRequested );
+
 }
 
 void App::Shutdown()
@@ -70,6 +74,7 @@ void App::Shutdown()
 	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
+	delete g_theAudio;
 }
 
 
@@ -129,6 +134,7 @@ bool App::IsNoClipping()
 void App::BeginFrame()
 {
 	Clock::BeginFrame();
+	g_theAudio->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
@@ -158,6 +164,7 @@ void App::Render()
 }
 void App::EndFrame()
 {
+	g_theAudio->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theConsole->EndFrame();
 	g_theInput->EndFrame();
