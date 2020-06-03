@@ -128,6 +128,9 @@
     <FxCompile Include="..\..\Run\Data\Shaders\TransformColorEffect.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\WorldOpaque.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml">
