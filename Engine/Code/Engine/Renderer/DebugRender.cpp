@@ -1314,8 +1314,9 @@ void DebugAddScreenBasis( Mat44 const& basis, Rgba8 const& startTint, Rgba8 cons
 	
 	AABB2 screenBounds = DebugGetScreenBounds();
 	float height = screenBounds.maxs.y - screenBounds.mins.y;
+	float width = screenBounds.maxs.x - screenBounds.mins.x;
 	float screenBasisScale = height * 0.1f;
-	Vec3 screenOffset( height * 0.2f, height * 0.2f, 0.f );
+	Vec3 screenOffset( width * 0.5f, height * 0.5f, 0.f );
 	Vec3 pos = screenBounds.maxs;
 	pos.z = 100.f;
 	pos -= screenOffset;
