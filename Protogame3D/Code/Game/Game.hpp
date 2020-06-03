@@ -18,6 +18,7 @@ class ShaderState;
 class World;
 
 struct light_t;
+struct Vertex_PCUTBN;
 
 struct fresnel_t
 {
@@ -98,6 +99,7 @@ private:
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
 
+	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList );
 
 	void ToggleAttenuation();
 	void ToggleBloom();
