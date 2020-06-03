@@ -260,6 +260,8 @@ void Game::Render()
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
 
+	Shader* shader = g_theRenderer->GetOrCreateShader(  "Data/Shaders/WorldOpaque.hlsl" );
+	g_theRenderer->BindShader( shader );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
