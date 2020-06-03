@@ -70,17 +70,17 @@ void App::Shutdown()
 	delete m_devConsoleCamera;
 
 
+	delete g_theAudio;
+	delete g_gameConfigBlackboard;
 	m_game->Shutdown();
 	delete m_game;
-	g_theInput->Shutdown();
-	delete g_theInput;
 	g_theConsole->Shutdown();
 	delete g_theConsole;
 	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
-	delete g_theAudio;
-	delete g_gameConfigBlackboard;
+	g_theInput->Shutdown();
+	delete g_theInput;
 }
 
 
