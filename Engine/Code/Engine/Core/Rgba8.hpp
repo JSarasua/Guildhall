@@ -44,5 +44,6 @@ public:
 	static const Rgba8 BLUE;
 	static const Rgba8 BLACK;
 	static const Rgba8 GREY;
+	static const Rgba8 YELLOW;
 
 };

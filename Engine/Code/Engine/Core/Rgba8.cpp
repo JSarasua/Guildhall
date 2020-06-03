@@ -11,6 +11,7 @@ const Rgba8 Rgba8::GREEN	=	Rgba8(0,255,0,255);
 const Rgba8 Rgba8::BLUE		=	Rgba8(0,0,255,255);
 const Rgba8 Rgba8::BLACK	=	Rgba8(0,0,0,255);
 const Rgba8 Rgba8::GREY		=	Rgba8(128,128,128,255);
+const Rgba8 Rgba8::YELLOW		=	Rgba8(255,255,0,255);
 
 Rgba8::Rgba8 (const Rgba8& copy)
 	: r( copy.r )
