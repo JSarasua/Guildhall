@@ -17,7 +17,7 @@ const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per
 App::App()
 {
 	g_currentBases = eYawPitchRollRotationOrder::ZYX;
-
+	g_gameConfigBlackboard = new NamedStrings();
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	m_game = new Game();
@@ -32,8 +32,13 @@ void App::Startup()
 
 	Clock::SystemStartup();
 
+	XmlDocument gameConfigDoc;
+	const XmlElement& gameConfigRootElement = GetRootElement( gameConfigDoc, "Data/GameConfig.xml" );
+	g_gameConfigBlackboard->PopulateFromXmlElementAttributes( gameConfigRootElement );
+
+	float aspectRatio = g_gameConfigBlackboard->GetValue("windowAspect", 0.f);
 	g_theWindow = new Window();
-	g_theWindow->Open( APP_NAME, CLIENT_ASPECT, 0.90f );
+	g_theWindow->Open( APP_NAME, aspectRatio, 0.90f );
 	g_theWindow->SetInputSystem(g_theInput);
 	g_theWindow->SetEventSystem(g_theEventSystem);
 	
@@ -75,6 +80,7 @@ void App::Shutdown()
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
 	delete g_theAudio;
+	delete g_gameConfigBlackboard;
 }
 
 
