@@ -51,6 +51,16 @@ void Game::Startup()
 	m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
 	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
 
+
+	Vec2 UIdimension = Vec2( 16.f, 9.f );
+	m_UICamera = Camera();
+	m_UICamera.SetColorTarget( g_theRenderer->GetBackBuffer() );
+	m_UICamera.SetClearMode( NO_CLEAR, Rgba8::BLACK );
+	m_UICamera.SetProjectionOrthographic( UIdimension, 0.f, 100.f );
+	m_UICamera.SetPosition( Vec3( 0.5f * UIdimension ) );
+	m_UICamera.m_cameraType = SCREENCAMERA;
+
+
 	m_frontCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 0.5f, 0.5f ) );
 	m_leftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.5f, 2.5f, 0.5f ) );
 	m_frontleftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 2.5f, 0.5f ) );
@@ -105,6 +115,8 @@ void Game::Startup()
 	float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
 	float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
 	g_theAudio->PlaySound( soundID, false, volume, balance, speed );
+
+	FPSStartup();
 }
 
 void Game::Shutdown()
@@ -117,6 +129,7 @@ void Game::RunFrame(){}
 
 void Game::Update()
 {
+	FPSCounterUpdate();
 	float dt = (float)m_gameClock->GetLastDeltaSeconds();
 
 	m_currentTime += dt;
@@ -211,15 +224,19 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+
+
 	//RenderProjection();
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
 
+
+	//g_theRenderer->BeginCamera( m_UICamera );
+	//g_theRenderer->EndCamera( m_UICamera );
+
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
-
-
 	
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 
@@ -232,6 +249,10 @@ void Game::Render()
 
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
+
+	g_theRenderer->BeginCamera( m_UICamera );
+	FPSRender();
+	g_theRenderer->EndCamera( m_UICamera );
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
@@ -307,7 +328,6 @@ void Game::DecrementCurrentLight()
 	if( m_currentLightIndex == 0 )
 	{
 		m_currentLightIndex = MAX_LIGHTS - 1;
-
 	}
 	else
 	{
@@ -987,6 +1007,39 @@ IntVec2 Game::GetCurrentMapBounds() const
 void Game::SetLightPosition( Vec3 const& pos )
 {
 	m_lights[m_currentLightIndex].position = pos;
+}
+
+void Game::FPSStartup()
+{
+	for( int i = 0; i < 10; i++ )
+	{
+		m_deltaSecondsFromLastFrame[i] = 0.0;
+	}
+}
+
+void Game::FPSCounterUpdate()
+{
+	m_deltaSecondsFromLastFrame[m_fpsCounterIndex] = m_gameClock->GetLastDeltaSeconds();
+	m_fpsCounterIndex++;
+	if( m_fpsCounterIndex > 9 )
+	{
+		m_fpsCounterIndex = 0;
+	}
+
+	m_fps = 0.f;
+	for( int frameIndex = 0; frameIndex < 10; frameIndex++ )
+	{
+		m_fps += (float)m_deltaSecondsFromLastFrame[m_fpsCounterIndex];
+	}
+	m_fps /= 10.f;
+	m_fps = 1.f / m_fps;
+}
+
+void Game::FPSRender()
+{
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	std::string renderString = Stringf( "FPS: %.2f", m_fps );
+	g_theRenderer->DrawTextAtPosition( renderString.c_str(), Vec2( 13.f, 8.5f ), 0.2f );
 }
 
 void Game::RenderDevConsole()

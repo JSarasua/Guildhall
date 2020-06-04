@@ -110,6 +110,10 @@ private:
 	IntVec2 GetCurrentMapBounds() const;
 	void SetLightPosition( Vec3 const& pos );
 
+	void FPSStartup();
+	void FPSCounterUpdate();
+	void FPSRender();
+
 private:
 	Mat44 m_frontCubeModelMatrix;
 	Mat44 m_leftCubeModelMatrix;
@@ -170,6 +174,9 @@ private:
 
 	bool m_isDebugRenderingEnabled = true;
 
+	double m_deltaSecondsFromLastFrame[10];
+	int m_fpsCounterIndex = 0;
+	float m_fps = 0.f;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
