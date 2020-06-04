@@ -1,0 +1,9 @@
+<EntityTypes>
+
+	<EntityType name="Player">
+		<Physics radius="0.2" height="0.7" walkSpeed="1.0"/>
+	</EntityType>
+
+</EntityTypes>
+
+
