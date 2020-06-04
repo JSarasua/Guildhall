@@ -46,6 +46,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -76,6 +79,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

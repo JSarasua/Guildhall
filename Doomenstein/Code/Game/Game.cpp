@@ -999,10 +999,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 }
 
-IntVec2 Game::GetCurrentMapBounds() const
-{
-	return m_world->getCurrentMapBounds();
-}
 
 void Game::SetLightPosition( Vec3 const& pos )
 {

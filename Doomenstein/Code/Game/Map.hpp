@@ -13,35 +13,13 @@ class Map
 {
 public:
 	Map();
-	~Map();
-	Map(const IntVec2& mapSize, Game* game);
+	virtual ~Map();
+	Map( Game* game );
 
-	void Startup();
-	void Shutdown();
 
-	void Update( float deltaSeconds );
-	void Render();
-
-	int GetTileIndexForTileCoordinates( const IntVec2& tileCoords );
-	IntVec2 GetTileCoordinatesForTileIndex( int tileIndex ) const;
-
-	Player* GetPlayer();
-
-	IntVec2 GetMapBounds() const;
+	virtual void Update( float deltaSeconds ) = 0;
+	virtual void Render() = 0;
 
 private:
-	std::vector<Tile> m_tiles;
-	std::vector<Entity*> m_entities;
-	std::vector<Vertex_PCU> m_vertsToRender;
 	Game* m_game = nullptr;
-	IntVec2 m_mapSize;
-	int m_NumOftiles = 0;
-	void RenderTiles();
-	void RenderEntities();
-	void UpdateTiles( float deltaSeconds );
-	void UpdateEntities( float deltaSeconds );
-	void SpawnTiles();
-	void SpawnEntities();
-
-	void PushPlayerOutOfWalls();
 };

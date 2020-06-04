@@ -1,5 +1,6 @@
 #include "Game/World.hpp"
 #include "Game/Game.hpp"
+#include "Game/TileMap.hpp"
 
 
 
@@ -12,8 +13,7 @@ World::World( Game* game ) :
 void World::Startup()
 {
 	//Create 
-	m_currentMap = new Map(IntVec2(INT_MAP_SIZE_X,INT_MAP_SIZE_Y), m_game);
-	m_currentMap->Startup();
+	m_currentMap = new TileMap( m_game );
 }
 
 void World::Shutdown()
@@ -29,15 +29,5 @@ void World::Update( float deltaSeconds )
 void World::Render()
 {
 	m_currentMap->Render();
-}
-
-Player* World::GetPlayer()
-{
-	return m_currentMap->GetPlayer();
-}
-
-IntVec2 World::getCurrentMapBounds() const
-{
-	return m_currentMap->GetMapBounds();
 }
 
