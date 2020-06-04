@@ -99,6 +99,12 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
 	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
+
+	SoundID soundID = g_theAudio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
+	float volume = m_rand.RollRandomFloatInRange( 0.5f, 1.f );
+	float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
+	float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
+	g_theAudio->PlaySound( soundID, false, volume, balance, speed );
 }
 
 void Game::Shutdown()
@@ -663,12 +669,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( f1Key.WasJustPressed() )
 	{
-		SoundID soundID = g_theAudio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
-		float volume = m_rand.RollRandomFloatInRange( 0.5f, 1.f );
-		float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
-		float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
+		m_isDebugRenderingEnabled = !m_isDebugRenderingEnabled;
 
-		g_theAudio->PlaySound( soundID, false, volume, balance, speed );
+		if( m_isDebugRenderingEnabled )
+		{
+			EnableDebugRendering();
+		}
+		else
+		{
+			DisableDebugRendering();
+		}
 	}
 
 	if( f11Key.WasJustPressed() )

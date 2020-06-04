@@ -168,6 +168,8 @@ private:
 
 	bool m_isBloomActive = false;
 
+	bool m_isDebugRenderingEnabled = true;
+
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
