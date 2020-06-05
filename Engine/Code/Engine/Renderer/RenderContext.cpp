@@ -330,6 +330,22 @@ void RenderContext::DrawIndexedVertexArray( std::vector<Vertex_PCU> const& verte
 	}
 }
 
+void RenderContext::DrawIndexedVertexArray( std::vector<Vertex_PCUTBN> const& vertexes, std::vector<uint> const& indices )
+{
+	if( vertexes.size() > 0 )
+	{
+		size_t bufferTotalByteSize = vertexes.size() * sizeof( Vertex_PCUTBN );
+		size_t elementSize = sizeof( Vertex_PCUTBN );
+		m_immediateVBO->Update( &vertexes[0], bufferTotalByteSize, elementSize );
+		m_immediateIBO->Update( indices );
+
+		BindVertexBuffer( m_immediateVBO );
+		BindIndexBuffer( m_immediateIBO );
+
+		DrawIndexed( (int)indices.size() );
+	}
+}
+
 void RenderContext::DrawMesh( GPUMesh* mesh )
 {
 	//m_immediateVBO = mesh->m_vertices;

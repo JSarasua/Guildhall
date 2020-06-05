@@ -171,6 +171,7 @@ public:
 	void DrawVertexArray( int numVertexes, const Vertex_PCU* vertexes );
 	void DrawVertexArray( const std::vector<Vertex_PCU>& vertexes);
 	void DrawIndexedVertexArray( std::vector<Vertex_PCU> const& vertexes, std::vector<uint> const& indices );
+	void DrawIndexedVertexArray( std::vector<Vertex_PCUTBN> const& vertexes, std::vector<uint> const& indices );
 	void DrawMesh( GPUMesh* mesh );
 
 	void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertsToAppend);
