@@ -117,12 +117,19 @@ void Game::Startup()
 	g_theAudio->PlaySound( soundID, false, volume, balance, speed );
 
 	FPSStartup();
+
+	m_world = new World( this );
+	m_world->Startup();
 }
 
 void Game::Shutdown()
 {
 	delete m_cubeMesh;
 	m_cubeMesh = nullptr;
+
+	m_world->Shutdown();
+	delete m_world;
+	m_world = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -144,6 +151,8 @@ void Game::Update()
 	clearColor.b = 0;
 
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
+	
+	m_world->Update( dt );
 
 	if( !g_theConsole->IsOpen() )
 	{
@@ -224,6 +233,7 @@ void Game::Render()
 	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
 	g_theRenderer->DrawMesh( m_cubeMesh );
 
+	m_world->Render();
 
 
 	//RenderProjection();
