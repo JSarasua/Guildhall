@@ -3,6 +3,7 @@
 #include "App.hpp"
 
 extern RenderContext* g_theRenderer;
+Window* g_theWindow = nullptr;
 
 void DrawLine( Vec2 startPoint, Vec2 endPoint, Rgba8 color, float thickness )
 {

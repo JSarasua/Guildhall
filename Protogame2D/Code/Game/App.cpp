@@ -3,37 +3,80 @@
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Time/Clock.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 App* g_theApp = nullptr;
 RenderContext* g_theRenderer = nullptr;
-InputSystem* g_theInput = nullptr;
+AudioSystem* g_theAudio = nullptr;
+//InputSystem* g_theInput = nullptr;
 
-//Constants for calculation ship position change
-const float TIMEPERFRAME = 1.f/60.f;
-const float SLOWTIME = 1.f/600.f;
-const float NOTIME = 0.f;
+const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per project!)
 
 App::App()
 {
+	g_currentBases = eYawPitchRollRotationOrder::ZYX;
+	g_gameConfigBlackboard = new NamedStrings();
+	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
-	g_theRenderer = new RenderContext();
-	m_game =  new Game();
-
+	m_game = new Game();
+	g_theConsole = new DevConsole();
+	g_theEventSystem = new EventSystem();
 }
 
 App::~App() {}
 
 void App::Startup()
 {
-	g_theInput->Startup();
-	g_theRenderer->StartUp();
+
+	Clock::SystemStartup();
+
+	XmlDocument gameConfigDoc;
+	const XmlElement& gameConfigRootElement = GetRootElement( gameConfigDoc, "Data/GameConfig.xml" );
+	g_gameConfigBlackboard->PopulateFromXmlElementAttributes( gameConfigRootElement );
+
+	float aspectRatio = g_gameConfigBlackboard->GetValue("windowAspect", 0.f);
+	g_theWindow = new Window();
+	g_theWindow->Open( APP_NAME, aspectRatio, 0.90f );
+	g_theWindow->SetInputSystem(g_theInput);
+	g_theWindow->SetEventSystem(g_theEventSystem);
+	
+	g_theInput->Startup( g_theWindow );
+	g_theInput->PushMouseOptions( MOUSE_MODE_RELATIVE, false, true );
+
+	g_theRenderer = new RenderContext();
+	g_theRenderer->StartUp(g_theWindow);
+
+	DebugRenderSystemStartup( g_theRenderer );
+	
 	m_game->Startup();
+	g_theConsole->Startup();
+
+	m_devConsoleCamera = new Camera();
+	m_devConsoleCamera->SetColorTarget( g_theRenderer->GetBackBuffer() );
+	//m_devConsoleCamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y));
+	m_devConsoleCamera->SetProjectionOrthographic(Vec2(GAME_CAMERA_Y* CLIENT_ASPECT, GAME_CAMERA_Y), 0.f, -100.f );
+	m_devConsoleCamera->m_cameraType = SCREENCAMERA;
+	g_theRenderer->CreateOrGetBitmapFont( "Fonts/SquirrelFixedFont.png" );
+
+
+	g_theEventSystem->SubscribeMethodToEvent("quit", CONSOLECOMMAND, this, &App::QuitRequested );
+
 }
 
 void App::Shutdown()
 {
+	delete m_devConsoleCamera;
+
+
+	delete g_theAudio;
+	delete g_gameConfigBlackboard;
 	m_game->Shutdown();
 	delete m_game;
+	g_theConsole->Shutdown();
+	delete g_theConsole;
+	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
 	g_theInput->Shutdown();
@@ -43,33 +86,10 @@ void App::Shutdown()
 
 void App::RunFrame()
 {
-	m_previousTime = m_currentTime;
-	m_currentTime = (float)GetCurrentTimeSeconds();
-	m_deltaTime = Clampf( m_currentTime - m_previousTime, 0.f, 0.1f );
-
-
-	if( m_isPaused )
-	{
-		Update(NOTIME);
-	} 
-	else if( m_isSlowed )
-	{
-		Update( m_deltaTime * 0.1f );
-	}
-	else if( m_isSpedUp )
-	{
-		Update( m_deltaTime * 4.f );
-	}
-	else
-	{
-		Update(m_deltaTime);
-	}
-
-
 	BeginFrame(); //For all engine systems (Not the game)
+	Update();
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
-
 }
 
 
@@ -91,8 +111,6 @@ bool App::HandleQuitRequested()
 	m_isQuitting = true;
 	return true;
 }
-
-
 
 bool App::IsUpArrowPressed()
 {
@@ -121,20 +139,23 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
-	g_theInput->BeginFrame();
+	Clock::BeginFrame();
+	g_theAudio->BeginFrame();
+	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
+	g_theInput->BeginFrame();
+	g_theConsole->BeginFrame();
 }
 
-void App::Update(float deltaSeconds)
+void App::Update()
 {
+	g_theRenderer->UpdateFrameTime();
+	g_theConsole->Update();
 
 	CheckButtonPresses();
 	CheckController();
 
-
-
-	m_game->Update(deltaSeconds);
-
+	m_game->Update();
 }
 
 
@@ -142,11 +163,18 @@ void App::Render()
 {
 	m_game->Render();
 
+	g_theRenderer->BeginCamera(*m_devConsoleCamera);
+	g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+	g_theConsole->Render(*g_theRenderer, *m_devConsoleCamera, 0.1f);
+	g_theRenderer->EndCamera(*m_devConsoleCamera);
 }
 void App::EndFrame()
 {
+	g_theAudio->EndFrame();
 	g_theRenderer->EndFrame();
+	g_theConsole->EndFrame();
 	g_theInput->EndFrame();
+	g_theWindow->EndFrame();
 }
 
 void App::RestartGame()
@@ -167,31 +195,26 @@ bool App::GetDebugCameraMode()
 	return m_debugCameraMode;
 }
 
+bool App::QuitRequested( const EventArgs& args )
+{
+	UNUSED( args );
+	g_theApp->HandleQuitRequested();
+	return true;
+}
+
 void App::CheckButtonPresses()
 {
+	const KeyButtonState& tildeKey = g_theInput->GetKeyStates( 0xC0 );	//tilde: ~
+	if( tildeKey.WasJustPressed() )
+	{
+		g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
+	}
+
+
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
-		HandleQuitRequested();
-	}
-
-	if( g_theInput->GetKeyStates( 0x70 ).WasJustPressed() ) //F1
-	{
-		m_debugGameMode = !m_debugGameMode;
-	}
-
-	if( g_theInput->GetKeyStates( 0x72 ).WasJustPressed() ) //F3
-	{
-		m_noClip = !m_noClip;
-	}
-
-	if( g_theInput->GetKeyStates( 0x73 ).WasJustPressed() ) //F4
-	{
-		m_debugCameraMode = !m_debugCameraMode;
-	}
-
-	if( g_theInput->GetKeyStates( 0x77 ).WasJustPressed() ) //F8
-	{
-		g_theApp->RestartGame();
+		g_theEventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
+		//HandleQuitRequested();
 	}
 
 	if( g_theInput->GetKeyStates( 'P' ).WasJustPressed() )

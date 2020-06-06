@@ -5,7 +5,11 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Core/NamedStrings.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include "Game.hpp"
+
+
 
 class App
 {
@@ -16,7 +20,7 @@ public:
 	void Shutdown();
 	void RunFrame();
 
-	bool IsQuitting() const { return m_isQuitting; }
+	bool IsQuitting() const { return m_isQuitting; } //return m_isQuitting
 	bool HandleKeyPressed( unsigned char keyCode );
 	bool HandleKeyReleased( unsigned char keyCode );
 	bool HandleQuitRequested();
@@ -29,7 +33,7 @@ public:
 	bool IsNoClipping();
 
 	void BeginFrame();
-	void Update(float deltaSeconds);
+	void Update();
 	void Render();
 	void EndFrame();
 
@@ -38,10 +42,14 @@ public:
 	bool GetDebugGameMode();
 	bool GetDebugCameraMode();
 
+	bool QuitRequested(const EventArgs& args);
 
 private:
 	void CheckButtonPresses();
 	void CheckController();
+
+public:
+	Game* m_game = nullptr;
 
 private:
 	bool m_isQuitting = false;
@@ -54,7 +62,6 @@ private:
 	bool m_isRightActuallyPressed = false;
 	bool m_isSpaceStillHeld = false;
 	bool m_isOstillHeld = false;
-	Game* m_game;
 	float m_previousTime = 0.f;
 	float m_currentTime = 0.f;
 	float m_deltaTime = 0.f;
@@ -63,5 +70,6 @@ private:
 	bool m_debugCameraMode = false;
 	bool m_noClip = false;
 	bool m_isSpedUp = false;
+	Camera* m_devConsoleCamera = nullptr;
 
 };

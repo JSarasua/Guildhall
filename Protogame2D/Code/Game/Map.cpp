@@ -75,7 +75,7 @@ IntVec2 Map::GetMapBounds() const
 
 void Map::RenderTiles()
 {
-	g_theRenderer->BindTexture(nullptr);
+	//g_theRenderer->BindTexture(nullptr);
 	g_theRenderer->DrawVertexArray(m_vertsToRender);
 
 }
