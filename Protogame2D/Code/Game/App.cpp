@@ -16,7 +16,7 @@ const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per
 
 App::App()
 {
-	g_currentBases = eYawPitchRollRotationOrder::ZYX;
+	g_currentBases = eYawPitchRollRotationOrder::YXZ;
 	g_gameConfigBlackboard = new NamedStrings();
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
@@ -165,6 +165,8 @@ void App::Render()
 
 	g_theRenderer->BeginCamera(*m_devConsoleCamera);
 	g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+	Shader* shader = g_theRenderer->GetOrCreateShader( "Data/Shaders/WorldOpaque.hlsl" );
+	g_theRenderer->BindShader( shader );
 	g_theConsole->Render(*g_theRenderer, *m_devConsoleCamera, 0.1f);
 	g_theRenderer->EndCamera(*m_devConsoleCamera);
 }

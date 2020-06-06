@@ -44,9 +44,8 @@ void Game::Startup()
 	m_camera.SetColorTarget(nullptr); // we use this
 	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
 	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
-	m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
-	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
-	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, -0.1f, -100.f );
+	//m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
+	m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.f, 100.f );
 
 
 	m_frontCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 0.5f, 0.5f ) );
@@ -69,15 +68,18 @@ void Game::Startup()
 
 	m_screenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::BLACK, IntVec2(1920,1080) );
 
-
-
-	Vec3 cameraDirection = m_camera.GetDirection();
+	m_world = new World( this );
+	m_world->Startup();
 }
 
 void Game::Shutdown()
 {
 	delete m_cubeMesh;
 	m_cubeMesh = nullptr;
+
+	m_world->Shutdown();
+	delete m_world;
+	m_world = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -103,6 +105,8 @@ void Game::Update()
 	{
 		CheckButtonPresses( dt );
 	}
+
+	m_world->Update( dt );
 
 	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
 	Mat44 cameraModelMatrix = Mat44();
@@ -141,58 +145,27 @@ void Game::Update()
 	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::RED, Rgba8::RED, 0.f, cameraIBasisStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, cameraJBasisStr.c_str() );
 	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, cameraKBasisStr.c_str() );
+
+
+	DebugAddScreenPoint( Vec2( 100.f, 100.f ), 100.f, Rgba8::WHITE, 0.f );
 }
 
 void Game::Render()
 {
 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* bloomTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* albedoTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* normalTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* tangentTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	
 	m_camera.SetColorTarget( 0, colorTarget );
-	m_camera.SetColorTarget( 1, bloomTarget );
-	m_camera.SetColorTarget( 2, normalTarget );
-	m_camera.SetColorTarget( 3, albedoTarget );
-	m_camera.SetColorTarget( 4, tangentTarget );
 
 	g_theRenderer->BeginCamera(m_camera);
-
-	g_theRenderer->DisableLight( 0 );
-
-	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
-	g_theRenderer->BindTexture( testTexture );
-	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
-
-	Shader* shader = g_theRenderer->GetOrCreateShader(  "Data/Shaders/WorldOpaque.hlsl" );
-	g_theRenderer->BindShader( shader );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->BindTexture( nullptr );
+	m_world->Render();
 	g_theRenderer->EndCamera(m_camera);
 
 	DebugRenderBeginFrame();
 	DebugRenderWorldToCamera( &m_camera );
 
-
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-	g_theRenderer->ReleaseRenderTarget( bloomTarget );
-	g_theRenderer->ReleaseRenderTarget( albedoTarget );
-	g_theRenderer->ReleaseRenderTarget( normalTarget );
-	g_theRenderer->ReleaseRenderTarget( tangentTarget );
-
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
@@ -380,17 +353,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
-
 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
 	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
 	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
-	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
-	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+	//const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
@@ -626,27 +593,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( wKey.IsPressed() )
 	{
-		translator.x +=  1.f * deltaSeconds;
+		translator.y +=  1.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.x -=  1.f * deltaSeconds;
+		translator.y -=  1.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
-		translator.y +=  1.f * deltaSeconds;
+		translator.x -=  1.f * deltaSeconds;
 	}
 	if( dKey.IsPressed() )
 	{
-		translator.y -=  1.f * deltaSeconds;
-	}
-	if( cKey.IsPressed() )
-	{
-		translator.z +=  1.f * deltaSeconds;
-	}
-	if( spaceKey.IsPressed() )
-	{
-		translator.z -=  1.f * deltaSeconds;
+		translator.x +=  1.f * deltaSeconds;
 	}
 
 	if( shiftKey.IsPressed() )
@@ -655,31 +614,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 
 	m_camera.TranslateRelativeToViewOnlyYaw( translator );
-
-	Vec3 rotator;
-	if( upArrow.IsPressed() )
-	{
-		rotator.x += 1.f * deltaSeconds;
-	}
-	if( downArrow.IsPressed() )
-	{
-		rotator.x -= 1.f * deltaSeconds;
-	}
-	if( leftArrow.IsPressed() )
-	{
-		rotator.z += 1.f * deltaSeconds;
-	}
-	if( rightArrow.IsPressed() )
-	{
-		rotator.z -= 1.f * deltaSeconds;
-	}
-
-	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
-
-	rotator.x += mouseChange.y * 0.1f;
-	rotator.z -= mouseChange.x * 0.1f;
-	m_camera.RotatePitchRollYawDegrees( rotator );
-
 }
 
 IntVec2 Game::GetCurrentMapBounds() const
