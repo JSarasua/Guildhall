@@ -58,6 +58,9 @@ void Map::Update( float deltaSeconds )
 
 void Map::Render()
 {
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
 	RenderTiles();
 	RenderEntities();
 
@@ -75,7 +78,7 @@ IntVec2 Map::GetMapBounds() const
 
 void Map::RenderTiles()
 {
-	//g_theRenderer->BindTexture(nullptr);
+	g_theRenderer->BindTexture(nullptr);
 	g_theRenderer->DrawVertexArray(m_vertsToRender);
 
 }
