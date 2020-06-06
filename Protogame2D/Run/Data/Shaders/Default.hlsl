@@ -103,22 +103,4 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 color = tDiffuse.Sample( sSampler, input.uv );
 	return color * input.color;
-
-	// we'll outoupt our UV coordinates as color here
-	// to make sure they're being passed correctly.
-	// Very common rendering debugging method is to 
-	// use color to portray information; 
-//	float4 uvAsColor = float4( input.uv, 0.0f, 1.0f ); 
-//	float4 finalColor = uvAsColor * input.color; 
-
-//	float3 zero = float3(0,0,0);
-//	float distanceVar = distance(zero, input.worldPosition);
-
-//	float r = (sin( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
-//	float g = (cos( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
-//	float b = (sin( 10.f * distanceVar + SYSTEM_TIME_SECONDS));
-//	finalColor.r = r;
-//	finalColor.g = g;
-//	finalColor.b = b;
-//	return finalColor; 
 }
