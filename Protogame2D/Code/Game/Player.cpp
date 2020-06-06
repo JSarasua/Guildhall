@@ -8,12 +8,9 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
-
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
 extern InputSystem* g_theInput;
-
-
 
 Player::Player( const Vec2& initialPosition, Game* game ) :
 	Entity(game)
@@ -33,18 +30,12 @@ void Player::Update( float deltaSeconds )
 {
 	CapOrientationDegrees();
 	UpdateFromJoystick(deltaSeconds);
-	//UpdateFromKeyboard(deltaSeconds);
 
 	m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
-	//Entity::Update(deltaSeconds);
 }
 
 void Player::Render() const
 {
-
-
-
-	
 	AABB2 playerAABB2 = AABB2(Vec2(-PLAYER_SIZE, -PLAYER_SIZE), Vec2(PLAYER_SIZE, PLAYER_SIZE));
 	Vertex_PCU playerVertexes[] =
 	{
@@ -57,7 +48,6 @@ void Player::Render() const
 	Vertex_PCU( Vec3( Vec2(playerAABB2.mins.x, playerAABB2.maxs.y) ),Rgba8( 255,255,255,255 ),Vec2( 0.f,1.f ) )
 
 	};
-
 
 	//	// Draw tank base (textured)
 	//	Texture* tankBaseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/TankBase.png" );
@@ -72,11 +62,6 @@ void Player::Render() const
 	g_theRenderer->DrawVertexArray( 6, playerVertexes );
 
 
-
-
-
-
-
 	AABB2 playerCannonAABB2 = AABB2( Vec2( -PLAYER_SIZE, -PLAYER_SIZE ), Vec2( PLAYER_SIZE, PLAYER_SIZE ) );
 	Vertex_PCU playerCannonVertexes[] =
 	{
@@ -87,7 +72,6 @@ void Player::Render() const
 		Vertex_PCU( Vec3( playerCannonAABB2.mins ),Rgba8( 255,255,255,255 ),Vec2( 0.f,0.f ) ),
 		Vertex_PCU( Vec3( playerCannonAABB2.maxs ),Rgba8( 255,255,255,255 ),Vec2( 1.f,1.f ) ),
 		Vertex_PCU( Vec3( Vec2( playerCannonAABB2.mins.x, playerCannonAABB2.maxs.y ) ),Rgba8( 255,255,255,255 ),Vec2( 0.f,1.f ) )
-
 	};
 	
 	Texture* cannonTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PlayerTankTop.png" );
@@ -95,25 +79,18 @@ void Player::Render() const
 	g_theRenderer->BindTexture( cannonTexture );
 	g_theRenderer->DrawVertexArray( 6, playerCannonVertexes );
 
-
-
-
 	if( g_theApp->GetDebugGameMode() )
 	{
 		g_theRenderer->BindTexture(nullptr);
 		DrawRing(m_position, PLAYER_SIZE, Rgba8(255,0,255), 0.01f);
 		DrawRing(m_position, PLAYER_PHYSICS_RADIUS, Rgba8(0,255,255), 0.01f);
 	}
-
-
-
 }
 
 
 
 void Player::UpdateFromJoystick( float deltaSeconds )
 {
-
 	const XboxController& controller = g_theInput->GetXboxController( 0 );
 	if( controller.IsConnected() )
 	{
@@ -136,11 +113,6 @@ void Player::UpdateFromJoystick( float deltaSeconds )
 void Player::UpdateFromKeyboard( float deltaSeconds )
 {
 	UNUSED(deltaSeconds);
-
-
-
-
-
 
 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates(0x25);
 	const KeyButtonState& upArrow = g_theInput->GetKeyStates(0x26);
@@ -224,30 +196,10 @@ void Player::UpdateFromKeyboard( float deltaSeconds )
 	{
 		m_velocity.y = 0.f;
 	}
-
-
-
-
-
-
 }
 
 void Player::UpdatePlayerOrientationAndVelocity( float joystickOrientation, float joystickMagnitude, float deltaSeconds )
 {
-	/*
-	float direction = 0.f;
-	if( joystickOrientation - m_orientationDegrees < 180.f )
-	{
-		direction = 1.f;
-	}
-	else
-	{
-		direction = -1.f;
-	}
-	m_orientationDegrees += PLAYER_TURN_SPEED * direction * deltaSeconds;
-	*/
-
-
 	m_orientationDegrees = GetTurnedToward( m_orientationDegrees, joystickOrientation, PLAYER_TURN_SPEED * deltaSeconds);
 	m_velocity  = Vec2::MakeFromPolarDegrees(m_orientationDegrees, joystickMagnitude * PLAYER_SPEED);
 }

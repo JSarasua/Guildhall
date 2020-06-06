@@ -16,13 +16,10 @@ public:
 	virtual void Update( float deltaSeconds );
 	virtual void Render() const override;
 
-
-
 private:
 
 	void UpdateFromJoystick( float deltaSeconds );
 	void UpdateFromKeyboard( float deltaSeconds );
-
 
 	void UpdatePlayerOrientationAndVelocity( float joystickOrientation, float joystickMagnitude, float deltaSeconds );
 	void CapOrientationDegrees();
