@@ -4,11 +4,6 @@
 
 class Game;
 
-
-
-
-
-
 class World
 {
 public:
@@ -16,8 +11,6 @@ public:
 	~World(){}
 
 	World(Game* game);
-
-
 
 
 	void Startup();

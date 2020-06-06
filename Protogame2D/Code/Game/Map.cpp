@@ -107,7 +107,6 @@ void Map::UpdateEntities( float deltaSeconds )
 		PushPlayerOutOfWalls();
 	}
 
-
 }
 
 void Map::SpawnTiles()
@@ -171,9 +170,6 @@ void Map::SpawnTiles()
 		tileIndex = borderYIndex * INT_MAP_SIZE_X + (INT_MAP_SIZE_X-1);
 		m_tiles[tileIndex].m_tileType = STONE;
 	}
-
-
-
 
 }
 
