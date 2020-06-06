@@ -98,7 +98,6 @@ private:
 	Mat44 m_leftCubeModelMatrix;
 	Mat44 m_frontleftCubeModelMatrix;
 
-
 	Clock* m_gameClock = nullptr;
 
 	Camera m_UICamera;
@@ -121,12 +120,6 @@ private:
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
-
-
-	ShaderState* m_testShaderState = nullptr;
-	Material* m_testMaterial = nullptr;
-
-	bool m_isBloomActive = false;
 
 public:
 	Rgba8 m_clearColor = Rgba8::BLACK;

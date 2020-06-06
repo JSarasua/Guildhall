@@ -78,9 +78,6 @@ void Game::Shutdown()
 {
 	delete m_cubeMesh;
 	m_cubeMesh = nullptr;
-
-	delete m_testMaterial;
-	m_testMaterial = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -515,57 +512,27 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( num9Key.IsPressed() )
 	{
-		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
-		float currentAmbientIntensity = currentAmbientLight.w;
 
-		float newAmbientIntensity = currentAmbientIntensity - ( 0.5f*deltaSeconds );
-		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
-		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
 	}
 	if( num0Key.IsPressed() )
 	{
-		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
-		float currentAmbientIntensity = currentAmbientLight.w;
 
-		float newAmbientIntensity = currentAmbientIntensity + (0.5f*deltaSeconds);
-		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
-		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
 	}
 	if( lBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
 
-		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
-		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		g_theRenderer->SetSpecularFactor( newSpecularFactor );
-		m_testMaterial->m_specularFactor = newSpecularFactor;
 	}
 	if( rBracketKey.IsPressed() )
 	{
-		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
 
-		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
-		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		g_theRenderer->SetSpecularFactor( newSpecularFactor );
-		m_testMaterial->m_specularFactor = newSpecularFactor;
 	}
 	if( semiColonKey.IsPressed() )
 	{
-		float currentSpecularPower = g_theRenderer->GetSpecularPower();
 
-		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
-		newSpecularPower = Max( newSpecularPower, 1.f );
-		g_theRenderer->SetSpecularPower( newSpecularPower );
-		m_testMaterial->m_specularPower = newSpecularPower;
 	}
 	if( singleQuoteKey.IsPressed() )
 	{
-		float currentSpecularPower = g_theRenderer->GetSpecularPower();
 
-		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
-		newSpecularPower = Max( newSpecularPower, 1.f );
-		g_theRenderer->SetSpecularPower( newSpecularPower );
-		m_testMaterial->m_specularPower = newSpecularPower;
 	}
 	if( commaKey.WasJustPressed() )
 	{
