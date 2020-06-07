@@ -342,6 +342,8 @@ void DevConsole::Render( RenderContext& renderer, const Camera& camera, float li
 	{
 		return;
 	}
+	renderer.SetBlendMode(eBlendMode::ALPHA);
+	renderer.BindShader( (Shader*)nullptr );
 	AABB2 cameraAABB(camera.GetOrthoBottomLeft(),camera.GetOrthoTopRight());
 	renderer.BindTexture(nullptr);
 	renderer.DrawAABB2Filled(cameraAABB,Rgba8(0,0,0,128));
