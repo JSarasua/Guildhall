@@ -108,31 +108,6 @@ void Game::Update()
 
 	m_world->Update( dt );
 	UpdateCamera( dt );
-
-	Vec3 cameraPitchRollYaw = m_camera.GetRotation();
-	Vec3 cameraPosition = m_camera.GetPosition();
-	float yaw = cameraPitchRollYaw.z;
-	float pitch = cameraPitchRollYaw.x;
-	float roll = cameraPitchRollYaw.y;
-	Mat44 cameraBases = m_camera.GetCameraScreenRotationMatrix();
-	Vec3 cameraIBasis = cameraBases.GetIBasis3D();
-	Vec3 cameraJBasis = cameraBases.GetJBasis3D();
-	Vec3 cameraKBasis = cameraBases.GetKBasis3D();
-
- 	std::string playingUIStr = Stringf( "Playing (UI)");
-	std::string cameraRotationTranslationStr = Stringf( "Camera Yaw = %.1f	Pitch=%.1f	Roll=%.1f	xyz=(%.2f, %.2f, %.2f)", yaw, pitch, roll, cameraPosition.x, cameraPosition.y, cameraPosition.z );;
-	std::string cameraIBasisStr = Stringf( "iBasis (forward, +x world-east when identity): (%.2f, %.2f, %.2f)", cameraIBasis.x, cameraIBasis.y, cameraIBasis.z );
-	std::string cameraJBasisStr = Stringf( "jBasis (left,	+y world-north when identity):	(%.2f, %.2f, %.2f)", cameraJBasis.x, cameraJBasis.y, cameraJBasis.z );
-	std::string cameraKBasisStr = Stringf( "kBasis (up, +z world-up when identity):		(%.2f, %.2f, %.2f)", cameraKBasis.x, cameraKBasis.y, cameraKBasis.z );
-
- 	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, playingUIStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::YELLOW, Rgba8::YELLOW, 0.f, cameraRotationTranslationStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::RED, Rgba8::RED, 0.f, cameraIBasisStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, cameraJBasisStr.c_str() );
-	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, cameraKBasisStr.c_str() );
-
-
-	DebugAddScreenPoint( Vec2( 100.f, 100.f ), 100.f, Rgba8::WHITE, 0.f );
 }
 
 void Game::Render()
@@ -145,15 +120,16 @@ void Game::Render()
 	m_world->Render();
 	g_theRenderer->EndCamera(m_camera);
 
-	DebugRenderBeginFrame();
-	DebugRenderWorldToCamera( &m_camera );
+	RenderUI();
+
 
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
 }
@@ -341,6 +317,10 @@ void Game::RenderGame()
 
 void Game::RenderUI()
 {
+	Player* player = m_world->GetPlayer();
+	int playerHealth = player->GetCurrentHealth();
+	std::string playerHealthStr = Stringf( "Player Health: %i", playerHealth );
+	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, playerHealthStr.c_str() );
 }
 
 void Game::CheckButtonPresses(float deltaSeconds)
