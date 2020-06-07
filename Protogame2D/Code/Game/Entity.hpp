@@ -26,7 +26,7 @@ public:
 
 	void SetPosition(const Vec2& newPosition);
 
-
+	int GetCurrentHealth() const;
 
 protected:
 	Vec2 m_position = Vec2(0.f,0.f);

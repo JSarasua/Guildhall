@@ -72,3 +72,8 @@ void Entity::SetPosition( const Vec2& newPosition )
 {
 	m_position = newPosition;
 }
+
+int Entity::GetCurrentHealth() const
+{
+	return m_health;
+}
