@@ -47,20 +47,6 @@ void Game::Startup()
 	//m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
 	m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.f, 100.f );
 
-
-	m_frontCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 0.5f, 0.5f ) );
-	m_leftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.5f, 2.5f, 0.5f ) );
-	m_frontleftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 2.5f, 0.5f ) );
-
-	m_cubeMesh = new GPUMesh( g_theRenderer );
-	std::vector<Vertex_PCUTBN> cubeVerts;
-	std::vector<uint> cubeIndices;
-	AppendIndexedVertsTestCube( cubeVerts, cubeIndices );
-
-	m_cubeMesh->UpdateVertices( cubeVerts );
-	m_cubeMesh->UpdateIndices( cubeIndices );
-
-
 	m_gameClock = new Clock();
 	m_gameClock->SetParent( Clock::GetMaster() );
 
@@ -74,9 +60,6 @@ void Game::Startup()
 
 void Game::Shutdown()
 {
-	delete m_cubeMesh;
-	m_cubeMesh = nullptr;
-
 	m_world->Shutdown();
 	delete m_world;
 	m_world = nullptr;
@@ -87,19 +70,6 @@ void Game::RunFrame(){}
 void Game::Update()
 {
 	float dt = (float)m_gameClock->GetLastDeltaSeconds();
-
-	m_currentTime += dt;
-	if( m_currentTime > 255.f )
-	{
-		m_currentTime = 0.f;
-	}
-	Rgba8 clearColor;
-
-	clearColor.g = 0;
-	clearColor.r = 0;
-	clearColor.b = 0;
-
-	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
 	if( !g_theConsole->IsOpen() )
 	{
@@ -116,12 +86,8 @@ void Game::Render()
 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
 	m_camera.SetColorTarget( 0, colorTarget );
 
-	g_theRenderer->BeginCamera(m_camera);
-	m_world->Render();
-	g_theRenderer->EndCamera(m_camera);
-
+	RenderGame();
 	RenderUI();
-
 
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 	m_camera.SetColorTarget( nullptr );
@@ -133,158 +99,6 @@ void Game::Render()
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
 }
-
-void Game::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList )
-{
-	Vec3 nonUniformScale = Vec3( 1.f, 1.f, 1.f );
-	float cubeHalfHeight = 0.5f;
-	float c = cubeHalfHeight;
-
-	Vec2 bLeft( 0.f, 0.f );
-	Vec2 tRight( 1.f, 1.f );
-	Vec2 tLeft( 0.f, 1.f );
-	Vec2 bRight( 1.f, 0.f );
-
-	Vec3 forward	= Vec3( 0.f, 0.f, 1.f );
-	Vec3 right	= Vec3( 1.f, 0.f, 0.f );
-	Vec3 back		= Vec3( 0.f, 0.f, -1.f );
-	Vec3 left		= Vec3( -1.f, 0.f, 0.f );
-	Vec3 up		= Vec3( 0.f, 1.f, 0.f );
-	Vec3 down		= Vec3( 0.f, -1.f, 0.f );
-
-	Vertex_PCUTBN cubeVerts[24] =
-	{
-		//Front Quad
-		//Now top
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bLeft,  forward, right, up ),	//0
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bRight, forward, right, up ),		//1
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, forward, right, up ),		//2
-
-
-		//Vertex_PCUTBN( Vec3( -c, -c, c ), Rgba8::WHITE,		bLeft ),	//0
-		//Vertex_PCUTBN( Vec3( c, c, c ), Rgba8::WHITE,		tRight ),	//2
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, forward, right, up ),		//3
-
-		//Right Quad
-		//Now back
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft,	right, back, up ),		//4
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, right, back, up ),		//5
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, right, back, up ),		//6
-
-
-		//Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		bLeft ),	//4
-		//Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//6
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, right, back, up ),		//7
-
-		//Back Quad
-		//Now bottom
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		tRight,	back, left, up ),		//8
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	tLeft, back, left, up ),		//9
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, back, left, up ),		//10
-
-		//Vertex_PCUTBN( Vec3( c, -c, -c ), Rgba8::WHITE,	bLeft ),		//8
-		//Vertex_PCUTBN( Vec3( -c, c, -c ), Rgba8::WHITE,	tRight ),		//10
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, back, left, up ),		//11
-
-		//Left Quad
-		//Now Front
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bRight,	left, forward, up ),		//12	//bLeft
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, left, forward, up ),		//13
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, left, forward, up ),			//14
-
-		//Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//12
-		//Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		tRight ),	//14
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, left, forward, up ),		//15
-
-		//Top Quad
-		//Now Left
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight,	up, right, back ),		//16
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, up, right, back ),		//17
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, up, right, back ),		//18
-
-		//Vertex_PCUTBN( Vec3( -c, c, c ), Rgba8::WHITE,		bLeft ),	//16
-		//Vertex_PCUTBN( Vec3( c, c, -c ), Rgba8::WHITE,		tRight ),	//18
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,			bRight, up, right, back ),		//19
-
-		//Bottom Quad
-		//Now Right
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bLeft,	down, right, forward ),		//20
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, down, right, forward ),		//21
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, down, right, forward ),		//22
-
-		//Vertex_PCUTBN( Vec3( -c, -c, -c ), Rgba8::WHITE,	bLeft ),		//20
-		//Vertex_PCUTBN( Vec3( c, -c, c ), Rgba8::WHITE,		tRight ),	//22
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, down, right, forward )			//23
-	};
-
-	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
-	{
-		masterVertexList.push_back( cubeVerts[vertexIndex] );
-	}
-
-	uint cubeIndices[36] =
-	{
-		//Front Quad
-		0,
-		1,
-		2,
-
-		0,
-		2,
-		3,
-
-		//Right Quad
-		4,
-		5,
-		6,
-
-		4,
-		6,
-		7,
-
-		//Back Quad
-		8,
-		9,
-		10,
-
-		8 ,
-		10,
-		11,
-
-		//Left Quad
-		12,
-		13,
-		14,
-
-		12,
-		14,
-		15,
-
-		//Top Quad
-		16,
-		17,
-		18,
-
-		16,
-		18,
-		19,
-
-		//Bottom Quad
-		20,
-		21,
-		22,
-
-		20,
-		22,
-		23
-	};
-
-	for( int indicesIndex = 0; indicesIndex < 36; indicesIndex++ )
-	{
-		masterIndexList.push_back( cubeIndices[indicesIndex] );
-	}
-}
-
 
 void Game::CheckCollisions()
 {}
@@ -298,6 +112,10 @@ void Game::UpdateCamera( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 
+	Rgba8 clearColor = Rgba8::BLACK;
+	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
+
+	//Clamp camera to map bounds centered on player
 	Vec2 playerCenter = m_world->GetPlayer()->GetPosition();
 	Vec2 cameraOutputSize = m_camera.GetOutputSize();
 	Vec2 cameraHalfSize = 0.5f * cameraOutputSize;
@@ -307,12 +125,15 @@ void Game::UpdateCamera( float deltaSeconds )
 	Vec2 mapBoundsMin = cameraHalfSize;
 	AABB2 cameraBoundingBox = AABB2( mapBoundsMin, mapBoundsMax );
 	Vec2 newCameraCenter = cameraBoundingBox.GetNearestPoint( playerCenter );
+	
 	m_camera.SetPosition( newCameraCenter );
 }
 
 void Game::RenderGame()
 {
-	//m_world->Render();
+	g_theRenderer->BeginCamera( m_camera );
+	m_world->Render();
+	g_theRenderer->EndCamera( m_camera );
 }
 
 void Game::RenderUI()
