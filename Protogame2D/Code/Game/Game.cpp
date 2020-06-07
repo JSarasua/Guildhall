@@ -107,22 +107,7 @@ void Game::Update()
 	}
 
 	m_world->Update( dt );
-
-	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
-	Mat44 cameraModelMatrix = Mat44();
-	cameraModelMatrix.ScaleUniform3D( 0.01f );
-	Vec3 compassPosition = m_camera.GetPosition();
-	compassPosition += m_camera.GetDirection() * 0.1f;
-
-	cameraModelMatrix.SetTranslation3D( compassPosition );
-	DebugAddWorldBasis( cameraModelMatrix, 0.f, DEBUG_RENDER_ALWAYS );
-	//DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
-
-	//GREY: Playing (UI)
-	//YELLOW: Camera Yaw=X.X	Pitch=X.X	Roll=X.X	xyz=(X.XX, Y.YY, Z.ZZ)
-	//RED: iBasis (forward,	+x world-east when identity): (X.XX, Y.YY, Z.ZZ)
-	//GREEN: jBasis (left,	+y world-north when identity):	(X.XX, Y.YY, Z.ZZ)
-	//BLUE: kBasis (up, +z world-up when identity):		(X.XX, Y.YY, Z.ZZ)
+	UpdateCamera( dt );
 
 	Vec3 cameraPitchRollYaw = m_camera.GetRotation();
 	Vec3 cameraPosition = m_camera.GetPosition();
@@ -336,6 +321,17 @@ void Game::UpdateEntities( float deltaSeconds )
 void Game::UpdateCamera( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+
+	Vec2 playerCenter = m_world->GetPlayer()->GetPosition();
+	Vec2 cameraOutputSize = m_camera.GetOutputSize();
+	Vec2 cameraHalfSize = 0.5f * cameraOutputSize;
+	IntVec2 currentMapBounds = GetCurrentMapBounds();
+	Vec2 currentMapBoundsVec2 = (Vec2)currentMapBounds;
+	Vec2 mapBoundsMax = currentMapBoundsVec2 - cameraHalfSize;
+	Vec2 mapBoundsMin = cameraHalfSize;
+	AABB2 cameraBoundingBox = AABB2( mapBoundsMin, mapBoundsMax );
+	Vec2 newCameraCenter = cameraBoundingBox.GetNearestPoint( playerCenter );
+	m_camera.SetPosition( newCameraCenter );
 }
 
 void Game::RenderGame()
@@ -593,27 +589,27 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( wKey.IsPressed() )
 	{
-		translator.y +=  1.f * deltaSeconds;
+		//translator.y +=  1.f * deltaSeconds;
 	}
 	if( sKey.IsPressed() )
 	{
-		translator.y -=  1.f * deltaSeconds;
+		//translator.y -=  1.f * deltaSeconds;
 	}
 	if( aKey.IsPressed() )
 	{
-		translator.x -=  1.f * deltaSeconds;
+		//translator.x -=  1.f * deltaSeconds;
 	}
 	if( dKey.IsPressed() )
 	{
-		translator.x +=  1.f * deltaSeconds;
+		//translator.x +=  1.f * deltaSeconds;
 	}
 
 	if( shiftKey.IsPressed() )
 	{
-		translator *= 2.f;
+		//translator *= 2.f;
 	}
 
-	m_camera.TranslateRelativeToViewOnlyYaw( translator );
+	//m_camera.TranslateRelativeToViewOnlyYaw( translator );
 }
 
 IntVec2 Game::GetCurrentMapBounds() const
