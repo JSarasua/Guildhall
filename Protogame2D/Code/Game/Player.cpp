@@ -29,7 +29,8 @@ void Player::Startup()
 void Player::Update( float deltaSeconds )
 {
 	CapOrientationDegrees();
-	UpdateFromJoystick(deltaSeconds);
+	UpdateFromJoystick( deltaSeconds );
+	UpdateFromKeyboard( deltaSeconds );
 
 	m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
 }
