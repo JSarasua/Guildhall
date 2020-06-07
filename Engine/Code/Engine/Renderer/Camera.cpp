@@ -123,6 +123,11 @@ Vec2 Camera::GetOrthoTopRight() const
 	return topRight2D;
 }
 
+Vec2 Camera::GetOutputSize() const
+{
+	return m_outputSize;
+}
+
 Vec2 Camera::GetColorTargetSize() const
 {
 	if( nullptr != m_colorTargets[0] )

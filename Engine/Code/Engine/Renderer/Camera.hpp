@@ -77,6 +77,7 @@ public:
 
 	Vec2 GetOrthoBottomLeft() const;
 	Vec2 GetOrthoTopRight() const;
+	Vec2 GetOutputSize() const;
 	Vec2 GetColorTargetSize() const;
 	Mat44 GetProjection() const;
 
