@@ -3,8 +3,9 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
-#include "Engine/Input/InputSystem.hpp"
+/*#include "Engine/Input/InputSystem.hpp"*/
 
+class InputSystem;
 
 #define UNUSED(x) (void)(x);
 typedef unsigned int uint;
