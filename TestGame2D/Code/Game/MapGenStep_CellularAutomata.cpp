@@ -6,7 +6,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 
-MapGenStep_CellularAutomata::MapGenStep_CellularAutomata( const XMLElement& element ) : MapGenStep(element)
+MapGenStep_CellularAutomata::MapGenStep_CellularAutomata( const XmlElement& element ) : MapGenStep(element)
 {
 	std::string ifNeighborTileType = ParseXMLAttribute( element, "ifNeighborTileType", "NONE" );
 	m_numOfNeighbors = ParseXMLAttribute(element, "numOfNeighbors", IntRange(1,2));

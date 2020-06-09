@@ -9,7 +9,7 @@ class TileDefinition;
 class MapGenStep_Worm : public MapGenStep
 {
 public:
-	MapGenStep_Worm( const XMLElement& element );
+	MapGenStep_Worm( const XmlElement& element );
 
 	virtual void RunStepOnce( Map& mapToMutate ) override;
 

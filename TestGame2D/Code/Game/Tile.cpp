@@ -23,7 +23,7 @@ void Tile::Render() const
 void Tile::AppendVerts( std::vector<Vertex_PCU>& masterVertexList )
 {
 	AABB2 tileUVs = m_tileDef->m_spriteUVs;
-	const Texture tileTexture = g_tileSpriteSheet->GetTexture();
+	Texture const& tileTexture = g_tileSpriteSheet->GetTexture();
 	Rgba8 tileTint = m_tileDef->m_tint;
 
 	g_theRenderer->AppendVertsFromAABB2(masterVertexList, GetAABB2(), tileTint, tileUVs.mins, tileUVs.maxs);

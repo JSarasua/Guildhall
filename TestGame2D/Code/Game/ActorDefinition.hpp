@@ -16,10 +16,10 @@ class ActorDefinition : public EntityDefinition
 	friend class Map;
 public:
 	ActorDefinition() = delete;
-	ActorDefinition( const XMLElement& element );
+	ActorDefinition( const XmlElement& element );
 	~ActorDefinition() {}
 
-	static void InitializeActorDefinitions( const XMLElement& rootActorDefElement );
+	static void InitializeActorDefinitions( const XmlElement& rootActorDefElement );
 
 	static std::map< std::string, ActorDefinition*> s_definitions;
 

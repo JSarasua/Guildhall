@@ -6,7 +6,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 
-MapGenStep_FromImage::MapGenStep_FromImage( const XMLElement& element ) : MapGenStep(element)
+MapGenStep_FromImage::MapGenStep_FromImage( const XmlElement& element ) : MapGenStep(element)
 {
 	m_fromImageFilePath = ParseXMLAttribute(element, "fromImageFilePath", "INVALID");
 	m_rotations			= ParseXMLAttribute(element, "rotations", IntRange(0,3));

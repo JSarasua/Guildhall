@@ -10,11 +10,11 @@ class EntityDefinition
 	friend class Map;
 public:
 	EntityDefinition() = delete;
-	EntityDefinition( const XMLElement& element );
+	EntityDefinition( const XmlElement& element );
 	~EntityDefinition() {}
 
 
-	//static void InitializeEntityDefinitions( const XMLElement& rootEntityDefElement );
+	//static void InitializeEntityDefinitions( const XmlElement& rootEntityDefElement );
 
 	//static std::map< std::string, EntityDefinition*> s_definitions;
 

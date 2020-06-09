@@ -8,7 +8,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/TileDefinition.hpp"
 
-MapGenStep::MapGenStep( const XMLElement& element )
+MapGenStep::MapGenStep( const XmlElement& element )
 {
 	std::string ifTileTypeName = ParseXMLAttribute( element, "ifTileType", "INVALID" );
 	std::string changeToTypeName = ParseXMLAttribute( element, "changeToType", "INVALID" );
@@ -45,7 +45,7 @@ MapGenStep::MapGenStep( const XMLElement& element )
 	}
 }
 
-MapGenStep* MapGenStep::CreateNewMapGenStep( const XMLElement& element )
+MapGenStep* MapGenStep::CreateNewMapGenStep( const XmlElement& element )
 {
 	std::string mapGenStepName = element.Name();
 

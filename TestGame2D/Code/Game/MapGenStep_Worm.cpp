@@ -5,7 +5,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
-MapGenStep_Worm::MapGenStep_Worm( const XMLElement& element ) : MapGenStep(element)
+MapGenStep_Worm::MapGenStep_Worm( const XmlElement& element ) : MapGenStep(element)
 {
 	m_wormLength = ParseXMLAttribute( element, "wormLength", 5 );
 	std::string changeToTypeName = ParseXMLAttribute( element, "changeToType", "INVALID" );

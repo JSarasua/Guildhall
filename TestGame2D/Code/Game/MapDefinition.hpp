@@ -11,10 +11,10 @@ class MapDefinition
 	friend class Map;
 public:
 	MapDefinition() = delete;
-	MapDefinition( const XMLElement& element);
+	MapDefinition( const XmlElement& element);
 	~MapDefinition(){}
 
-	static void InitializeMapDefinitions( const XMLElement& rootMapDefElement);
+	static void InitializeMapDefinitions( const XmlElement& rootMapDefElement);
 
 	static std::map< std::string, MapDefinition*> s_definitions;
 

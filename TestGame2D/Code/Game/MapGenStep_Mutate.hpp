@@ -7,7 +7,7 @@ class TileDefinition;
 class MapGenStep_Mutate : public MapGenStep
 {
 public:
-	MapGenStep_Mutate(const XMLElement& element);
+	MapGenStep_Mutate(const XmlElement& element);
 
 	virtual void RunStepOnce( Map& mapToMutate ) override;
 

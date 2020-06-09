@@ -5,8 +5,9 @@ struct IntVec2;
 
 class App;
 class Game;
+class Window;
 class RenderContext;
-class InputSystem;
+/*class InputSystem;*/
 class SpriteSheet;
 
 constexpr float CLIENT_ASPECT = 16.f/9.f;
@@ -35,8 +36,9 @@ extern const IntVec2 STEP_NORTHEAST;
 
 extern App* g_theApp;
 extern Game* g_theGame;
+extern Window* g_theWindow;
 extern RenderContext* g_theRenderer;
-extern InputSystem* g_theInput;
+/*extern InputSystem* g_theInput;*/
 extern SpriteSheet* g_tileSpriteSheet;
 extern SpriteSheet* g_actorSpriteSheet;
 extern SpriteSheet* g_portraitSpriteSheet;

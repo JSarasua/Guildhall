@@ -4,9 +4,13 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Console/DevConsole.hpp"
+#include "Engine/Platform/Window.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
+const char* APP_NAME = "Testgame2D";	// ...becomes ??? (Change this per project!)
+
 
 App::App()
 {
@@ -23,18 +27,26 @@ App::~App() {}
 
 void App::Startup()
 {
-	g_theInput->Startup();
-	g_theRenderer->StartUp();
+	float aspectRatio = g_gameConfigBlackboard->GetValue( "windowAspect", 0.f );
+	g_theWindow = new Window();
+	g_theWindow->Open( APP_NAME, aspectRatio, 0.90f );
+	g_theWindow->SetInputSystem( g_theInput );
+	g_theWindow->SetEventSystem( g_theEventSystem );
+
+	g_theInput->Startup( g_theWindow );
+	g_theRenderer->StartUp( g_theWindow );
+	DebugRenderSystemStartup( g_theRenderer );
 	g_theGame->Startup();
 	g_theConsole->Startup();
 
-	g_theEventSystem->SubscribeToEvent("QUIT", QuitRequested);
+	g_theEventSystem->SubscribeToEvent("QUIT", CONSOLECOMMAND, QuitRequested);
 }
 
 void App::Shutdown()
 {
 	g_theGame->Shutdown();
 	delete g_theGame;;
+	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
 	g_theInput->Shutdown();
@@ -99,6 +111,7 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
+	g_theWindow->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theConsole->BeginFrame();
@@ -124,6 +137,7 @@ void App::EndFrame()
 	g_theRenderer->EndFrame();
 	g_theInput->EndFrame();
 	g_theConsole->EndFrame();
+	g_theWindow->EndFrame();
 }
 
 void App::RestartGame()
@@ -155,7 +169,7 @@ void App::CheckButtonPresses()
 {
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
-		g_theEventSystem->FireEvent("QUIT", nullptr);
+		g_theEventSystem->FireEvent("QUIT", CONSOLECOMMAND, nullptr);
 		//HandleQuitRequested();
 	}
 

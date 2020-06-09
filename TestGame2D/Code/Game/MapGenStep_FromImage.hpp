@@ -10,7 +10,7 @@ class TileDefinition;
 class MapGenStep_FromImage : public MapGenStep
 {
 public:
-	MapGenStep_FromImage( const XMLElement& element );
+	MapGenStep_FromImage( const XmlElement& element );
 
 	virtual void RunStepOnce( Map& mapToMutate ) override;
 

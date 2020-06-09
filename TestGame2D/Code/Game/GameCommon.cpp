@@ -1,16 +1,19 @@
 #pragma once
-#include "GameCommon.hpp"
-#include "App.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/App.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
-#include "Engine/Input/InputSystem.hpp"
+//#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Math/IntVec2.hpp"
+#include "Engine/Platform/Window.hpp"
 
 App* g_theApp = nullptr;
 Game* g_theGame = nullptr;
 RenderContext* g_theRenderer = nullptr;
-InputSystem* g_theInput = nullptr;
+/*InputSystem* g_theInput = nullptr;*/
+Window* g_theWindow = nullptr;
+
 SpriteSheet* g_tileSpriteSheet = nullptr;
 SpriteSheet* g_actorSpriteSheet = nullptr;
 SpriteSheet* g_portraitSpriteSheet = nullptr;

@@ -107,9 +107,9 @@ private:
 	std::string m_blackBoardText;
 
 	//XML Definitions
-	XMLDocument* m_mapDefDoc	= nullptr;
-	XMLDocument* m_tileDefDoc	= nullptr;
-	XMLDocument* m_actorDefDoc	= nullptr;
+	XmlDocument* m_mapDefDoc	= nullptr;
+	XmlDocument* m_tileDefDoc	= nullptr;
+	XmlDocument* m_actorDefDoc	= nullptr;
 
 public:
 	//Rand for game to use

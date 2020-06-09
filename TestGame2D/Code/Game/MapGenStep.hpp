@@ -8,9 +8,9 @@
 class MapGenStep
 {
 public:
-	MapGenStep( const XMLElement& element );
+	MapGenStep( const XmlElement& element );
 
-	static MapGenStep* CreateNewMapGenStep(const XMLElement& element);
+	static MapGenStep* CreateNewMapGenStep(const XmlElement& element);
 
 	void RunStep( Map& mapToMutate );
 	

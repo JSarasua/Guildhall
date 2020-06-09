@@ -6,7 +6,7 @@
 #include "Game/Game.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
-MapGenStep_Mutate::MapGenStep_Mutate( const XMLElement& element ) : MapGenStep(element)
+MapGenStep_Mutate::MapGenStep_Mutate( const XmlElement& element ) : MapGenStep(element)
 {}
 
 void MapGenStep_Mutate::RunStepOnce( Map& mapToMutate )

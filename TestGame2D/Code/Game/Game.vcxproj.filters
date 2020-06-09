@@ -11,6 +11,9 @@
     <Filter Include="Data\Gameplay">
       <UniqueIdentifier>{f1473f6b-886a-4ba0-abdf-cac3d0753907}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{999eb0bf-48ab-45be-b04d-3735b3cfc0f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -152,5 +155,10 @@
     <Xml Include="..\..\Run\Data\Gameplay\Projectiles.xml">
       <Filter>Data\Gameplay</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run\Data\Shaders\Default.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

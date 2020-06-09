@@ -121,7 +121,7 @@ std::vector<Tile*> Map::GetNeighboringTiles( Tile* currentTile )
 
 void Map::RenderTiles()
 {
-	const Texture tex = g_tileSpriteSheet->GetTexture();
+	Texture const& tex = g_tileSpriteSheet->GetTexture();
 	g_theRenderer->BindTexture(&tex);
 	g_theRenderer->DrawVertexArray(m_vertsToRender);
 }

@@ -28,10 +28,10 @@ class TileDefinition
 	friend class MapGenStep_Mutate;
 public:
 	TileDefinition() = delete;
-	TileDefinition(const XMLElement& element);
+	TileDefinition(const XmlElement& element);
 	~TileDefinition(){}
 
-	static void InitializeTileDefinitions(const XMLElement& rootTileDefelement);
+	static void InitializeTileDefinitions(const XmlElement& rootTileDefelement);
 	static TileDefinition* GetTileDefFromColor(const Rgba8& colorValue);
 	static std::map< std::string, TileDefinition*> s_definitions;
 

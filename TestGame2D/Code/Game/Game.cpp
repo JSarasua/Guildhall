@@ -19,6 +19,7 @@
 #include "Game/ActorDefinition.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Actor.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 
 
@@ -39,15 +40,27 @@ Game::~Game(){}
 
 void Game::Startup()
 {
-
 	LoadAssets();
 	InitializeDefinitions();
 	m_world->Startup();
 	m_player = m_world->GetPlayer();
 	m_numTilesInViewVertically = GAME_CAMERA_Y;
 	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
-	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
-	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(UI_CAMERA_X, UI_CAMERA_Y));
+// 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
+// 	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(UI_CAMERA_X, UI_CAMERA_Y));
+
+	EnableDebugRendering();
+	m_camera = Camera();
+	m_camera.SetColorTarget( nullptr ); // we use this
+	m_camera.CreateMatchingDepthStencilTarget( g_theRenderer );
+	m_camera.SetOutputSize( Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically) );
+	m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.f, 100.f );
+
+	m_UICamera = Camera();
+	m_UICamera.SetColorTarget( nullptr ); // we use this
+	m_UICamera.SetOutputSize( Vec2(UI_CAMERA_X, UI_CAMERA_Y) );
+	m_UICamera.SetProjectionOrthographic( m_UICamera.m_outputSize, 0.f, 100.f );
+	m_UICamera.SetPosition( Vec2(UI_CAMERA_X, UI_CAMERA_Y) * 0.5f );
 
 	AddDevConsoleTest();
 	AddAlignedTextTest();
@@ -66,8 +79,8 @@ void Game::Update( float deltaSeconds )
 {
 	m_world->Update(deltaSeconds);
 
-	//UpdateCamera( deltaSeconds );
-	UpdateCameras();
+	UpdateCamera( deltaSeconds );
+	//UpdateCameras();
 	UpdateConsoleTest( deltaSeconds );
 	UpdateAlignedTextTest( deltaSeconds );
 	UpdateDebugMouse();
@@ -78,19 +91,38 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render()
 {
-	g_theRenderer->ClearScreen( Rgba8( 0, 0, 0, 1 ) );
-	for( int cameraIndex = 0; cameraIndex < m_cameras.size(); cameraIndex++ )
-	{
-		g_theRenderer->BeginCamera( m_cameras[cameraIndex], (Viewport)cameraIndex );
-		RenderGame();
-		g_theRenderer->EndCamera( m_cameras[cameraIndex] );
-	}
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+// 	for( int cameraIndex = 0; cameraIndex < m_cameras.size(); cameraIndex++ )
+// 	{
+// 		g_theRenderer->BeginCamera( m_cameras[cameraIndex], (Viewport)cameraIndex );
+// 		RenderGame();
+// 		g_theRenderer->EndCamera( m_cameras[cameraIndex] );
+// 	}
 
-// 	g_theRenderer->BeginCamera( m_camera );
-// 	RenderGame();
-// 	g_theRenderer->EndCamera( m_camera );
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
 
-	g_theRenderer->BeginCamera( m_UICamera, Viewport::FullScreen );
+ 	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture(nullptr);
+	g_theRenderer->BindShader( (Shader*)nullptr );
+ 	RenderGame();
+ 	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
+
+	g_theRenderer->BeginCamera( m_UICamera );
 	RenderUI();
 	g_theRenderer->EndCamera( m_UICamera );
 }
@@ -121,14 +153,15 @@ void Game::UpdateCamera( float deltaSeconds )
 
 	if( g_theApp->GetDebugCameraMode() )
 	{
-		if( currentMapBounds.x > currentMapBounds.y * CLIENT_ASPECT )
-		{
-			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.x, (float)currentMapBounds.x/CLIENT_ASPECT ) );
-		}
-		else
-		{
-			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.y * CLIENT_ASPECT, (float)currentMapBounds.y ) );
-		}
+		UNIMPLEMENTED();
+// 		if( currentMapBounds.x > currentMapBounds.y * CLIENT_ASPECT )
+// 		{
+// 			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.x, (float)currentMapBounds.x/CLIENT_ASPECT ) );
+// 		}
+// 		else
+// 		{
+// 			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.y * CLIENT_ASPECT, (float)currentMapBounds.y ) );
+// 		}
 	}
 	else
 	{
@@ -137,7 +170,7 @@ void Game::UpdateCamera( float deltaSeconds )
 		cameraPosition.x = Clampf( cameraPosition.x, m_numTilesInViewHorizontally/2.f, currentMapBounds.x - m_numTilesInViewHorizontally/2.f );
 		cameraPosition.y = Clampf( cameraPosition.y, m_numTilesInViewVertically/2.f, currentMapBounds.y - m_numTilesInViewVertically/2.f );
 
-		m_camera.SetOrthoView( Vec2( cameraPosition.x - m_numTilesInViewHorizontally/2.f, cameraPosition.y - m_numTilesInViewVertically/2.f ), Vec2( cameraPosition.x + m_numTilesInViewHorizontally/2.f, cameraPosition.y + m_numTilesInViewVertically/2.f ) );
+		m_camera.SetPosition( cameraPosition );
 	}
 }
 
@@ -150,7 +183,7 @@ void Game::UpdateCamera( const Vec2& centerPosition, Camera& camera )
 	cameraPosition.x = Clampf( cameraPosition.x, m_numTilesInViewHorizontally/2.f, currentMapBounds.x - m_numTilesInViewHorizontally/2.f );
 	cameraPosition.y = Clampf( cameraPosition.y, m_numTilesInViewVertically/2.f, currentMapBounds.y - m_numTilesInViewVertically/2.f );
 
-	camera.SetOrthoView( Vec2( cameraPosition.x - m_numTilesInViewHorizontally/2.f, cameraPosition.y - m_numTilesInViewVertically/2.f ), Vec2( cameraPosition.x + m_numTilesInViewHorizontally/2.f, cameraPosition.y + m_numTilesInViewVertically/2.f ) );
+	camera.SetPosition( cameraPosition );
 }
 
 void Game::UpdateCameras()
@@ -308,7 +341,7 @@ void Game::AddBlackboardTest()
 
 void Game::UpdateConsoleTest( float deltaSeconds )
 {
-	g_theConsole->Update(g_theInput);
+	g_theConsole->Update();
 // 	static float consoleTimer = 0.f;
 // 
 // 	consoleTimer += deltaSeconds;
@@ -446,13 +479,13 @@ void Game::RenderBlackboardTest() const
 
 void Game::InitializeDefinitions()
 {
-	m_mapDefDoc		= new XMLDocument;
-	m_tileDefDoc	= new XMLDocument;
-	m_actorDefDoc	= new XMLDocument;
+	m_mapDefDoc		= new XmlDocument;
+	m_tileDefDoc	= new XmlDocument;
+	m_actorDefDoc	= new XmlDocument;
 
-	const XMLElement& tileDef = GetRootElement(*m_tileDefDoc, "Data/Gameplay/TileDefs.xml");
-	const XMLElement& mapDef = GetRootElement(*m_mapDefDoc, "Data/Gameplay/MapDefs.xml");
-	const XMLElement& actorDef = GetRootElement(*m_actorDefDoc, "Data/Gameplay/Actors.xml");
+	const XmlElement& tileDef = GetRootElement(*m_tileDefDoc, "Data/Gameplay/TileDefs.xml");
+	const XmlElement& mapDef = GetRootElement(*m_mapDefDoc, "Data/Gameplay/MapDefs.xml");
+	const XmlElement& actorDef = GetRootElement(*m_actorDefDoc, "Data/Gameplay/Actors.xml");
 
 	TileDefinition::InitializeTileDefinitions(tileDef);
 	MapDefinition::InitializeMapDefinitions(mapDef);
@@ -485,19 +518,19 @@ void Game::UpdateDebugMouse()
 void Game::AddDevConsoleTest()
 {
 	m_isDevConsoleTestActive = true;
-	g_theConsole->PringString( Rgba8::RED, "Hello World!" );
-	g_theConsole->PringString( Rgba8::GREEN, "Are you still there?" );
-	g_theConsole->PringString( Rgba8::BLUE, "Why?" );
+	g_theConsole->PrintString( Rgba8::RED, "Hello World!" );
+	g_theConsole->PrintString( Rgba8::GREEN, "Are you still there?" );
+	g_theConsole->PrintString( Rgba8::BLUE, "Why?" );
 
-	g_theConsole->PringString( Rgba8::RED, "Hello World!" );
-	g_theConsole->PringString( Rgba8::GREEN, "Are you still there?" );
-	g_theConsole->PringString( Rgba8::BLUE, "Why?" );
+	g_theConsole->PrintString( Rgba8::RED, "Hello World!" );
+	g_theConsole->PrintString( Rgba8::GREEN, "Are you still there?" );
+	g_theConsole->PrintString( Rgba8::BLUE, "Why?" );
 
-	g_theConsole->PringString( Rgba8::RED, "Hello World!" );
-	g_theConsole->PringString( Rgba8::GREEN, "Are you still there?" );
-	g_theConsole->PringString( Rgba8::BLUE, "Why?" );
+	g_theConsole->PrintString( Rgba8::RED, "Hello World!" );
+	g_theConsole->PrintString( Rgba8::GREEN, "Are you still there?" );
+	g_theConsole->PrintString( Rgba8::BLUE, "Why?" );
 
-	g_theConsole->PringString( Rgba8::RED, "Hello World!" );
-	g_theConsole->PringString( Rgba8::GREEN, "Are you still there?" );
-	g_theConsole->PringString( Rgba8::BLUE, "Why?" );
+	g_theConsole->PrintString( Rgba8::RED, "Hello World!" );
+	g_theConsole->PrintString( Rgba8::GREEN, "Are you still there?" );
+	g_theConsole->PrintString( Rgba8::BLUE, "Why?" );
 }

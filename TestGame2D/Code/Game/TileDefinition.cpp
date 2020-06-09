@@ -4,7 +4,7 @@
 
 std::map< std::string, TileDefinition*> TileDefinition::s_definitions;
 
-TileDefinition::TileDefinition( const XMLElement& element )
+TileDefinition::TileDefinition( const XmlElement& element )
 {
 
 	m_name						= ParseXMLAttribute(element, "name", "INVALID");
@@ -20,10 +20,10 @@ TileDefinition::TileDefinition( const XMLElement& element )
 	g_tileSpriteSheet->GetSpriteUVs(m_spriteUVs.mins, m_spriteUVs.maxs, spriteIndex);
 }
 
-void TileDefinition::InitializeTileDefinitions( const XMLElement& rootTileDefelement )
+void TileDefinition::InitializeTileDefinitions( const XmlElement& rootTileDefelement )
 {
-	for( const XMLElement* element = rootTileDefelement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
-		const XMLAttribute* nameAttribute = element->FindAttribute("name");
+	for( const XmlElement* element = rootTileDefelement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
+		const XmlAttribute* nameAttribute = element->FindAttribute("name");
 		
 		if( nameAttribute )
 		{

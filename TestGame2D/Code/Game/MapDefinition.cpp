@@ -4,7 +4,7 @@
 
 std::map< std::string, MapDefinition*> MapDefinition::s_definitions;
 
-MapDefinition::MapDefinition( const XMLElement& element )
+MapDefinition::MapDefinition( const XmlElement& element )
 {
 	m_name				= ParseXMLAttribute( element, "name", "INVALID" );
 	m_mapDimensions.x	= ParseXMLAttribute( element, "width", 0 );
@@ -12,8 +12,8 @@ MapDefinition::MapDefinition( const XMLElement& element )
 	m_fillTile			= ParseXMLAttribute( element, "fillTile", "INVALID" );
 	m_edgeTile			= ParseXMLAttribute( element, "edgeTile", "INVALID" );
 
-	const XMLElement* generationStepsElement = nullptr;
-	for( const XMLElement* childElement = element.FirstChildElement(); childElement; childElement = childElement->NextSiblingElement() )
+	const XmlElement* generationStepsElement = nullptr;
+	for( const XmlElement* childElement = element.FirstChildElement(); childElement; childElement = childElement->NextSiblingElement() )
 	{
 		const std::string name( childElement->Name() );
 		if( name == "GenerationSteps" )
@@ -30,17 +30,17 @@ MapDefinition::MapDefinition( const XMLElement& element )
 	//Find generationStepElement
 	if( generationStepsElement )
 	{
-		for( const XMLElement* childStepElement = generationStepsElement->FirstChildElement(); childStepElement; childStepElement = childStepElement->NextSiblingElement() )
+		for( const XmlElement* childStepElement = generationStepsElement->FirstChildElement(); childStepElement; childStepElement = childStepElement->NextSiblingElement() )
 		{
 			m_mapGenSteps.push_back( MapGenStep::CreateNewMapGenStep( *childStepElement ) );
 		}
 	}
 }
 
-void MapDefinition::InitializeMapDefinitions( const XMLElement& rootMapDefElement )
+void MapDefinition::InitializeMapDefinitions( const XmlElement& rootMapDefElement )
 {
-	for( const XMLElement* element = rootMapDefElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
-		const XMLAttribute* nameAttribute = element->FindAttribute( "name" );
+	for( const XmlElement* element = rootMapDefElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
+		const XmlAttribute* nameAttribute = element->FindAttribute( "name" );
 		if( nameAttribute )
 		{
 			std::string mapDefName = nameAttribute->Value();

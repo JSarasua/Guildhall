@@ -8,7 +8,7 @@ class TileDefinition;
 class MapGenStep_CellularAutomata : public MapGenStep
 {
 public:
-	MapGenStep_CellularAutomata( const XMLElement& element );
+	MapGenStep_CellularAutomata( const XmlElement& element );
 
 	virtual void RunStepOnce(  Map& mapToMutate ) override;
 

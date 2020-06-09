@@ -4,7 +4,7 @@
 
 std::map< std::string, ActorDefinition*> ActorDefinition::s_definitions;
 
-ActorDefinition::ActorDefinition( const XMLElement& element ) : EntityDefinition(element)
+ActorDefinition::ActorDefinition( const XmlElement& element ) : EntityDefinition(element)
 {
 	IntVec2 spriteCoords		= ParseXMLAttribute( element, "spriteCoords", IntVec2( 0, 0 ) );
 	m_tint						= ParseXMLAttribute( element, "spriteTint", Rgba8( 255, 255, 255 ) );
@@ -17,7 +17,7 @@ ActorDefinition::ActorDefinition( const XMLElement& element ) : EntityDefinition
 	m_waitingTime				= ParseXMLAttribute( element, "waitingTime", FloatRange(3.f,5.f));
 
 
-	for( const XMLElement* childElement = element.FirstChildElement(); childElement; childElement = childElement->NextSiblingElement() )
+	for( const XmlElement* childElement = element.FirstChildElement(); childElement; childElement = childElement->NextSiblingElement() )
 	{
 		const std::string name(childElement->Name());
 		if( name == "SpriteAnimSet" )
@@ -36,10 +36,10 @@ ActorDefinition::ActorDefinition( const XMLElement& element ) : EntityDefinition
 	g_portraitSpriteSheet->GetSpriteUVs( m_spritePortraitUVs.mins, m_spritePortraitUVs.maxs, portraitIndex );
 }
 
-void ActorDefinition::InitializeActorDefinitions( const XMLElement& rootActorDefElement )
+void ActorDefinition::InitializeActorDefinitions( const XmlElement& rootActorDefElement )
 {
-	for( const XMLElement* element = rootActorDefElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
-		const XMLAttribute* nameAttribute = element->FindAttribute( "name" );
+	for( const XmlElement* element = rootActorDefElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
+		const XmlAttribute* nameAttribute = element->FindAttribute( "name" );
 
 		if( nameAttribute )
 		{
