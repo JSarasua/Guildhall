@@ -8,68 +8,10 @@
 
 
 
-//Removed includes since they didn't seem necessary
-//#include <math.h>
-//#include <cassert>
-//#include <crtdbg.h>
-
-
-//-----------------------------------------------------------------------------------------------
-// #SD1ToDo: Move each of these items to its proper place, once that place is established
-// 
-
-
-
 extern App* g_theApp;
 extern InputSystem* g_theInput;
 
 extern Window* g_theWindow;
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-// #SD1ToDo: We will move this function to a more appropriate place later on...
-//
-// void CreateOSWindow( void* applicationInstanceHandle, float clientAspect )
-// {
-// 
-// 
-// /*	g_displayDeviceContext = GetDC( g_hWnd );*/
-// 
-// }
-
-
-
-//------------------------------------------------------------------------------------------------
-// Given an existing OS Window, create a Rendering Context (RC) for, say, OpenGL to draw to it.
-//
-// void CreateRenderContext()
-// {
-// 	// Creates an OpenGL rendering context (RC) and binds it to the current window's device context (DC)
-// 	PIXELFORMATDESCRIPTOR pixelFormatDescriptor;
-// 	memset( &pixelFormatDescriptor, 0, sizeof( pixelFormatDescriptor ) );
-// 	pixelFormatDescriptor.nSize = sizeof( pixelFormatDescriptor );
-// 	pixelFormatDescriptor.nVersion = 1;
-// 	pixelFormatDescriptor.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-// 	pixelFormatDescriptor.iPixelType = PFD_TYPE_RGBA;
-// 	pixelFormatDescriptor.cColorBits = 24;
-// 	pixelFormatDescriptor.cDepthBits = 24;
-// 	pixelFormatDescriptor.cAccumBits = 0;
-// 	pixelFormatDescriptor.cStencilBits = 8;
-// 
-// 	int pixelFormatCode = ChoosePixelFormat( g_displayDeviceContext, &pixelFormatDescriptor );
-// 	SetPixelFormat( g_displayDeviceContext, pixelFormatCode, &pixelFormatDescriptor );
-// 	g_openGLRenderingContext = wglCreateContext( g_displayDeviceContext );
-// 	wglMakeCurrent( g_displayDeviceContext, g_openGLRenderingContext );
-// }
-
-
-
-
-
-
-
 
 //-----------------------------------------------------------------------------------------------
 int WINAPI WinMain( _In_ HINSTANCE applicationInstanceHandle, _In_opt_ HINSTANCE, _In_ LPSTR commandLineString, _In_ int )
