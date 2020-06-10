@@ -19,7 +19,11 @@ public:
 private:
 
 	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile );
+	void AddTileIndices( std::vector<uint>& tileIndices, MapTile const& tile );
 
+	bool IsTileSolidAtCoords( IntVec2 const& tileCoords );
+	MapTile const& GetMapTileAtTileCoords( IntVec2 const& tileCoords );
+	
 	void RenderTiles();
 	void RenderEntities();
 	void UpdateTiles( float deltaSeconds );

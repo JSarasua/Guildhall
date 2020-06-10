@@ -109,122 +109,125 @@ void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVert
 	}
 
 	std::vector<uint> cubeIndices;
-	if( tile.m_tempIsSolid )
-	{
-		//Top quad
-		cubeIndices.push_back( 0 );
-		cubeIndices.push_back( 1 );
-		cubeIndices.push_back( 2 );
-		cubeIndices.push_back( 0 );
-		cubeIndices.push_back( 2 );
-		cubeIndices.push_back( 3 );
-
-		//Bottom quad
-		cubeIndices.push_back( 4 );
-		cubeIndices.push_back( 5 );
-		cubeIndices.push_back( 6 );
-		cubeIndices.push_back( 4 );
-		cubeIndices.push_back( 6 );
-		cubeIndices.push_back( 7 );
-	}
-
-	//Back quad
-	cubeIndices.push_back( 8 );
-	cubeIndices.push_back( 9 );
-	cubeIndices.push_back( 10 );
-	cubeIndices.push_back( 8 );
-	cubeIndices.push_back( 10 );
-	cubeIndices.push_back( 11 );
-
-	//Front quad
-	cubeIndices.push_back( 12 );
-	cubeIndices.push_back( 13 );
-	cubeIndices.push_back( 14 );
-	cubeIndices.push_back( 12 );
-	cubeIndices.push_back( 14 );
-	cubeIndices.push_back( 15 );
-
-	//Left quad
-	cubeIndices.push_back( 16 );
-	cubeIndices.push_back( 17 );
-	cubeIndices.push_back( 18 );
-	cubeIndices.push_back( 16 );
-	cubeIndices.push_back( 18 );
-	cubeIndices.push_back( 19 );
-
-	//Right quad
-	cubeIndices.push_back( 20 );
-	cubeIndices.push_back( 21 );
-	cubeIndices.push_back( 22 );
-	cubeIndices.push_back( 20 );
-	cubeIndices.push_back( 22 );
-	cubeIndices.push_back( 23 );
-
-
-	
-
-// 	uint cubeIndices[36] =
-// 	{
-// 		//Top quad
-// 		0,
-// 		1,
-// 		2,
-// 
-// 		0,
-// 		2,
-// 		3,
-// 
-// 		//Bottom quad
-// 		4,
-// 		5,
-// 		6,
-// 
-// 		4,
-// 		6,
-// 		7,
-// 
-// 		//Back quad
-// 		8,
-// 		9,
-// 		10,
-// 
-// 		8 ,
-// 		10,
-// 		11,
-// 
-// 		//Front quad
-// 		12,
-// 		13,
-// 		14,
-// 
-// 		12,
-// 		14,
-// 		15,
-// 
-// 		//Left quad
-// 		16,
-// 		17,
-// 		18,
-// 
-// 		16,
-// 		18,
-// 		19,
-// 
-// 		//Right quad
-// 		20,
-// 		21,
-// 		22,
-// 
-// 		20,
-// 		22,
-// 		23
-// 	};
+	AddTileIndices( cubeIndices, tile );
 
 
 	for( size_t indicesIndex = 0; indicesIndex < cubeIndices.size(); indicesIndex++ )
 	{
 		masterIndexList.push_back( cubeIndices[indicesIndex] + currentVertexListSize );
 	}
+}
+
+void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& tile )
+{
+	bool isBackTile = (tile.m_tileCoords.x == m_mapSize.x - 1);
+	bool isRightTile = (tile.m_tileCoords.y == 0);
+	bool isFrontTile = (tile.m_tileCoords.x == 0);
+	bool isLeftTile = (tile.m_tileCoords.y == m_mapSize.y - 1);
+	bool isEdgeTile = isBackTile || isRightTile || isLeftTile || isFrontTile;
+
+	IntVec2 left = IntVec2( 0, 1 );
+	IntVec2 right = IntVec2( 0, -1 );
+	IntVec2 forward = IntVec2( -1, 0 );
+	IntVec2 backward = IntVec2( 1, 0 );
+
+	IntVec2 currentTileCoords = tile.m_tileCoords;
+
+	bool isLeftTileSolid = IsTileSolidAtCoords( currentTileCoords + left );
+	bool isRightTileSolid = IsTileSolidAtCoords( currentTileCoords + right );
+	bool isBackTileSolid = IsTileSolidAtCoords( currentTileCoords + backward );
+	bool isFrontTileSolid = IsTileSolidAtCoords( currentTileCoords + forward );
+
+	if( !isEdgeTile )
+	{
+		//Top quad
+		tileIndices.push_back( 0 );
+		tileIndices.push_back( 1 );
+		tileIndices.push_back( 2 );
+		tileIndices.push_back( 0 );
+		tileIndices.push_back( 2 );
+		tileIndices.push_back( 3 );
+
+		//Bottom quad
+		tileIndices.push_back( 4 );
+		tileIndices.push_back( 5 );
+		tileIndices.push_back( 6 );
+		tileIndices.push_back( 4 );
+		tileIndices.push_back( 6 );
+		tileIndices.push_back( 7 );
+	}
+
+	if( tile.m_tempIsSolid )
+	{
+		//Back quad
+		if( (!isBackTile && !isLeftTile && !isRightTile) && (!isBackTileSolid) )
+		{
+			tileIndices.push_back( 8 );
+			tileIndices.push_back( 9 );
+			tileIndices.push_back( 10 );
+			tileIndices.push_back( 8 );
+			tileIndices.push_back( 10 );
+			tileIndices.push_back( 11 );
+		}
+
+		//Front quad
+		if( !isFrontTile && !isLeftTile && !isRightTile && (!isFrontTileSolid) )
+		{
+			tileIndices.push_back( 12 );
+			tileIndices.push_back( 13 );
+			tileIndices.push_back( 14 );
+			tileIndices.push_back( 12 );
+			tileIndices.push_back( 14 );
+			tileIndices.push_back( 15 );
+		}
+
+
+		//Left quad
+		if( !isBackTile && !isLeftTile && !isFrontTile && (!isLeftTileSolid) )
+		{
+			tileIndices.push_back( 16 );
+			tileIndices.push_back( 17 );
+			tileIndices.push_back( 18 );
+			tileIndices.push_back( 16 );
+			tileIndices.push_back( 18 );
+			tileIndices.push_back( 19 );
+		}
+
+
+		//Right quad
+		if( !isBackTile && !isFrontTile && !isRightTile && (!isRightTileSolid) )
+		{
+			tileIndices.push_back( 20 );
+			tileIndices.push_back( 21 );
+			tileIndices.push_back( 22 );
+			tileIndices.push_back( 20 );
+			tileIndices.push_back( 22 );
+			tileIndices.push_back( 23 );
+		}
+	}
+}
+
+bool TileMap::IsTileSolidAtCoords( IntVec2 const& tileCoords )
+{
+	//if tile doesn't exist its solid
+	if( tileCoords.x < 0 || tileCoords.x >= m_mapSize.x )
+	{
+		return true;
+	}
+	if( tileCoords.y < 0 || tileCoords.y >= m_mapSize.y )
+	{
+		return true;
+	}
+
+	MapTile const& tile = GetMapTileAtTileCoords( tileCoords );
+	return tile.m_tempIsSolid;
+
+}
+
+MapTile const& TileMap::GetMapTileAtTileCoords( IntVec2 const& tileCoords )
+{
+	int tileIndex = tileCoords.x + tileCoords.y * m_mapSize.x;
+	return m_tiles[tileIndex];
 }
 
 void TileMap::SpawnTiles()
@@ -235,7 +238,12 @@ void TileMap::SpawnTiles()
 		{
 			IntVec2 tileCoords = IntVec2( widthIndex, heightIndex );
 			MapTile mapTile = MapTile( tileCoords );
-			mapTile.m_tempIsSolid = true;
+			mapTile.m_tempIsSolid = false;
+
+			if( widthIndex == 0 || heightIndex == 0 || widthIndex + 1 == m_mapSize.x || heightIndex + 1 == m_mapSize.y )
+			{
+				mapTile.m_tempIsSolid = true;
+			}
 			m_tiles.push_back( mapTile );
 
 		}
