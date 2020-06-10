@@ -1,8 +1,8 @@
 #pragma once
 #include "Game/Map.hpp"
-//#include "Engine/Core/Vertex_PCUTBN.hpp"
-#include "Engine/Math/IntVec2.hpp"
 #include "Game/Game.hpp"
+#include "Game/MapTile.hpp"
+#include "Engine/Math/IntVec2.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 
@@ -18,7 +18,7 @@ public:
 
 private:
 
-	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 centerPosition );
+	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile );
 
 	void RenderTiles();
 	void RenderEntities();
@@ -31,6 +31,7 @@ private:
 	//std::vector<Tile> m_tiles;
 	std::vector<Vertex_PCUTBN> m_vertsToRender;
 	std::vector<uint> m_tileIndices;
+	std::vector<MapTile> m_tiles;
 	IntVec2 m_mapSize;
 	int m_NumOftiles = 0;
 };
