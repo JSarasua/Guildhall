@@ -160,7 +160,7 @@ void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& til
 	if( tile.m_tempIsSolid )
 	{
 		//Back quad
-		if( (!isBackTile && !isLeftTile && !isRightTile) && (!isBackTileSolid) )
+		if( !isBackTileSolid )
 		{
 			tileIndices.push_back( 8 );
 			tileIndices.push_back( 9 );
@@ -171,7 +171,7 @@ void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& til
 		}
 
 		//Front quad
-		if( !isFrontTile && !isLeftTile && !isRightTile && (!isFrontTileSolid) )
+		if( !isFrontTileSolid )
 		{
 			tileIndices.push_back( 12 );
 			tileIndices.push_back( 13 );
@@ -183,7 +183,7 @@ void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& til
 
 
 		//Left quad
-		if( !isBackTile && !isLeftTile && !isFrontTile && (!isLeftTileSolid) )
+		if( !isLeftTileSolid )
 		{
 			tileIndices.push_back( 16 );
 			tileIndices.push_back( 17 );
@@ -195,7 +195,7 @@ void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& til
 
 
 		//Right quad
-		if( !isBackTile && !isFrontTile && !isRightTile && (!isRightTileSolid) )
+		if( !isRightTileSolid )
 		{
 			tileIndices.push_back( 20 );
 			tileIndices.push_back( 21 );
