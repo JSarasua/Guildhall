@@ -10,9 +10,12 @@ public:
 	MapRegionType( XmlElement const& element );
 	~MapRegionType(){}
 
+	bool IsSolid() const;
+	
 	static void InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement );
-
+	static MapRegionType* GetMapRegionTypeByString( std::string const& mapRegionName );
 	static std::map< std::string, MapRegionType*> s_definitions;
+
 
 protected:
 	std::string m_name;

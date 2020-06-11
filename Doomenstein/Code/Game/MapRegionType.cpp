@@ -8,6 +8,11 @@ MapRegionType::MapRegionType( XmlElement const& element )
 	m_isSolid = ParseXMLAttribute( element, "isSolid", false );
 }
 
+bool MapRegionType::IsSolid() const
+{
+	return m_isSolid;
+}
+
 void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement )
 {
 	for( const XmlElement* element = rootMapRegionElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
@@ -20,5 +25,14 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 			s_definitions[mapRegionName] = mapRegion;
 		}
 	}
+}
+
+MapRegionType* MapRegionType::GetMapRegionTypeByString( std::string const& mapRegionName )
+{
+	auto mapRegionIter = s_definitions.find( mapRegionName );
+	GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find map region by name" );
+
+	MapRegionType* mapRegionType = mapRegionIter->second;
+	return mapRegionType;
 }
 
