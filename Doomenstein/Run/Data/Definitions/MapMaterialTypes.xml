@@ -1,4 +1,4 @@
-<MapMaterialTypes>
+<MapMaterialTypes default="InvalidMaterial">
 
 	<MaterialsSheet name="TestTerrain" layout="8,8">
 		<Diffuse image="Data/Images/Terrain_8x8.png"/>
@@ -8,9 +8,21 @@
 	<!-- ToDo: we'll add multiple terrain sprite sheet sets here later -->
 
 	<MaterialType
-		name="Grass"
+		name="TestMaterial"
 		sheet="TestTerrain"
 		spriteCoords="0,0"
+		/>
+
+	<MaterialType
+		name="InvalidMaterial"
+		sheet="TestTerrain"
+		spriteCoords="7,7"
+		/>
+
+	<MaterialType
+		name="Grass"
+		sheet="TestTerrain"
+		spriteCoords="0,1"
 		/>
 
 	<MaterialType

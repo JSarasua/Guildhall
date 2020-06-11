@@ -1,4 +1,18 @@
-<MapRegionTypes>
+<MapRegionTypes default="InvalidRegion">
+
+	<RegionType name="InvalidRegion" isSolid="false">
+		<Floor material="InvalidMaterial"/>
+		<Ceiling material="InvalidMaterial"/>
+	</RegionType>
+
+	<RegionType name="TestRegionOpen" isSolid="false">
+		<Floor material="TestMaterial"/>
+		<Ceiling material="TestMaterial"/>
+	</RegionType>
+
+	<RegionType name="TestRegionSolid" isSolid="true">
+		<Side material="TestMaterial"/>
+	</RegionType>
 
 	<RegionType name="CobblestoneWall" isSolid="true">
 		<Side material="Cobblestone"/>

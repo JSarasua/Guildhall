@@ -2,13 +2,13 @@
 
 	<Legend>
 		<Tile glyph="#" regionType="CobblestoneWall"/>
-		<Tile glyph="B" regionType="WoodWall"/>
+		<Tile glyph="W" regionType="WoodWall"/>
 		<Tile glyph="." regionType="StoneFloor"/>
 		<Tile glyph="," regionType="GrassFloor"/>
 	</Legend>
 	<MapRows>
-		<MapRow tiles="BBBB####"/>
-		<MapRow tiles="B,,,.#.#"/>
+		<MapRow tiles="WWWW####"/>
+		<MapRow tiles="W,,,.#.#"/>
 		<MapRow tiles="###,#..#"/>
 		<MapRow tiles="#..,#.##"/>
 		<MapRow tiles="#.#,#..#"/>
