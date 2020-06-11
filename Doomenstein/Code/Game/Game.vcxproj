@@ -191,6 +191,9 @@
     <ClCompile Include="GameCommon.cpp" />
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapDefinition.cpp" />
+    <ClCompile Include="MapMaterialType.cpp" />
+    <ClCompile Include="MapRegionType.cpp" />
     <ClCompile Include="MapTile.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -205,6 +208,9 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="Map.hpp" />
+    <ClInclude Include="MapDefinition.hpp" />
+    <ClInclude Include="MapMaterialType.hpp" />
+    <ClInclude Include="MapRegionType.hpp" />
     <ClInclude Include="MapTile.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Tile.hpp" />
@@ -330,7 +336,15 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="..\..\Run\Data\Definitions\EntityTypes.xml" />
+    <Xml Include="..\..\Run\Data\Definitions\MapMaterialTypes.xml" />
+    <Xml Include="..\..\Run\Data\Definitions\MapRegionTypes.xml" />
     <Xml Include="..\..\Run\Data\GameConfig.xml" />
+    <Xml Include="..\..\Run\Data\Maps\EmptyRoom.xml" />
+    <Xml Include="..\..\Run\Data\Maps\SingleBlock.xml" />
+    <Xml Include="..\..\Run\Data\Maps\TestRoom.xml" />
+    <Xml Include="..\..\Run\Data\Maps\TwistyMaze.xml" />
+    <Xml Include="..\..\Run\Data\Maps\UVTest.xml" />
     <Xml Include="..\..\Run\Data\Materials\TestMaterial.xml" />
     <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml" />
   </ItemGroup>

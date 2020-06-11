@@ -12,8 +12,10 @@ World::World( Game* game ) :
 
 void World::Startup()
 {
+	XmlDocument singleBlockMap		= new XmlDocument;
+	XmlElement const& singleBlockMapDef = GetRootElement( singleBlockMap, "Data/Maps/SingleBlock.xml");
 	//Create 
-	m_currentMap = new TileMap( m_game );
+	m_currentMap = new TileMap( singleBlockMapDef, m_game );
 }
 
 void World::Shutdown()

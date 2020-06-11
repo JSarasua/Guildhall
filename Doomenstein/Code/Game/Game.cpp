@@ -23,6 +23,8 @@
 #include "Game/World.hpp"
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Game/MapRegionType.hpp"
+#include "Game/MapMaterialType.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -133,6 +135,18 @@ void Game::Shutdown()
 }
 
 void Game::RunFrame(){}
+
+void Game::InitializeDefinitions()
+{
+	XmlDocument mapMaterialDoc;
+	XmlDocument mapRegionDoc;
+
+	XmlElement const& mapMaterialTypeRoot = GetRootElement( mapMaterialDoc, "Data/Definitions/MapMaterialTypes.xml" );
+	XmlElement const& mapRegionTypeRoot = GetRootElement( mapRegionDoc, "Data/Definitions/MapRegionTypes.xml" );
+
+	MapMaterialType::InitializeMapMaterialDefinitions( mapMaterialTypeRoot );
+	MapRegionType::InitializeMapRegionDefinitions( mapRegionTypeRoot );
+}
 
 void Game::Update()
 {

@@ -17,6 +17,12 @@
     <Filter Include="GameConfig">
       <UniqueIdentifier>{4a0d1909-9c36-4f49-8845-cc57c2e31342}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Maps">
+      <UniqueIdentifier>{96ae0c9d-2be5-42c4-a712-5dd49bc80472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Definitions">
+      <UniqueIdentifier>{1ec80f21-9f44-48ca-a030-30531e1c6ddc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Windows.cpp">
@@ -50,6 +56,15 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="MapTile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapRegionType.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapMaterialType.cpp">
       <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
@@ -88,6 +103,15 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="MapTile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapRegionType.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapMaterialType.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
@@ -156,6 +180,30 @@
     </Xml>
     <Xml Include="..\..\Run\Data\GameConfig.xml">
       <Filter>GameConfig</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\EmptyRoom.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\SingleBlock.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TestRoom.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TwistyMaze.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\UVTest.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\EntityTypes.xml">
+      <Filter>Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapMaterialTypes.xml">
+      <Filter>Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapRegionTypes.xml">
+      <Filter>Definitions</Filter>
     </Xml>
   </ItemGroup>
 </Project>

@@ -3,9 +3,9 @@
 
 extern RenderContext* g_theRenderer;
 
-TileMap::TileMap( Game* game ) : Map( game )
+TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 {
-	m_mapSize = IntVec2( 8, 8 );
+	m_mapSize = ParseXMLAttribute( element, "dimensions", IntVec2( 8, 8 ) );
 	SpawnTiles();
 }
 

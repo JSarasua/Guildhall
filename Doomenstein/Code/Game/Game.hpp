@@ -78,6 +78,8 @@ public:
 	void Shutdown();
 	void RunFrame();
 
+	void InitializeDefinitions();
+
 	void Update();
 	void Render();
 
