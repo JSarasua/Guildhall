@@ -5,6 +5,7 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include <vector>
+#include <map>
 
 class TileMap : public Map
 {
@@ -24,11 +25,14 @@ private:
 	bool IsTileSolidAtCoords( IntVec2 const& tileCoords );
 	MapTile const& GetMapTileAtTileCoords( IntVec2 const& tileCoords );
 	
+	void ParseLegend( XmlElement const& legendElement );
+	void SpawnTiles( XmlElement const& mapRowsElement );
+	void SpawnMapRow( std::string const& mapRow, uint heightIndex );
+
 	void RenderTiles();
 	void RenderEntities();
 	void UpdateTiles( float deltaSeconds );
 	void UpdateEntities( float deltaSeconds );
-	void SpawnTiles();
 	void SpawnEntities();
 
 private:
@@ -38,4 +42,6 @@ private:
 	std::vector<MapTile> m_tiles;
 	IntVec2 m_mapSize;
 	int m_NumOftiles = 0;
+
+	std::map< unsigned char, std::string > m_legend;
 };
