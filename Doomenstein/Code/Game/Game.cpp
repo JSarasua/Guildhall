@@ -45,6 +45,8 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	InitializeDefinitions();
+
 	EnableDebugRendering();
 	m_camera = Camera();
 	m_camera.SetColorTarget(nullptr); // we use this
