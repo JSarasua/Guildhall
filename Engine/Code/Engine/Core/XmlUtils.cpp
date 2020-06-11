@@ -60,7 +60,7 @@ char ParseXMLAttribute( const XmlElement& element, const char* attributeName, ch
 	char value = defaultValue;
 	if( attribute )
 	{
-		value = (char)atoi( attribute );
+		value = attribute[0];
 	}
 	return value;
 }
