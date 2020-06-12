@@ -23,9 +23,6 @@ MapMaterialType::MapMaterialType( XmlElement const& element )
 	spriteSheet->GetSpriteUVs( uvAtMins, uvAtMaxs, spriteIndex );
 
 	m_spriteDefinition = new SpriteDefinition( *spriteSheet, spriteIndex, uvAtMins, uvAtMaxs );
-	
-//	IntVec2 ceilingSpriteCoords		= ParseXMLAttribute(element, "spriteCoords", IntVec2( -1,-1 ) );
-// 	IntVec2 sideSpriteCoords		= ParseXMLAttribute(element, "spriteCoords", IntVec2( -1,-1 ) );
 }
 
 void MapMaterialType::InitializeMapMaterialDefinitions( const XmlElement& rootMapMaterialElement )
