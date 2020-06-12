@@ -22,12 +22,7 @@ public:
 protected:
 	std::string m_name;
 
-	SpriteDefinition* m_floorSpriteDefinition = nullptr;
+	SpriteDefinition* m_spriteDefinition = nullptr;
 	
-	//Floor
-	IntVec2 m_floorSpriteUVs;
-	//Ceiling
-	IntVec2 m_ceilingSpriteUVs;
-	//Side
-	IntVec2 m_sideSpriteUVs;
+
 };
