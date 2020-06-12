@@ -231,28 +231,22 @@ void Game::Render()
 
 	g_theRenderer->BeginCamera(m_camera);
 
-	g_theRenderer->DisableLight( 0 );
-	//EnableLights();
-
-	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
-	g_theRenderer->BindTexture( testTexture );
-	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
-
-	Shader* shader = g_theRenderer->GetOrCreateShader(  "Data/Shaders/WorldOpaque.hlsl" );
-	g_theRenderer->BindShader( shader );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
-	g_theRenderer->DrawMesh( m_cubeMesh );
+// 	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+// 	g_theRenderer->BindTexture( testTexture );
+// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+// 	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
+// 
+// 	Shader* shader = g_theRenderer->GetOrCreateShader(  "Data/Shaders/WorldOpaque.hlsl" );
+// 	g_theRenderer->BindShader( shader );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
+// 
+// 	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
+// 
+// 	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
+// 	g_theRenderer->DrawMesh( m_cubeMesh );
 
 	m_world->Render();
-
-
-	//RenderProjection();
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);

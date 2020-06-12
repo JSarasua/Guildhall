@@ -92,7 +92,7 @@ void RenderContext::StartUp(Window* window)
 	m_frameUBO = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 	m_ubo = new RenderBuffer( this, UNIFORM_BUFFER_BIT, MEMORY_HINT_DYNAMIC );
 
-	m_sampDefault = new Sampler( this, SAMPLER_BILINEAR );
+	m_sampDefault = new Sampler( this, SAMPLER_POINT );
 	m_texWhite = CreateTextureFromColor( Rgba8::WHITE );
 	m_defaultNormalTex = CreateTextureFromColor( Rgba8( 128, 128, 255 ) );
 
