@@ -39,6 +39,9 @@ void TileMap::Update( float deltaSeconds )
 
 void TileMap::Render()
 {
+	//Should always be the same texture for ceiling, side, and floor
+	Texture const& texture = m_tiles[0].GetTexture( eMapMaterialArea::SIDE );
+	g_theRenderer->BindTexture( &texture );
 	g_theRenderer->SetModelMatrix( Mat44() );
 	g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
 }
@@ -54,11 +57,6 @@ void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVert
 	float cubeHalfHeight = 0.5f;
 	float c = cubeHalfHeight;
 
-	Vec2 bLeft( 0.f, 0.f );
-	Vec2 tRight( 1.f, 1.f );
-	Vec2 tLeft( 0.f, 1.f );
-	Vec2 bRight( 1.f, 0.f );
-
 	Vec3 forward	= Vec3( 0.f, 0.f, 1.f );
 	Vec3 right	= Vec3( 1.f, 0.f, 0.f );
 	Vec3 back		= Vec3( 0.f, 0.f, -1.f );
@@ -66,64 +64,216 @@ void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVert
 	Vec3 up		= Vec3( 0.f, 1.f, 0.f );
 	Vec3 down		= Vec3( 0.f, -1.f, 0.f );
 
-	Vertex_PCUTBN cubeVerts[24] =
+	Vertex_PCUTBN cubeVerts[24];
+	if( tile.IsSolid() )
 	{
+		Vec2 sideBLeft;
+		Vec2 sideTRight;
+
+		tile.GetUVs( sideBLeft, sideTRight, eMapMaterialArea::SIDE );
+
+		Vec2 sideTLeft( sideBLeft.x, sideTRight.y );
+		Vec2 sideBRight( sideTRight.x, sideBLeft.y );
+
 		//Top quad
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, forward, right, up ),		//3
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, forward, right, up ),		//2
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bLeft, forward, right, up ),		//1
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bRight,  forward, right, up ),	//0
-		
+		cubeVerts[0] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTRight, forward, right, up );		//3
+		cubeVerts[1] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft, forward, right, up );		//2
+		cubeVerts[2] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideBLeft, forward, right, up );		//1
+		cubeVerts[3] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideBRight,  forward, right, up );	//0
+
 		//Bottom quad
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		tRight, back, left, up ),		//11
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		tLeft, back, left, up ),		//10
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bLeft, back, left, up ),		//9
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight,	back, left, up ),		//8
-
+		cubeVerts[4] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		sideTRight, back, left, up );		//11
+		cubeVerts[5] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft, back, left, up );		//10
+		cubeVerts[6] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	sideBLeft, back, left, up );		//9
+		cubeVerts[7] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBRight,	back, left, up );		//8
+	
 		//Back quad
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft,	right, back, up ),		//4
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, right, back, up ),		//5
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, right, back, up ),		//6
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, right, back, up ),		//7
+		cubeVerts[8] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft,	right, back, up );		//4
+		cubeVerts[9] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBLeft, right, back, up );		//5
+		cubeVerts[10] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBRight, right, back, up );		//6
+		cubeVerts[11] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTRight, right, back, up );		//7
 		
-
 		//Front quad
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bRight,	left, forward, up ),		//12
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, left, forward, up ),		//13
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, left, forward, up ),			//14
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, left, forward, up ),		//15
-
+		cubeVerts[12] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	sideBRight,	left, forward, up );		//12
+		cubeVerts[13] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideTRight, left, forward, up );		//13
+		cubeVerts[14] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft, left, forward, up );			//14
+		cubeVerts[15] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBLeft, left, forward, up );		//15
+			
 		//Left quad
-		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight,	up, right, back ),		//16
-		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, up, right, back ),		//17
-		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, up, right, back ),		//18
-		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,			bRight, up, right, back ),		//19
-
+		cubeVerts[16] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTRight,	up, right, back );		//16
+		cubeVerts[17] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft, up, right, back );		//17
+		cubeVerts[18] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBLeft, up, right, back );		//18
+		cubeVerts[19] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,			sideBRight, up, right, back );		//19
+			
 		//Right quad
-		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bLeft,	down, right, forward ),		//20
-		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, down, right, forward ),		//21
-		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, down, right, forward ),		//22
-		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, down, right, forward )			//23
-	};
+		cubeVerts[20] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	sideBLeft,	down, right, forward );		//20
+		cubeVerts[21] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		sideBRight, down, right, forward );		//21
+		cubeVerts[22] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideTRight, down, right, forward );		//22
+		cubeVerts[23] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		sideTLeft, down, right, forward );			//23
 
-	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+
+		for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+		{
+			cubeVerts[vertexIndex].position += centerPosition;
+		}
+
+		for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+		{
+			masterVertexList.push_back( cubeVerts[vertexIndex] );
+		}
+
+		std::vector<uint> cubeIndices;
+		AddTileIndices( cubeIndices, tile );
+
+
+		for( size_t indicesIndex = 0; indicesIndex < cubeIndices.size(); indicesIndex++ )
+		{
+			masterIndexList.push_back( cubeIndices[indicesIndex] + currentVertexListSize );
+		}
+	}
+	else
 	{
-		cubeVerts[vertexIndex].position += centerPosition;
+		Vec2 floorBLeft;
+		Vec2 floorTRight;
+		tile.GetUVs( floorBLeft, floorTRight, eMapMaterialArea::FLOOR );
+		Vec2 floorTLeft( floorBLeft.x, floorTRight.y );
+		Vec2 floorBRight( floorTRight.x, floorBLeft.y );
+
+		Vec2 ceilingBLeft;
+		Vec2 ceilingTRight;
+		tile.GetUVs( ceilingBLeft, ceilingTRight, eMapMaterialArea::CEILING );
+		Vec2 ceilingTLeft( ceilingBLeft.x, ceilingTRight.y );
+		Vec2 ceilingBRight( ceilingTRight.x, ceilingBLeft.y );
+
+		//Top quad
+		cubeVerts[0] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTRight, forward, right, up );		//3
+		cubeVerts[1] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTLeft, forward, right, up );		//2
+		cubeVerts[2] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingBLeft, forward, right, up );		//1
+		cubeVerts[3] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingBRight, forward, right, up );	//0
+
+																																//Bottom quad
+		cubeVerts[4] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE, floorTRight, back, left, up );		//11
+		cubeVerts[5] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE, floorTLeft, back, left, up );		//10
+		cubeVerts[6] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE, floorBLeft, back, left, up );		//9
+		cubeVerts[7] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE, floorBRight, back, left, up );		//8
+
+																																//Back quad
+		cubeVerts[8] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTLeft, right, back, up );		//4
+		cubeVerts[9] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBLeft, right, back, up );		//5
+		cubeVerts[10] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBRight, right, back, up );		//6
+		cubeVerts[11] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTRight, right, back, up );		//7
+
+																															//Front quad
+		cubeVerts[12] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBRight, left, forward, up );		//12
+		cubeVerts[13] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTRight, left, forward, up );		//13
+		cubeVerts[14] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTLeft, left, forward, up );			//14
+		cubeVerts[15] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBLeft, left, forward, up );		//15
+
+																																//Left quad
+		cubeVerts[16] =	Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTRight, up, right, back );		//16
+		cubeVerts[17] =	Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTLeft, up, right, back );		//17
+		cubeVerts[18] =	Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBLeft, up, right, back );		//18
+		cubeVerts[19] =	Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBRight, up, right, back );		//19
+
+																																	//Right quad
+		cubeVerts[20] =	Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBLeft, down, right, forward );		//20
+		cubeVerts[21] =	Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE, ceilingBRight, down, right, forward );		//21
+		cubeVerts[22] =	Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTRight, down, right, forward );		//22
+		cubeVerts[23] =	Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE, ceilingTLeft, down, right, forward );			//23
+
+
+		for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+		{
+			cubeVerts[vertexIndex].position += centerPosition;
+		}
+
+		for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+		{
+			masterVertexList.push_back( cubeVerts[vertexIndex] );
+		}
+
+		std::vector<uint> cubeIndices;
+		AddTileIndices( cubeIndices, tile );
+
+
+		for( size_t indicesIndex = 0; indicesIndex < cubeIndices.size(); indicesIndex++ )
+		{
+			masterIndexList.push_back( cubeIndices[indicesIndex] + currentVertexListSize );
+		}
 	}
 
-	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
-	{
-		masterVertexList.push_back( cubeVerts[vertexIndex] );
-	}
-
-	std::vector<uint> cubeIndices;
-	AddTileIndices( cubeIndices, tile );
 
 
-	for( size_t indicesIndex = 0; indicesIndex < cubeIndices.size(); indicesIndex++ )
-	{
-		masterIndexList.push_back( cubeIndices[indicesIndex] + currentVertexListSize );
-	}
+
+
+
+// 	Vec2 bLeft;
+// 	Vec2 tRight;
+// 	tile.GetUVs( bLeft, tRight, eMapMaterialArea::CEILING );
+// 
+// 	Vec2 tLeft( bLeft.x, tRight.y );
+// 	Vec2 bRight( tRight.x, bLeft.y );
+// 
+// 
+// 
+// 	Vertex_PCUTBN cubeVerts[24] = 
+// 	{
+// 		//Top quad
+// 		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, forward, right, up ),		//3
+// 		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, forward, right, up ),		//2
+// 		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bLeft, forward, right, up ),		//1
+// 		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		bRight,  forward, right, up ),	//0
+// 		
+// 		//Bottom quad
+// 		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		tRight, back, left, up ),		//11
+// 		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		tLeft, back, left, up ),		//10
+// 		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bLeft, back, left, up ),		//9
+// 		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight,	back, left, up ),		//8
+// 
+// 		//Back quad
+// 		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft,	right, back, up ),		//4
+// 		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, right, back, up ),		//5
+// 		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, right, back, up ),		//6
+// 		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, right, back, up ),		//7
+// 		
+// 
+// 		//Front quad
+// 		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bRight,	left, forward, up ),		//12
+// 		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, left, forward, up ),		//13
+// 		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, left, forward, up ),			//14
+// 		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, left, forward, up ),		//15
+// 
+// 		//Left quad
+// 		Vertex_PCUTBN( Vec3( -c, c, c ) * nonUniformScale, Rgba8::WHITE,		tRight,	up, right, back ),		//16
+// 		Vertex_PCUTBN( Vec3( c, c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, up, right, back ),		//17
+// 		Vertex_PCUTBN( Vec3( c, c, -c ) * nonUniformScale, Rgba8::WHITE,		bLeft, up, right, back ),		//18
+// 		Vertex_PCUTBN( Vec3( -c, c, -c ) * nonUniformScale, Rgba8::WHITE,			bRight, up, right, back ),		//19
+// 
+// 		//Right quad
+// 		Vertex_PCUTBN( Vec3( -c, -c, -c ) * nonUniformScale, Rgba8::WHITE,	bLeft,	down, right, forward ),		//20
+// 		Vertex_PCUTBN( Vec3( c, -c, -c ) * nonUniformScale, Rgba8::WHITE,		bRight, down, right, forward ),		//21
+// 		Vertex_PCUTBN( Vec3( c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tRight, down, right, forward ),		//22
+// 		Vertex_PCUTBN( Vec3( -c, -c, c ) * nonUniformScale, Rgba8::WHITE,		tLeft, down, right, forward )			//23
+// 	};
+// 
+// 	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+// 	{
+// 		cubeVerts[vertexIndex].position += centerPosition;
+// 	}
+// 
+// 	for( int vertexIndex = 0; vertexIndex < 24; vertexIndex++ )
+// 	{
+// 		masterVertexList.push_back( cubeVerts[vertexIndex] );
+// 	}
+// 
+// 	std::vector<uint> cubeIndices;
+// 	AddTileIndices( cubeIndices, tile );
+// 
+// 
+// 	for( size_t indicesIndex = 0; indicesIndex < cubeIndices.size(); indicesIndex++ )
+// 	{
+// 		masterIndexList.push_back( cubeIndices[indicesIndex] + currentVertexListSize );
+// 	}
 }
 
 void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& tile )
