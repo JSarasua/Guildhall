@@ -4,6 +4,10 @@
 #include <map>
 #include <string>
 
+class Texture;
+class SpriteSheet;
+class SpriteDefinition;
+
 class MapMaterialType
 {
 public:
@@ -12,11 +16,13 @@ public:
 	~MapMaterialType() {}
 
 	static void InitializeMapMaterialDefinitions( const XmlElement& rootMapMaterialElement );
-
+	static std::map< std::string, SpriteSheet*> s_textures;
 	static std::map< std::string, MapMaterialType*> s_definitions;
 
 protected:
 	std::string m_name;
+
+	SpriteDefinition* m_floorSpriteDefinition = nullptr;
 	
 	//Floor
 	IntVec2 m_floorSpriteUVs;
