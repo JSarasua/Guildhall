@@ -2,6 +2,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
+#include "Engine/Renderer/Texture.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -24,6 +25,17 @@ MapMaterialType::MapMaterialType( XmlElement const& element )
 
 	m_spriteDefinition = new SpriteDefinition( *spriteSheet, spriteIndex, uvAtMins, uvAtMaxs );
 }
+
+void MapMaterialType::GetUVs( Vec2& uvAtMins, Vec2& uvAtMaxs )
+{
+	m_spriteDefinition->GetUVs( uvAtMins, uvAtMaxs );
+}
+
+Texture const& MapMaterialType::GetTexture()
+{
+	return m_spriteDefinition->GetTexture();
+}
+
 
 void MapMaterialType::InitializeMapMaterialDefinitions( const XmlElement& rootMapMaterialElement )
 {

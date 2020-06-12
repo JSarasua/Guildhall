@@ -15,6 +15,10 @@ public:
 	MapMaterialType( XmlElement const& element );
 	~MapMaterialType() {}
 
+	void GetUVs( Vec2& uvAtMins, Vec2& uvAtMaxs );
+	Texture const& GetTexture();
+
+
 	static void InitializeMapMaterialDefinitions( const XmlElement& rootMapMaterialElement );
 	static std::map< std::string, SpriteSheet*> s_textures;
 	static std::map< std::string, MapMaterialType*> s_definitions;

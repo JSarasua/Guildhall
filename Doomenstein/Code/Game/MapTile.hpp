@@ -1,11 +1,12 @@
 #pragma once
+#include "Game/MapRegionType.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include <vector>
 
 struct AABB2;
 struct Vertex_PCU;
 
-class MapRegionType;
+
 
 class MapTile
 {
@@ -14,6 +15,9 @@ public:
 	~MapTile() {}
 
 	MapTile( const IntVec2& tileCoords, MapRegionType* mapRegionType );
+
+	void GetUVs( Vec2& uvAtMins, Vec2& uvAtMaxs, eMapMaterialArea mapMaterialArea ) const;
+	Texture const& GetTexture( eMapMaterialArea mapMaterialArea );
 
 	bool IsSolid() const;
 

@@ -42,6 +42,44 @@ bool MapRegionType::IsSolid() const
 	return m_isSolid;
 }
 
+void MapRegionType::GetUVs( Vec2& uvAtMins, Vec2& uvAtMaxs, eMapMaterialArea mapMaterialArea ) const
+{
+	switch( mapMaterialArea )
+	{
+	case eMapMaterialArea::FLOOR:
+		m_floorMaterialType->GetUVs( uvAtMins, uvAtMaxs );
+		break;
+	case eMapMaterialArea::CEILING:
+		m_ceilingMaterialType->GetUVs( uvAtMins, uvAtMaxs );
+		break;
+	case eMapMaterialArea::SIDE:
+		m_sideMaterialType->GetUVs( uvAtMins, uvAtMaxs );
+		break;
+	default:
+		ERROR_AND_DIE("Invalid Map Material Area, should be floor, ceiling, or side" );
+		break;
+	}
+}
+
+Texture const& MapRegionType::GetTexture( eMapMaterialArea mapMaterialArea )
+{
+	switch( mapMaterialArea )
+	{
+	case eMapMaterialArea::FLOOR:
+		return m_floorMaterialType->GetTexture();
+		break;
+	case eMapMaterialArea::CEILING:
+		return m_ceilingMaterialType->GetTexture();
+		break;
+	case eMapMaterialArea::SIDE:
+		return m_sideMaterialType->GetTexture();
+		break;
+	default:
+		ERROR_AND_DIE( "Invalid Map Material Area, should be floor, ceiling, or side" );
+		break;
+	}
+}
+
 void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement )
 {
 	for( const XmlElement* element = rootMapRegionElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {

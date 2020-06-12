@@ -3,7 +3,15 @@
 #include <map>
 #include <string>
 
+enum class eMapMaterialArea
+{
+	FLOOR,
+	CEILING,
+	SIDE
+};
+
 class MapMaterialType;
+class Texture;
 
 class MapRegionType
 {
@@ -13,6 +21,8 @@ public:
 	~MapRegionType(){}
 
 	bool IsSolid() const;
+	void GetUVs( Vec2& uvAtMins, Vec2& uvAtMaxs, eMapMaterialArea mapMaterialArea ) const;
+	Texture const& GetTexture( eMapMaterialArea mapMaterialArea );
 	
 	static void InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement );
 	static MapRegionType* GetMapRegionTypeByString( std::string const& mapRegionName );
