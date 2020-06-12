@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 
+class MapMaterialType;
+
 class MapRegionType
 {
 public:
@@ -20,6 +22,10 @@ public:
 protected:
 	std::string m_name;
 	bool m_isSolid = false;
+
+	MapMaterialType* m_floorMaterialType = nullptr;
+	MapMaterialType* m_ceilingMaterialType = nullptr;
+	MapMaterialType* m_sideMaterialType = nullptr;
 	//Floor
 	//Ceiling
 	//Side
