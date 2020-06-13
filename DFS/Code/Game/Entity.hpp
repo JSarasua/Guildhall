@@ -54,6 +54,8 @@ public:
 	bool IsOffScreen();
 	Vec2 GetForwardVector();
 	float GetOrientationDegrees();
+	float GetWeaponOrientationDegrees();
+	Vec2 GetWeaponStartPosition();
 	bool IsAlive();
 	void SetAlive();
 	const Vec2 GetPosition();
@@ -68,7 +70,9 @@ public:
 protected:
 	Vec2 m_position = Vec2(0.f,0.f);
 	Vec2 m_velocity = Vec2(0.f,0.f);
+	Vec2 m_weaponOffset = Vec2( 0.f, 0.f );
 	float m_orientationDegrees = 0.f;
+	float m_weaponOrientationDegrees = 0.f;
 	float m_angularVelocity = 1000.f;
 	float m_physicsRadius = 1000.f;
 	float m_cosmeticRadius = 2000.f;

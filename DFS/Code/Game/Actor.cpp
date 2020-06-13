@@ -118,6 +118,10 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
+	
+	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
+	Vec2 weaponDirection = mousePos - GetPosition();
+	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
 	if( leftMouseButton.WasJustPressed() )
 	{

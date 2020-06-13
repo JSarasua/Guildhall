@@ -47,6 +47,16 @@ float Entity::GetOrientationDegrees()
 	return m_orientationDegrees;
 }
 
+float Entity::GetWeaponOrientationDegrees()
+{
+	return m_weaponOrientationDegrees;
+}
+
+Vec2 Entity::GetWeaponStartPosition()
+{
+	return m_position + m_weaponOffset;
+}
+
 bool Entity::IsAlive()
 {
 	return !m_isDead;

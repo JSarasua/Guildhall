@@ -309,7 +309,6 @@ void Map::SpawnEntities()
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
 	m_entities.push_back( new Actor( Vec2( 3.5f, 3.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef ) );
 	m_entities.push_back( new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef ) );
-	m_entities.push_back( new Bullet( Vec2(2.5f, 2.5f ), 0.f, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD ) );
 }
 
 
@@ -332,7 +331,7 @@ void Map::SpawnBullets()
 void Map::SpawnBullet( Entity* shooter )
 {
 	Vec2 bulletPosition = shooter->GetPosition() + shooter->GetForwardVector();
-	float bulletOrientation = shooter->GetOrientationDegrees();
+	float bulletOrientation = shooter->GetWeaponOrientationDegrees();
 
 	bool didAddBullet = false;
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
