@@ -293,11 +293,11 @@ void Map::SpawnEntities()
 	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
 
 	m_entities.push_back( new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1));
-	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
-	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
-	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
-	//m_entities.push_back( new Actor(Vec2(3.5f, 3.5f),Vec2(0.f,0.f), 0.f, 0.f, maryActorDef));
-	//m_entities.push_back( new Actor(Vec2(4.5f, 4.5f),Vec2(0.f,0.f), 0.f, 0.f, josenActorDef));
+// 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
+// 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
+// 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
+	m_entities.push_back( new Actor( Vec2( 3.5f, 3.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef ) );
+	m_entities.push_back( new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef ) );
 }
 
 
