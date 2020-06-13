@@ -46,8 +46,6 @@ void Game::Startup()
 	m_player = m_world->GetPlayer();
 	m_numTilesInViewVertically = GAME_CAMERA_Y;
 	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
-// 	m_camera.SetOrthoView(Vec2(0.f, 0.f), Vec2(m_numTilesInViewHorizontally, m_numTilesInViewVertically));
-// 	m_UICamera.SetOrthoView(Vec2(0.f, 0.f), Vec2(UI_CAMERA_X, UI_CAMERA_Y));
 
 	EnableDebugRendering();
 	m_camera = Camera();
@@ -62,13 +60,10 @@ void Game::Startup()
 	m_UICamera.SetProjectionOrthographic( m_UICamera.m_outputSize, 0.f, 100.f );
 	m_UICamera.SetPosition( Vec2(UI_CAMERA_X, UI_CAMERA_Y) * 0.5f );
 
-	AddDevConsoleTest();
-	AddAlignedTextTest();
-	AddImageTest();
-	//AddBlackboardTest();
-
-
-
+	// 	AddDevConsoleTest();
+	// 	AddAlignedTextTest();
+	// 	AddImageTest();
+	//	AddBlackboardTest();
 }
 
 void Game::Shutdown(){}
@@ -77,31 +72,30 @@ void Game::RunFrame(){}
 
 void Game::Update( float deltaSeconds )
 {
+	if( !g_theConsole->IsOpen() )
+	{
+		CheckButtonPresses( deltaSeconds );
+	}
 	m_world->Update(deltaSeconds);
 
 	UpdateCamera( deltaSeconds );
 	//UpdateCameras();
-	UpdateConsoleTest( deltaSeconds );
-	UpdateAlignedTextTest( deltaSeconds );
+// 	UpdateConsoleTest( deltaSeconds );
+// 	UpdateAlignedTextTest( deltaSeconds );
 	UpdateDebugMouse();
-	UpdateImageTest(deltaSeconds);
-	UpdateBlackboardTest(deltaSeconds);
-	CheckButtonPresses( deltaSeconds );
+// 	UpdateImageTest(deltaSeconds);
+// 	UpdateBlackboardTest(deltaSeconds);
+
 }
 
 void Game::Render()
 {
 	g_theRenderer->ClearScreen( Rgba8::BLACK );
-// 	for( int cameraIndex = 0; cameraIndex < m_cameras.size(); cameraIndex++ )
-// 	{
-// 		g_theRenderer->BeginCamera( m_cameras[cameraIndex], (Viewport)cameraIndex );
-// 		RenderGame();
-// 		g_theRenderer->EndCamera( m_cameras[cameraIndex] );
-// 	}
 
 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
 	m_camera.SetColorTarget( 0, colorTarget );
+	m_UICamera.SetColorTarget( 0, colorTarget );
 
  	g_theRenderer->BeginCamera( m_camera );
 	g_theRenderer->SetModelMatrix( Mat44() );
@@ -111,6 +105,10 @@ void Game::Render()
 	g_theRenderer->BindShader( (Shader*)nullptr );
  	RenderGame();
  	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->BeginCamera( m_UICamera );
+	RenderUI();
+	g_theRenderer->EndCamera( m_UICamera );
 
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 	m_camera.SetColorTarget( nullptr );
@@ -122,9 +120,7 @@ void Game::Render()
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
 
-	g_theRenderer->BeginCamera( m_UICamera );
-	RenderUI();
-	g_theRenderer->EndCamera( m_UICamera );
+
 }
 
 
@@ -215,17 +211,17 @@ void Game::RenderGame()
 {
 	m_world->Render();
 
-	RenderDebugMouse();
+	//RenderDebugMouse();
 }
 
 void Game::RenderUI()
 {
-	RenderConsoleTest();
-	RenderAlignedTextTest();
-	RenderImageTest();
-	RenderBlackboardTest();
-	RenderMouseTest();
-	m_world->RenderDebug();
+// 	RenderAlignedTextTest();
+// 	RenderImageTest();
+// 	RenderBlackboardTest();
+// 	RenderMouseTest();
+//	m_world->RenderDebug();
+	RenderConsole();
 }
 
 void Game::CheckButtonPresses(float deltaSeconds)
@@ -235,12 +231,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const XboxController& controller = g_theInput->GetXboxController(0);
 	
 	if( controller.GetButtonState( XBOX_BUTTON_ID_Y ).WasJustPressed() )
-	{
-		g_theConsole->SetIsOpen(!g_theConsole->IsOpen());
-	}
-
-	const KeyButtonState& tildeKey = g_theInput->GetKeyStates(0xC0);	//tilde: ~
-	if( tildeKey.WasJustPressed() )
 	{
 		g_theConsole->SetIsOpen(!g_theConsole->IsOpen());
 	}
@@ -291,7 +281,7 @@ void Game::RenderDebugMouse()
 	g_theRenderer->DrawAlignedTextAtPosition(mousePositionString.c_str(), topRightBox, 0.1f, ALIGN_CENTER_RIGHT);
 }
 
-void Game::RenderConsoleTest() const
+void Game::RenderConsole() const
 {
 	g_theConsole->Render(*g_theRenderer,m_UICamera,TESTTEXTLINEHEIGHT);
 }

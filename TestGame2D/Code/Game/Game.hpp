@@ -49,7 +49,7 @@ private:
 	//Renders
 	void RenderGame();
 	void RenderUI();
-	void RenderConsoleTest() const;
+	void RenderConsole() const;
 	void RenderAlignedTextTest() const;
 	void RenderImageTest() const;
 	void RenderBlackboardTest() const;
