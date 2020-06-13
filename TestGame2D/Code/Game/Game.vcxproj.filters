@@ -160,5 +160,8 @@
     <FxCompile Include="..\..\Run\Data\Shaders\Default.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\WorldOpaque.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
