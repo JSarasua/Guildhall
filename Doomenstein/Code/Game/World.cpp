@@ -13,7 +13,7 @@ World::World( Game* game ) :
 void World::Startup()
 {
 	XmlDocument singleBlockMap		= new XmlDocument;
-	XmlElement const& singleBlockMapDef = GetRootElement( singleBlockMap, "Data/Maps/EmptyRoom.xml");
+	XmlElement const& singleBlockMapDef = GetRootElement( singleBlockMap, "Data/Maps/TwistyMaze.xml");
 	//Create 
 	m_currentMap = new TileMap( singleBlockMapDef, m_game );
 }
