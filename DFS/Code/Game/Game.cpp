@@ -137,9 +137,11 @@ void Game::LoadAssets()
 	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Terrain_8x8.png" );
 	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaCharacters_12x53.png" );
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
+	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
 	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(8,8));
 	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(12,53));
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
+	g_weaponSpriteSheet = new SpriteSheet(*weaponSpriteSheetTexture, IntVec2(12, 12) );
 }
 
 void Game::UpdateCamera( float deltaSeconds )

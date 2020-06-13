@@ -54,7 +54,7 @@ public:
 	bool IsOffScreen();
 	Vec2 GetForwardVector();
 	float GetOrientationDegrees();
-	float GetWeaponOrientationDegrees();
+	float GetWeaponOrientationDegrees() const;
 	Vec2 GetWeaponStartPosition();
 	bool IsAlive();
 	void SetAlive();

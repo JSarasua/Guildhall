@@ -47,7 +47,7 @@ float Entity::GetOrientationDegrees()
 	return m_orientationDegrees;
 }
 
-float Entity::GetWeaponOrientationDegrees()
+float Entity::GetWeaponOrientationDegrees() const
 {
 	return m_weaponOrientationDegrees;
 }

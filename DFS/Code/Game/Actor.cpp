@@ -78,6 +78,21 @@ void Actor::Render() const
 
 	g_theRenderer->BindTexture( &actorTexture );
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
+
+
+	if( m_name == "Player" )
+	{
+		const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
+		int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
+		AABB2 weaponUVs;
+		g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
+		//maxDrawBounds="0.375,0.5"
+		AABB2 weaponBounds = AABB2( Vec2( -.55f, -.5f ), Vec2( .55f, .5f ) );
+		//Vec2 weaponPosition = GetForwardVector();
+		weaponBounds.Translate( m_position );
+		g_theRenderer->BindTexture( &weaponTexture );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds,actorTint,weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
+	}
 }
 
 void Actor::UpdateFromJoystick()
