@@ -73,6 +73,9 @@
     <ClCompile Include="TileMetaData.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -130,6 +133,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="TileMetaData.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

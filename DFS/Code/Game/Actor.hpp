@@ -39,6 +39,7 @@ protected:
 	float m_timeSinceCreation = 0.f;
 	float m_timeUntilNextGoalPosition = 2.f;
 	PlayerController m_playerController = Invalid_Player;
+
 private:
 	void UpdateNPC( float deltaSeconds );
 	void GetNewGoalPosition();

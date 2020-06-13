@@ -1,5 +1,6 @@
-#include "Game/TileMetaData.hpp"
 #include "Game/Map.hpp"
+#include "Game/Bullet.hpp"
+#include "Game/TileMetaData.hpp"
 #include "Game/Tile.hpp"
 #include "Game/Entity.hpp"
 #include "Game/GameCommon.hpp"
@@ -18,6 +19,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/StringUtils.hpp"
+
 
 
 extern App* g_theApp;
@@ -59,6 +61,7 @@ void Map::Update( float deltaSeconds )
 	UpdateTiles(deltaSeconds);
 	UpdateEntities(deltaSeconds);
 	UpdateDebugMode();
+	GarbageCollectEntities();
 }
 
 void Map::Render()
@@ -131,7 +134,10 @@ void Map::RenderEntities()
 {
 	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
-		m_entities[entityIndex]->Render();
+		if( !m_entities[entityIndex]->IsGarbage() )
+		{
+			m_entities[entityIndex]->Render();
+		}
 	}
 }
 
@@ -144,9 +150,14 @@ void Map::UpdateTiles( float deltaSeconds )
 
 void Map::UpdateEntities( float deltaSeconds )
 {
+	SpawnBullets();
+
 	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
-		m_entities[entityIndex]->Update(deltaSeconds);
+		if( !m_entities[entityIndex]->IsGarbage() )
+		{
+			m_entities[entityIndex]->Update(deltaSeconds);
+		}
 	}
 
 	if( !g_theApp->IsNoClipping() )
@@ -298,8 +309,48 @@ void Map::SpawnEntities()
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
 	m_entities.push_back( new Actor( Vec2( 3.5f, 3.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef ) );
 	m_entities.push_back( new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef ) );
+	m_entities.push_back( new Bullet( Vec2(2.5f, 2.5f ), 0.f, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD ) );
 }
 
+
+void Map::SpawnBullets()
+{
+	size_t entityListSize = m_entities.size();
+	for( size_t entityIndex = 0; entityIndex < entityListSize; entityIndex++ )
+	{
+		Entity* entity = m_entities[entityIndex];
+		if( !entity->IsGarbage() )
+		{
+			if( entity->IsFiring() )
+			{
+				SpawnBullet( entity );
+			}
+		}
+	}
+}
+
+void Map::SpawnBullet( Entity* shooter )
+{
+	Vec2 bulletPosition = shooter->GetPosition() + shooter->GetForwardVector();
+	float bulletOrientation = shooter->GetOrientationDegrees();
+
+	bool didAddBullet = false;
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		if( !m_entities[entityIndex] )
+		{
+			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientation, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD );
+			didAddBullet = true;
+			break;
+		}
+	}
+	if( !didAddBullet )
+	{
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientation, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD ) );
+	}
+
+	shooter->SetIsFiring( false );
+}
 
 void Map::PushEntityOutOfWalls(Entity* currentEntity)
 {
@@ -378,7 +429,10 @@ void Map::PushEntitiesOutOfWalls()
 {
 	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
-		PushEntityOutOfWalls(m_entities[entityIndex]);
+		if( !m_entities[entityIndex]->IsGarbage() )
+		{
+			PushEntityOutOfWalls(m_entities[entityIndex]);
+		}
 	}
 }
 
@@ -387,6 +441,10 @@ void Map::UpdateEntityMouseIsTouching()
 {
 	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
+		if( m_entities[entityIndex]->IsGarbage() )
+		{
+			continue;
+		}
 		SetMouseIsTouchingEntity( m_entities[entityIndex] );
 
 		if( m_entityMouseIsTouching )
@@ -427,6 +485,33 @@ void Map::SetMouseIsTouchingEntity( Entity* entity )
 	}
 }
 
+
+void Map::GarbageCollectEntities()
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		Entity* entity = m_entities[entityIndex];
+		if( entity )
+		{
+			if( entity->IsGarbage() )
+			{
+				delete m_entities[entityIndex];
+				m_entities[entityIndex] = nullptr;
+			}
+			else
+			{
+				IntVec2 entityTileCoords = (IntVec2)entity->GetPosition();
+				bool isValidPosition = IsValidTileCoordinates( entityTileCoords );
+				if( !isValidPosition )
+				{
+					delete m_entities[entityIndex];
+					m_entities[entityIndex] = nullptr;
+				}
+			}
+
+		}
+	}
+}
 
 TileMetaData& Map::GetTileMetaDataAtTilePosition( IntVec2 currentCoords )
 {
@@ -520,10 +605,30 @@ void Map::UpdateDebugMode()
 
 int Map::GetTileIndexForTileCoordinates( const IntVec2& tileCoords )
 {
+	if( !IsValidTileCoordinates( tileCoords ) )
+	{
+		return 0;
+	}
 	int tileIndex = tileCoords.x + m_mapSize.x * tileCoords.y;
 	return tileIndex;
 }
 IntVec2 Map::GetTileCoordinatesForTileIndex( int tileIndex ) const
 {
 	return m_tiles[tileIndex].m_tileCoords;
+}
+
+bool Map::IsValidTileCoordinates( const IntVec2& tileCoords ) const
+{
+	//Check if min bounds
+	if( tileCoords.x < 0 || tileCoords.y < 0 )
+	{
+		return false;
+	}
+	//Check max bounds
+	if( tileCoords.x >= m_mapSize.x || tileCoords.y >= m_mapSize.y )
+	{
+		return false;
+	}
+
+	return true;
 }

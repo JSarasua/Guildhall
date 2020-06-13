@@ -184,6 +184,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityDefinition.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityDefinition.hpp" />

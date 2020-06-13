@@ -2,21 +2,58 @@
 #include "Engine/Math/Vec2.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/AABB2.hpp"
+
+
+
+enum EntityFaction
+{
+	FACTION_INVALID = -1,
+
+	FACTION_GOOD,
+	FACTION_EVIL,
+	FACTION_NEUTRAL,
+
+	NUM_OF_FACTIONS
+};
+
+
+//Everything after ENTITY_TYPE_EXPLOSION will blend Additively
+enum EntityType
+{
+	ENTITY_TYPE_INVALID = -1,
+
+	ENTITY_TYPE_PLAYER,
+	ENTITY_TYPE_NPC_TURRET,
+	ENTITY_TYPE_NPC_TANK,
+	ENTITY_TYPE_BOULDER,
+	ENTITY_TYPE_GOOD_BULLET,
+	ENTITY_TYPE_EVIL_BULLET,
+	ENTITY_TYPE_EXPLOSION,
+
+	NUM_OF_ENTITY_TYPES
+};
+
+
 class Game;
 
 class Entity
 {
 public:
 	friend class Map;
-	~Entity() {}
+	virtual ~Entity() {}
 	Entity(Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity);
 
 	virtual void Startup() = 0;
 	virtual void Update(float deltaSeconds);
 	virtual void Render() const = 0;
 
+	bool IsFiring() const;
+	void SetIsFiring( bool isFiring );
+
+	bool IsGarbage() const;
 	bool IsOffScreen();
 	Vec2 GetForwardVector();
+	float GetOrientationDegrees();
 	bool IsAlive();
 	void SetAlive();
 	const Vec2 GetPosition();
@@ -39,6 +76,9 @@ protected:
 	bool m_isDead = true;
 	Rgba8 m_color = Rgba8(255,255,255);
 	bool m_hasCollided = false;
+
+	bool m_isGarbage = false;
+	bool m_isFiring = false;
 
 	AABB2 m_drawBounds;
 	bool m_canWalk = false;

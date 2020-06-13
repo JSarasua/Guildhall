@@ -33,6 +33,7 @@ public:
 
 	int GetTileIndexForTileCoordinates( const IntVec2& tileCoords );
 	IntVec2 GetTileCoordinatesForTileIndex( int tileIndex ) const;
+	bool IsValidTileCoordinates( const IntVec2& tileCoords ) const;
 
 	Actor* GetPlayer();
 	void GetPlayers(std::vector<Actor*>& players);
@@ -50,6 +51,8 @@ private:
 
 	void SpawnTiles();
 	void SpawnEntities();
+	void SpawnBullets();
+	void SpawnBullet( Entity* shooter );
 
 	void RenderTiles();
 	void RenderEntities();
@@ -66,6 +69,8 @@ private:
 	bool IsTilePositionValid( IntVec2 mouseTilePosition );
 
 	void SetMouseIsTouchingEntity( Entity* entity );
+
+	void GarbageCollectEntities();
 
 protected:
 	std::vector<Tile> m_tiles;

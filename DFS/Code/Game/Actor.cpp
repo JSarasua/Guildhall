@@ -117,6 +117,12 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
+
+	if( leftMouseButton.WasJustPressed() )
+	{
+		m_isFiring = true;
+	}
 
 	if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
 	{

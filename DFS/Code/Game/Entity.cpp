@@ -13,7 +13,23 @@ Entity::Entity( Vec2 initialPosition, Vec2 initialVelocity, float initialOrienta
 void Entity::Update( float deltaSeconds )
 {
 	//m_orientationDegrees += m_angularVelocity * deltaSeconds;
-	m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
+	//m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
+	m_position += m_velocity * deltaSeconds;
+}
+
+bool Entity::IsFiring() const
+{
+	return m_isFiring;
+}
+
+void Entity::SetIsFiring( bool isFiring )
+{
+	m_isFiring = isFiring;
+}
+
+bool Entity::IsGarbage() const
+{
+	return !this || m_isGarbage;
 }
 
 bool Entity::IsOffScreen()
@@ -24,6 +40,11 @@ bool Entity::IsOffScreen()
 Vec2 Entity::GetForwardVector()
 {
 	return m_velocity;
+}
+
+float Entity::GetOrientationDegrees()
+{
+	return m_orientationDegrees;
 }
 
 bool Entity::IsAlive()
