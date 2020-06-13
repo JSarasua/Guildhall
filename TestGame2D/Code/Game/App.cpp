@@ -65,6 +65,7 @@ void App::RunFrame()
 	m_deltaTime = Clampf( m_currentTime - m_previousTime, 0.f, 0.1f );
 
 
+	BeginFrame(); //For all engine systems (Not the game)
 	if( m_isPaused )
 	{
 		Update(NOTIME);
@@ -83,7 +84,6 @@ void App::RunFrame()
 	}
 
 
-	BeginFrame(); //For all engine systems (Not the game)
 	Render();
 	EndFrame(); //For all engine systems (Not the game)
 
@@ -112,8 +112,8 @@ bool App::IsNoClipping()
 void App::BeginFrame()
 {
 	g_theWindow->BeginFrame();
-	g_theInput->BeginFrame();
 	g_theRenderer->BeginFrame();
+	g_theInput->BeginFrame();
 	g_theConsole->BeginFrame();
 }
 
@@ -135,8 +135,8 @@ void App::Render()
 void App::EndFrame()
 {
 	g_theRenderer->EndFrame();
-	g_theInput->EndFrame();
 	g_theConsole->EndFrame();
+	g_theInput->EndFrame();
 	g_theWindow->EndFrame();
 }
 
@@ -167,6 +167,12 @@ bool App::QuitRequested( const EventArgs* args )
 
 void App::CheckButtonPresses()
 {
+	const KeyButtonState& tildeKey = g_theInput->GetKeyStates( 0xC0 );	//tilde: ~
+	if( tildeKey.WasJustPressed() )
+	{
+		g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
+	}
+
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
 		g_theEventSystem->FireEvent("QUIT", CONSOLECOMMAND, nullptr);
