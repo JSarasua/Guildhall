@@ -49,12 +49,22 @@ float Entity::GetOrientationDegrees()
 
 float Entity::GetWeaponOrientationDegrees() const
 {
-	return m_weaponOrientationDegrees;
+	float weaponOrientation = m_weaponOrientationDegrees;
+// 	if( weaponOrientation > 90.f && weaponOrientation < 180.f )
+// 	{
+// 		weaponOrientation = -m_weaponOrientationDegrees;
+// 	}
+	return weaponOrientation;
 }
 
 Vec2 Entity::GetWeaponStartPosition()
 {
 	return m_position + m_weaponOffset;
+}
+
+Vec2 Entity::GetBulletStartPosition() const
+{
+	return m_position + m_weaponOffset + m_bulletOffset;
 }
 
 bool Entity::IsAlive()

@@ -80,16 +80,35 @@ void Actor::Render() const
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
 
 
+	//RenderWeapon
 	if( m_name == "Player" )
 	{
+		Vec2 weaponCenter = m_weaponOffset + m_position;
 		const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
 		int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
 		AABB2 weaponUVs;
 		g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
+
+		if( m_isWeaponFlipped )
+		{
+			float weaponUVMinsX = weaponUVs.mins.x;
+			weaponUVs.mins.x = weaponUVs.maxs.x;
+			weaponUVs.maxs.x = weaponUVMinsX;
+		}
+		else
+		{
+			Vec2 uvMins = weaponUVs.mins;
+			weaponUVs.mins = weaponUVs.maxs;
+			weaponUVs.maxs = uvMins;
+// 			float weaponUVMinsY = weaponUVs.mins.y;
+// 			weaponUVs.mins.y = weaponUVs.maxs.y;
+// 			weaponUVs.maxs.y = weaponUVMinsY;
+		}
+
 		//maxDrawBounds="0.375,0.5"
-		AABB2 weaponBounds = AABB2( Vec2( -.55f, -.5f ), Vec2( .55f, .5f ) );
+		AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
 		//Vec2 weaponPosition = GetForwardVector();
-		weaponBounds.Translate( m_position );
+		weaponBounds.Translate( weaponCenter );
 		g_theRenderer->BindTexture( &weaponTexture );
 		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds,actorTint,weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
 	}
@@ -136,6 +155,19 @@ void Actor::UpdateFromKeyboard()
 	
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
 	Vec2 weaponDirection = mousePos - GetPosition();
+
+	if( weaponDirection.x >= 0.f )
+	{
+		m_weaponOffset = Vec2( 0.2f, -0.2f );
+		m_bulletOffset = Vec2( 0.25f, 0.1f );
+		m_isWeaponFlipped = true;
+	}
+	else
+	{
+		m_weaponOffset = Vec2( -0.25f, -0.2f );
+		m_bulletOffset = Vec2( -0.1f, 0.1f );
+		m_isWeaponFlipped = false;
+	}
 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
 	if( leftMouseButton.WasJustPressed() )

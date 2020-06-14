@@ -56,6 +56,7 @@ public:
 	float GetOrientationDegrees();
 	float GetWeaponOrientationDegrees() const;
 	Vec2 GetWeaponStartPosition();
+	Vec2 GetBulletStartPosition() const;
 	bool IsAlive();
 	void SetAlive();
 	const Vec2 GetPosition();
@@ -71,6 +72,7 @@ protected:
 	Vec2 m_position = Vec2(0.f,0.f);
 	Vec2 m_velocity = Vec2(0.f,0.f);
 	Vec2 m_weaponOffset = Vec2( 0.f, 0.f );
+	Vec2 m_bulletOffset = Vec2( 0.f, 0.f );
 	float m_orientationDegrees = 0.f;
 	float m_weaponOrientationDegrees = 0.f;
 	float m_angularVelocity = 1000.f;

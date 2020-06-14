@@ -39,6 +39,7 @@ protected:
 	float m_timeSinceCreation = 0.f;
 	float m_timeUntilNextGoalPosition = 2.f;
 	PlayerController m_playerController = Invalid_Player;
+	bool m_isWeaponFlipped = true;
 
 private:
 	void UpdateNPC( float deltaSeconds );

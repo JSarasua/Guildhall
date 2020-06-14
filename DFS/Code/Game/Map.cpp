@@ -330,7 +330,7 @@ void Map::SpawnBullets()
 
 void Map::SpawnBullet( Entity* shooter )
 {
-	Vec2 bulletPosition = shooter->GetPosition() + shooter->GetForwardVector();
+	Vec2 bulletPosition = shooter->GetBulletStartPosition();
 	float bulletOrientation = shooter->GetWeaponOrientationDegrees();
 
 	bool didAddBullet = false;
