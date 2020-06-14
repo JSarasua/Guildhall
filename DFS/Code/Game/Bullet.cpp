@@ -25,6 +25,7 @@ Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityTyp
 	//m_position = initialPosition;
 	m_physicsRadius = BULLET_PHYSICS_RADIUS;
 	m_cosmeticRadius = BULLET_COSMETIC_RADIUS;
+	m_entityType = type;
 	//m_orientationDegrees = orientationDegrees;
 	//m_velocity = Vec2::MakeFromPolarDegrees( m_orientationDegrees, BULLET_SPEED );
 }

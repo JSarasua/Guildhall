@@ -67,7 +67,7 @@ Vec2 Entity::GetBulletStartPosition() const
 	return m_position + m_weaponOffset + m_bulletOffset;
 }
 
-bool Entity::IsAlive()
+bool Entity::IsAlive() const
 {
 	return !m_isDead;
 }

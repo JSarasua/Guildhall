@@ -19,6 +19,19 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	m_canFly = m_actorDef->m_canFly;
 
 	m_physicsRadius = m_actorDef->m_physicsRadius;
+
+	if( m_name == "Player" )
+	{
+		m_entityType = ENTITY_TYPE_PLAYER;
+		m_health = 5;
+		m_isDead = false;
+	}
+	else
+	{
+		m_entityType = ENTITY_TYPE_NPC_ENEMY;
+		m_health = 3;
+		m_isDead = false;
+	}
 }
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef, PlayerController playerController ):
@@ -32,6 +45,19 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	m_canFly = m_actorDef->m_canFly;
 
 	m_physicsRadius = m_actorDef->m_physicsRadius;
+
+	if( m_name == "Player" )
+	{
+		m_entityType = ENTITY_TYPE_PLAYER;
+		m_health = 5;
+		m_isDead = false;
+	}
+	else
+	{
+		m_entityType = ENTITY_TYPE_NPC_ENEMY;
+		m_health = 3;
+		m_isDead = false;
+	}
 }
 
 void Actor::Startup()
@@ -41,6 +67,10 @@ void Actor::Startup()
 
 void Actor::Update( float deltaSeconds )
 {
+	if( !IsAlive() )
+	{
+		return;
+	}
 	m_timeSinceCreation += deltaSeconds;
 
 	if( m_name == "Player" )
@@ -59,6 +89,11 @@ void Actor::Update( float deltaSeconds )
 
 void Actor::Render() const
 {
+	if( !IsAlive() )
+	{
+		return;
+	}
+
 	const SpriteAnimSet& currentSpriteAnimSet = *m_actorDef->m_actorAnimations;
 
 	std::string animationName = GetCurrentAnimationName();

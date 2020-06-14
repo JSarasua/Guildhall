@@ -66,6 +66,9 @@ private:
 	void PushEntityOutOfWalls(Entity* currentEntity);
 	void PushEntityOutOfWall( Entity* entityToPush, const Tile& tile );
 	void PushEntitiesOutOfWalls();
+	void ResolveEntitiesCollisions();
+	void ResolveEntityCollisions( Entity* currentEntity );
+	bool AreEntitiesColliding( Entity* entityA, Entity* entityB );
 	bool IsTilePositionValid( IntVec2 mouseTilePosition );
 
 	void SetMouseIsTouchingEntity( Entity* entity );

@@ -163,6 +163,7 @@ void Map::UpdateEntities( float deltaSeconds )
 	if( !g_theApp->IsNoClipping() )
 	{
 		PushEntitiesOutOfWalls();
+		ResolveEntitiesCollisions();
 	}
 }
 
@@ -307,7 +308,7 @@ void Map::SpawnEntities()
 // 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
-	m_entities.push_back( new Actor( Vec2( 3.5f, 3.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef ) );
+	m_entities.push_back( new Actor( Vec2( 3.f, 3.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef ) );
 	m_entities.push_back( new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef ) );
 }
 
@@ -332,20 +333,29 @@ void Map::SpawnBullet( Entity* shooter )
 {
 	Vec2 bulletPosition = shooter->GetBulletStartPosition();
 	float bulletOrientation = shooter->GetWeaponOrientationDegrees();
+	EntityType bulletType;
+	if( shooter->m_entityType == ENTITY_TYPE_PLAYER )
+	{
+		bulletType = ENTITY_TYPE_GOOD_BULLET;
+	}
+	else
+	{
+		bulletType = ENTITY_TYPE_EVIL_BULLET;
+	}
 
 	bool didAddBullet = false;
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( !m_entities[entityIndex] )
 		{
-			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientation, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD );
+			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientation, bulletType, FACTION_GOOD );
 			didAddBullet = true;
 			break;
 		}
 	}
 	if( !didAddBullet )
 	{
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientation, ENTITY_TYPE_GOOD_BULLET, FACTION_GOOD ) );
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientation, bulletType, FACTION_GOOD ) );
 	}
 
 	shooter->SetIsFiring( false );
@@ -435,6 +445,72 @@ void Map::PushEntitiesOutOfWalls()
 	}
 }
 
+
+void Map::ResolveEntitiesCollisions()
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		Entity* currentEntity = m_entities[entityIndex];
+		if( !currentEntity->IsGarbage() )
+		{
+			if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER || currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
+			{
+				ResolveEntityCollisions( currentEntity );
+			}
+		}
+	}
+}
+
+void Map::ResolveEntityCollisions( Entity* currentEntity )
+{
+	if( !currentEntity->IsAlive() )
+	{
+		return;
+	}
+	EntityType typeToCheck;
+	if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER )
+	{
+		typeToCheck = ENTITY_TYPE_EVIL_BULLET;
+	}
+	else
+	{
+		typeToCheck = ENTITY_TYPE_GOOD_BULLET;
+	}
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		if( !m_entities[entityIndex]->IsGarbage() )
+		{
+			if( m_entities[entityIndex]->m_entityType == typeToCheck )
+			{
+				if( AreEntitiesColliding( currentEntity, m_entities[entityIndex] ) )
+				{
+					currentEntity->Lose1Health();
+					m_entities[entityIndex]->m_isGarbage = true;
+				}
+			}
+		}
+	}
+}
+
+bool Map::AreEntitiesColliding( Entity* entityA, Entity* entityB )
+{
+	float radiusA = entityA->m_physicsRadius;
+	Vec2 positionA = entityA->GetPosition();
+
+	float radiusB = entityB->m_physicsRadius;
+	Vec2 positionB = entityB->GetPosition();
+
+	float distanceAToB = GetDistance2D( positionA, positionB );
+
+	if( distanceAToB < radiusA + radiusB )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void Map::UpdateEntityMouseIsTouching()
 {

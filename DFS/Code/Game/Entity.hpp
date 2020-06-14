@@ -23,9 +23,9 @@ enum EntityType
 	ENTITY_TYPE_INVALID = -1,
 
 	ENTITY_TYPE_PLAYER,
-	ENTITY_TYPE_NPC_TURRET,
-	ENTITY_TYPE_NPC_TANK,
-	ENTITY_TYPE_BOULDER,
+	ENTITY_TYPE_NPC_ENEMY,
+	//ENTITY_TYPE_NPC_TANK,
+	//ENTITY_TYPE_BOULDER,
 	ENTITY_TYPE_GOOD_BULLET,
 	ENTITY_TYPE_EVIL_BULLET,
 	ENTITY_TYPE_EXPLOSION,
@@ -57,7 +57,7 @@ public:
 	float GetWeaponOrientationDegrees() const;
 	Vec2 GetWeaponStartPosition();
 	Vec2 GetBulletStartPosition() const;
-	bool IsAlive();
+	bool IsAlive() const;
 	void SetAlive();
 	const Vec2 GetPosition();
 	virtual void Lose1Health();
@@ -90,4 +90,6 @@ protected:
 	bool m_canWalk = false;
 	bool m_canFly = false;
 	bool m_canSwim = false;
+
+	EntityType m_entityType = ENTITY_TYPE_INVALID;
 };
