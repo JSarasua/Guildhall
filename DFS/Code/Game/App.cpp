@@ -7,6 +7,7 @@
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
@@ -15,7 +16,7 @@ const char* APP_NAME = "Testgame2D";	// ...becomes ??? (Change this per project!
 
 App::App()
 {
-
+	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
 	g_theGame =  new Game();
@@ -52,13 +53,14 @@ void App::Shutdown()
 	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
-	g_theInput->Shutdown();
-	delete g_theInput;
 	g_theConsole->Shutdown();
 	delete g_theConsole;
-
+	delete g_theAudio;
 	delete g_theEventSystem;
 	Clock::SystemShutdown();
+	
+	g_theInput->Shutdown();
+	delete g_theInput;
 }
 
 
@@ -116,6 +118,7 @@ bool App::IsNoClipping()
 void App::BeginFrame()
 {
 	Clock::BeginFrame();
+	g_theAudio->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
@@ -143,6 +146,7 @@ void App::EndFrame()
 	g_theConsole->EndFrame();
 	g_theInput->EndFrame();
 	g_theWindow->EndFrame();
+	g_theAudio->EndFrame();
 }
 
 void App::RestartGame()
@@ -168,6 +172,37 @@ bool App::QuitRequested( const EventArgs* args )
 	UNUSED(args);
 	g_theApp->HandleQuitRequested();
 	return true;
+}
+
+void App::TogglePause()
+{
+	m_isPaused = !m_isPaused;
+	Clock* masterClock = Clock::GetMaster();
+
+	if( m_isPaused )
+	{
+		masterClock->Pause();
+	}
+	else
+	{
+		masterClock->Resume();
+	}
+}
+
+void App::PauseGame()
+{
+	m_isPaused = true;
+
+	Clock* masterClock = Clock::GetMaster();
+	masterClock->Pause();
+}
+
+void App::UnPauseGame()
+{
+	m_isPaused = false;
+
+	Clock* masterClock = Clock::GetMaster();
+	masterClock->Resume();
 }
 
 void App::CheckButtonPresses()
@@ -206,7 +241,7 @@ void App::CheckButtonPresses()
 
 	if( g_theInput->GetKeyStates( 'P' ).WasJustPressed() )
 	{
-		m_isPaused = !m_isPaused;
+		TogglePause();
 	}
 
 	if( g_theInput->GetKeyStates( 'T' ).IsPressed() )

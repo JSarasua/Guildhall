@@ -7,6 +7,7 @@ class App;
 class Game;
 class Window;
 class RenderContext;
+class AudioSystem;
 /*class InputSystem;*/
 class SpriteSheet;
 
@@ -38,6 +39,7 @@ extern App* g_theApp;
 extern Game* g_theGame;
 extern Window* g_theWindow;
 extern RenderContext* g_theRenderer;
+extern AudioSystem* g_theAudio;
 /*extern InputSystem* g_theInput;*/
 extern SpriteSheet* g_tileSpriteSheet;
 extern SpriteSheet* g_actorSpriteSheet;

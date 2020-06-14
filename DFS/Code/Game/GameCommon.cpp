@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/GameCommon.hpp"
 #include "Game/App.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 //#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
@@ -13,6 +14,7 @@ Game* g_theGame = nullptr;
 RenderContext* g_theRenderer = nullptr;
 /*InputSystem* g_theInput = nullptr;*/
 Window* g_theWindow = nullptr;
+AudioSystem* g_theAudio = nullptr;
 
 SpriteSheet* g_tileSpriteSheet = nullptr;
 SpriteSheet* g_actorSpriteSheet = nullptr;

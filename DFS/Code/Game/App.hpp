@@ -35,6 +35,10 @@ public:
 
 	static bool QuitRequested(const EventArgs* args);
 
+	void TogglePause();
+	void PauseGame();
+	void UnPauseGame();
+
 private:
 	void CheckButtonPresses();
 	void CheckController();
