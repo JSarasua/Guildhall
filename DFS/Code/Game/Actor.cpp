@@ -116,48 +116,57 @@ void Actor::Render() const
 	//const AABB2& actorUVs = m_actorDef->m_spriteUVs;
 	const Texture& actorTexture = g_actorSpriteSheet->GetTexture();
 
+	if( !m_isWeaponInFront )
+	{
+		RenderWeapon();
+	}
+
 	g_theRenderer->BindTexture( &actorTexture );
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
 
-
-	//RenderWeapon
-/*	if( m_name == "Player" )*/
+	if( m_isWeaponInFront )
 	{
-		Vec2 weaponCenter = m_weaponOffset + m_position;
-		const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
-		int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
-		AABB2 weaponUVs;
-		g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
+		RenderWeapon();
+	}
+}
 
-		if( m_isWeaponFlipped )
-		{
-			float weaponUVMinsX = weaponUVs.mins.x;
-			weaponUVs.mins.x = weaponUVs.maxs.x;
-			weaponUVs.maxs.x = weaponUVMinsX;
-		}
-		else
-		{
-			Vec2 uvMins = weaponUVs.mins;
-			weaponUVs.mins = weaponUVs.maxs;
-			weaponUVs.maxs = uvMins;
-// 			float weaponUVMinsY = weaponUVs.mins.y;
-// 			weaponUVs.mins.y = weaponUVs.maxs.y;
-// 			weaponUVs.maxs.y = weaponUVMinsY;
-		}
+void Actor::RenderWeapon() const
+{
+	const Rgba8& actorTint = m_actorDef->m_tint;
+	Vec2 weaponCenter = m_weaponOffset + m_position;
+	const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
+	int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
+	AABB2 weaponUVs;
+	g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
 
-		//maxDrawBounds="0.375,0.5"
-		AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
-		//Vec2 weaponPosition = GetForwardVector();
-		weaponBounds.Translate( weaponCenter );
-		g_theRenderer->BindTexture( &weaponTexture );
-		if( m_name == "Player" )
-		{
-			g_theRenderer->DrawRotatedAABB2Filled( weaponBounds,actorTint,weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
-		}
-		else
-		{
-			g_theRenderer->DrawRotatedAABB2Filled( weaponBounds,actorTint,weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees );
-		}
+	if( m_isWeaponFlipped )
+	{
+		float weaponUVMinsX = weaponUVs.mins.x;
+		weaponUVs.mins.x = weaponUVs.maxs.x;
+		weaponUVs.maxs.x = weaponUVMinsX;
+	}
+	else
+	{
+		Vec2 uvMins = weaponUVs.mins;
+		weaponUVs.mins = weaponUVs.maxs;
+		weaponUVs.maxs = uvMins;
+		// 			float weaponUVMinsY = weaponUVs.mins.y;
+		// 			weaponUVs.mins.y = weaponUVs.maxs.y;
+		// 			weaponUVs.maxs.y = weaponUVMinsY;
+	}
+
+	//maxDrawBounds="0.375,0.5"
+	AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
+	//Vec2 weaponPosition = GetForwardVector();
+	weaponBounds.Translate( weaponCenter );
+	g_theRenderer->BindTexture( &weaponTexture );
+	if( m_name == "Player" )
+	{
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, actorTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
+	}
+	else
+	{
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, actorTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees );
 	}
 }
 
@@ -219,6 +228,15 @@ void Actor::UpdateFromKeyboard()
 		m_weaponOffset = Vec2( -0.25f, -0.2f );
 		m_bulletOffset = Vec2( -0.1f, 0.1f );
 		m_isWeaponFlipped = false;
+	}
+
+	if( weaponDirection.y >= 0.f )
+	{
+		m_isWeaponInFront = false;
+	}
+	else
+	{
+		m_isWeaponInFront = true;
 	}
 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
@@ -363,6 +381,15 @@ void Actor::UpdateNPC( float deltaSeconds )
 			m_weaponOffset = Vec2( -0.25f, -0.2f );
 			m_bulletOffset = Vec2( -0.1f, 0.1f );
 			m_isWeaponFlipped = false;
+		}
+
+		if( goalDirection.y >= 0.f )
+		{
+			m_isWeaponInFront = false;
+		}
+		else
+		{
+			m_isWeaponInFront = true;
 		}
 	}
 

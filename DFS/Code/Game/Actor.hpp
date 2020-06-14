@@ -29,6 +29,8 @@ public:
 	virtual void Update( float deltaSeconds );
 	virtual void Render() const override;
 
+	void RenderWeapon() const;
+
 	void SetEnemy( Entity* enemy );
 
 protected:
@@ -44,6 +46,7 @@ protected:
 	Timer m_firingTimer;
 	PlayerController m_playerController = Invalid_Player;
 	bool m_isWeaponFlipped = true;
+	bool m_isWeaponInFront = true;
 	Entity* m_enemyActor = nullptr;
 
 private:
