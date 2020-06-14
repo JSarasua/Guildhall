@@ -2,6 +2,7 @@
 #include <string>
 #include "Game/Entity.hpp"
 #include "Engine/Math/vec2.hpp"
+#include "Engine/Time/Timer.hpp"
 
 class ActorDefinition;
 
@@ -28,6 +29,8 @@ public:
 	virtual void Update( float deltaSeconds );
 	virtual void Render() const override;
 
+	void SetEnemy( Entity* enemy );
+
 protected:
 	void UpdateFromJoystick();
 	void UpdateFromKeyboard();
@@ -38,8 +41,10 @@ protected:
 	Vec2 m_goalPosition = Vec2(-1.f,-1.f);
 	float m_timeSinceCreation = 0.f;
 	float m_timeUntilNextGoalPosition = 2.f;
+	Timer m_firingTimer;
 	PlayerController m_playerController = Invalid_Player;
 	bool m_isWeaponFlipped = true;
+	Entity* m_enemyActor = nullptr;
 
 private:
 	void UpdateNPC( float deltaSeconds );

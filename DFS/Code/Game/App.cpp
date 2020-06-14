@@ -6,6 +6,7 @@
 #include "Engine/Console/DevConsole.hpp"
 #include "Engine/Platform/Window.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Time/Clock.hpp"
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
@@ -14,6 +15,7 @@ const char* APP_NAME = "Testgame2D";	// ...becomes ??? (Change this per project!
 
 App::App()
 {
+
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
 	g_theGame =  new Game();
@@ -27,6 +29,7 @@ App::~App() {}
 
 void App::Startup()
 {
+	Clock::SystemStartup();
 	float aspectRatio = g_gameConfigBlackboard->GetValue( "windowAspect", 0.f );
 	g_theWindow = new Window();
 	g_theWindow->Open( APP_NAME, aspectRatio, 0.90f );
@@ -55,6 +58,7 @@ void App::Shutdown()
 	delete g_theConsole;
 
 	delete g_theEventSystem;
+	Clock::SystemShutdown();
 }
 
 
@@ -111,6 +115,7 @@ bool App::IsNoClipping()
 
 void App::BeginFrame()
 {
+	Clock::BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
