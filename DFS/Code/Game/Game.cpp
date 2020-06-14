@@ -20,6 +20,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Game/Actor.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
 
 
 
@@ -40,10 +41,11 @@ Game::~Game(){}
 
 void Game::Startup()
 {
-	LoadAssets();
-	InitializeDefinitions();
-	m_world->Startup();
-	m_player = m_world->GetPlayer();
+	//LoadAssets();
+	//InitializeDefinitions();
+	//m_world->Startup();
+	//m_player = m_world->GetPlayer();
+	g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 	m_numTilesInViewVertically = GAME_CAMERA_Y;
 	m_numTilesInViewHorizontally = GAME_CAMERA_Y * CLIENT_ASPECT;
 
@@ -60,10 +62,9 @@ void Game::Startup()
 	m_UICamera.SetProjectionOrthographic( m_UICamera.m_outputSize, 0.f, 100.f );
 	m_UICamera.SetPosition( Vec2(UI_CAMERA_X, UI_CAMERA_Y) * 0.5f );
 
-	// 	AddDevConsoleTest();
-	// 	AddAlignedTextTest();
-	// 	AddImageTest();
-	//	AddBlackboardTest();
+
+	Rgba8 clearColor = Rgba8::BLACK;
+	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 }
 
 void Game::Shutdown(){}
@@ -76,13 +77,24 @@ void Game::Update( float deltaSeconds )
 	{
 		CheckButtonPresses( deltaSeconds );
 	}
-	m_world->Update(deltaSeconds);
 
-	UpdateCamera( deltaSeconds );
+	switch( m_gameState )
+	{
+	case LOADING: UpdateLoading( deltaSeconds );
+		break;
+	case ATTRACT: UpdateAttract( deltaSeconds );
+		break;
+	case PLAYING: UpdatePlaying( deltaSeconds );
+		break;
+	default: ERROR_AND_DIE( "Invalid Game State" );
+		break;
+	}
+
+
+
 	//UpdateCameras();
 // 	UpdateConsoleTest( deltaSeconds );
 // 	UpdateAlignedTextTest( deltaSeconds );
-	UpdateDebugMouse();
 // 	UpdateImageTest(deltaSeconds);
 // 	UpdateBlackboardTest(deltaSeconds);
 
@@ -90,35 +102,24 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render()
 {
-	g_theRenderer->ClearScreen( Rgba8::BLACK );
+	switch( m_gameState )
+	{
+	case LOADING: RenderLoading();
+		break;
+	case ATTRACT: RenderAttract();
+		break;
+// 	case DEATH: RenderDeath();
+// 		break;
+// 	case VICTORY: RenderVictory();
+// 		break;
+// 	case PAUSED: RenderPaused();
+// 		break;
+	case PLAYING: RenderPlaying();
+		break;
+	default: ERROR_AND_DIE( "Invalid Game State" );
+		break;
+	}
 
-	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	m_camera.SetColorTarget( 0, colorTarget );
-	m_UICamera.SetColorTarget( 0, colorTarget );
-
- 	g_theRenderer->BeginCamera( m_camera );
-	g_theRenderer->SetModelMatrix( Mat44() );
-	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-	g_theRenderer->BindTexture(nullptr);
-	g_theRenderer->BindShader( (Shader*)nullptr );
- 	RenderGame();
- 	g_theRenderer->EndCamera( m_camera );
-
-	g_theRenderer->BeginCamera( m_UICamera );
-	RenderUI();
-	g_theRenderer->EndCamera( m_UICamera );
-
-	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-	m_camera.SetColorTarget( nullptr );
-	g_theRenderer->ReleaseRenderTarget( colorTarget );
-	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
-
-	DebugRenderBeginFrame();
-	DebugRenderWorldToCamera( &m_camera );
-	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
-	DebugRenderEndFrame();
 
 
 }
@@ -131,7 +132,7 @@ Vec2 Game::GetMousePositionOnMainCamera()
 
 void Game::LoadAssets()
 {
-	g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
+	//g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 	g_theRenderer->CreateOrGetTextureFromFile(IMAGETESTPATH);
 
 	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Terrain_8x8.png" );
@@ -230,18 +231,37 @@ void Game::CheckButtonPresses(float deltaSeconds)
 {
 	UNUSED( deltaSeconds );
 
-	const XboxController& controller = g_theInput->GetXboxController(0);
+	XboxController const& controller = g_theInput->GetXboxController(0);
 	
-	if( controller.GetButtonState( XBOX_BUTTON_ID_Y ).WasJustPressed() )
+	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
+	KeyButtonState const& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+
+	if( m_gameState == ATTRACT )
 	{
-		g_theConsole->SetIsOpen(!g_theConsole->IsOpen());
+		if( leftMouseButton.WasJustPressed() || spaceKey.WasJustPressed() )
+		{
+			m_gameState = PLAYING;
+			g_theApp->UnPauseGame();
+		}
+	}
+	if( m_gameState == PLAYING )
+	{
+		if( controller.GetButtonState( XBOX_BUTTON_ID_Y ).WasJustPressed() )
+		{
+			g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
+		}
+
+		const KeyButtonState& f5Key = g_theInput->GetKeyStates( 0x74 );
+		if( f5Key.WasJustPressed() )
+		{
+			RebuildWorld();
+		}
 	}
 
-	const KeyButtonState& f5Key = g_theInput->GetKeyStates(0x74);
-	if( f5Key.WasJustPressed() )
-	{
-		RebuildWorld();
-	}
+	
+
+
+
 }
 
 IntVec2 Game::GetCurrentMapBounds() const
@@ -505,6 +525,132 @@ void Game::UpdateDebugMouse()
 	Vec2 mouseDrawPosOnCamera = orthoBounds.GetPointAtUV( mouseNormalizedPos );
 
 	m_mousePositionOnMainCamera = mouseDrawPosOnCamera;
+}
+
+void Game::UpdateLoading( float deltaSeconds )
+{
+	g_theApp->PauseGame();
+	
+	static int frameCounter = 0;
+
+	//CheckButtonPressesLoading( deltaSeconds );
+
+
+	if( frameCounter > 1 )
+	{
+		m_world->Update( 0.f );
+		m_gameState = ATTRACT;
+	}
+	else if( frameCounter == 1 )
+	{
+		LoadAssets();
+		InitializeDefinitions();
+		m_world->Startup();
+		m_player = m_world->GetPlayer();
+	}
+	else if( frameCounter == 0 )
+	{
+		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
+		g_theAudio->PlaySound( loadingSound );
+	}
+
+	frameCounter++;
+}
+
+void Game::UpdateAttract( float deltaSeconds )
+{
+	m_world->Update( 0.f );
+}
+
+void Game::UpdatePlaying( float deltaSeconds )
+{
+	m_world->Update( deltaSeconds );
+	UpdateCamera( deltaSeconds );
+	UpdateDebugMouse();
+}
+
+void Game::RenderLoading()
+{
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
+	
+	g_theRenderer->BeginCamera( m_camera );
+	
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+
+
+	g_theRenderer->DrawTextAtPosition( "LOADING", Vec2( -3.f, -3.f ), 1.f );
+	
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+}
+
+void Game::RenderAttract()
+{
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
+
+	g_theRenderer->BeginCamera( m_camera );
+
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+
+	g_theRenderer->DrawTextAtPosition( "Bullet Hell Dungeon", Vec2( -4.75f, 1.f ), 0.5f );
+	g_theRenderer->DrawTextAtPosition( "[SPACE] or [LMB] to Play", Vec2( -3.f, -2.f ), 0.25f );
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+}
+
+void Game::RenderPlaying()
+{
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
+	m_UICamera.SetColorTarget( 0, colorTarget );
+
+	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderGame();
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->BeginCamera( m_UICamera );
+	RenderUI();
+	g_theRenderer->EndCamera( m_UICamera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
 }
 
 void Game::AddDevConsoleTest()

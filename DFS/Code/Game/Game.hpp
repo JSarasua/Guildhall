@@ -8,6 +8,17 @@
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/Image.hpp"
 
+enum eGameState
+{
+	LOADING,
+	ATTRACT,
+// 	DEATH,
+// 	VICTORY,
+	PAUSED,
+	PLAYING,
+
+	NUM_OF_GAMESTATES
+};
 
 class Actor;
 class World;
@@ -30,6 +41,22 @@ public:
 	AABB2 GetCamera() const;
 
 private:
+	//Update State
+	void UpdateLoading( float deltaSeconds );
+	void UpdateAttract( float deltaSeconds );
+	void UpdateDeath( float deltaSeconds );
+	void UpdateVictory( float deltaSeconds );
+	void UpdatePaused( float deltaSeconds );
+	void UpdatePlaying( float deltaSeconds );
+
+	//RenderState
+	void RenderLoading();
+	void RenderAttract();
+	void RenderDeath();
+	void RenderVictory();
+	void RenderPaused();
+	void RenderPlaying();
+
 	//Add Tests
 	void AddDevConsoleTest();
 	void AddAlignedTextTest();
@@ -110,6 +137,8 @@ private:
 	XmlDocument* m_mapDefDoc	= nullptr;
 	XmlDocument* m_tileDefDoc	= nullptr;
 	XmlDocument* m_actorDefDoc	= nullptr;
+
+	eGameState m_gameState = LOADING;
 
 public:
 	//Rand for game to use
