@@ -179,6 +179,7 @@ private:
 	double m_deltaSecondsFromLastFrame[10];
 	int m_fpsCounterIndex = 0;
 	float m_fps = 0.f;
+	float m_msPerFrame = 0.f;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

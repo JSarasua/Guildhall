@@ -1047,15 +1047,19 @@ void Game::FPSCounterUpdate()
 	{
 		m_fps += (float)m_deltaSecondsFromLastFrame[m_fpsCounterIndex];
 	}
+
 	m_fps /= 10.f;
+	m_msPerFrame = m_fps;
 	m_fps = 1.f / m_fps;
+	
+	m_msPerFrame *= 1000.f;
 }
 
 void Game::FPSRender()
 {
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	std::string renderString = Stringf( "FPS: %.2f", m_fps );
-	g_theRenderer->DrawTextAtPosition( renderString.c_str(), Vec2( 13.f, 8.5f ), 0.2f );
+	std::string renderString = Stringf( "FPS: %.2f (%.2f ms/frame)", m_fps, m_msPerFrame );
+	g_theRenderer->DrawTextAtPosition( renderString.c_str(), Vec2( 13.f, 8.75f ), 0.1f );
 }
 
 void Game::RenderDevConsole()
