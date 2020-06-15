@@ -117,3 +117,4 @@ $RECYCLE.BIN/
 !**/Run/*.exe
 !**/Run/*.dll
 !**/ThirdParty/**/*.lib
+DFS/BulletHellDungeon.zip
