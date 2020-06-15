@@ -16,6 +16,8 @@ const std::string Stringf( const char* format, ... );
 const std::string Stringf( const int maxLength, const char* format, ... );
 const std::string Stringv( const char* format, va_list args );
 
+Strings GetFileNamesInFolder( std::string const& folderPath, const char* filePattern );
+
 
 const std::vector<std::string> SplitStringOnDelimeter( const char* text, const char delimeter);
 
