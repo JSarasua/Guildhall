@@ -305,7 +305,7 @@ void Map::SpawnEntities()
 	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
 
 	Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
-	Actor* enemy1 = new Actor( Vec2( 3.f, 3.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
+	Actor* enemy1 = new Actor( Vec2( 8.f, 2.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
 	Actor* enemy2 = new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef );
 	enemy1->SetEnemy( player1 );
 	enemy2->SetEnemy( player1 );
