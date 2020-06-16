@@ -12,10 +12,14 @@ World::World( Game* game ) :
 
 void World::Startup()
 {
+	g_theConsole->PrintString( Rgba8::WHITE, "Loading Maps..." );
+
 	Strings filePaths = GetFileNamesInFolder( "Data/Maps", "*.xml" );
 
 	for( size_t fileIndex = 0; fileIndex < filePaths.size(); fileIndex++ )
 	{
+		g_theConsole->PrintString( Rgba8::WHITE, Stringf( "Loading Map: %s...", filePaths[fileIndex].c_str() ) );
+		
 		std::string filePath = "Data/Maps/" + filePaths[fileIndex];
 		XmlDocument currentMapDoc		= new XmlDocument;
 		XmlElement const& currentMapDefElement = GetRootElement( currentMapDoc, filePath.c_str() );

@@ -11,10 +11,22 @@ TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 	XmlElement const* legendElement = element.FirstChildElement( "Legend" );
 	XmlElement const* mapRowsElement = element.FirstChildElement( "MapRows" );
 
-	GUARANTEE_OR_DIE( legendElement, "No Legend found in map definition" );
-	GUARANTEE_OR_DIE( mapRowsElement, "No MapRows found in MapDefinition" );
+	m_isValid = g_theConsole->GuaranteeOrError( legendElement, Stringf( "ERROR: No Legend for map" ) );
+	if( !m_isValid )
+	{
+		return;
+	}
+
+	m_isValid = g_theConsole->GuaranteeOrError( mapRowsElement, Stringf( "ERROR: No MapRows found for map" ) );
+	if( !m_isValid )
+	{
+		return;
+	}
+
 	ParseLegend( *legendElement );
 	SpawnTiles( *mapRowsElement );
+
+	m_isValid = true;
 }
 
 TileMap::~TileMap()

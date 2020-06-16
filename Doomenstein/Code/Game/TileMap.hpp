@@ -43,5 +43,7 @@ private:
 	IntVec2 m_mapSize;
 	int m_NumOftiles = 0;
 
+
+
 	std::map< unsigned char, std::string > m_legend;
 };
