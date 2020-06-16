@@ -27,15 +27,18 @@ public:
 	static void InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement );
 	static MapRegionType* GetMapRegionTypeByString( std::string const& mapRegionName );
 	static std::map< std::string, MapRegionType*> s_definitions;
+	static std::string s_defaultMapRegion;
 
 
 protected:
 	std::string m_name;
 	bool m_isSolid = false;
+	bool m_isValid = false;
 
 	MapMaterialType* m_floorMaterialType = nullptr;
 	MapMaterialType* m_ceilingMaterialType = nullptr;
 	MapMaterialType* m_sideMaterialType = nullptr;
+
 	//Floor
 	//Ceiling
 	//Side

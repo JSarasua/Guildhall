@@ -2,13 +2,19 @@
 #include "Game/MapMaterialType.hpp"
 
 std::map< std::string, MapRegionType*> MapRegionType::s_definitions;
+std::string MapRegionType::s_defaultMapRegion;
 
 MapRegionType::MapRegionType( XmlElement const& element )
 {
 	m_name = ParseXMLAttribute( element, "name", "INVALID" );
 	m_isSolid = ParseXMLAttribute( element, "isSolid", false );
 
-	GUARANTEE_OR_DIE( m_name != "INVALID", "Could not parse MapRegion name" );
+	//GUARANTEE_OR_DIE( m_name != "INVALID", "Could not parse MapRegion name" );
+	if( m_name == "INVALID" )
+	{
+		m_isValid = false;
+		return;
+	}
 
 	if( m_isSolid )
 	{
@@ -35,6 +41,8 @@ MapRegionType::MapRegionType( XmlElement const& element )
 		m_floorMaterialType = MapMaterialType::s_definitions[floorMaterialName];
 		m_ceilingMaterialType = MapMaterialType::s_definitions[ceilingMaterialName];
 	}
+
+	m_isValid = true;
 }
 
 bool MapRegionType::IsSolid() const
@@ -82,6 +90,9 @@ Texture const& MapRegionType::GetTexture( eMapMaterialArea mapMaterialArea )
 
 void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement )
 {
+	s_defaultMapRegion = ParseXMLAttribute( rootMapRegionElement, "default", "INVALID" );
+	GUARANTEE_OR_DIE( s_defaultMapRegion != "INVALID", "Invalid default Map Region, cannot be INVALID" );
+	
 	for( const XmlElement* element = rootMapRegionElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
 		const XmlAttribute* nameAttribute = element->FindAttribute( "name" );
 
@@ -89,7 +100,14 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 		{
 			std::string mapRegionName = nameAttribute->Value();
 			MapRegionType* mapRegion = new MapRegionType( *element );
-			s_definitions[mapRegionName] = mapRegion;
+			if( mapRegion->m_isValid )
+			{
+				s_definitions[mapRegionName] = mapRegion;
+			}
+			else
+			{
+				s_definitions[mapRegionName] = s_definitions[s_defaultMapRegion];
+			}
 		}
 	}
 }
@@ -97,7 +115,13 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 MapRegionType* MapRegionType::GetMapRegionTypeByString( std::string const& mapRegionName )
 {
 	auto mapRegionIter = s_definitions.find( mapRegionName );
-	GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find map region by name" );
+	//GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find map region by name" );
+
+	if( mapRegionIter == s_definitions.end() )
+	{
+		mapRegionIter = s_definitions.find( MapRegionType::s_defaultMapRegion );
+		GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find default map region by name" );
+	}
 
 	MapRegionType* mapRegionType = mapRegionIter->second;
 	return mapRegionType;

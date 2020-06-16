@@ -40,10 +40,21 @@ void TileMap::Update( float deltaSeconds )
 void TileMap::Render()
 {
 	//Should always be the same texture for ceiling, side, and floor
-	Texture const& texture = m_tiles[0].GetTexture( eMapMaterialArea::SIDE );
-	g_theRenderer->BindTexture( &texture );
-	g_theRenderer->SetModelMatrix( Mat44() );
-	g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
+	if( m_tiles[0].IsSolid() )
+	{
+		Texture const& texture = m_tiles[0].GetTexture( eMapMaterialArea::SIDE );
+		g_theRenderer->BindTexture( &texture );
+		g_theRenderer->SetModelMatrix( Mat44() );
+		g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
+	}
+	else
+	{
+		Texture const& texture = m_tiles[0].GetTexture( eMapMaterialArea::CEILING );
+		g_theRenderer->BindTexture( &texture );
+		g_theRenderer->SetModelMatrix( Mat44() );
+		g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
+	}
+
 }
 
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )
