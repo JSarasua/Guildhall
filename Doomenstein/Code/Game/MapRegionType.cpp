@@ -34,7 +34,7 @@ MapRegionType::MapRegionType( XmlElement const& element )
 			return;
 		}
 
-		m_sideMaterialType = MapMaterialType::s_definitions[sideMaterialName];
+		m_sideMaterialType = MapMaterialType::GetMapMaterialMatchingName( sideMaterialName );
 	}
 	else
 	{
@@ -68,8 +68,8 @@ MapRegionType::MapRegionType( XmlElement const& element )
 			return;
 		}
 
-		m_floorMaterialType = MapMaterialType::s_definitions[floorMaterialName];
-		m_ceilingMaterialType = MapMaterialType::s_definitions[ceilingMaterialName];
+		m_floorMaterialType = MapMaterialType::GetMapMaterialMatchingName( floorMaterialName );
+		m_ceilingMaterialType = MapMaterialType::GetMapMaterialMatchingName( ceilingMaterialName );
 	}
 
 	m_isValid = true;
@@ -120,6 +120,8 @@ Texture const& MapRegionType::GetTexture( eMapMaterialArea mapMaterialArea )
 
 void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement )
 {
+	g_theConsole->PrintString(Rgba8::WHITE, "Loading Map Region Types..." );
+
 	s_defaultMapRegion = ParseXMLAttribute( rootMapRegionElement, "default", "INVALID" );
 	GUARANTEE_OR_DIE( s_defaultMapRegion != "INVALID", "Invalid default Map Region, cannot be INVALID" );
 	
@@ -146,7 +148,7 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 MapRegionType* MapRegionType::GetMapRegionTypeByString( std::string const& mapRegionName )
 {
 	auto mapRegionIter = s_definitions.find( mapRegionName );
-	//GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find map region by name" );
+	g_theConsole->GuaranteeOrError( mapRegionIter != s_definitions.end(), Stringf("Couldn't find map region: %s", mapRegionName.c_str() ) ); 
 
 	if( mapRegionIter == s_definitions.end() )
 	{
