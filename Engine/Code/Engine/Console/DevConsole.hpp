@@ -36,16 +36,18 @@ public:
 	void HandleKeyStroke( unsigned char keyStroke );
 	void HandleSpecialKeyStroke ( unsigned char keyStroke ); //Delete, pg up, pg down, etc.
 
-	void PrintString( const Rgba8& textColor, const std::string& devConsolePrintString );
-	void Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const;
+	void ErrorString( std::string const& devConsolePrintString );
+	bool GuaranteeOrError( bool condition, std::string const& devConsolePrintString );
+	void PrintString( Rgba8 const& textColor, std::string const& devConsolePrintString );
+	void Render( RenderContext& renderer, Camera const& camera, float lineHeight ) const;
 
 	void SetIsOpen( bool isOpen );
 	bool IsOpen() const {return m_isOpen;}
 
 	void AutoCompleteCommand();
 
-	static bool InvalidCommand( const EventArgs* args );
-	static bool ListCommands( const EventArgs* args );
+	static bool InvalidCommand( EventArgs const* args );
+	static bool ListCommands( EventArgs const* args );
 
 private:
 	void ClampScrollIndex();

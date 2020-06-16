@@ -329,14 +329,31 @@ void DevConsole::HandleSpecialKeyStroke( unsigned char keyStroke )
 	}
 }
 
-void DevConsole::PrintString( const Rgba8& textColor, const std::string& devConsolePrintString )
+void DevConsole::ErrorString( std::string const& devConsolePrintString )
+{
+	PrintString( Rgba8::RED, devConsolePrintString );
+	SetIsOpen( true );
+}
+
+bool DevConsole::GuaranteeOrError( bool condition, std::string const& devConsolePrintString )
+{
+	if( !condition )
+	{
+		ErrorString( devConsolePrintString );
+		return false;
+	}
+
+	return true;
+}
+
+void DevConsole::PrintString( Rgba8 const& textColor, std::string const& devConsolePrintString )
 {
 	m_coloredLines.push_back(ColoredLine(textColor,devConsolePrintString));
 	m_currentCharIndex = 0;
 	m_currentScrollIndex++;
 }
 
-void DevConsole::Render( RenderContext& renderer, const Camera& camera, float lineHeight ) const
+void DevConsole::Render( RenderContext& renderer, Camera const& camera, float lineHeight ) const
 {
 	if( !m_isOpen )
 	{
@@ -430,7 +447,7 @@ void DevConsole::AutoCompleteCommand()
 	ClampCurrentLine();
 }
 
-bool DevConsole::InvalidCommand( const EventArgs* args )
+bool DevConsole::InvalidCommand( EventArgs const* args )
 {
 	UNUSED(args);
 
@@ -438,7 +455,7 @@ bool DevConsole::InvalidCommand( const EventArgs* args )
 	return true;
 }
 
-bool DevConsole::ListCommands( const EventArgs* args )
+bool DevConsole::ListCommands( EventArgs const* args )
 {
 	UNUSED(args);
 
