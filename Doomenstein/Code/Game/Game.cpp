@@ -298,7 +298,7 @@ bool Game::SetAmbientColor( const EventArgs* args )
 bool Game::SetAttenuation( const EventArgs* args )
 {
 	Vec3 attenuation = args->GetValue( "attenuation", Vec3( 0.f, 1.f, 0.f ) );
-	g_theApp->m_game->SetAttenuation( attenuation );
+	g_theGame->SetAttenuation( attenuation );
 
 	return true;
 }

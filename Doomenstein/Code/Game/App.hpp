@@ -49,7 +49,7 @@ private:
 	void CheckController();
 
 public:
-	Game* m_game = nullptr;
+	//Game* m_game = nullptr;
 
 private:
 	bool m_isQuitting = false;

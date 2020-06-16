@@ -3,7 +3,12 @@
 struct Vec2;
 struct Rgba8;
 
+class Game;
+class App;
+
 extern Window* g_theWindow;
+extern Game* g_theGame;
+extern App* g_theApp;
 
 constexpr float CLIENT_ASPECT = 16.f/9.f;
 
@@ -23,10 +28,3 @@ constexpr float PLAYER_PHYSICS_RADIUS = 0.3f;
 constexpr float PLAYER_MAX_SPEED = 2.f;
 
 //constexpr float CAMERAABLATIONPERSECOND = 1.f;
-
-
-
-
-
-void DrawLine( Vec2 startPoint, Vec2 endPoint, Rgba8 color, float thickness );
-void DrawRing( Vec2 center, float radius, Rgba8 color, float thickness );

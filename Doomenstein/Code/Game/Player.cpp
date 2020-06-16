@@ -101,12 +101,9 @@ void Player::Render() const
 	if( g_theApp->GetDebugGameMode() )
 	{
 		g_theRenderer->BindTexture(nullptr);
-		DrawRing(m_position, PLAYER_SIZE, Rgba8(255,0,255), 0.01f);
-		DrawRing(m_position, PLAYER_PHYSICS_RADIUS, Rgba8(0,255,255), 0.01f);
+		g_theRenderer->DrawRing(m_position, PLAYER_SIZE, Rgba8(255,0,255), 0.01f);
+		g_theRenderer->DrawRing(m_position, PLAYER_PHYSICS_RADIUS, Rgba8(0,255,255), 0.01f);
 	}
-
-
-
 }
 
 
