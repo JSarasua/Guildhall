@@ -2,6 +2,8 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Renderer/Texture.hpp"
 #include "Engine/Math/IntVec2.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/StringUtils.hpp"
 
 
 
@@ -46,7 +48,7 @@ const int SpriteSheet::GetSpriteIndex( const IntVec2& spriteCoords ) const
 		const int spriteIndex = m_spriteSheetDimensions.x * spriteCoords.y + spriteCoords.x;
 		return spriteIndex;
 	}
-
+	g_theConsole->ErrorString( Stringf("ERROR: Invalid sprite coordinates for sprite sheet: (%i,%i)", spriteCoords.x, spriteCoords.y ) );
 	return 0;
 }
 
