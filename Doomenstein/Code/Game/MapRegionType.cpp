@@ -1,5 +1,7 @@
 #include "Game/MapRegionType.hpp"
 #include "Game/MapMaterialType.hpp"
+#include "Engine/Console/DevConsole.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 std::map< std::string, MapRegionType*> MapRegionType::s_definitions;
 std::string MapRegionType::s_defaultMapRegion;
@@ -9,20 +11,28 @@ MapRegionType::MapRegionType( XmlElement const& element )
 	m_name = ParseXMLAttribute( element, "name", "INVALID" );
 	m_isSolid = ParseXMLAttribute( element, "isSolid", false );
 
-	//GUARANTEE_OR_DIE( m_name != "INVALID", "Could not parse MapRegion name" );
-	if( m_name == "INVALID" )
+	m_isValid = g_theConsole->GuaranteeOrError( m_name != "INVALID", "Could not parse map region name" );
+	if( !m_isValid )
 	{
-		m_isValid = false;
 		return;
 	}
 
 	if( m_isSolid )
 	{
 		XmlElement const* sideElement = element.FirstChildElement( "Side" );
-		GUARANTEE_OR_DIE( sideElement, "No Side element for map region" );
+		m_isValid = g_theConsole->GuaranteeOrError( sideElement, "No Side element for map region" );
+		if( !m_isValid )
+		{
+			return;
+		}
 		
 		std::string sideMaterialName = ParseXMLAttribute( *sideElement, "material", "INVALID" );
-		GUARANTEE_OR_DIE( sideMaterialName != "INVALID", "Material not found for Side" );
+
+		m_isValid = g_theConsole->GuaranteeOrError( sideMaterialName != "INVALID", "Material not found for Side" );
+		if( !m_isValid )
+		{
+			return;
+		}
 
 		m_sideMaterialType = MapMaterialType::s_definitions[sideMaterialName];
 	}
@@ -30,13 +40,33 @@ MapRegionType::MapRegionType( XmlElement const& element )
 	{
 		XmlElement const* floorElement = element.FirstChildElement( "Floor" );
 		XmlElement const* ceilingElement = element.FirstChildElement( "Ceiling" );
-		GUARANTEE_OR_DIE( floorElement, "No Floor element for map region" );
-		GUARANTEE_OR_DIE( ceilingElement, "No Ceiling element for map region" );
+
+		m_isValid = g_theConsole->GuaranteeOrError( floorElement, "No Floor element for map region" );
+		if( !m_isValid )
+		{
+			return;
+		}
+
+		m_isValid = g_theConsole->GuaranteeOrError( ceilingElement, "No Ceiling element for map region" );
+		if( !m_isValid )
+		{
+			return;
+		}
 
 		std::string floorMaterialName = ParseXMLAttribute( *floorElement, "material", "INVALID" );
 		std::string ceilingMaterialName = ParseXMLAttribute( *ceilingElement, "material", "INVALID" );
-		GUARANTEE_OR_DIE( floorMaterialName != "INVALID", "Material not found for Floor" );
-		GUARANTEE_OR_DIE( ceilingMaterialName != "INVALID", "Material not found for Floor" );
+
+		m_isValid = g_theConsole->GuaranteeOrError( floorMaterialName != "INVALID", "Material not found for Floor" );
+		if( !m_isValid )
+		{
+			return;
+		}
+
+		m_isValid = g_theConsole->GuaranteeOrError( ceilingMaterialName != "INVALID", "Material not found for Ceiling" );
+		if( !m_isValid )
+		{
+			return;
+		}
 
 		m_floorMaterialType = MapMaterialType::s_definitions[floorMaterialName];
 		m_ceilingMaterialType = MapMaterialType::s_definitions[ceilingMaterialName];
@@ -106,7 +136,8 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 			}
 			else
 			{
-				s_definitions[mapRegionName] = s_definitions[s_defaultMapRegion];
+				delete mapRegion;
+				mapRegion = nullptr;
 			}
 		}
 	}
