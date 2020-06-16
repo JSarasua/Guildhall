@@ -25,6 +25,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/MapRegionType.hpp"
 #include "Game/MapMaterialType.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -45,6 +46,7 @@ Game::~Game(){}
 
 void Game::Startup()
 {
+	LoadAssets();
 	InitializeDefinitions();
 
 	EnableDebugRendering();
@@ -134,6 +136,9 @@ void Game::Shutdown()
 	m_world->Shutdown();
 	delete m_world;
 	m_world = nullptr;
+
+	delete m_viewModelsSpriteSheet;
+	m_viewModelsSpriteSheet = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -272,6 +277,7 @@ void Game::Render()
 
 	g_theRenderer->BeginCamera( m_UICamera );
 	FPSRender();
+	UIRender();
 	g_theRenderer->EndCamera( m_UICamera );
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
@@ -1060,6 +1066,37 @@ void Game::FPSRender()
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	std::string renderString = Stringf( "FPS: %.2f (%.2f ms/frame)", m_fps, m_msPerFrame );
 	g_theRenderer->DrawTextAtPosition( renderString.c_str(), Vec2( 13.f, 8.75f ), 0.1f );
+}
+
+void Game::UIRender()
+{
+	Texture* baseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/HUD_Base.png" );
+	float baseAspect = baseTexture->GetAspectRatio();
+	float heightOverWidth = 1.f / baseAspect;
+	AABB2 screenDimensions = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	float screenWidth = screenDimensions.maxs.x - screenDimensions.mins.x;
+	float screenHeight = screenWidth * heightOverWidth;
+	AABB2 uiBounds = screenDimensions.CarveBoxOffBottom( 0.f, screenHeight );
+	//uiBounds.maxs.y = screenHeight;
+	g_theRenderer->BindTexture( baseTexture );
+	g_theRenderer->DrawAABB2Filled( uiBounds, Rgba8::WHITE );
+
+	AABB2 gunBounds = screenDimensions.CarveBoxOffBottom( 0.f, screenHeight );
+	AABB2 gunSpriteUvs;
+	SpriteDefinition const& gunSpriteDef = m_viewModelsSpriteSheet->GetSpriteDefinition( 0 );
+	Texture const& gunSpriteTexture = gunSpriteDef.GetTexture();
+	float gunSpriteTextureAspect = gunSpriteTexture.GetAspectRatio();
+	float gunSpriteHeightOverWidth = 1.f / gunSpriteTextureAspect;
+	gunBounds.maxs.y = gunSpriteHeightOverWidth * (gunBounds.GetDimensions().x) - gunBounds.mins.y;
+	gunSpriteDef.GetUVs( gunSpriteUvs.mins, gunSpriteUvs.maxs );
+	g_theRenderer->BindTexture( &gunSpriteTexture );
+	g_theRenderer->DrawAABB2Filled( gunBounds, Rgba8::WHITE, gunSpriteUvs.mins, gunSpriteUvs.maxs );
+}
+
+void Game::LoadAssets()
+{
+	Texture* viewModelSpriteTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/ViewModelsSpriteSheet_8x8.png" );
+	m_viewModelsSpriteSheet = new SpriteSheet( *viewModelSpriteTex, IntVec2( 8, 8 ) );
 }
 
 void Game::RenderDevConsole()

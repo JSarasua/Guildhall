@@ -16,6 +16,7 @@ class Player;
 class Shader;
 class ShaderState;
 class World;
+class SpriteSheet;
 
 struct light_t;
 struct Vertex_PCUTBN;
@@ -115,6 +116,9 @@ private:
 	void FPSStartup();
 	void FPSCounterUpdate();
 	void FPSRender();
+	void UIRender();
+
+	void LoadAssets();
 
 private:
 	Mat44 m_frontCubeModelMatrix;
@@ -180,6 +184,8 @@ private:
 	int m_fpsCounterIndex = 0;
 	float m_fps = 0.f;
 	float m_msPerFrame = 0.f;
+
+	SpriteSheet* m_viewModelsSpriteSheet = nullptr;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;
