@@ -27,9 +27,37 @@ void World::Startup()
 		
 		m_maps[filePaths[fileIndex]] = newMap;
 	}
+	std::string startMapStr = g_gameConfigBlackboard->GetValue("startMap", "INVALID" );
+	bool hasValidStartMap = g_theConsole->GuaranteeOrError( startMapStr != "INVALID", "Gameconfig.xml did not have a startmap" );
 	
-	m_currentMap = m_maps.begin()->second;
-	m_currentMap->SetPlayerToStart();
+	if( hasValidStartMap )
+	{
+		auto mapIter = m_maps.find( startMapStr );
+		hasValidStartMap =g_theConsole->GuaranteeOrError( mapIter != m_maps.end(), Stringf( "Couldn't find start map: %s", startMapStr.c_str() ) );
+		
+		if( hasValidStartMap )
+		{
+			Map* startMap = mapIter->second;
+			g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Warping player to %s...", startMapStr.c_str() ) );
+			m_currentMap = startMap;
+		}
+		else
+		{
+			g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Warping player to %s...", m_maps.begin()->first.c_str() ) );
+			m_currentMap = m_maps.begin()->second;
+		}
+	}
+	else
+	{
+		g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Warping player to %s...", m_maps.begin()->first.c_str() ) );
+		m_currentMap = m_maps.begin()->second;
+	}
+
+	if( m_currentMap )
+	{
+		m_currentMap->SetPlayerToStart();
+	}
+
 
 
 	g_theEventSystem->SubscribeMethodToEvent("warp", CONSOLECOMMAND, this, &World::WarpPlayer );
