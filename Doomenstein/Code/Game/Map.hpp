@@ -21,6 +21,8 @@ public:
 	virtual void Render() = 0;
 
 	virtual void SetPlayerToStart() = 0;
+	virtual Vec2 const& GetPlayerStartPosition() = 0;
+	virtual float GetPlayerStartYaw() = 0;
 
 protected:
 	Game* m_game = nullptr;

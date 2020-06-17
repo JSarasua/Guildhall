@@ -1106,7 +1106,7 @@ void Game::SetPlayerPosition( Vec3 const& playerPos )
 
 void Game::SetPlayerRotation( Vec3 const& pitchRollYawDegrees )
 {
-	m_camera.RotatePitchRollYawDegrees( pitchRollYawDegrees );
+	m_camera.SetRotationPitchRollYawDegrees( pitchRollYawDegrees );
 }
 
 void Game::RenderDevConsole()

@@ -87,6 +87,16 @@ void TileMap::SetPlayerToStart()
 	g_theGame->SetPlayerRotation( pitchRollYawDegrees );
 }
 
+Vec2 const& TileMap::GetPlayerStartPosition()
+{
+	return m_playerStartPosition;
+}
+
+float TileMap::GetPlayerStartYaw()
+{
+	return m_playerStartYaw;
+}
+
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )
 {
 	Vec3 tileOffset = Vec3( 0.5f, 0.5f, 0.5f );

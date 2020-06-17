@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/Map.hpp"
-
+#include "Engine/Core/EventSystem.hpp"
+#include <map>
 
 class Game;
 
@@ -25,8 +26,10 @@ public:
 
 	void SetCurrentMap( Map* newCurrentMap );
 
+	bool WarpPlayer( EventArgs const& args );
+
 private:
-	std::vector<Map*> m_maps;
+	std::map<std::string, Map*> m_maps;
 
 	Map* m_currentMap = nullptr;
 	Game* m_game = nullptr;

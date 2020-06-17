@@ -17,6 +17,8 @@ public:
 	virtual void Update( float deltaSeconds ) override;
 	virtual void Render() override;
 	virtual void SetPlayerToStart() override;
+	virtual Vec2 const& GetPlayerStartPosition() override;
+	virtual float GetPlayerStartYaw() override;
 
 private:
 
