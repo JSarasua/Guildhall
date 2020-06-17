@@ -65,6 +65,15 @@ void Camera::RotatePitchRollYawDegrees( Vec3 const& rotator )
 	m_transform.SetRotationFromPitchRollYawDegrees( pitch, rotationPitchRollYaw.y, rotationPitchRollYaw.z );
 }
 
+void Camera::SetRotationPitchRollYawDegrees( Vec3 const& pitchRollYawDegrees )
+{
+	Vec3 pitchRollYaw = pitchRollYawDegrees;
+
+	pitchRollYaw.x = Clampf( pitchRollYaw.x, -89.9f, 89.9f );
+
+	m_transform.SetRotationFromPitchRollYawDegrees( pitchRollYaw );
+}
+
 void Camera::SetScreenShakeIntensity( float newIntensity )
 {
 	m_screenShakeIntensity = newIntensity;

@@ -59,6 +59,7 @@ public:
 	void TranslateRelativeToView( Vec3 const& translation );
 	void TranslateRelativeToViewOnlyYaw( Vec3 const& translation );
 	void RotatePitchRollYawDegrees( Vec3 const& rotator );
+	void SetRotationPitchRollYawDegrees( Vec3 const& pitchRollYawDegrees );
 	void UpdateCameraUBO();
 
 	void UpdateScreenShake( RandomNumberGenerator& rand );
