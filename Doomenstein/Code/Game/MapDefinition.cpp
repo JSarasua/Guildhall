@@ -1,11 +1,12 @@
 #include "Game/MapDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 std::map< std::string, MapDefinition*> MapDefinition::s_definitions;
 
 MapDefinition::MapDefinition( const XmlElement& element )
 {
-
+	UNUSED( element );
 }
 
 void MapDefinition::InitializeMapDefinitions( const XmlElement& rootMapDefElement )
