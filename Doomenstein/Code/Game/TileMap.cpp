@@ -347,7 +347,7 @@ void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& til
 	bool isBackTileSolid = IsTileSolidAtCoords( currentTileCoords + backward );
 	bool isFrontTileSolid = IsTileSolidAtCoords( currentTileCoords + forward );
 
-	if( !isEdgeTile )
+	if( !tile.IsSolid() )
 	{
 		//Top quad
 		tileIndices.push_back( 0 );
