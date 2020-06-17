@@ -56,6 +56,7 @@ public:
 
 	void PopulateFromXMLAttributes( XmlElement const& element );
 	void PopulateFromKeyValuePairs( std::string const& str ); //key=value key1=othervalue
+	bool IsNotEmpty() const;
 
 	void SetValue( std::string const& keyName, std::string const& valueName );
 
