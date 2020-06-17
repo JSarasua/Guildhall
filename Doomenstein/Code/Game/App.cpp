@@ -35,6 +35,9 @@ void App::Startup()
 
 	XmlDocument gameConfigDoc;
 	const XmlElement& gameConfigRootElement = GetRootElement( gameConfigDoc, "Data/GameConfig.xml" );
+	std::string gameConfigName = gameConfigRootElement.Name();
+	g_theConsole->GuaranteeOrError( gameConfigName == "GameConfig", "ERROR: Expected GameConfig as root element in GameConfig.xml" );
+
 	g_gameConfigBlackboard->PopulateFromXmlElementAttributes( gameConfigRootElement );
 
 	float aspectRatio = g_gameConfigBlackboard->GetValue("windowAspect", 0.f);

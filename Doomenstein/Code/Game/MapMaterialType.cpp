@@ -49,6 +49,8 @@ Texture const& MapMaterialType::GetTexture()
 void MapMaterialType::InitializeMapMaterialDefinitions( const XmlElement& rootMapMaterialElement )
 {
 	g_theConsole->PrintString(Rgba8::WHITE, "Loading Map Material Types..." );
+	std::string mapMaterialRootName = rootMapMaterialElement.Name();
+	g_theConsole->GuaranteeOrError( mapMaterialRootName == "MapMaterialTypes", Stringf( "ERROR: Expected MapMaterialTypes as root node" ) );
 
 	s_defaultMapMaterial = ParseXMLAttribute( rootMapMaterialElement, "default", "INVALID" );
 	g_theConsole->GuaranteeOrError( s_defaultMapMaterial != "INVALID", "ERROR: Invalid default Map material, cannot be INVALID" );

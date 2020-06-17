@@ -138,6 +138,8 @@ Texture const& MapRegionType::GetTexture( eMapMaterialArea mapMaterialArea )
 void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapRegionElement )
 {
 	g_theConsole->PrintString(Rgba8::WHITE, "Loading Map Region Types..." );
+	std::string mapRegionRootName = rootMapRegionElement.Name();
+	g_theConsole->GuaranteeOrError( mapRegionRootName == "MapRegionTypes", Stringf( "ERROR: Expected MapRegionTypes as root node" ) );
 
 	s_defaultMapRegion = ParseXMLAttribute( rootMapRegionElement, "default", "INVALID" );
 	GUARANTEE_OR_DIE( s_defaultMapRegion != "INVALID", "Invalid default Map Region, cannot be INVALID" );
