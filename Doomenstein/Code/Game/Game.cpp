@@ -1077,18 +1077,18 @@ void Game::UIRender()
 	float screenWidth = screenDimensions.maxs.x - screenDimensions.mins.x;
 	float screenHeight = screenWidth * heightOverWidth;
 	AABB2 uiBounds = screenDimensions.CarveBoxOffBottom( 0.f, screenHeight );
-	//uiBounds.maxs.y = screenHeight;
 	g_theRenderer->BindTexture( baseTexture );
 	g_theRenderer->DrawAABB2Filled( uiBounds, Rgba8::WHITE );
 
-	AABB2 gunBounds = screenDimensions.CarveBoxOffBottom( 0.f, screenHeight );
-	AABB2 gunSpriteUvs;
+	AABB2 gunBounds = screenDimensions;
+ 	AABB2 gunSpriteUvs;
 	SpriteDefinition const& gunSpriteDef = m_viewModelsSpriteSheet->GetSpriteDefinition( 0 );
 	Texture const& gunSpriteTexture = gunSpriteDef.GetTexture();
 	float gunSpriteTextureAspect = gunSpriteTexture.GetAspectRatio();
-	float gunSpriteHeightOverWidth = 1.f / gunSpriteTextureAspect;
-	gunBounds.maxs.y = gunSpriteHeightOverWidth * (gunBounds.GetDimensions().x) - gunBounds.mins.y;
+	float gunSpriteWidth = gunBounds.GetDimensions().y * gunSpriteTextureAspect;
+	gunBounds.SetDimensions( Vec2( gunSpriteWidth, gunBounds.GetDimensions().y) );
 	gunSpriteDef.GetUVs( gunSpriteUvs.mins, gunSpriteUvs.maxs );
+	
 	g_theRenderer->BindTexture( &gunSpriteTexture );
 	g_theRenderer->DrawAABB2Filled( gunBounds, Rgba8::WHITE, gunSpriteUvs.mins, gunSpriteUvs.maxs );
 }
