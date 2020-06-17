@@ -28,6 +28,7 @@ void World::Startup()
 	}
 	
 	m_currentMap = m_maps[0];
+	m_currentMap->SetPlayerToStart();
 }
 
 void World::Shutdown()

@@ -1099,6 +1099,16 @@ void Game::LoadAssets()
 	m_viewModelsSpriteSheet = new SpriteSheet( *viewModelSpriteTex, IntVec2( 8, 8 ) );
 }
 
+void Game::SetPlayerPosition( Vec3 const& playerPos )
+{
+	m_camera.SetPosition( playerPos );
+}
+
+void Game::SetPlayerRotation( Vec3 const& pitchRollYawDegrees )
+{
+	m_camera.RotatePitchRollYawDegrees( pitchRollYawDegrees );
+}
+
 void Game::RenderDevConsole()
 {
 	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);

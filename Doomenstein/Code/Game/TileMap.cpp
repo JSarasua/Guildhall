@@ -1,6 +1,7 @@
 #include "Game/TileMap.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game/MapRegionType.hpp"
+#include "Game/GameCommon.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -10,6 +11,7 @@ TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 
 	XmlElement const* legendElement = element.FirstChildElement( "Legend" );
 	XmlElement const* mapRowsElement = element.FirstChildElement( "MapRows" );
+	XmlElement const* entitiesElement = element.FirstChildElement( "Entities" );
 
 	m_isValid = g_theConsole->GuaranteeOrError( legendElement, Stringf( "ERROR: No Legend for map" ) );
 	if( !m_isValid )
@@ -22,9 +24,16 @@ TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 	{
 		return;
 	}
+	bool isEntitiesElementValid = false;
+	isEntitiesElementValid = g_theConsole->GuaranteeOrError( entitiesElement, Stringf( "ERROR: No Entities found for map" ) );
 
 	ParseLegend( *legendElement );
 	SpawnTiles( *mapRowsElement );
+
+	if( isEntitiesElementValid )
+	{
+		ParseEntities( *entitiesElement );
+	}
 
 	m_isValid = true;
 }
@@ -36,6 +45,8 @@ TileMap::~TileMap()
 
 void TileMap::Update( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	m_vertsToRender.clear();
 	m_tileIndices.clear();
 	Vec3 tileOffset = Vec3( 0.5f, 0.5f, 0.5f );
@@ -67,6 +78,13 @@ void TileMap::Render()
 		g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
 	}
 
+}
+
+void TileMap::SetPlayerToStart()
+{
+	g_theGame->SetPlayerPosition( Vec3(m_playerStartPosition, 0.5f) );
+	Vec3 pitchRollYawDegrees = Vec3( 0.f, 0.f, m_playerStartYaw );
+	g_theGame->SetPlayerRotation( pitchRollYawDegrees );
 }
 
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )
@@ -486,5 +504,15 @@ void TileMap::SpawnMapRow( std::string const& mapRow, uint heightIndex  )
 		IntVec2 tileCoords = IntVec2( (int)mapRowIndex, heightIndex );
 		m_tiles.push_back( MapTile( tileCoords, mapRegionType ) );
 	}
+}
+
+void TileMap::ParseEntities( XmlElement const& entitiesElement )
+{
+	XmlElement const* playerStartElement = entitiesElement.FirstChildElement( "PlayerStart" );
+
+	g_theConsole->GuaranteeOrError( playerStartElement, Stringf( "No PlayerStart foud for map" ) );
+	
+	m_playerStartPosition = ParseXMLAttribute( *playerStartElement, "pos", Vec2( 0.f, 0.f ) );
+	m_playerStartYaw = ParseXMLAttribute( *playerStartElement, "yaw", 0.f );
 }
 

@@ -16,6 +16,7 @@ public:
 public:
 	virtual void Update( float deltaSeconds ) override;
 	virtual void Render() override;
+	virtual void SetPlayerToStart() override;
 
 private:
 
@@ -28,6 +29,7 @@ private:
 	void ParseLegend( XmlElement const& legendElement );
 	void SpawnTiles( XmlElement const& mapRowsElement );
 	void SpawnMapRow( std::string const& mapRow, uint heightIndex );
+	void ParseEntities( XmlElement const& entitiesElement );
 
 	void RenderTiles();
 	void RenderEntities();
@@ -42,6 +44,9 @@ private:
 	std::vector<MapTile> m_tiles;
 	IntVec2 m_mapSize;
 	int m_NumOftiles = 0;
+
+	Vec2 m_playerStartPosition;
+	float m_playerStartYaw = 0.f;
 
 
 

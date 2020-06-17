@@ -20,6 +20,8 @@ public:
 	virtual void Update( float deltaSeconds ) = 0;
 	virtual void Render() = 0;
 
+	virtual void SetPlayerToStart() = 0;
+
 protected:
 	Game* m_game = nullptr;
 	bool m_isValid = false;

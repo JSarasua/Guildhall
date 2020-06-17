@@ -91,6 +91,9 @@ public:
 	bool TestEventSystem( EventArgs const& args );
 	bool TestEventSystem2( EventArgs const& args );
 
+	void SetPlayerPosition( Vec3 const& playerPos );
+	void SetPlayerRotation( Vec3 const& pitchRollYawDegrees );
+
 private:
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
@@ -119,6 +122,8 @@ private:
 	void UIRender();
 
 	void LoadAssets();
+
+
 
 private:
 	Mat44 m_frontCubeModelMatrix;
