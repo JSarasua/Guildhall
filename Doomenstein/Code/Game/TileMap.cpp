@@ -24,12 +24,26 @@ TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 	{
 		return;
 	}
+	
+	if( !ParseLegend( *legendElement ) )
+	{
+		m_isValid = false;
+		return;
+	}
+
+	if( !SpawnTiles( *mapRowsElement ) )
+	{
+		m_isValid = false;
+		return;
+	}
+
+	if( !m_isValid )
+	{
+		return;
+	}
+
 	bool isEntitiesElementValid = false;
 	isEntitiesElementValid = g_theConsole->GuaranteeOrError( entitiesElement, Stringf( "ERROR: No Entities found for map" ) );
-
-	ParseLegend( *legendElement );
-	SpawnTiles( *mapRowsElement );
-
 	if( isEntitiesElementValid )
 	{
 		ParseEntities( *entitiesElement );
@@ -329,11 +343,11 @@ void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVert
 
 void TileMap::AddTileIndices( std::vector<uint>& tileIndices, MapTile const& tile )
 {
-	bool isBackTile = (tile.m_tileCoords.x == m_mapSize.x - 1);
-	bool isRightTile = (tile.m_tileCoords.y == 0);
-	bool isFrontTile = (tile.m_tileCoords.x == 0);
-	bool isLeftTile = (tile.m_tileCoords.y == m_mapSize.y - 1);
-	bool isEdgeTile = isBackTile || isRightTile || isLeftTile || isFrontTile;
+// 	bool isBackTile = (tile.m_tileCoords.x == m_mapSize.x - 1);
+// 	bool isRightTile = (tile.m_tileCoords.y == 0);
+// 	bool isFrontTile = (tile.m_tileCoords.x == 0);
+// 	bool isLeftTile = (tile.m_tileCoords.y == m_mapSize.y - 1);
+	//bool isEdgeTile = isBackTile || isRightTile || isLeftTile || isFrontTile;
 
 	IntVec2 left = IntVec2( 0, 1 );
 	IntVec2 right = IntVec2( 0, -1 );
@@ -439,7 +453,7 @@ MapTile const& TileMap::GetMapTileAtTileCoords( IntVec2 const& tileCoords )
 	return m_tiles[tileIndex];
 }
 
-void TileMap::ParseLegend( XmlElement const& legendElement )
+bool TileMap::ParseLegend( XmlElement const& legendElement )
 {
 	//Passed in element with name Legend
 	//Has sub elements with format <Tile glyph="#" regionType="WoodWall"/>
@@ -450,21 +464,42 @@ void TileMap::ParseLegend( XmlElement const& legendElement )
 		XmlAttribute const* regionAttribute = element->FindAttribute( "regionType" );
 		std::string elementName = element->Name();
 
-		GUARANTEE_OR_DIE( elementName == "Tile", "Legend has elements not named Tile");
-		GUARANTEE_OR_DIE( glyphAttribute, "There was no glyph attribute in Legend" );
-		GUARANTEE_OR_DIE( regionAttribute, "There was no regionType attribute in Legend" );
+		if( !g_theConsole->GuaranteeOrError( elementName == "Tile", "Legend has elements not named Tile" ) )
+		{
+			return false;
+		}
+
+
+		if( !g_theConsole->GuaranteeOrError( glyphAttribute, "There was no glyph attribute in Legend" ) )
+		{
+			return false;
+		}
+
+		if( !g_theConsole->GuaranteeOrError( regionAttribute, "There was no regionType attribute in Legend" ) )
+		{
+			return false;
+		}
 
 		unsigned char glyph = ParseXMLAttribute( *element, "glyph", '\0' );
 		std::string regionTypeStr = ParseXMLAttribute( *element, "regionType", "INVALID" );
 
-		GUARANTEE_OR_DIE( glyph != '\0', "glyph was an invalid character or string" );
-		GUARANTEE_OR_DIE( regionTypeStr != "INVALID", "Invalid region type" );
+		if( !g_theConsole->GuaranteeOrError( glyph != '\0', "glyph was an invalid character or string") )
+		{
+			return false;
+		}
+
+		if( !g_theConsole->GuaranteeOrError( regionTypeStr != "INVALID", "Invalid region type" ) )
+		{
+			return false;
+		}
 
 		m_legend[glyph] = regionTypeStr;
 	}
+
+	return true;
 }
 
-void TileMap::SpawnTiles( XmlElement const& mapRowsElement )
+bool TileMap::SpawnTiles( XmlElement const& mapRowsElement )
 {
 	std::vector<std::string> mapRows;
 	for( XmlElement const* element = mapRowsElement.FirstChildElement(); element; element=element->NextSiblingElement() )
@@ -479,41 +514,40 @@ void TileMap::SpawnTiles( XmlElement const& mapRowsElement )
 	uint heightIndex = 0;
 	for( int mapRowsIndex = (int)mapRows.size() - 1; mapRowsIndex >= 0; mapRowsIndex-- )
 	{
-		SpawnMapRow( mapRows[mapRowsIndex], heightIndex );
+		bool isValid = SpawnMapRow( mapRows[mapRowsIndex], heightIndex );
 		heightIndex++;
+
+		if( !isValid )
+		{
+			return false;
+		}
 	}
 
-// 	for( int heightIndex = 0; heightIndex < m_mapSize.y; heightIndex++ )
-// 	{
-// 		for( int widthIndex = 0; widthIndex < m_mapSize.x; widthIndex++ )
-// 		{
-// 			IntVec2 tileCoords = IntVec2( widthIndex, heightIndex );
-// 			MapTile mapTile = MapTile( tileCoords );
-// 			mapTile.m_tempIsSolid = false;
-// 
-// 			if( widthIndex == 0 || heightIndex == 0 || widthIndex + 1 == m_mapSize.x || heightIndex + 1 == m_mapSize.y )
-// 			{
-// 				mapTile.m_tempIsSolid = true;
-// 			}
-// 			m_tiles.push_back( mapTile );
-// 
-// 		}
-// 	}
+	return true;
 }
 
-void TileMap::SpawnMapRow( std::string const& mapRow, uint heightIndex  )
+bool TileMap::SpawnMapRow( std::string const& mapRow, uint heightIndex  )
 {
 	for( size_t mapRowIndex = 0; mapRowIndex < mapRow.size(); mapRowIndex++ )
 	{
 		char glyph = mapRow[mapRowIndex];
 		auto legendIter = m_legend.find(glyph);
+		
 		GUARANTEE_OR_DIE( legendIter != m_legend.end(), "Glyph not found in legend" );
+		
 		std::string mapRegionStr = legendIter->second;
 		MapRegionType* mapRegionType = MapRegionType::GetMapRegionTypeByString( mapRegionStr );
+
+		if( !mapRegionType )
+		{
+			return false;
+		}
 
 		IntVec2 tileCoords = IntVec2( (int)mapRowIndex, heightIndex );
 		m_tiles.push_back( MapTile( tileCoords, mapRegionType ) );
 	}
+
+	return true;
 }
 
 void TileMap::ParseEntities( XmlElement const& entitiesElement )

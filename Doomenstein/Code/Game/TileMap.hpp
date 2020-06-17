@@ -28,9 +28,9 @@ private:
 	bool IsTileSolidAtCoords( IntVec2 const& tileCoords );
 	MapTile const& GetMapTileAtTileCoords( IntVec2 const& tileCoords );
 	
-	void ParseLegend( XmlElement const& legendElement );
-	void SpawnTiles( XmlElement const& mapRowsElement );
-	void SpawnMapRow( std::string const& mapRow, uint heightIndex );
+	bool ParseLegend( XmlElement const& legendElement );
+	bool SpawnTiles( XmlElement const& mapRowsElement );
+	bool SpawnMapRow( std::string const& mapRow, uint heightIndex );
 	void ParseEntities( XmlElement const& entitiesElement );
 
 	void RenderTiles();

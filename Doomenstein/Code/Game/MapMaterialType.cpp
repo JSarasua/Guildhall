@@ -106,7 +106,12 @@ MapMaterialType* MapMaterialType::GetMapMaterialMatchingName( std::string const&
 	if( mapMaterialIter == s_definitions.end() )
 	{
 		mapMaterialIter = s_definitions.find( MapMaterialType::s_defaultMapMaterial );
-		GUARANTEE_OR_DIE( mapMaterialIter != s_definitions.end(), "ERROR: Couldn't find default map material by name" );
+
+		if( mapMaterialIter == s_definitions.end() )
+		{
+			return nullptr;
+		}
+		//GUARANTEE_OR_DIE( mapMaterialIter != s_definitions.end(), "ERROR: Couldn't find default map material by name" );
 	}
 
 	return mapMaterialIter->second;

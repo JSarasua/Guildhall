@@ -151,8 +151,16 @@ void Game::InitializeDefinitions()
 	XmlElement const& mapMaterialTypeRoot = GetRootElement( mapMaterialDoc, "Data/Definitions/MapMaterialTypes.xml" );
 	XmlElement const& mapRegionTypeRoot = GetRootElement( mapRegionDoc, "Data/Definitions/MapRegionTypes.xml" );
 
-	MapMaterialType::InitializeMapMaterialDefinitions( mapMaterialTypeRoot );
-	MapRegionType::InitializeMapRegionDefinitions( mapRegionTypeRoot );
+	if( &mapMaterialTypeRoot )
+	{
+		MapMaterialType::InitializeMapMaterialDefinitions( mapMaterialTypeRoot );
+	}
+
+	if( &mapRegionTypeRoot )
+	{
+		MapRegionType::InitializeMapRegionDefinitions( mapRegionTypeRoot );
+	}
+
 }
 
 void Game::Update()

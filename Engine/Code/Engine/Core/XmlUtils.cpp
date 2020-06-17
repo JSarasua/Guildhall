@@ -6,6 +6,7 @@
 #include "Engine/Math/IntRange.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 const XmlElement& GetRootElement( XmlDocument& document, const char* xmlFilePath )
@@ -13,7 +14,8 @@ const XmlElement& GetRootElement( XmlDocument& document, const char* xmlFilePath
 	XmlError errorFlag = document.LoadFile( xmlFilePath );
  	std::string errorMessage = "Xml Not Found: ";
  	errorMessage.append(xmlFilePath);
- 	GUARANTEE_OR_DIE( errorFlag == XmlError::XML_SUCCESS, errorMessage.c_str() );
+
+	g_theConsole->GuaranteeOrError( errorFlag == XmlError::XML_SUCCESS, errorMessage.c_str() );
 
 	const XmlElement* element = document.RootElement();
 	return *element;

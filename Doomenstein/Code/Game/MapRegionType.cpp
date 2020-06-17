@@ -35,6 +35,11 @@ MapRegionType::MapRegionType( XmlElement const& element )
 		}
 
 		m_sideMaterialType = MapMaterialType::GetMapMaterialMatchingName( sideMaterialName );
+		if( !m_sideMaterialType )
+		{
+			m_isValid = false;
+			return;
+		}
 	}
 	else
 	{
@@ -70,6 +75,18 @@ MapRegionType::MapRegionType( XmlElement const& element )
 
 		m_floorMaterialType = MapMaterialType::GetMapMaterialMatchingName( floorMaterialName );
 		m_ceilingMaterialType = MapMaterialType::GetMapMaterialMatchingName( ceilingMaterialName );
+
+		if( !m_floorMaterialType )
+		{
+			m_isValid = false;
+			return;
+		}
+
+		if( !m_ceilingMaterialType )
+		{
+			m_isValid = false;
+			return;
+		}
 	}
 
 	m_isValid = true;
@@ -153,7 +170,11 @@ MapRegionType* MapRegionType::GetMapRegionTypeByString( std::string const& mapRe
 	if( mapRegionIter == s_definitions.end() )
 	{
 		mapRegionIter = s_definitions.find( MapRegionType::s_defaultMapRegion );
-		GUARANTEE_OR_DIE( mapRegionIter != s_definitions.end(), "Couldn't find default map region by name" );
+		
+		if( mapRegionIter == s_definitions.end() )
+		{
+			return nullptr;
+		}
 	}
 
 	MapRegionType* mapRegionType = mapRegionIter->second;
