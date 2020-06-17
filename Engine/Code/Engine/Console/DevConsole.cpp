@@ -332,7 +332,11 @@ void DevConsole::HandleSpecialKeyStroke( unsigned char keyStroke )
 void DevConsole::ErrorString( std::string const& devConsolePrintString )
 {
 	PrintString( Rgba8::RED, devConsolePrintString );
-	SetIsOpen( true );
+
+	if( !m_isOpen )
+	{
+		SetIsOpen( true );
+	}
 }
 
 bool DevConsole::GuaranteeOrError( bool condition, std::string const& devConsolePrintString )
