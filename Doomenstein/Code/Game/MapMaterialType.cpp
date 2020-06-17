@@ -16,12 +16,12 @@ MapMaterialType::MapMaterialType( XmlElement const& element )
 	std::string spriteSheetName			= ParseXMLAttribute( element, "sheet", "INVALID" );
 	IntVec2 materialSpriteCoords		= ParseXMLAttribute(element, "spriteCoords", IntVec2( -1,-1 ) );
 	
-	m_isValid = g_theConsole->GuaranteeOrError( spriteSheetName != "INVALID", Stringf("Could not parse Spritesheet name for material: %s", m_name.c_str() ) );
+	m_isValid = g_theConsole->GuaranteeOrError( spriteSheetName != "INVALID", Stringf("Missing Spritesheet name for material: %s", m_name.c_str() ) );
 	if( !m_isValid )
 	{
 		return;
 	}
-	m_isValid = g_theConsole->GuaranteeOrError( materialSpriteCoords != IntVec2( -1, -1 ), Stringf("Could not parse sprite coordinates for material: %s", m_name.c_str() ) );
+	m_isValid = g_theConsole->GuaranteeOrError( materialSpriteCoords != IntVec2( -1, -1 ), Stringf("Missing sprite coordinates for material: %s", m_name.c_str() ) );
 	if( !m_isValid )
 	{
 		return;
@@ -53,28 +53,52 @@ void MapMaterialType::InitializeMapMaterialDefinitions( const XmlElement& rootMa
 	g_theConsole->GuaranteeOrError( mapMaterialRootName == "MapMaterialTypes", Stringf( "ERROR: Expected MapMaterialTypes as root node" ) );
 
 	s_defaultMapMaterial = ParseXMLAttribute( rootMapMaterialElement, "default", "INVALID" );
-	g_theConsole->GuaranteeOrError( s_defaultMapMaterial != "INVALID", "ERROR: Invalid default Map material, cannot be INVALID" );
+	if( !g_theConsole->GuaranteeOrError( s_defaultMapMaterial != "INVALID", "ERROR: Invalid default Map material, cannot be INVALID" ) )
+	{
+		//return;
+	}
 
 	const XmlElement* materialSheetElement = rootMapMaterialElement.FirstChildElement();
 	std::string materialSheetName = materialSheetElement->Name();
-	GUARANTEE_OR_DIE( materialSheetName == "MaterialsSheet", "MaterialsSheet must be first element in MapMaterialTypes" );
 
+	if( !g_theConsole->GuaranteeOrError( materialSheetName == "MaterialsSheet", "MaterialsSheet must be first element in MapMaterialTypes" ) )
+	{
+		return;
+	}
 	const XmlAttribute* materialSheetNameAttribute = materialSheetElement->FindAttribute( "name" );
 	if( materialSheetNameAttribute )
 	{
 		std::string sheetName = materialSheetNameAttribute->Value();
 
 		XmlElement const* imageElement = materialSheetElement->FirstChildElement( "Diffuse" );
+
+		if( !g_theConsole->GuaranteeOrError( imageElement, "Material sheet must have a Diffuse element" ) )
+		{
+			return;
+		}
+
 		std::string imageFilePath = ParseXMLAttribute( *imageElement, "image", "INVALID" );
 		IntVec2 imageDimensions = ParseXMLAttribute( *materialSheetElement, "layout", IntVec2() );
-		GUARANTEE_OR_DIE( imageFilePath != "INVALID", "Invalid Image File path for diffuse sheet" );
-		GUARANTEE_OR_DIE( imageDimensions != IntVec2(), "Invalid Image dimensions for diffuse sheet" );
+
+		if( !g_theConsole->GuaranteeOrError( imageFilePath != "INVALID", "Invalid Image File path for diffuse sheet" ) )
+		{
+			return;
+		}
+
+		if( !g_theConsole->GuaranteeOrError( imageDimensions != IntVec2(), "Missing layout for diffuse sheet" ) )
+		{
+			return;
+		}
 
 		Texture* texture = g_theRenderer->CreateOrGetTextureFromFile( imageFilePath.c_str() );
 		SpriteSheet* spriteSheet = new SpriteSheet( *texture, imageDimensions );
 
 		s_textures[sheetName] = spriteSheet;
-			
+	}
+	else
+	{
+		g_theConsole->ErrorString( "MaterialsSheet requires a name element" );
+		return;
 	}
 
 
@@ -95,7 +119,10 @@ void MapMaterialType::InitializeMapMaterialDefinitions( const XmlElement& rootMa
 				delete mapMaterialType;
 				mapMaterialType = nullptr;
 			}
-
+		}
+		else
+		{
+			g_theConsole->ErrorString( "Missing name for MaterialType" );
 		}
 	}
 }
