@@ -48,12 +48,20 @@ void World::Shutdown()
 
 void World::Update( float deltaSeconds )
 {
-	m_currentMap->Update(deltaSeconds);
+	if( m_currentMap && m_currentMap->IsValid() )
+	{
+		m_currentMap->Update(deltaSeconds);
+	}
+
 }
 
 void World::Render()
 {
-	m_currentMap->Render();
+	if( m_currentMap && m_currentMap->IsValid() )
+	{
+		m_currentMap->Render();
+	}
+
 }
 
 void World::SetCurrentMap( Map* newCurrentMap )
@@ -94,6 +102,7 @@ bool World::WarpPlayer( EventArgs const& args )
 			}
 			else
 			{
+				g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Warping to %s...", mapIter->first.c_str() ) );
 				m_currentMap = mapIter->second;
 			}
 

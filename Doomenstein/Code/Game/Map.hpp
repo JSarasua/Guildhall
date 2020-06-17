@@ -24,6 +24,8 @@ public:
 	virtual Vec2 const& GetPlayerStartPosition() = 0;
 	virtual float GetPlayerStartYaw() = 0;
 
+	bool IsValid() const;
+
 protected:
 	Game* m_game = nullptr;
 	bool m_isValid = false;

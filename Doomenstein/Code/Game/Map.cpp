@@ -23,6 +23,11 @@ Map::Map(Game* game) :
 {
 }
 
+bool Map::IsValid() const
+{
+	return m_isValid;
+}
+
 Map::~Map()
 {
 
