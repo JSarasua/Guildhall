@@ -8,6 +8,9 @@ std::string MapRegionType::s_defaultMapRegion;
 
 MapRegionType::MapRegionType( XmlElement const& element )
 {
+	std::string regionTypeStr = element.Name();
+	g_theConsole->GuaranteeOrError( regionTypeStr == "RegionType", "MapRegionType element not named RegionType" );
+	
 	m_name = ParseXMLAttribute( element, "name", "INVALID" );
 	m_isSolid = ParseXMLAttribute( element, "isSolid", false );
 
@@ -142,7 +145,8 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 	g_theConsole->GuaranteeOrError( mapRegionRootName == "MapRegionTypes", Stringf( "ERROR: Expected MapRegionTypes as root node" ) );
 
 	s_defaultMapRegion = ParseXMLAttribute( rootMapRegionElement, "default", "INVALID" );
-	GUARANTEE_OR_DIE( s_defaultMapRegion != "INVALID", "Invalid default Map Region, cannot be INVALID" );
+
+	g_theConsole->GuaranteeOrError( s_defaultMapRegion != "INVALID", "Missing default Map Region, cannot be INVALID" );
 	
 	for( const XmlElement* element = rootMapRegionElement.FirstChildElement(); element; element=element->NextSiblingElement() ) {
 		const XmlAttribute* nameAttribute = element->FindAttribute( "name" );
@@ -160,6 +164,10 @@ void MapRegionType::InitializeMapRegionDefinitions( const XmlElement& rootMapReg
 				delete mapRegion;
 				mapRegion = nullptr;
 			}
+		}
+		else
+		{
+			g_theConsole->ErrorString( "ERROR: Missing name for MapRegionType" );
 		}
 	}
 }
