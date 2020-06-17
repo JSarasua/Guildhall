@@ -7,6 +7,10 @@ extern RenderContext* g_theRenderer;
 
 TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 {
+	std::string mapName = element.Name();
+	g_theConsole->GuaranteeOrError( mapName == "MapDefinition", Stringf( "ERROR: Expected MapDefinition as root node" ) );
+
+
 	m_mapSize = ParseXMLAttribute( element, "dimensions", IntVec2( 8, 8 ) );
 
 	XmlElement const* legendElement = element.FirstChildElement( "Legend" );
@@ -506,10 +510,23 @@ bool TileMap::SpawnTiles( XmlElement const& mapRowsElement )
 	{
 		std::string mapRow = ParseXMLAttribute( *element, "tiles", "INVALID" );
 
-		GUARANTEE_OR_DIE( mapRow != "INVALID" && mapRow.length() == m_mapSize.x, "Invalid MapRow tiles" );
+		if( !g_theConsole->GuaranteeOrError( mapRow != "INVALID", "Invalid MapRow tiles" ) )
+		{
+			return false;
+		}
+
+		if( !g_theConsole->GuaranteeOrError( mapRow.length() == m_mapSize.x, "Invalid MapRow tile width" ) )
+		{
+			return false;
+		}
+
 		mapRows.push_back( mapRow );
 	}
-	GUARANTEE_OR_DIE( mapRows.size() == m_mapSize.y, "Number of Map rows doesn't match map height dimension" );
+
+	if( !g_theConsole->GuaranteeOrError( mapRows.size() == m_mapSize.y, "Number of Map rows doesn't match map height dimension" ) )
+	{
+		return false;
+	}
 
 	uint heightIndex = 0;
 	for( int mapRowsIndex = (int)mapRows.size() - 1; mapRowsIndex >= 0; mapRowsIndex-- )
@@ -533,7 +550,10 @@ bool TileMap::SpawnMapRow( std::string const& mapRow, uint heightIndex  )
 		char glyph = mapRow[mapRowIndex];
 		auto legendIter = m_legend.find(glyph);
 		
-		GUARANTEE_OR_DIE( legendIter != m_legend.end(), "Glyph not found in legend" );
+		if( !g_theConsole->GuaranteeOrError( legendIter != m_legend.end(), Stringf( "Glyph %c not found in legend", glyph ) ) )
+		{
+			return false;
+		}
 		
 		std::string mapRegionStr = legendIter->second;
 		MapRegionType* mapRegionType = MapRegionType::GetMapRegionTypeByString( mapRegionStr );
