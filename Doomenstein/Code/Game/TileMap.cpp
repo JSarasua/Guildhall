@@ -11,7 +11,12 @@ TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
 	g_theConsole->GuaranteeOrError( mapName == "MapDefinition", Stringf( "ERROR: Expected MapDefinition as root node" ) );
 
 
-	m_mapSize = ParseXMLAttribute( element, "dimensions", IntVec2( 8, 8 ) );
+	m_mapSize = ParseXMLAttribute( element, "dimensions", IntVec2( 0, 0 ) );
+	m_isValid = g_theConsole->GuaranteeOrError( m_mapSize != IntVec2( 0, 0 ), Stringf( "ERROR: Missing Map dimensions" ) );
+	if( !m_isValid )
+	{
+		return;
+	}
 
 	XmlElement const* legendElement = element.FirstChildElement( "Legend" );
 	XmlElement const* mapRowsElement = element.FirstChildElement( "MapRows" );
@@ -508,9 +513,12 @@ bool TileMap::SpawnTiles( XmlElement const& mapRowsElement )
 	std::vector<std::string> mapRows;
 	for( XmlElement const* element = mapRowsElement.FirstChildElement(); element; element=element->NextSiblingElement() )
 	{
+		std::string elementName = element->Name();
+		g_theConsole->GuaranteeOrError( elementName == "MapRow", "ERROR: MapRows has element not named MapRow" );
+
 		std::string mapRow = ParseXMLAttribute( *element, "tiles", "INVALID" );
 
-		if( !g_theConsole->GuaranteeOrError( mapRow != "INVALID", "Invalid MapRow tiles" ) )
+		if( !g_theConsole->GuaranteeOrError( mapRow != "INVALID", "ERROR: Missing MapRow tiles" ) )
 		{
 			return false;
 		}
@@ -574,9 +582,22 @@ void TileMap::ParseEntities( XmlElement const& entitiesElement )
 {
 	XmlElement const* playerStartElement = entitiesElement.FirstChildElement( "PlayerStart" );
 
-	g_theConsole->GuaranteeOrError( playerStartElement, Stringf( "No PlayerStart foud for map" ) );
+	if( !g_theConsole->GuaranteeOrError( playerStartElement, Stringf( "ERROR: No PlayerStart found for map" ) ) )
+	{
+		return;
+	}
 	
-	m_playerStartPosition = ParseXMLAttribute( *playerStartElement, "pos", Vec2( 0.f, 0.f ) );
-	m_playerStartYaw = ParseXMLAttribute( *playerStartElement, "yaw", 0.f );
+	m_playerStartPosition = ParseXMLAttribute( *playerStartElement, "pos", Vec2( -999.f, -999.f ) );
+	m_playerStartYaw = ParseXMLAttribute( *playerStartElement, "yaw", -999.f );
+
+	if( !g_theConsole->GuaranteeOrError( m_playerStartPosition != Vec2( -999.f, -999.f ), Stringf( "ERROR: Missing player start position for map" ) ) )
+	{
+		//return;
+	}
+
+	if( !g_theConsole->GuaranteeOrError( m_playerStartYaw != -999.f, Stringf( "ERROR: Missing player start yaw for map" ) ) )
+	{
+		//return;
+	}
 }
 
