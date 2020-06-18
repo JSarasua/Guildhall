@@ -67,6 +67,9 @@
     <ClCompile Include="MapMaterialType.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="EntityDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -112,6 +115,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="MapMaterialType.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDefinition.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
