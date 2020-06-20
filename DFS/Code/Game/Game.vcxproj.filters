@@ -76,6 +76,12 @@
     <ClCompile Include="Bullet.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="WeaponDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="BulletDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -138,6 +144,12 @@
     <ClInclude Include="Bullet.hpp">
       <Filter>General</Filter>
     </ClInclude>
+    <ClInclude Include="WeaponDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="BulletDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\GameConfig.xml">
@@ -159,6 +171,12 @@
       <Filter>Data\Gameplay</Filter>
     </Xml>
     <Xml Include="..\..\Run\Data\Gameplay\Projectiles.xml">
+      <Filter>Data\Gameplay</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Gameplay\Bullets.xml">
+      <Filter>Data\Gameplay</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Gameplay\Weapons.xml">
       <Filter>Data\Gameplay</Filter>
     </Xml>
   </ItemGroup>

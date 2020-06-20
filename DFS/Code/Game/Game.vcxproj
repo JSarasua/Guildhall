@@ -189,6 +189,7 @@
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="BulletDefinition.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityDefinition.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -204,6 +205,7 @@
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="TileMetaData.cpp" />
+    <ClCompile Include="WeaponDefinition.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +213,7 @@
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Bullet.hpp" />
+    <ClInclude Include="BulletDefinition.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="EntityDefinition.hpp" />
@@ -226,16 +229,19 @@
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="TileMetaData.hpp" />
+    <ClInclude Include="WeaponDefinition.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\GameConfig.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Actors.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Adventures.xml" />
+    <Xml Include="..\..\Run\Data\Gameplay\Bullets.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\MapDefs.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Portals.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Projectiles.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\TileDefs.xml" />
+    <Xml Include="..\..\Run\Data\Gameplay\Weapons.xml" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\Run\Data\Shaders\Default.hlsl">
