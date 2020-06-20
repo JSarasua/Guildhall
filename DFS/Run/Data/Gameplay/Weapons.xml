@@ -1,0 +1,22 @@
+<WeaponDefinitions spriteSheet="test.xml" spriteLayout ="8,8">
+
+  <WeaponDefinition
+    name="Pistol"
+    spriteCoords="3,4"
+    spriteTint="255,255,255"
+    shotsPerSecond="1"
+    bulletsPerShot="2"
+    bulletSpreadDegrees="10"
+    minDrawBounds="-0.375,-0.5"
+    maxDrawBounds="0.375,0.5"
+    bulletType = "bulletTest"
+  >
+  </WeaponDefinition>
+
+
+
+
+  
+</WeaponDefinitions>
+
+

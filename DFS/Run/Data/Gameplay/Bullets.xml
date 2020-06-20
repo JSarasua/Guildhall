@@ -1,0 +1,19 @@
+<BulletDefinitions>
+
+  <BulletDefinition
+    name="bulletTest"
+    spriteCoords="3,4"
+    spriteTint="255,255,255"
+    minDrawBounds="-0.375,-0.5"
+    maxDrawBounds="0.375,0.5"
+    physicsRadius=" 0.2"
+    bulletSped="1"
+  >
+
+    
+  </BulletDefinition>
+
+  
+</BulletDefinitions>
+
+
