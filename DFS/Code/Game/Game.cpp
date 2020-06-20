@@ -21,7 +21,8 @@
 #include "Game/Actor.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
-
+#include "Game/WeaponDefinition.hpp"
+#include "Game/BulletDefinition.hpp"
 
 
 
@@ -139,10 +140,12 @@ void Game::LoadAssets()
 	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaCharacters_12x53.png" );
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
 	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
+	Texture* bulletsSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Bullets_WithAlpha.png" );
 	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(8,8));
 	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(12,53));
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
 	g_weaponSpriteSheet = new SpriteSheet(*weaponSpriteSheetTexture, IntVec2(12, 12) );
+	g_bulletsSpriteSheet = new SpriteSheet( *bulletsSpriteSheetTexture, IntVec2( 16, 6 ) );
 }
 
 void Game::UpdateCamera( float deltaSeconds )
@@ -494,14 +497,20 @@ void Game::InitializeDefinitions()
 	m_mapDefDoc		= new XmlDocument;
 	m_tileDefDoc	= new XmlDocument;
 	m_actorDefDoc	= new XmlDocument;
+	XmlDocument bulletDefDoc;
+	XmlDocument weaponDefDoc;
 
 	const XmlElement& tileDef = GetRootElement(*m_tileDefDoc, "Data/Gameplay/TileDefs.xml");
 	const XmlElement& mapDef = GetRootElement(*m_mapDefDoc, "Data/Gameplay/MapDefs.xml");
 	const XmlElement& actorDef = GetRootElement(*m_actorDefDoc, "Data/Gameplay/Actors.xml");
+	XmlElement const& bulletsDef = GetRootElement( bulletDefDoc, "Data/Gameplay/Bullets.xml");
+	XmlElement const& weaponDef = GetRootElement( weaponDefDoc, "Data/Gameplay/Weapons.xml");
 
 	TileDefinition::InitializeTileDefinitions(tileDef);
 	MapDefinition::InitializeMapDefinitions(mapDef);
 	ActorDefinition::InitializeActorDefinitions(actorDef);
+	BulletDefinition::InitializeBulletDefinitions( bulletsDef );
+	WeaponDefinition::InitializeWeaponDefinitions( weaponDef );
 }
 
 void Game::RenderMouseTest() const
@@ -529,6 +538,7 @@ void Game::UpdateDebugMouse()
 
 void Game::UpdateLoading( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 	g_theApp->PauseGame();
 	
 	static int frameCounter = 0;
