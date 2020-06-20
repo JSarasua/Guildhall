@@ -20,6 +20,8 @@ SpriteSheet* g_tileSpriteSheet = nullptr;
 SpriteSheet* g_actorSpriteSheet = nullptr;
 SpriteSheet* g_portraitSpriteSheet = nullptr;
 SpriteSheet* g_weaponSpriteSheet = nullptr;
+SpriteSheet* g_bulletsSpriteSheet = nullptr;
+
 const char* IMAGETESTPATH = "Data/Images/Test_StbiAndDirectX.png";
 
 const IntVec2 STEP_NORTH = IntVec2( 1, 0 );

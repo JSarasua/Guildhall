@@ -45,5 +45,6 @@ extern SpriteSheet* g_tileSpriteSheet;
 extern SpriteSheet* g_actorSpriteSheet;
 extern SpriteSheet* g_portraitSpriteSheet;
 extern SpriteSheet* g_weaponSpriteSheet;
+extern SpriteSheet* g_bulletsSpriteSheet;
 
 
