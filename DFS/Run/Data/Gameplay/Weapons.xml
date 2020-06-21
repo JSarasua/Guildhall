@@ -2,13 +2,52 @@
 
   <WeaponDefinition
     name="Pistol"
-    spriteCoords="3,4"
+    spriteCoords="0,1"
     spriteTint="255,255,255"
-    shotsPerSecond="1"
-    bulletsPerShot="2"
+    shotsPerSecond="4"
+    bulletsPerShot="1"
     bulletSpreadDegrees="10"
-    minDrawBounds="-0.375,-0.5"
-    maxDrawBounds="0.375,0.5"
+    minDrawBounds="-0.58,-0.35"
+    maxDrawBounds="0.58,0.35"
+    bulletType = "bulletTest"
+  >
+  </WeaponDefinition>
+
+  <WeaponDefinition
+  name="Shotgun"
+  spriteCoords="11,0"
+  spriteTint="255,255,255"
+  shotsPerSecond="1"
+  bulletsPerShot="4"
+  bulletSpreadDegrees="25"
+  minDrawBounds="-0.58,-0.35"
+  maxDrawBounds="0.58,0.35"
+  bulletType = "bulletTest"
+  >
+  </WeaponDefinition>
+
+  <WeaponDefinition
+    name="SMG"
+    spriteCoords="0,0"
+    spriteTint="255,255,255"
+    shotsPerSecond="3"
+    bulletsPerShot="1"
+    bulletSpreadDegrees="20"
+    minDrawBounds="-0.58,-0.35"
+    maxDrawBounds="0.58,0.35"
+    bulletType = "bulletTest"
+  >
+  </WeaponDefinition>
+
+  <WeaponDefinition
+    name="RocketLauncher"
+    spriteCoords="9,1"
+    spriteTint="255,255,255"
+    shotsPerSecond="0.5"
+    bulletsPerShot="1"
+    bulletSpreadDegrees="10"
+    minDrawBounds="-0.58,-0.35"
+    maxDrawBounds="0.58,0.35"
     bulletType = "bulletTest"
   >
   </WeaponDefinition>

@@ -8,7 +8,8 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Time/Clock.hpp"
-
+#include "Game/WeaponDefinition.hpp"
+#include "Game/BulletDefinition.hpp"
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef ) :
 	m_actorDef(actorDef),
@@ -132,13 +133,17 @@ void Actor::Render() const
 
 void Actor::RenderWeapon() const
 {
-	const Rgba8& actorTint = m_actorDef->m_tint;
-	Vec2 weaponCenter = m_weaponOffset + m_position;
-	const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
-	int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
-	AABB2 weaponUVs;
-	g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
+	WeaponDefinition* currentWeapon = m_weapons[m_currentWeaponIndex];
 
+	//const Rgba8& actorTint = m_actorDef->m_tint;
+	Vec2 weaponCenter = m_weaponOffset + m_position;
+	//const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
+	//int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
+	AABB2 weaponUVs;
+	//g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
+	currentWeapon->GetWeaponSpriteDef()->GetUVs( weaponUVs.mins, weaponUVs.maxs );
+	Texture const& weaponTexture = currentWeapon->GetWeaponSpriteDef()->GetTexture();
+	Rgba8 const& weaponTint = currentWeapon->GetWeaponTint();
 	if( m_isWeaponFlipped )
 	{
 		float weaponUVMinsX = weaponUVs.mins.x;
@@ -150,29 +155,75 @@ void Actor::RenderWeapon() const
 		Vec2 uvMins = weaponUVs.mins;
 		weaponUVs.mins = weaponUVs.maxs;
 		weaponUVs.maxs = uvMins;
-		// 			float weaponUVMinsY = weaponUVs.mins.y;
-		// 			weaponUVs.mins.y = weaponUVs.maxs.y;
-		// 			weaponUVs.maxs.y = weaponUVMinsY;
 	}
 
-	//maxDrawBounds="0.375,0.5"
-	AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
+
+	//AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
+	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
 	//Vec2 weaponPosition = GetForwardVector();
 	weaponBounds.Translate( weaponCenter );
 	g_theRenderer->BindTexture( &weaponTexture );
 	if( m_name == "Player" )
 	{
-		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, actorTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
 	}
 	else
 	{
-		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, actorTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees );
 	}
 }
 
 void Actor::SetEnemy( Entity* enemy )
 {
 	m_enemyActor = enemy;
+}
+
+void Actor::IncrementActiveWeapon()
+{
+	m_currentWeaponIndex++;
+	if( m_currentWeaponIndex >= m_weapons.size() )
+	{
+		m_currentWeaponIndex = 0;
+	}
+
+	float shotsPerSecond = m_weapons[m_currentWeaponIndex]->GetShotsPerSecond();
+	float fireRate = 1.f / shotsPerSecond;
+	m_firingTimer.SetSeconds( (double)fireRate );
+}
+
+void Actor::DecrementActiveWeapon()
+{
+	m_currentWeaponIndex--;
+	if( m_currentWeaponIndex < 0 )
+	{
+		m_currentWeaponIndex = (int)m_weapons.size() - 1;
+	}
+
+	float shotsPerSecond = m_weapons[m_currentWeaponIndex]->GetShotsPerSecond();
+	float fireRate = 1.f / shotsPerSecond;
+	m_firingTimer.SetSeconds( (double)fireRate );
+}
+
+void Actor::AddWeapon( WeaponDefinition* newWeapon )
+{
+	float shotsPerSecond = newWeapon->GetShotsPerSecond();
+	float fireRate = 1.f / shotsPerSecond;
+	m_weapons.push_back( newWeapon );
+
+	if( m_weapons.size() == 1 )
+	{
+		m_firingTimer.SetSeconds( (double)fireRate );
+	}
+}
+
+int Actor::GetBulletsPerShot() const
+{
+	return m_weapons[m_currentWeaponIndex]->GetBulletsPerShot();
+}
+
+float Actor::GetBulletSpreadDegrees() const
+{
+	return m_weapons[m_currentWeaponIndex]->GetBulletSpreadDegrees();
 }
 
 void Actor::UpdateFromJoystick()
@@ -212,6 +263,8 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
 	
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
@@ -240,9 +293,9 @@ void Actor::UpdateFromKeyboard()
 	}
 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
-	if( leftMouseButton.WasJustPressed() )
+	if( leftMouseButton.IsPressed() )
 	{
-		m_isFiring = true;
+		m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
 	}
 
 	if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
@@ -317,10 +370,21 @@ void Actor::UpdateFromKeyboard()
 	{
 		m_velocity.y = 0.f;
 	}
+
+	if( wKey.WasJustPressed() )
+	{
+		DecrementActiveWeapon();
+	}
+
+	if( rKey.WasJustPressed() )
+	{
+		IncrementActiveWeapon();
+	}
 }
 
 void Actor::UpdateNPC( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 	//static float timeUntilNextGoalPosition = 2.f;
 
 // 
@@ -353,7 +417,7 @@ void Actor::UpdateNPC( float deltaSeconds )
 	}
 	
 	float goalDistance = GetDistance2D( m_goalPosition, m_position );
-	if( goalDistance < 5.f && m_firingTimer.CheckAndDecrement() )
+	if( goalDistance < 5.f && (bool)m_firingTimer.CheckAndDecrementAll() )
 	{
 		m_isFiring = true;
 	}

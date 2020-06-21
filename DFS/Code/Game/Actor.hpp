@@ -3,8 +3,10 @@
 #include "Game/Entity.hpp"
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Time/Timer.hpp"
+#include <vector>
 
 class ActorDefinition;
+class WeaponDefinition;
 
 enum PlayerController
 {
@@ -33,6 +35,13 @@ public:
 
 	void SetEnemy( Entity* enemy );
 
+	void IncrementActiveWeapon();
+	void DecrementActiveWeapon();
+	void AddWeapon( WeaponDefinition* newWeapon );
+
+	int GetBulletsPerShot() const;
+	float GetBulletSpreadDegrees() const;
+
 protected:
 	void UpdateFromJoystick();
 	void UpdateFromKeyboard();
@@ -48,6 +57,9 @@ protected:
 	bool m_isWeaponFlipped = true;
 	bool m_isWeaponInFront = true;
 	Entity* m_enemyActor = nullptr;
+
+	std::vector<WeaponDefinition*> m_weapons;
+	int m_currentWeaponIndex = 0;
 
 private:
 	void UpdateNPC( float deltaSeconds );

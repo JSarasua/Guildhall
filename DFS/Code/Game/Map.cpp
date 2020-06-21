@@ -19,6 +19,7 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Game/WeaponDefinition.hpp"
 
 
 
@@ -309,6 +310,17 @@ void Map::SpawnEntities()
 	Actor* enemy2 = new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef );
 	enemy1->SetEnemy( player1 );
 	enemy2->SetEnemy( player1 );
+	
+	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
+	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
+	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+	player1->AddWeapon( pistolWeapon );
+	player1->AddWeapon( shotgunWeapon );
+	player1->AddWeapon( smgWeapon );
+	player1->AddWeapon( rocketLauncherWeapon );
+	enemy1->AddWeapon(smgWeapon);
+	enemy2->AddWeapon(rocketLauncherWeapon);
 
 	m_entities.push_back( player1 );
 	m_entities.push_back( enemy1 );
@@ -339,6 +351,10 @@ void Map::SpawnBullets()
 
 void Map::SpawnBullet( Entity* shooter )
 {
+	Actor* actorShooter = (Actor*)shooter;
+	int bulletCount = actorShooter->GetBulletsPerShot();
+	float bulletSpread = actorShooter->GetBulletSpreadDegrees();
+
 	Vec2 bulletPosition = shooter->GetBulletStartPosition();
 	float bulletOrientation = shooter->GetWeaponOrientationDegrees();
 	EntityType bulletType;
@@ -351,19 +367,26 @@ void Map::SpawnBullet( Entity* shooter )
 		bulletType = ENTITY_TYPE_EVIL_BULLET;
 	}
 
-	bool didAddBullet = false;
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( !m_entities[entityIndex] )
 		{
-			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientation, bulletType, FACTION_GOOD );
-			didAddBullet = true;
-			break;
+			float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
+			float bulletOrientationWithSpread = bulletOrientation + spread;
+			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD );
+
+			bulletCount--;
+			if( bulletCount <= 0 )
+			{
+				break;
+			}
 		}
 	}
-	if( !didAddBullet )
+	for( bulletCount; bulletCount > 0; bulletCount-- )
 	{
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientation, bulletType, FACTION_GOOD ) );
+		float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
+		float bulletOrientationWithSpread = bulletOrientation + spread;
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD ) );
 	}
 
 	shooter->SetIsFiring( false );
