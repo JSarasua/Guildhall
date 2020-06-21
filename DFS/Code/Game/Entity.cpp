@@ -95,6 +95,16 @@ void Entity::Lose1Health()
 
 }
 
+void Entity::LoseHealth( int damage )
+{
+	m_health -= damage;
+	if( m_health <= 0 )
+	{
+		m_health = 0;
+		m_isDead = true;
+	}
+}
+
 void Entity::LoseAllHealth()
 {
 	m_health = 0;

@@ -7,6 +7,7 @@
 
 class ActorDefinition;
 class WeaponDefinition;
+class BulletDefinition;
 
 enum PlayerController
 {
@@ -41,6 +42,8 @@ public:
 
 	int GetBulletsPerShot() const;
 	float GetBulletSpreadDegrees() const;
+
+	BulletDefinition const* GetBulletDefinition() const;
 
 protected:
 	void UpdateFromJoystick();

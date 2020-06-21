@@ -25,14 +25,14 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 5;
+		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 	}
 	else
 	{
 		m_entityType = ENTITY_TYPE_NPC_ENEMY;
-		m_health = 3;
+		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 	}
@@ -224,6 +224,11 @@ int Actor::GetBulletsPerShot() const
 float Actor::GetBulletSpreadDegrees() const
 {
 	return m_weapons[m_currentWeaponIndex]->GetBulletSpreadDegrees();
+}
+
+BulletDefinition const* Actor::GetBulletDefinition() const
+{
+	return m_weapons[m_currentWeaponIndex]->GetBulletDefinition();
 }
 
 void Actor::UpdateFromJoystick()

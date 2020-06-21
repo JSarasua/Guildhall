@@ -49,7 +49,7 @@ void App::Startup()
 void App::Shutdown()
 {
 	g_theGame->Shutdown();
-	delete g_theGame;;
+	delete g_theGame;
 	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
@@ -152,7 +152,7 @@ void App::EndFrame()
 void App::RestartGame()
 {
 	g_theGame->Shutdown();
-	delete g_theGame;;
+	delete g_theGame;
 	g_theGame = new Game();
 	g_theGame->Startup();
 }

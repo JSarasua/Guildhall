@@ -315,10 +315,12 @@ void Map::SpawnEntities()
 	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
 	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+	WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
 	player1->AddWeapon( smgWeapon );
 	player1->AddWeapon( rocketLauncherWeapon );
+	player1->AddWeapon( laserWeapon );
 	enemy1->AddWeapon(smgWeapon);
 	enemy2->AddWeapon(rocketLauncherWeapon);
 
@@ -352,6 +354,7 @@ void Map::SpawnBullets()
 void Map::SpawnBullet( Entity* shooter )
 {
 	Actor* actorShooter = (Actor*)shooter;
+	BulletDefinition const* bulletDef = actorShooter->GetBulletDefinition();
 	int bulletCount = actorShooter->GetBulletsPerShot();
 	float bulletSpread = actorShooter->GetBulletSpreadDegrees();
 
@@ -373,7 +376,7 @@ void Map::SpawnBullet( Entity* shooter )
 		{
 			float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 			float bulletOrientationWithSpread = bulletOrientation + spread;
-			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD );
+			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef );
 
 			bulletCount--;
 			if( bulletCount <= 0 )
@@ -386,7 +389,7 @@ void Map::SpawnBullet( Entity* shooter )
 	{
 		float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 		float bulletOrientationWithSpread = bulletOrientation + spread;
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD ) );
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef ) );
 	}
 
 	shooter->SetIsFiring( false );
@@ -471,7 +474,11 @@ void Map::PushEntitiesOutOfWalls()
 	{
 		if( !m_entities[entityIndex]->IsGarbage() )
 		{
-			PushEntityOutOfWalls(m_entities[entityIndex]);
+			EntityType entityType = m_entities[entityIndex]->m_entityType;
+			if( entityType != ENTITY_TYPE_GOOD_BULLET &&  entityType != ENTITY_TYPE_EVIL_BULLET )
+			{
+				PushEntityOutOfWalls(m_entities[entityIndex]);
+			}
 		}
 	}
 }
@@ -515,7 +522,10 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 			{
 				if( AreEntitiesColliding( currentEntity, m_entities[entityIndex] ) )
 				{
-					currentEntity->Lose1Health();
+					Bullet* bullet = (Bullet*)m_entities[entityIndex];
+					int bulletDamage = bullet->GetBulletDamage();
+					currentEntity->LoseHealth( bulletDamage );
+					//currentEntity->Lose1Health();
 					m_entities[entityIndex]->m_isGarbage = true;
 				}
 			}

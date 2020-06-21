@@ -61,6 +61,7 @@ public:
 	void SetAlive();
 	const Vec2 GetPosition();
 	virtual void Lose1Health();
+	virtual void LoseHealth( int damage );
 	virtual void LoseAllHealth();
 	const Rgba8& GetColor();
 
