@@ -4,6 +4,7 @@
 #include "Engine/Math/AABB2.hpp"
 #include <map>
 #include <string>
+#include "Engine/Renderer/RenderContext.hpp"
 
 class BulletDefinition
 {
@@ -15,6 +16,14 @@ public:
 	static void InitializeBulletDefinitions( XmlElement const& rootBulletDefinitionElement );
 	static std::map< std::string, BulletDefinition*> s_definitions;
 
+	float GetBulletSpeed() const;
+	float GetPhysicsRadius() const;
+	AABB2 const& GetDrawBounds() const;
+	Rgba8 const& GetTint() const;
+	SpriteDefinition const* GetSpriteDefinition() const;
+	eBlendMode const& GetBlendMode() const;
+	int	GetBulletDamage() const;
+
 protected:
 	SpriteDefinition* m_bulletSpriteDef = nullptr;
 	std::string m_name;
@@ -22,6 +31,8 @@ protected:
 	Rgba8 m_tint;
 	float m_physicsRadius = 1.f;
 	float m_bulletSpeed = 1.f;
+	eBlendMode m_blendMode = eBlendMode::ALPHA;
+	int m_bulletDamage = 0;
 	//int m_bulletBounce = 1.f;
 	//explosionDef
 	//explosion radius

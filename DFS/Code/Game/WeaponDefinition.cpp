@@ -35,6 +35,11 @@ float WeaponDefinition::GetBulletSpreadDegrees() const
 	return m_bulletSpreadDegrees;
 }
 
+BulletDefinition const* WeaponDefinition::GetBulletDefinition() const
+{
+	return m_bulletDef;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );

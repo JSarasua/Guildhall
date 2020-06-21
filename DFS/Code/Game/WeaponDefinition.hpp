@@ -23,6 +23,7 @@ public:
 	float GetShotsPerSecond() const;
 	int GetBulletsPerShot() const;
 	float GetBulletSpreadDegrees() const;
+	BulletDefinition const* GetBulletDefinition() const;
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;

@@ -2,15 +2,41 @@
 
   <BulletDefinition
     name="bulletTest"
-    spriteCoords="3,4"
+    spriteCoords="0,3"
     spriteTint="255,255,255"
-    minDrawBounds="-0.375,-0.5"
-    maxDrawBounds="0.375,0.5"
-    physicsRadius=" 0.2"
-    bulletSped="1"
+    minDrawBounds="-0.1,-0.1"
+    maxDrawBounds="0.1,0.1"
+    physicsRadius=" 0.03"
+    bulletSpeed="4"
+    blendMode ="ALPHA"
+    damage="5"
   >
+  </BulletDefinition>
 
-    
+  <BulletDefinition
+  name="bigRock"
+  spriteCoords="3,0"
+  spriteTint="255,255,255"
+  minDrawBounds="-0.3,-0.3"
+  maxDrawBounds="0.3,0.3"
+  physicsRadius=" 0.2"
+  bulletSpeed="2"
+  blendMode ="ALPHA"
+  damage="50"
+  >
+  </BulletDefinition>
+
+  <BulletDefinition
+  name="laser"
+  spriteCoords="1,3"
+  spriteTint="255,255,255"
+  minDrawBounds="-0.1,-0.1"
+  maxDrawBounds="0.1,0.1"
+  physicsRadius=" 0.1"
+  bulletSpeed="5"
+  blendMode ="ADDITIVE"
+  damage="1"
+  >
   </BulletDefinition>
 
   
