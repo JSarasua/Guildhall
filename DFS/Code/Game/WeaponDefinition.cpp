@@ -5,6 +5,36 @@
 std::map< std::string, WeaponDefinition*> WeaponDefinition::s_definitions;
 
 
+AABB2 const& WeaponDefinition::GetWeaponDrawBounds() const
+{
+	return m_drawBounds;
+}
+
+Rgba8 const& WeaponDefinition::GetWeaponTint() const
+{
+	return m_tint;
+}
+
+SpriteDefinition const* WeaponDefinition::GetWeaponSpriteDef() const
+{
+	return m_weaponSpriteDef;
+}
+
+float WeaponDefinition::GetShotsPerSecond() const
+{
+	return m_shotsPerSecond;
+}
+
+int WeaponDefinition::GetBulletsPerShot() const
+{
+	return m_bulletsPerShot;
+}
+
+float WeaponDefinition::GetBulletSpreadDegrees() const
+{
+	return m_bulletSpreadDegrees;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -13,7 +43,7 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_drawBounds.mins			= ParseXMLAttribute( element, "minDrawBounds", Vec2( 0.f, 0.f ) );
 	m_drawBounds.maxs			= ParseXMLAttribute( element, "maxDrawBounds", Vec2( 0.f, 0.f ) );
 	m_shotsPerSecond			= ParseXMLAttribute( element, "shotsPerSecond", 1.f );
-	m_bulletsPerShot			= ParseXMLAttribute( element, "bulletsPerShot", 1.f );
+	m_bulletsPerShot			= ParseXMLAttribute( element, "bulletsPerShot", 1 );
 	m_bulletSpreadDegrees		= ParseXMLAttribute( element, "bulletSpreadDegrees", 10.f );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
 
