@@ -1,6 +1,7 @@
 #include "Game/WeaponDefinition.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/BulletDefinition.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 std::map< std::string, WeaponDefinition*> WeaponDefinition::s_definitions;
 
@@ -49,7 +50,12 @@ Vec2 WeaponDefinition::GetMuzzlePosition( float weaponOrientation ) const
 {
 	Vec2 localTriggerPosition = m_drawBounds.GetPointAtUV( m_triggerPosition );
 	//Vec2 localTriggerPosition = m_drawBounds.GetPointAtUV( Vec2( 0.5f, 0.5f ) );
-	Vec2 localMuzzlePosition = m_drawBounds.GetPointAtUV( m_muzzlePosition );
+	Vec2 muzzleUV = m_muzzlePosition;
+	if( GetShortestAngularDistance( 180.f, weaponOrientation ) <  90.f )
+	{
+		muzzleUV.y = 1.f - muzzleUV.y;
+	}
+	Vec2 localMuzzlePosition = m_drawBounds.GetPointAtUV( muzzleUV );
 	Vec2 triggerToMuzzle = localMuzzlePosition - localTriggerPosition;
 	Vec2 muzzlePosition = triggerToMuzzle.GetRotatedDegrees( weaponOrientation );
 
