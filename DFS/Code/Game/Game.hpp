@@ -63,6 +63,8 @@ private:
 	void AddImageTest();
 	void AddBlackboardTest();
 
+	void AddScreenShake( float screenShakeIncrement );
+
 	//Updates
 	void UpdateCamera( float deltaSeconds );
 	void UpdateCamera( const Vec2& centerPosition, Camera& camera );

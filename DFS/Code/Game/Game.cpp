@@ -354,6 +354,12 @@ void Game::AddBlackboardTest()
 	m_blackBoardText = Stringf("Start level: %s, WindowAspect: %f, isFullScreen: %d, newSetValue: %s", startLevel.c_str(), windowAspect, isFullscreen, newSetValue.c_str());
 }
 
+void Game::AddScreenShake( float screenShakeIncrement )
+{
+// 	screenShakeIncrement += m_camera.
+// 	m_camera.SetScreenShakeIntensity( screenShakeIncrement );
+}
+
 void Game::UpdateConsoleTest( float deltaSeconds )
 {
 	g_theConsole->Update();
