@@ -28,6 +28,7 @@ public:
 	Vec2 GetMuzzlePosition( float weaponOrientation ) const;
 	Vec2 const& GetWeaponOffsetLeft() const;
 	Vec2 const& GetWeaponOffsetRight() const;
+	float GetScreenShakeIncremenet() const;
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;
@@ -41,6 +42,7 @@ protected:
 	Vec2 m_muzzlePosition;
 	Vec2 m_weaponOffsetRight;
 	Vec2 m_weaponOffsetLeft;
+	float m_screenShakeIncrement = 0.f;
 	
 	BulletDefinition* m_bulletDef = nullptr;
 };

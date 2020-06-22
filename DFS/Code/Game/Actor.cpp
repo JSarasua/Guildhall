@@ -316,7 +316,8 @@ void Actor::UpdateFromKeyboard()
 		m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
 		if( m_isFiring )
 		{
-			//g_theGame->get
+			float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
+			g_theGame->AddScreenShake( screenShakeIncrement );
 		}
 	}
 

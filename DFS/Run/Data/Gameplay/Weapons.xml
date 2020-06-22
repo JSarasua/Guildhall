@@ -14,6 +14,7 @@
     muzzlePosition="0.75,0.67"
     weaponOffsetRight ="0.15,-0.1"
     weaponOffsetLeft ="-0.15,-0.1"
+    screenshakeIncrement ="0.1"
   >
   </WeaponDefinition>
 
@@ -31,6 +32,7 @@
     muzzlePosition="0.95,0.6"
     weaponOffsetRight ="0.3,-0.2"
     weaponOffsetLeft ="0.2,-0.2"
+    screenshakeIncrement ="0.1"
   >
   </WeaponDefinition>
 
@@ -48,6 +50,7 @@
     muzzlePosition="0.9,0.6"
     weaponOffsetRight ="0.3,-0.2"
     weaponOffsetLeft ="-0.1,-0.2"
+    screenshakeIncrement ="0.05"
   >
   </WeaponDefinition>
 
@@ -65,7 +68,7 @@
     muzzlePosition="0.95,0.5"
     weaponOffsetRight ="0.1,0"
     weaponOffsetLeft ="-0.1,0"
-    
+    screenshakeIncrement ="0.5"
   >
   </WeaponDefinition>
 
@@ -83,23 +86,25 @@
     muzzlePosition="0.9,0.5"
     weaponOffsetRight ="0.3,-0.2"
     weaponOffsetLeft ="-0.1,-0.2"
+    screenshakeIncrement ="0.01"
   >
   </WeaponDefinition>
 
   <WeaponDefinition
-  name="Flamethrower"
-  spriteCoords="10,3"
-  spriteTint="255,128,128"
-  shotsPerSecond="30"
-  bulletsPerShot="1"
-  bulletSpreadDegrees="20"
-  minDrawBounds="-0.58,-0.35"
-  maxDrawBounds="0.58,0.35"
-  bulletType = "flame"
-  triggerPosition="0.57,0.5"
-  muzzlePosition="0.9,0.5"
-  weaponOffsetRight ="0.1,-0.1"
-  weaponOffsetLeft ="-0.25,-0.1"
+    name="Flamethrower"
+    spriteCoords="10,3"
+    spriteTint="255,128,128"
+    shotsPerSecond="30"
+    bulletsPerShot="1"
+    bulletSpreadDegrees="20"
+    minDrawBounds="-0.58,-0.35"
+    maxDrawBounds="0.58,0.35"
+    bulletType = "flame"
+    triggerPosition="0.57,0.5"
+    muzzlePosition="0.9,0.5"
+    weaponOffsetRight ="0.1,-0.1"
+    weaponOffsetLeft ="-0.25,-0.1"
+    screenshakeIncrement ="0.01"
   >
   </WeaponDefinition>
 

@@ -72,6 +72,11 @@ Vec2 const& WeaponDefinition::GetWeaponOffsetRight() const
 	return m_weaponOffsetRight;
 }
 
+float WeaponDefinition::GetScreenShakeIncremenet() const
+{
+	return m_screenShakeIncrement;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -86,6 +91,7 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_muzzlePosition			= ParseXMLAttribute( element, "muzzlePosition", Vec2( 0.5f, 0.5f ) );
 	m_weaponOffsetRight			= ParseXMLAttribute( element, "weaponOffsetRight", Vec2( 0.5f, 0.5f ) );
 	m_weaponOffsetLeft			= ParseXMLAttribute( element, "weaponOffsetLeft", Vec2( 0.5f, 0.5f ) );
+	m_screenShakeIncrement		= ParseXMLAttribute( element, "screenshakeIncrement", 0.f );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
 
 

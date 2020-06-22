@@ -39,6 +39,7 @@ public:
 	Vec2 GetMousePositionOnMainCamera();
 	AABB2 GetUICamera() const;
 	AABB2 GetCamera() const;
+	void AddScreenShake( float screenShakeIncrement );
 
 private:
 	//Update State
@@ -63,7 +64,7 @@ private:
 	void AddImageTest();
 	void AddBlackboardTest();
 
-	void AddScreenShake( float screenShakeIncrement );
+
 
 	//Updates
 	void UpdateCamera( float deltaSeconds );

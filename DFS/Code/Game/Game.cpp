@@ -174,6 +174,12 @@ void Game::UpdateCamera( float deltaSeconds )
 
 		m_camera.SetPosition( cameraPosition );
 	}
+
+	m_camera.UpdateScreenShake( m_rand );
+	float currentScreenShake = m_camera.GetCurrentScreenShakeIntensity();
+	currentScreenShake -= currentScreenShake * deltaSeconds + deltaSeconds;
+	currentScreenShake = Max( currentScreenShake, 0.f );
+	m_camera.SetScreenShakeIntensity( currentScreenShake );
 }
 
 void Game::UpdateCamera( const Vec2& centerPosition, Camera& camera )
@@ -356,8 +362,8 @@ void Game::AddBlackboardTest()
 
 void Game::AddScreenShake( float screenShakeIncrement )
 {
-// 	screenShakeIncrement += m_camera.
-// 	m_camera.SetScreenShakeIntensity( screenShakeIncrement );
+	screenShakeIncrement += m_camera.GetCurrentScreenShakeIntensity();
+	m_camera.SetScreenShakeIntensity( screenShakeIncrement );
 }
 
 void Game::UpdateConsoleTest( float deltaSeconds )
