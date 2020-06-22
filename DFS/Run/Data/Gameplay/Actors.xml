@@ -19,7 +19,7 @@
       <SpriteAnim name="MoveWest"		spriteIndexes="57,58,59"/>
       <SpriteAnim name="MoveNorth"	spriteIndexes="48,49,50"/>
       <SpriteAnim name="MoveSouth"	spriteIndexes="54,55,56"/>
-      <SpriteAnim name="Idle"				spriteIndexes="54,55,56" fps="3"/>
+      <SpriteAnim name="Idle"				spriteIndexes="55,55,55" fps="3"/>
     </SpriteAnimSet>
     
   </ActorDefinition>
