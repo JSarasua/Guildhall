@@ -250,6 +250,7 @@ public:
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, float z = 0.f );
 	void DrawAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax);
 	void DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& color, const Vec2& uvMin, const Vec2& uvMax, float orientationDegrees);
+	void DrawRotatedAABB2Filled( AABB2 const& aabb, Rgba8 const& tint, Vec2 const& uvMin, Vec2 const& uvMax, float orientationDegrees, Vec2 const& pivot );
 	void DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness );
 
 	//Draw text

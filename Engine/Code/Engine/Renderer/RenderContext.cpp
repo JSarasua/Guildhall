@@ -1414,6 +1414,32 @@ void RenderContext::DrawRotatedAABB2Filled( const AABB2& aabb, const Rgba8& colo
 	DrawVertexArray( 6, vertexes );
 }
 
+void RenderContext::DrawRotatedAABB2Filled( AABB2 const& aabb, Rgba8 const& tint, Vec2 const& uvMin, Vec2 const& uvMax, float orientationDegrees, Vec2 const& pivot )
+{
+	Vec2 center = aabb.GetCenter();
+	AABB2 localSpaceAABB2 = aabb;
+	localSpaceAABB2.Translate( -center );
+
+	Vec2 pivotPoint = localSpaceAABB2.GetPointAtUV( pivot );
+	localSpaceAABB2.Translate( -pivotPoint );
+	Vertex_PCU vertexes[6] =
+	{
+		Vertex_PCU( Vec3( localSpaceAABB2.mins.x, localSpaceAABB2.mins.y,0.f ),tint,uvMin ),
+		Vertex_PCU( Vec3( localSpaceAABB2.maxs.x, localSpaceAABB2.mins.y,0.f ),tint,Vec2( uvMax.x,uvMin.y ) ),
+		Vertex_PCU( Vec3( localSpaceAABB2.maxs.x,localSpaceAABB2.maxs.y,0.f ),tint,uvMax ),
+
+		Vertex_PCU( Vec3( localSpaceAABB2.mins.x,localSpaceAABB2.mins.y,0.f ),tint,uvMin ),
+		Vertex_PCU( Vec3( localSpaceAABB2.maxs.x,localSpaceAABB2.maxs.y,0.f ),tint,uvMax ),
+		Vertex_PCU( Vec3( localSpaceAABB2.mins.x,localSpaceAABB2.maxs.y,0.f ),tint,Vec2( uvMin.x,uvMax.y ) )
+	};
+
+	Vertex_PCU::TransformVertexArray( 6, vertexes, 1.f, orientationDegrees, pivotPoint );
+	Vertex_PCU::TransformVertexArray( 6, vertexes, 1.f, 0.f , center );
+
+	//BindTexture(nullptr);
+	DrawVertexArray( 6, vertexes );
+}
+
 void RenderContext::DrawPolygon2D( Polygon2D const& polygon, Rgba8 const& fillColor, Rgba8 const& borderColor, float thickness )
 {
 	std::vector<Vertex_PCU> vertexes;
