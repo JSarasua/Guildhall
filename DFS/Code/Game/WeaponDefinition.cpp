@@ -40,6 +40,11 @@ BulletDefinition const* WeaponDefinition::GetBulletDefinition() const
 	return m_bulletDef;
 }
 
+Vec2 const& WeaponDefinition::GetPivot() const
+{
+	return m_pivot;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -50,6 +55,7 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_shotsPerSecond			= ParseXMLAttribute( element, "shotsPerSecond", 1.f );
 	m_bulletsPerShot			= ParseXMLAttribute( element, "bulletsPerShot", 1 );
 	m_bulletSpreadDegrees		= ParseXMLAttribute( element, "bulletSpreadDegrees", 10.f );
+	m_pivot						= ParseXMLAttribute( element, "pivot", Vec2( 0.5f, 0.5f ) );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
 
 

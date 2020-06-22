@@ -25,7 +25,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 50;
+		m_health = 100;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 	}
@@ -53,14 +53,14 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 5;
+		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 	}
 	else
 	{
 		m_entityType = ENTITY_TYPE_NPC_ENEMY;
-		m_health = 3;
+		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 	}
@@ -134,16 +134,12 @@ void Actor::Render() const
 void Actor::RenderWeapon() const
 {
 	WeaponDefinition* currentWeapon = m_weapons[m_currentWeaponIndex];
-
-	//const Rgba8& actorTint = m_actorDef->m_tint;
 	Vec2 weaponCenter = m_weaponOffset + m_position;
-	//const Texture& weaponTexture = g_weaponSpriteSheet->GetTexture();
-	//int weaponIndex = g_weaponSpriteSheet->GetSpriteIndex( IntVec2( 0, 0 ) );
 	AABB2 weaponUVs;
-	//g_weaponSpriteSheet->GetSpriteUVs( weaponUVs.mins, weaponUVs.maxs, weaponIndex );
 	currentWeapon->GetWeaponSpriteDef()->GetUVs( weaponUVs.mins, weaponUVs.maxs );
 	Texture const& weaponTexture = currentWeapon->GetWeaponSpriteDef()->GetTexture();
 	Rgba8 const& weaponTint = currentWeapon->GetWeaponTint();
+	
 	if( m_isWeaponFlipped )
 	{
 		float weaponUVMinsX = weaponUVs.mins.x;
@@ -158,18 +154,17 @@ void Actor::RenderWeapon() const
 	}
 
 
-	//AABB2 weaponBounds = AABB2( Vec2( -.45f, -.4f ), Vec2( .45f, .4f ) );
+	Vec2 pivotPoint = currentWeapon->GetPivot();
 	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
-	//Vec2 weaponPosition = GetForwardVector();
 	weaponBounds.Translate( weaponCenter );
 	g_theRenderer->BindTexture( &weaponTexture );
 	if( m_name == "Player" )
 	{
-		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees() );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees(), pivotPoint );
 	}
 	else
 	{
-		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees, pivotPoint );
 	}
 }
 
@@ -277,13 +272,13 @@ void Actor::UpdateFromKeyboard()
 
 	if( weaponDirection.x >= 0.f )
 	{
-		m_weaponOffset = Vec2( 0.2f, -0.2f );
+		m_weaponOffset = Vec2( 0.4f, -0.2f );
 		m_bulletOffset = Vec2( 0.25f, 0.1f );
 		m_isWeaponFlipped = true;
 	}
 	else
 	{
-		m_weaponOffset = Vec2( -0.25f, -0.2f );
+		m_weaponOffset = Vec2( 0.1f, -0.2f );
 		m_bulletOffset = Vec2( -0.1f, 0.1f );
 		m_isWeaponFlipped = false;
 	}

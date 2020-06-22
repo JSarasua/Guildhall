@@ -24,6 +24,7 @@ public:
 	int GetBulletsPerShot() const;
 	float GetBulletSpreadDegrees() const;
 	BulletDefinition const* GetBulletDefinition() const;
+	Vec2 const& GetPivot() const;
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;
@@ -33,6 +34,7 @@ protected:
 	float m_shotsPerSecond = 0.f;
 	int m_bulletsPerShot = 0;
 	float m_bulletSpreadDegrees = 0.f;
+	Vec2 m_pivot;
 	
 	BulletDefinition* m_bulletDef = nullptr;
 };
