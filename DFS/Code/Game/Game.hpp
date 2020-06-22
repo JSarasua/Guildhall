@@ -143,4 +143,6 @@ private:
 public:
 	//Rand for game to use
 	RandomNumberGenerator m_rand;
+
+	int m_frameCounter = 0;
 };

@@ -540,31 +540,29 @@ void Game::UpdateLoading( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 	g_theApp->PauseGame();
-	
-	static int frameCounter = 0;
 
 	//CheckButtonPressesLoading( deltaSeconds );
 
 
-	if( frameCounter > 1 )
+	if( m_frameCounter > 1 )
 	{
 		m_world->Update( 0.f );
 		m_gameState = ATTRACT;
 	}
-	else if( frameCounter == 1 )
+	else if( m_frameCounter == 1 )
 	{
 		LoadAssets();
 		InitializeDefinitions();
 		m_world->Startup();
 		m_player = m_world->GetPlayer();
 	}
-	else if( frameCounter == 0 )
+	else if( m_frameCounter == 0 )
 	{
 		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
 		g_theAudio->PlaySound( loadingSound );
 	}
 
-	frameCounter++;
+	m_frameCounter++;
 }
 
 void Game::UpdateAttract( float deltaSeconds )
