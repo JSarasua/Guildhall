@@ -472,23 +472,24 @@ std::string Actor::GetCurrentAnimationName() const
 {
 	std::string currentAnimationName;
 
-	if( m_velocity.GetLength() == 0.f )
-	{
-		currentAnimationName = "Idle";
-	}
-	else if( GetShortestAngularDistance(0.f, m_orientationDegrees) < 45.f )
+// 	if( m_velocity.GetLength() == 0.f )
+// 	{
+// 		currentAnimationName = "Idle";
+// 	}
+// 	else if( GetShortestAngularDistance(0.f, m_weaponOrientationDegrees) < 45.f )
+	if( GetShortestAngularDistance(0.f, m_weaponOrientationDegrees) < 45.f )
 	{
 		currentAnimationName = "MoveEast";
 	}
-	else if( GetShortestAngularDistance(90.f, m_orientationDegrees) < 45.f )
+	else if( GetShortestAngularDistance(90.f, m_weaponOrientationDegrees) < 45.f )
 	{
 		currentAnimationName = "MoveNorth";
 	}
-	else if( GetShortestAngularDistance(180.f, m_orientationDegrees) < 45.f )
+	else if( GetShortestAngularDistance(180.f, m_weaponOrientationDegrees) < 45.f )
 	{
 		currentAnimationName = "MoveWest";
 	}
-	else if( GetShortestAngularDistance(270.f, m_orientationDegrees) < 45.f )
+	else if( GetShortestAngularDistance(270.f, m_weaponOrientationDegrees) < 45.f )
 	{
 		currentAnimationName = "MoveSouth";
 	}
