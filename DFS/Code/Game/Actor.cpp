@@ -10,6 +10,7 @@
 #include "Engine/Time/Clock.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/BulletDefinition.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef ) :
 	m_actorDef(actorDef),
@@ -154,8 +155,9 @@ void Actor::RenderWeapon() const
 	}
 
 
-	Vec2 pivotPoint = currentWeapon->GetPivot();
+	Vec2 pivotPoint = currentWeapon->GetTriggerPositionUV();
 	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
+	Vec2 debugPivot = weaponBounds.GetPointAtUV( pivotPoint );
 	weaponBounds.Translate( weaponCenter );
 	g_theRenderer->BindTexture( &weaponTexture );
 	if( m_name == "Player" )
@@ -166,6 +168,13 @@ void Actor::RenderWeapon() const
 	{
 		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees, pivotPoint );
 	}
+
+
+	g_theRenderer->DrawDisc( m_position, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+	g_theRenderer->DrawDisc( m_position + m_weaponOffset + debugPivot, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+	g_theRenderer->DrawDisc( GetMuzzlePosition(), 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+
+	//DebugAddWorldPoint( Vec3( pivotPoint ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 }
 
 void Actor::SetEnemy( Entity* enemy )
@@ -221,6 +230,14 @@ float Actor::GetBulletSpreadDegrees() const
 	return m_weapons[m_currentWeaponIndex]->GetBulletSpreadDegrees();
 }
 
+Vec2 Actor::GetMuzzlePosition() const
+{
+	AABB2 drawBounds = m_weapons[m_currentWeaponIndex]->GetWeaponDrawBounds();
+	Vec2 pivot = drawBounds.GetPointAtUV( m_weapons[m_currentWeaponIndex]->GetTriggerPositionUV() );
+
+	return m_position + m_weaponOffset + pivot + m_weapons[m_currentWeaponIndex]->GetMuzzlePosition( m_weaponOrientationDegrees );
+}
+
 BulletDefinition const* Actor::GetBulletDefinition() const
 {
 	return m_weapons[m_currentWeaponIndex]->GetBulletDefinition();
@@ -270,20 +287,21 @@ void Actor::UpdateFromKeyboard()
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
 	Vec2 weaponDirection = mousePos - GetPosition();
 
+	WeaponDefinition* weaponDef = m_weapons[m_currentWeaponIndex];
 	if( weaponDirection.x >= 0.f )
 	{
-		m_weaponOffset = Vec2( 0.4f, -0.2f );
-		m_bulletOffset = Vec2( 0.25f, 0.1f );
+		m_weaponOffset = weaponDef->GetWeaponOffsetRight();
 		m_isWeaponFlipped = true;
 	}
 	else
 	{
-		m_weaponOffset = Vec2( 0.1f, -0.2f );
-		m_bulletOffset = Vec2( -0.1f, 0.1f );
+		m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
 		m_isWeaponFlipped = false;
 	}
 
-	if( weaponDirection.y >= 0.f )
+
+	float weaponDirectionDegrees = weaponDirection.GetAngleDegrees();
+	if( GetShortestAngularDistance( 90.f, weaponDirectionDegrees ) < 45.f )
 	{
 		m_isWeaponInFront = false;
 	}
@@ -296,6 +314,10 @@ void Actor::UpdateFromKeyboard()
 	if( leftMouseButton.IsPressed() )
 	{
 		m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
+		if( m_isFiring )
+		{
+			//g_theGame->get
+		}
 	}
 
 	if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
@@ -433,17 +455,15 @@ void Actor::UpdateNPC( float deltaSeconds )
 		m_weaponOrientationDegrees = m_orientationDegrees;
 		m_velocity = goalDirection * m_actorDef->m_speed;
 
-
+		WeaponDefinition* weaponDef = m_weapons[m_currentWeaponIndex];
 		if( goalDirection.x >= 0.f )
 		{
-			m_weaponOffset = Vec2( 0.2f, -0.2f );
-			m_bulletOffset = Vec2( 0.25f, 0.1f );
+			m_weaponOffset = weaponDef->GetWeaponOffsetRight();
 			m_isWeaponFlipped = true;
 		}
 		else
 		{
-			m_weaponOffset = Vec2( -0.25f, -0.2f );
-			m_bulletOffset = Vec2( -0.1f, 0.1f );
+			m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
 			m_isWeaponFlipped = false;
 		}
 

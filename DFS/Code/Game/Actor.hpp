@@ -42,6 +42,7 @@ public:
 
 	int GetBulletsPerShot() const;
 	float GetBulletSpreadDegrees() const;
+	Vec2 GetMuzzlePosition() const;
 
 	BulletDefinition const* GetBulletDefinition() const;
 

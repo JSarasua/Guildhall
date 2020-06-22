@@ -306,10 +306,10 @@ void Map::SpawnEntities()
 	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
 
 	Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
-	Actor* enemy1 = new Actor( Vec2( 8.f, 2.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
-	Actor* enemy2 = new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef );
-	enemy1->SetEnemy( player1 );
-	enemy2->SetEnemy( player1 );
+// 	Actor* enemy1 = new Actor( Vec2( 8.f, 2.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
+// 	Actor* enemy2 = new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef );
+// 	enemy1->SetEnemy( player1 );
+// 	enemy2->SetEnemy( player1 );
 	
 	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
 	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
@@ -323,12 +323,15 @@ void Map::SpawnEntities()
 	player1->AddWeapon( rocketLauncherWeapon );
 	player1->AddWeapon( laserWeapon );
 	player1->AddWeapon( flamethrowerWeapon );
-	enemy1->AddWeapon(smgWeapon);
-	enemy2->AddWeapon(rocketLauncherWeapon);
+// 	enemy1->AddWeapon(smgWeapon);
+// 	enemy2->AddWeapon(rocketLauncherWeapon);
 
 	m_entities.push_back( player1 );
-	m_entities.push_back( enemy1 );
-	m_entities.push_back( enemy2 );
+	//m_entities.push_back( enemy1 );
+	//m_entities.push_back( enemy2 );
+
+
+
 // 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
@@ -360,7 +363,8 @@ void Map::SpawnBullet( Entity* shooter )
 	int bulletCount = actorShooter->GetBulletsPerShot();
 	float bulletSpread = actorShooter->GetBulletSpreadDegrees();
 
-	Vec2 bulletPosition = shooter->GetBulletStartPosition();
+	//Vec2 bulletPosition = shooter->GetBulletStartPosition();
+	Vec2 bulletPosition = actorShooter->GetMuzzlePosition();
 	float bulletOrientation = shooter->GetWeaponOrientationDegrees();
 	EntityType bulletType;
 	if( shooter->m_entityType == ENTITY_TYPE_PLAYER )

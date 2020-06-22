@@ -40,9 +40,30 @@ BulletDefinition const* WeaponDefinition::GetBulletDefinition() const
 	return m_bulletDef;
 }
 
-Vec2 const& WeaponDefinition::GetPivot() const
+Vec2 const& WeaponDefinition::GetTriggerPositionUV() const
 {
-	return m_pivot;
+	return m_triggerPosition;
+}
+
+Vec2 WeaponDefinition::GetMuzzlePosition( float weaponOrientation ) const
+{
+	Vec2 localTriggerPosition = m_drawBounds.GetPointAtUV( m_triggerPosition );
+	//Vec2 localTriggerPosition = m_drawBounds.GetPointAtUV( Vec2( 0.5f, 0.5f ) );
+	Vec2 localMuzzlePosition = m_drawBounds.GetPointAtUV( m_muzzlePosition );
+	Vec2 triggerToMuzzle = localMuzzlePosition - localTriggerPosition;
+	Vec2 muzzlePosition = triggerToMuzzle.GetRotatedDegrees( weaponOrientation );
+
+	return muzzlePosition;
+}
+
+Vec2 const& WeaponDefinition::GetWeaponOffsetLeft() const
+{
+	return m_weaponOffsetLeft;
+}
+
+Vec2 const& WeaponDefinition::GetWeaponOffsetRight() const
+{
+	return m_weaponOffsetRight;
 }
 
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
@@ -55,7 +76,10 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_shotsPerSecond			= ParseXMLAttribute( element, "shotsPerSecond", 1.f );
 	m_bulletsPerShot			= ParseXMLAttribute( element, "bulletsPerShot", 1 );
 	m_bulletSpreadDegrees		= ParseXMLAttribute( element, "bulletSpreadDegrees", 10.f );
-	m_pivot						= ParseXMLAttribute( element, "pivot", Vec2( 0.5f, 0.5f ) );
+	m_triggerPosition			= ParseXMLAttribute( element, "triggerPosition", Vec2( 0.5f, 0.5f ) );
+	m_muzzlePosition			= ParseXMLAttribute( element, "muzzlePosition", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetRight			= ParseXMLAttribute( element, "weaponOffsetRight", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetLeft			= ParseXMLAttribute( element, "weaponOffsetLeft", Vec2( 0.5f, 0.5f ) );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
 
 
