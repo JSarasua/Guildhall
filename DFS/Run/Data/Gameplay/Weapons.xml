@@ -62,10 +62,23 @@
     spriteTint="255,255,255"
     shotsPerSecond="100"
     bulletsPerShot="1"
-    bulletSpreadDegrees="5"
+    bulletSpreadDegrees="1"
     minDrawBounds="-0.58,-0.35"
     maxDrawBounds="0.58,0.35"
     bulletType = "laser"
+  >
+  </WeaponDefinition>
+
+  <WeaponDefinition
+  name="Flamethrower"
+  spriteCoords="10,3"
+  spriteTint="255,128,128"
+  shotsPerSecond="30"
+  bulletsPerShot="1"
+  bulletSpreadDegrees="20"
+  minDrawBounds="-0.58,-0.35"
+  maxDrawBounds="0.58,0.35"
+  bulletType = "flame"
   >
   </WeaponDefinition>
 

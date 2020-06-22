@@ -39,6 +39,11 @@ int BulletDefinition::GetBulletDamage() const
 	return m_bulletDamage;
 }
 
+float BulletDefinition::GetLifeTime() const
+{
+	return m_lifeTime;
+}
+
 BulletDefinition::BulletDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -50,6 +55,7 @@ BulletDefinition::BulletDefinition( XmlElement const& element )
 	m_bulletSpeed				= ParseXMLAttribute( element, "bulletSpeed", 1.f );
 	m_bulletDamage				= ParseXMLAttribute( element, "damage", 0 );
 	std::string blendMode		= ParseXMLAttribute( element, "blendMode", "ALPHA" );
+	m_lifeTime					= ParseXMLAttribute( element, "lifetime", 0.f );
 
 	if( blendMode == "ALPHA" )
 	{

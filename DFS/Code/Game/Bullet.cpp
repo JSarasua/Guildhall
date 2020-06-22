@@ -21,6 +21,7 @@ Bullet::Bullet( const Vec2& initialPosition, BulletDefinition const* bulletDef )
 	m_bulletDefinition = bulletDef;
 	m_physicsRadius = bulletDef->GetPhysicsRadius();
 	m_velocity.SetLength( bulletDef->GetBulletSpeed() );
+	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
 }
 
 Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef ):
@@ -32,6 +33,7 @@ Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityTyp
 	m_entityType = type;
 
 	m_velocity.SetLength( bulletDef->GetBulletSpeed() );
+	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
 
 }
 
@@ -43,6 +45,11 @@ void Bullet::Startup()
 void Bullet::Update( float deltaSeconds )
 {
 	Entity::Update( deltaSeconds );
+
+	if( m_lifetime.HasElapsed() )
+	{
+		m_isGarbage = true;
+	}
 }
 
 void Bullet::Render() const

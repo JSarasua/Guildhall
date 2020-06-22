@@ -23,6 +23,7 @@ public:
 	SpriteDefinition const* GetSpriteDefinition() const;
 	eBlendMode const& GetBlendMode() const;
 	int	GetBulletDamage() const;
+	float GetLifeTime() const;
 
 protected:
 	SpriteDefinition* m_bulletSpriteDef = nullptr;
@@ -33,6 +34,7 @@ protected:
 	float m_bulletSpeed = 1.f;
 	eBlendMode m_blendMode = eBlendMode::ALPHA;
 	int m_bulletDamage = 0;
+	float m_lifeTime = 0.f;
 	//int m_bulletBounce = 1.f;
 	//explosionDef
 	//explosion radius

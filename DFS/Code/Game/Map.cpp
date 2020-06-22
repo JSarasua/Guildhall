@@ -316,11 +316,13 @@ void Map::SpawnEntities()
 	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 	WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
+	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
 	player1->AddWeapon( smgWeapon );
 	player1->AddWeapon( rocketLauncherWeapon );
 	player1->AddWeapon( laserWeapon );
+	player1->AddWeapon( flamethrowerWeapon );
 	enemy1->AddWeapon(smgWeapon);
 	enemy2->AddWeapon(rocketLauncherWeapon);
 

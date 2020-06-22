@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/Entity.hpp"
+#include "Engine/Time/Timer.hpp"
 
 class Game;
 class BulletDefinition;
@@ -22,5 +23,5 @@ public:
 
 private:
 	BulletDefinition const* m_bulletDefinition = nullptr;
-
+	Timer m_lifetime;
 };

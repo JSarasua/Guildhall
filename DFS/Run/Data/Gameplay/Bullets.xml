@@ -10,6 +10,7 @@
     bulletSpeed="4"
     blendMode ="ALPHA"
     damage="5"
+    lifetime="1"
   >
   </BulletDefinition>
 
@@ -19,10 +20,11 @@
   spriteTint="255,255,255"
   minDrawBounds="-0.3,-0.3"
   maxDrawBounds="0.3,0.3"
-  physicsRadius=" 0.2"
-  bulletSpeed="2"
+  physicsRadius=" 0.3"
+  bulletSpeed="2.5"
   blendMode ="ALPHA"
   damage="50"
+  lifetime="3"
   >
   </BulletDefinition>
 
@@ -36,6 +38,21 @@
   bulletSpeed="5"
   blendMode ="ADDITIVE"
   damage="1"
+  lifetime="2"
+  >
+  </BulletDefinition>
+
+  <BulletDefinition
+name="flame"
+spriteCoords="0,0"
+spriteTint="255,255,255"
+minDrawBounds="-0.2,-0.2"
+maxDrawBounds="0.2,0.2"
+physicsRadius=" 0.2"
+bulletSpeed="3"
+blendMode ="ADDITIVE"
+damage="2"
+lifetime="0.5"
   >
   </BulletDefinition>
 
