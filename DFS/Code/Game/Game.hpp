@@ -78,6 +78,7 @@ private:
 
 	//Renders
 	void RenderGame();
+	void RenderMouse();
 	void RenderUI();
 	void RenderConsole() const;
 	void RenderAlignedTextTest() const;

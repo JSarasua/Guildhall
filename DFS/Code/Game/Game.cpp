@@ -66,6 +66,8 @@ void Game::Startup()
 
 	Rgba8 clearColor = Rgba8::BLACK;
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
+
+	g_theInput->HideSystemCursor();
 }
 
 void Game::Shutdown(){}
@@ -141,6 +143,7 @@ void Game::LoadAssets()
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
 	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
 	Texture* bulletsSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Extras_4x4.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/reticle.png" );
 	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(8,8));
 	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(12,53));
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
@@ -223,7 +226,17 @@ void Game::RenderGame()
 {
 	m_world->Render();
 
-	//RenderDebugMouse();
+	RenderDebugMouse();
+}
+
+void Game::RenderMouse()
+{
+	AABB2 mouseAABB;
+	mouseAABB.SetCenter( m_mousePositionOnMainCamera );
+	mouseAABB.SetDimensions( Vec2( 0.5f, 0.5f ) );
+	Texture* reticle = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/reticle.png" );
+	g_theRenderer->BindTexture( reticle );
+	g_theRenderer->DrawAABB2Filled( mouseAABB, Rgba8::WHITE );
 }
 
 void Game::RenderUI()
@@ -656,6 +669,7 @@ void Game::RenderPlaying()
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( (Shader*)nullptr );
 	RenderGame();
+	RenderMouse();
 	g_theRenderer->EndCamera( m_camera );
 
 	g_theRenderer->BeginCamera( m_UICamera );
