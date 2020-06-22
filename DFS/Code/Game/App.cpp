@@ -39,6 +39,7 @@ void App::Startup()
 
 	g_theInput->Startup( g_theWindow );
 	g_theRenderer->StartUp( g_theWindow );
+	g_theRenderer->Setup( nullptr );
 	DebugRenderSystemStartup( g_theRenderer );
 	g_theGame->Startup();
 	g_theConsole->Startup();
