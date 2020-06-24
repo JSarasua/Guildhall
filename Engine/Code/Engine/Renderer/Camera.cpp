@@ -346,8 +346,8 @@ void Camera::UpdateCameraUBO()
 void Camera::UpdateScreenShake( RandomNumberGenerator& rand )
 {
 	float newOffsetX = rand.RollRandomFloatZeroToOneInclusive();
-	float newOffsetY = rand.RollRandomFloatZeroToOneInclusive();
-	float newOffsetZ = rand.RollRandomFloatZeroToOneInclusive();
+	float newOffsetY = 0.5f;
+	float newOffsetZ = 0.5f;
 
 	Vec3 newScreenShakeOffset = Vec3( newOffsetX, newOffsetY, newOffsetZ );
 	newScreenShakeOffset -= Vec3( 0.5f, 0.5f, 0.5f );
