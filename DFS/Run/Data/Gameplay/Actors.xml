@@ -14,12 +14,12 @@
     maxDrawBounds="0.375,0.5"
     physicsRadius =" 0.2"
   >
-    <SpriteAnimSet spriteSheet="KushnariovaCharacters_12x53.png" spriteLayout="12,53" fps="5">
-      <SpriteAnim name="MoveEast"		spriteIndexes="51,52,53"/>
-      <SpriteAnim name="MoveWest"		spriteIndexes="57,58,59"/>
-      <SpriteAnim name="MoveNorth"	spriteIndexes="48,49,50"/>
-      <SpriteAnim name="MoveSouth"	spriteIndexes="54,55,56"/>
-      <SpriteAnim name="Idle"				spriteIndexes="55,55,55" fps="3"/>
+    <SpriteAnimSet spriteSheet="BlueDude.png" spriteLayout="20,1" fps="30">
+      <SpriteAnim name="MoveEast"		spriteIndexes="0,0,0"/>
+      <SpriteAnim name="MoveWest"		spriteIndexes="0,0,0"/>
+      <SpriteAnim name="MoveNorth"	spriteIndexes="0,0,0"/>
+      <SpriteAnim name="MoveSouth"	spriteIndexes="4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19"/>
+      <SpriteAnim name="Idle"				spriteIndexes="0,0,0" fps="3"/>
     </SpriteAnimSet>
     
   </ActorDefinition>
