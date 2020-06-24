@@ -39,4 +39,9 @@ protected:
 	int m_health = 0;
 	bool m_isDead = true;
 	Rgba8 m_color = Rgba8(255,255,255);
+
+
+	Vec3 m_pitchRollYawDegrees;
+	Vec3 m_positionBottomZ;
+	float m_eyeHeight;
 };

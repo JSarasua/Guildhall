@@ -26,5 +26,9 @@ protected:
 	bool m_canBePushedByEntities = false;
 	bool m_canPushEntities = false;
 	float m_mass = 1.f;
+	float m_height = 0.f;
+	float m_eyeHeight = 0.f;
+	float m_physicsRadius = 0.f;
+	float m_walkSpeed = 0.f;
 
 };
