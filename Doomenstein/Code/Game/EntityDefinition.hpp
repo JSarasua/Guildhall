@@ -15,7 +15,17 @@ public:
 	static void InitializeEntityDefinitions( XmlElement const& rootEntityDefinitionElement );
 	static std::map< std::string, EntityDefinition* > s_definitions;
 
+	float GetEyeHeight() const;
+	float GetHeight() const;
+	float GetMass() const;
+	float GetPhysicsRadius() const;
+	float GetWalkSpeed() const;
+	bool IsPushedByWalls() const;
+	bool IsPushedByEntities() const;
+	bool CanPushEntities() const;
 
+	std::string const& GetName() const;
+	std::string const& GetType() const;
 
 protected:
 	std::string m_name;

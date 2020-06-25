@@ -10,7 +10,7 @@ public:
 	Actor( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees );
 
 	virtual void Startup() override {}
-	virtual void Update( float deltaSeconds );
+	virtual void Update( float deltaSeconds ) override;
 	virtual void Render() const override;
 
 private:

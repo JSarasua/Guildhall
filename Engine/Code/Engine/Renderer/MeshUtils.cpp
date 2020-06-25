@@ -343,6 +343,100 @@ void AppendIndexedVertsCylinder( std::vector<Vertex_PCU>& masterVertexList, std:
 	}
 }
 
+void AppendIndexedVertsCylinderForDebugRender( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, float height, float radius, uint cuts /*= 16*/, Rgba8 color /*= Rgba8::WHITE */ )
+{
+
+	float degIncr = 360.f / (float)cuts;
+	std::vector<Vec3> vertexes;
+	std::vector<uint> indices;
+
+	for( uint cutIndex = 0; cutIndex < cuts; cutIndex++ )
+	{
+		float currentAngle = degIncr * (float)cutIndex;
+		Vec2 baseVert = Vec2::MakeFromPolarDegrees( currentAngle, radius );
+		Vec3 baseVert3D = (Vec3)baseVert;
+		vertexes.push_back( baseVert3D );
+	}
+
+	for( uint cutIndex = 0; cutIndex < cuts; cutIndex++ )
+	{
+		float currentAngle = degIncr * (float)cutIndex;
+		Vec2 topVert = Vec2::MakeFromPolarDegrees( currentAngle, radius );
+		Vec3 topVert3D = (Vec3)topVert;
+		topVert3D.z += height;
+		vertexes.push_back( topVert3D );
+	}
+
+	//0,1,2
+	//0,2,3
+	//0,3,4
+
+	//Bottom of Cylinder indices
+	for( uint cutIndex = 0; cutIndex < cuts - 2; cutIndex++ )
+	{
+		indices.push_back( 0 );
+		indices.push_back( cutIndex + 1 );
+		indices.push_back( cutIndex + 2 );
+	}
+
+
+	//for a 5 cut
+	//0 5 1
+	//5 6 1
+
+	//1 6 2
+	//6 7 2
+
+	//etc
+
+	//Between the two circles
+	for( uint cutIndex = 0; cutIndex < cuts; cutIndex++ )
+	{
+		if( cutIndex == cuts - 1 )
+		{
+			indices.push_back( cutIndex );
+			indices.push_back( cuts + cutIndex );
+			indices.push_back( 0 );
+
+			indices.push_back( cuts + cutIndex );
+			indices.push_back( cuts );
+			indices.push_back( 0 );
+		}
+		else
+		{
+			indices.push_back( cutIndex );
+			indices.push_back( cuts + cutIndex );
+			indices.push_back( cutIndex + 1 );
+
+			indices.push_back( cuts + cutIndex );
+			indices.push_back( cuts + cutIndex + 1 );
+			indices.push_back( cutIndex + 1 );
+		}
+
+	}
+
+	//Top of cylinder indices
+	for( uint cutIndex = 0; cutIndex < cuts - 2; cutIndex++ )
+	{
+		indices.push_back( cuts + cutIndex + 2 );
+		indices.push_back( cuts + cutIndex + 1 );
+		indices.push_back( cuts );
+	}
+
+	uint startIndex = (uint)masterVertexList.size();
+	for( size_t vertexIndex = 0; vertexIndex < vertexes.size(); vertexIndex++ )
+	{
+		Vec3 vertex = vertexes[vertexIndex];
+		masterVertexList.push_back( Vertex_PCU( vertex, color, Vec2() ) );
+	}
+
+	for( size_t indexIndex = 0; indexIndex < indices.size(); indexIndex++ )
+	{
+		uint currentIndex = indices[indexIndex] + startIndex;
+		masterIndexList.push_back( currentIndex );
+	}
+}
+
 void AppendIndexedVertsCone( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, Vec3 const& basePos, float baseRadius, Vec3 const& endPos, uint cuts /*= 16*/, Rgba8 color /*= Rgba8::WHITE */ )
 {
 	AppendIndexedVertsCylinder( masterVertexList, masterIndexList, basePos, baseRadius, endPos, 0.f, cuts, color );

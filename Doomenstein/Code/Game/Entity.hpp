@@ -10,7 +10,7 @@ class Entity
 {
 public:
 	Entity() {}
-	~Entity() {}
+	virtual ~Entity() {}
 	Entity(  EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees );
 
 	virtual void Startup() = 0;
@@ -18,17 +18,19 @@ public:
 	virtual void Render() const = 0;
 
 	bool IsOffScreen();
-	Vec3 GetForwardVector();
+	Vec3 GetForwardVector() const;
 	bool IsAlive();
 	void SetAlive();
 	const Vec2 GetPosition();
+	Vec3 GetEyeHeightPosition();
 	virtual void Lose1Health();
 	virtual void LoseAllHealth();
 	const Rgba8& GetColor();
 
 	void SetPosition(const Vec2& newPosition);
 
-
+	bool IsPossessed() const;
+	void SetIsPossessed( bool isPossessed );
 
 protected:
 	Vec2 m_position = Vec2(0.f,0.f);
@@ -44,4 +46,6 @@ protected:
 
 	EntityDefinition const* m_entityDef = nullptr;
 	Vec3 m_pitchRollYawDegrees;
+
+	bool m_isPossessed = false;
 };

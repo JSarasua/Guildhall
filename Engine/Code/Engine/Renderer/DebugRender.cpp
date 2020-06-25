@@ -175,6 +175,7 @@ public:
 	GPUMesh* m_cubeMesh;
 	GPUMesh* m_sphereMesh;
 	GPUMesh* m_basisMesh;
+	GPUMesh* m_cylinderMesh;
 };
 
 void DebugRenderSystem::UpdateColors()
@@ -462,6 +463,9 @@ void DebugRenderSystemShutdown()
 
 	delete s_DebugRenderSystem->m_basisMesh;
 	s_DebugRenderSystem->m_basisMesh = nullptr;
+
+	delete s_DebugRenderSystem->m_cylinderMesh;
+	s_DebugRenderSystem->m_cylinderMesh = nullptr;
 }
 
 void DebugRenderCreateMeshes()
@@ -482,6 +486,12 @@ void DebugRenderCreateMeshes()
 	s_DebugRenderSystem->m_sphereMesh->UpdateVertices( sphereVerts );
 	s_DebugRenderSystem->m_sphereMesh->UpdateIndices( sphereIndices );
 
+	s_DebugRenderSystem->m_cylinderMesh = new GPUMesh( s_DebugRenderSystem->m_context );
+	std::vector<Vertex_PCU> cylinderVerts;
+	std::vector<uint> cylinderIndices;
+	AppendIndexedVertsCylinderForDebugRender( cylinderVerts, cylinderIndices, 1.f, 1.f );
+	s_DebugRenderSystem->m_cylinderMesh->UpdateVertices( cylinderVerts );
+	s_DebugRenderSystem->m_cylinderMesh->UpdateIndices( cylinderIndices );
 
 	//Bases
 	Vec3 iBasis = Vec3( 1.f, 0.f, 0.f );
@@ -904,6 +914,30 @@ void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& startC
 void DebugAddWorldWireSphere( Vec3 const& pos, float radius, Rgba8 const& color, float duration /*= 0.f*/, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
 {
 	DebugAddWorldWireSphere( pos, radius, color, color, duration, mode );
+}
+
+void DebugAddWorldWireCylinder( Vec2 const& pos, float radius, float height, Rgba8 const& startColor, Rgba8 const& endColor, float duration, eDebugRenderMode mode /*= DEBUG_RENDER_USE_DEPTH */ )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_mode = mode;
+	debugObject->m_renderTo = DEBUG_RENDER_TO_WORLD;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_isBillBoarded = false;
+	debugObject->m_isText = false;
+	debugObject->m_isWireMesh = true;
+	debugObject->m_mesh	= s_DebugRenderSystem->m_cylinderMesh;
+
+	Transform transform;
+	transform.SetPosition( Vec3( pos, 0.f ) );
+	transform.SetNonUniformScale( Vec3( radius, radius, height ) );
+
+	debugObject->m_modelMatrix = transform.ToMatrixWithoutWorldBasis();
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_meshObjects );
+	//s_DebugRenderSystem->m_meshObjects.push_back( debugObject );
 }
 
 void DebugAddWireMeshToWorld( Mat44 const& modelMatrix, GPUMesh* mesh, Rgba8 startTint, Rgba8 endTint, float duration, eDebugRenderMode mode )

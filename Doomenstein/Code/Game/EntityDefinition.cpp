@@ -70,3 +70,52 @@ void EntityDefinition::InitializeEntityDefinitions( XmlElement const& rootEntity
 	}
 }
 
+float EntityDefinition::GetEyeHeight() const
+{
+	return m_eyeHeight;
+}
+
+float EntityDefinition::GetHeight() const
+{
+	return m_height;
+}
+
+float EntityDefinition::GetMass() const
+{
+	return m_mass;
+}
+
+float EntityDefinition::GetPhysicsRadius() const
+{
+	return m_physicsRadius;
+}
+
+float EntityDefinition::GetWalkSpeed() const
+{
+	return m_walkSpeed;
+}
+
+bool EntityDefinition::IsPushedByWalls() const
+{
+	return m_canBePushedByWalls;
+}
+
+bool EntityDefinition::IsPushedByEntities() const
+{
+	return m_canBePushedByEntities;
+}
+
+bool EntityDefinition::CanPushEntities() const
+{
+	return m_canPushEntities;
+}
+
+std::string const& EntityDefinition::GetName() const
+{
+	return m_name;
+}
+
+std::string const& EntityDefinition::GetType() const
+{
+	return m_type;
+}

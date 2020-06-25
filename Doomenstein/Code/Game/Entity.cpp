@@ -1,6 +1,7 @@
 #include "Game/Entity.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Mat44.hpp"
+#include "Game/EntityDefinition.hpp"
 
 
 Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees ) :
@@ -20,7 +21,7 @@ bool Entity::IsOffScreen()
 	return false;
 }
 
-Vec3 Entity::GetForwardVector()
+Vec3 Entity::GetForwardVector() const
 {
 	Mat44 mat;
 	mat.RotateYawPitchRollDegress( m_pitchRollYawDegrees.z, m_pitchRollYawDegrees.x, m_pitchRollYawDegrees.y );
@@ -43,6 +44,12 @@ void Entity::SetAlive()
 const Vec2 Entity::GetPosition()
 {
 	return m_position;
+}
+
+Vec3 Entity::GetEyeHeightPosition()
+{
+	float eyeHeight = m_entityDef->GetEyeHeight();
+	return Vec3( m_position, eyeHeight );
 }
 
 void Entity::Lose1Health()
@@ -72,4 +79,14 @@ const Rgba8& Entity::GetColor()
 void Entity::SetPosition( const Vec2& newPosition )
 {
 	m_position = newPosition;
+}
+
+bool Entity::IsPossessed() const
+{
+	return m_isPossessed;
+}
+
+void Entity::SetIsPossessed( bool isPossessed )
+{
+	m_isPossessed = isPossessed;
 }
