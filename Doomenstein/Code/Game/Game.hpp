@@ -8,7 +8,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include <vector>
 
-
+class Entity;
 class Clock;
 class GPUMesh;
 class Material;
@@ -123,6 +123,7 @@ private:
 
 	void LoadAssets();
 
+	void TogglePossession();
 
 
 private:
@@ -191,6 +192,8 @@ private:
 	float m_msPerFrame = 0.f;
 
 	SpriteSheet* m_viewModelsSpriteSheet = nullptr;
+
+	Entity* m_possessedEntity = nullptr;
 public:
 	//static light_t m_pointLight;
 	static std::vector<light_t> m_lights;

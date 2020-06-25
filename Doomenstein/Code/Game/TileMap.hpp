@@ -33,10 +33,6 @@ private:
 	bool SpawnMapRow( std::string const& mapRow, uint heightIndex );
 	void ParseEntities( XmlElement const& entitiesElement );
 
-	void RenderTiles();
-	void RenderEntities();
-	void UpdateTiles( float deltaSeconds );
-	void UpdateEntities( float deltaSeconds );
 	void SpawnEntities();
 
 	void ResolveAllEntityWallCollisions();

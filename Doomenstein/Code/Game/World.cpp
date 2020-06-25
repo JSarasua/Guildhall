@@ -155,3 +155,8 @@ bool World::WarpPlayer( EventArgs const& args )
 	return true;
 }
 
+Entity* World::GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance )
+{
+	return m_currentMap->GetClosestEntityInSector( position, forwardVector, forwardSpread, maxDistance );
+}
+

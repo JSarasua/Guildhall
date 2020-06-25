@@ -2,6 +2,9 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Game/MapRegionType.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/EntityDefinition.hpp"
+#include "Game/Actor.hpp"
+#include "Game/Entity.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -104,6 +107,7 @@ void TileMap::Render()
 		g_theRenderer->DrawIndexedVertexArray( m_vertsToRender, m_tileIndices );
 	}
 
+	Map::Render();
 }
 
 void TileMap::SetPlayerToStart()
@@ -603,7 +607,14 @@ void TileMap::ParseEntities( XmlElement const& entitiesElement )
 		//return;
 	}
 
+	SpawnEntities();
+}
 
+void TileMap::SpawnEntities()
+{
+	EntityDefinition const* entityDef = EntityDefinition::s_definitions["Pinky"];
+	Actor* actor1 = new Actor( entityDef, Vec2( 2.5, 1.5f ), Vec3( 0.f, 0.f, 30.f ) );
+	m_allEntities.push_back( actor1 );
 }
 
 void TileMap::ResolveAllEntityWallCollisions()

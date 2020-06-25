@@ -27,6 +27,7 @@ public:
 	void SetCurrentMap( Map* newCurrentMap );
 
 	bool WarpPlayer( EventArgs const& args );
+	Entity* GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance );
 
 private:
 	std::map<std::string, Map*> m_maps;

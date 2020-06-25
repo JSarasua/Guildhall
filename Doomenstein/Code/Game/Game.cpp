@@ -188,12 +188,13 @@ void Game::Update()
 
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 	
-	m_world->Update( dt );
-
 	if( !g_theConsole->IsOpen() )
 	{
 		CheckButtonPresses( dt );
 	}
+
+	m_world->Update( dt );
+
 
 	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
 	Mat44 cameraModelMatrix = Mat44();
@@ -638,6 +639,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
 	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
+	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
@@ -740,6 +742,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			DisableDebugRendering();
 		}
+	}
+
+	if( f3Key.WasJustPressed() )
+	{
+		TogglePossession();
 	}
 
 	if( f11Key.WasJustPressed() )
@@ -1112,6 +1119,27 @@ void Game::LoadAssets()
 {
 	Texture* viewModelSpriteTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/ViewModelsSpriteSheet_8x8.png" );
 	m_viewModelsSpriteSheet = new SpriteSheet( *viewModelSpriteTex, IntVec2( 8, 8 ) );
+}
+
+void Game::TogglePossession()
+{
+	if( nullptr != m_possessedEntity )
+	{
+		m_possessedEntity->SetIsPossessed( false );
+		m_possessedEntity = nullptr;
+	}
+	else
+	{
+		Vec3 position = m_camera.GetPosition();
+		Vec3 forwardVector = m_camera.GetDirection();
+		float maxDistance = 2.f;
+		float forwardSpread = 90.f;
+		m_possessedEntity = m_world->GetClosestEntityInSector( position, forwardVector, forwardSpread, maxDistance );
+		if( m_possessedEntity )
+		{
+			m_possessedEntity->SetIsPossessed( true );
+		}
+	}
 }
 
 void Game::SetPlayerPosition( Vec3 const& playerPos )

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Engine/Math/IntVec2.hpp"
+#include "Engine/Math/Vec3.hpp"
 
 
 class Tile;
@@ -17,7 +18,7 @@ public:
 
 
 	virtual void Update( float deltaSeconds );
-	virtual void Render() = 0;
+	virtual void Render();
 
 	virtual void SetPlayerToStart() = 0;
 	virtual Vec2 const& GetPlayerStartPosition() = 0;
@@ -25,8 +26,11 @@ public:
 
 	bool IsValid() const;
 
+	Entity* GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance );
+
 private:
 	void ResolveEntityCollisions();
+	void RenderEntities();
 
 protected:
 	bool m_isValid = false;
