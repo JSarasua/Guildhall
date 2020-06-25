@@ -22,7 +22,18 @@ bool Map::IsValid() const
 	return m_isValid;
 }
 
+
 Map::~Map()
+{
+
+}
+
+void Map::Update( float deltaSeconds )
+{
+	ResolveEntityCollisions();
+}
+
+void Map::ResolveEntityCollisions()
 {
 
 }

@@ -39,6 +39,10 @@ private:
 	void UpdateEntities( float deltaSeconds );
 	void SpawnEntities();
 
+	void ResolveAllEntityWallCollisions();
+	void ResolveEntityWallCollisions( Entity* entity );
+	void ResolveEntityWallCollision( Entity* entity, IntVec2 const& direction );
+
 private:
 	//std::vector<Tile> m_tiles;
 	std::vector<Vertex_PCUTBN> m_vertsToRender;

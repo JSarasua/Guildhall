@@ -16,7 +16,7 @@ public:
 	virtual ~Map();
 
 
-	virtual void Update( float deltaSeconds ) = 0;
+	virtual void Update( float deltaSeconds );
 	virtual void Render() = 0;
 
 	virtual void SetPlayerToStart() = 0;
@@ -25,8 +25,13 @@ public:
 
 	bool IsValid() const;
 
+private:
+	void ResolveEntityCollisions();
+
 protected:
 	bool m_isValid = false;
+
+	std::vector<Entity*> m_allEntities;
 
 private:
 };

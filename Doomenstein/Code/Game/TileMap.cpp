@@ -81,6 +81,9 @@ void TileMap::Update( float deltaSeconds )
 		MapTile const& tile = m_tiles[tileIndex];
 		AppendIndexedVertsTestCube( m_vertsToRender, m_tileIndices, tile );
 	}
+
+	Map::Update( deltaSeconds );
+	ResolveAllEntityWallCollisions();
 }
 
 void TileMap::Render()
@@ -599,5 +602,48 @@ void TileMap::ParseEntities( XmlElement const& entitiesElement )
 	{
 		//return;
 	}
+
+
+}
+
+void TileMap::ResolveAllEntityWallCollisions()
+{
+	size_t numEntities = m_allEntities.size();
+	for( size_t entityIndex = 0; entityIndex < numEntities; entityIndex++ )
+	{
+		Entity* entity = m_allEntities[entityIndex];
+		if( entity )
+		{
+			ResolveEntityWallCollisions( entity );
+		}
+	}
+}
+
+void TileMap::ResolveEntityWallCollisions( Entity* entity )
+{
+	IntVec2 north( 1, 0 );
+	IntVec2 east( 0, 1 );
+	IntVec2 south( -1, 0 );
+	IntVec2 west( 0, -1 );
+	
+	IntVec2 northEast( 1, 1 );
+	IntVec2 southEast( -1, 1 );
+	IntVec2 southWest( -1, -1 );
+	IntVec2 northWest( 1,-1 );
+
+	ResolveEntityWallCollision( entity, north );
+	ResolveEntityWallCollision( entity, east );
+	ResolveEntityWallCollision( entity, south );
+	ResolveEntityWallCollision( entity, west );
+	
+	ResolveEntityWallCollision( entity, northEast );
+	ResolveEntityWallCollision( entity, southEast );
+	ResolveEntityWallCollision( entity, southWest );
+	ResolveEntityWallCollision( entity, northWest );
+}
+
+void TileMap::ResolveEntityWallCollision( Entity* entity, IntVec2 const& direction )
+{
+
 }
 
