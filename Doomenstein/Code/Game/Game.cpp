@@ -1019,6 +1019,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		translator *= 2.f;
 	}
 
+	if( m_possessedEntity )
+	{
+		//Translate entity
+	}
 	m_camera.TranslateRelativeToViewOnlyYaw( translator );
 
 	Vec3 rotator;
