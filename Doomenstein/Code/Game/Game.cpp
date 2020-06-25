@@ -15,7 +15,6 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
-#include "Game/Player.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
@@ -25,6 +24,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/MapRegionType.hpp"
 #include "Game/MapMaterialType.hpp"
+#include "Game/EntityDefinition.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 
 extern App* g_theApp;
@@ -147,9 +147,11 @@ void Game::InitializeDefinitions()
 {
 	XmlDocument mapMaterialDoc;
 	XmlDocument mapRegionDoc;
+	XmlDocument entityDoc;
 
 	XmlElement const& mapMaterialTypeRoot = GetRootElement( mapMaterialDoc, "Data/Definitions/MapMaterialTypes.xml" );
 	XmlElement const& mapRegionTypeRoot = GetRootElement( mapRegionDoc, "Data/Definitions/MapRegionTypes.xml" );
+	XmlElement const& entityTypeRoot = GetRootElement( entityDoc, "data/Definitions/EntityTypes.xml" );
 
 	if( &mapMaterialTypeRoot )
 	{
@@ -159,6 +161,11 @@ void Game::InitializeDefinitions()
 	if( &mapRegionTypeRoot )
 	{
 		MapRegionType::InitializeMapRegionDefinitions( mapRegionTypeRoot );
+	}
+
+	if( &entityTypeRoot )
+	{
+		EntityDefinition::InitializeEntityDefinitions( entityTypeRoot );
 	}
 
 }
