@@ -1,22 +1,18 @@
 #include "Game/Entity.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/Mat44.hpp"
 
-Entity::Entity( Game* game ): m_game( game ), m_position( 0.f, 0.f ), m_velocity( 0.f, 0.f ), m_orientationDegrees( 0.f )
-{}
 
-Entity::Entity( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, Game* game ) :
-	m_position(initialPosition),
-	m_velocity(initialVelocity),
-	m_orientationDegrees(initialOrientationDegrees),
-	m_angularVelocity(initialAngularVelocity),
-	m_game(game)
+Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees ) :
+	m_entityDef( entityDef ), m_position( initialPosition ), m_pitchRollYawDegrees( pitchRollYawDegrees )
+{
 
-{}
+}
 
 void Entity::Update( float deltaSeconds )
 {
-	m_orientationDegrees += m_angularVelocity * deltaSeconds;
-	m_position = TransformPosition2D(m_position, 1.f, m_orientationDegrees, m_velocity * deltaSeconds);
+//	m_orientationDegrees += m_angularVelocity * deltaSeconds;
+//	m_position = TransformPosition2D(m_position, 1.f, m_orientationDegrees, m_velocity * deltaSeconds);
 }
 
 bool Entity::IsOffScreen()
@@ -24,9 +20,14 @@ bool Entity::IsOffScreen()
 	return false;
 }
 
-Vec2 Entity::GetForwardVector()
+Vec3 Entity::GetForwardVector()
 {
-	return m_velocity;
+	Mat44 mat;
+	mat.RotateYawPitchRollDegress( m_pitchRollYawDegrees.z, m_pitchRollYawDegrees.x, m_pitchRollYawDegrees.y );
+	Vec3 forward( 1.f, 0.f, 0.f );
+	forward = mat.TransformVector3D( forward );
+	
+	return forward;
 }
 
 bool Entity::IsAlive()

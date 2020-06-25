@@ -49,9 +49,6 @@
     <ClCompile Include="Tile.cpp">
       <Filter>General</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>General</Filter>
-    </ClCompile>
     <ClCompile Include="TileMap.cpp">
       <Filter>General</Filter>
     </ClCompile>
@@ -68,6 +65,9 @@
       <Filter>General</Filter>
     </ClCompile>
     <ClCompile Include="EntityDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
       <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,9 +96,6 @@
     <ClInclude Include="Tile.hpp">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="Player.hpp">
-      <Filter>General</Filter>
-    </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>General</Filter>
     </ClInclude>
@@ -118,6 +115,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="EntityDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

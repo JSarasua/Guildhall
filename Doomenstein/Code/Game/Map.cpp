@@ -2,7 +2,6 @@
 #include "Tile.hpp"
 #include "Entity.hpp"
 #include "Game/GameCommon.hpp"
-#include "Game/Player.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/Game.hpp"
