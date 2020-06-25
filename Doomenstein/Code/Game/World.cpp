@@ -23,7 +23,7 @@ void World::Startup()
 		std::string filePath = "Data/Maps/" + filePaths[fileIndex];
 		XmlDocument currentMapDoc		= new XmlDocument;
 		XmlElement const& currentMapDefElement = GetRootElement( currentMapDoc, filePath.c_str() );
-		Map* newMap = new TileMap( currentMapDefElement, m_game );
+		Map* newMap = new TileMap( currentMapDefElement );
 		
 		m_maps[filePaths[fileIndex]] = newMap;
 	}

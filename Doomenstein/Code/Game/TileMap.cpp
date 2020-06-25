@@ -5,7 +5,7 @@
 
 extern RenderContext* g_theRenderer;
 
-TileMap::TileMap( XmlElement const& element, Game* game ) : Map( game )
+TileMap::TileMap( XmlElement const& element )
 {
 	std::string mapName = element.Name();
 	g_theConsole->GuaranteeOrError( mapName == "MapDefinition", Stringf( "ERROR: Expected MapDefinition as root node" ) );

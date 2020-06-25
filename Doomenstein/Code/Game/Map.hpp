@@ -14,7 +14,6 @@ class Map
 public:
 	Map();
 	virtual ~Map();
-	Map( Game* game );
 
 
 	virtual void Update( float deltaSeconds ) = 0;
@@ -27,7 +26,6 @@ public:
 	bool IsValid() const;
 
 protected:
-	Game* m_game = nullptr;
 	bool m_isValid = false;
 
 private:

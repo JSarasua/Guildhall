@@ -17,11 +17,6 @@ extern RenderContext* g_theRenderer;
 Map::Map()
 {}
 
-Map::Map(Game* game) :
-	m_game(game)
-{
-}
-
 bool Map::IsValid() const
 {
 	return m_isValid;

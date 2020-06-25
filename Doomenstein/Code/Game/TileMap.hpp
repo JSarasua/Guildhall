@@ -10,7 +10,7 @@
 class TileMap : public Map
 {
 public:
-	TileMap( XmlElement const& element, Game* game );
+	TileMap( XmlElement const& element );
 	~TileMap();
 
 public:
