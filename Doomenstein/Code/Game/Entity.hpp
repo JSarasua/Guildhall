@@ -28,7 +28,9 @@ public:
 	const Rgba8& GetColor();
 
 	void SetPosition(const Vec2& newPosition);
-
+	Vec3 const& GetRotationPitchRollYawDegrees() const;
+	void TranslateRelativeToViewOnlyYaw( Vec3 const& translator );
+	void RotatePitchRollYawDegrees( Vec3 const& rotatePitchRollYawDegrees );
 	bool IsPossessed() const;
 	void SetIsPossessed( bool isPossessed );
 

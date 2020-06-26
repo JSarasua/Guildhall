@@ -2,6 +2,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/Mat44.hpp"
 #include "Game/EntityDefinition.hpp"
+#include "Engine/Math/Transform.hpp"
 
 
 Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees ) :
@@ -79,6 +80,33 @@ const Rgba8& Entity::GetColor()
 void Entity::SetPosition( const Vec2& newPosition )
 {
 	m_position = newPosition;
+}
+
+Vec3 const& Entity::GetRotationPitchRollYawDegrees() const
+{
+	return m_pitchRollYawDegrees;
+}
+
+void Entity::TranslateRelativeToViewOnlyYaw( Vec3 const& translator )
+{
+	float walkSpeed = m_entityDef->GetWalkSpeed();
+	Vec3 translatorNoZ = translator;
+	translatorNoZ.z = 0.f;
+	translatorNoZ *= walkSpeed;
+
+
+	Mat44 translationMatrix;
+	translationMatrix.RotateYawPitchRollDegress( m_pitchRollYawDegrees.z, 0.f, 0.f );
+
+
+	Vec3 translation = translationMatrix.TransformPosition3D( translatorNoZ );
+	m_position += translation;
+}
+
+void Entity::RotatePitchRollYawDegrees( Vec3 const& rotatePitchRollYawDegrees )
+{
+	m_pitchRollYawDegrees += rotatePitchRollYawDegrees;
+	m_pitchRollYawDegrees.x = Clampf( m_pitchRollYawDegrees.x, -89.9f, 89.9f );
 }
 
 bool Entity::IsPossessed() const

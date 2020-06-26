@@ -194,6 +194,7 @@ void Game::Update()
 	}
 
 	m_world->Update( dt );
+	UpdateCamera( dt );
 
 
 	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
@@ -608,7 +609,16 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
+	if( m_possessedEntity )
+	{
+		Vec3 entityPosition = m_possessedEntity->GetPosition();
+		entityPosition.z += 0.5f;
+		m_camera.SetPosition( entityPosition );
+
+		Vec3 pitchRollYaw = m_possessedEntity->GetRotationPitchRollYawDegrees();
+		m_camera.SetRotationPitchRollYawDegrees( pitchRollYaw );
+	}
+
 }
 
 void Game::RenderGame()
@@ -1021,9 +1031,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( m_possessedEntity )
 	{
-		//Translate entity
+		m_possessedEntity->TranslateRelativeToViewOnlyYaw( translator );
 	}
-	m_camera.TranslateRelativeToViewOnlyYaw( translator );
+	else
+	{
+		m_camera.TranslateRelativeToViewOnlyYaw( translator );
+	}
 
 	Vec3 rotator;
 	if( upArrow.IsPressed() )
@@ -1047,7 +1060,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	rotator.x += mouseChange.y * 0.1f;
 	rotator.z -= mouseChange.x * 0.1f;
-	m_camera.RotatePitchRollYawDegrees( rotator );
+
+	if( m_possessedEntity )
+	{
+		m_possessedEntity->RotatePitchRollYawDegrees( rotator );
+	}
+	else
+	{
+		m_camera.RotatePitchRollYawDegrees( rotator );
+	}
+
 
 }
 
