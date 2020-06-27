@@ -3,6 +3,36 @@
 #include <map>
 #include <string>
 
+class SpriteSheet;
+class SpriteAnimDefinition;
+
+//Contains front, left, right, etc for a "Walk"
+struct SpriteAnimMap
+{
+public:
+	SpriteAnimMap( XmlElement const& entityAnimStateElem );
+	~SpriteAnimMap();
+
+	SpriteAnimDefinition const* GetSpriteAnimDefinition( Vec2 const& localDirection ) const;
+
+private:
+	SpriteSheet* m_spriteSheet = nullptr;
+	std::map< std::string, SpriteAnimDefinition* > m_spriteanims;
+};
+
+//Contains Walk, Death, etc
+struct EntitySpriteAnimStates
+{
+public:
+	EntitySpriteAnimStates( XmlElement const& entityAppearanceElem );
+	~EntitySpriteAnimStates();
+
+	SpriteAnimDefinition const* GetSpriteAnimDefinition( std::string entityAnimState, Vec2 const& localDirection ) const;
+
+private:
+	std::map< std::string, SpriteAnimMap* > m_spriteAnimStates;
+};
+
 
 
 class EntityDefinition
