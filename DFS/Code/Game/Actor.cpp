@@ -521,7 +521,28 @@ std::string Actor::GetCurrentAnimationName() const
 {
 	std::string currentAnimationName;
 
-	if( m_velocity.GetLength() == 0.f )
+	if( m_isDodging )
+	{
+		float velocityOrientation = m_velocity.GetAngleDegrees();
+
+		if( GetShortestAngularDistance( 0.f, velocityOrientation ) < 45.f )
+		{
+			currentAnimationName = "DodgeEast";
+		}
+		else if( GetShortestAngularDistance( 90.f, velocityOrientation ) < 45.f )
+		{
+			currentAnimationName = "DodgeNorth";
+		}
+		else if( GetShortestAngularDistance( 180.f, velocityOrientation ) < 45.f )
+		{
+			currentAnimationName = "DodgeWest";
+		}
+		else
+		{
+			currentAnimationName = "DodgeSouth";
+		}
+	}
+	else if( m_velocity.GetLength() == 0.f )
 	{
 		if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 45.f )
 		{

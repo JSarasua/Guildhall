@@ -23,6 +23,10 @@
       <SpriteAnim name="IdleWest"				spriteIndexes="1,1,1" fps="3"/>
       <SpriteAnim name="IdleNorth"				spriteIndexes="3,3,3" fps="3"/>
       <SpriteAnim name="IdleSouth"				spriteIndexes="0,0,0" fps="3"/>
+      <SpriteAnim name="DodgeEast"				spriteIndexes="10,11,12" fps="3"/>
+      <SpriteAnim name="DodgeWest"				spriteIndexes="13,14,15" fps="3"/>
+      <SpriteAnim name="DodgeNorth"				spriteIndexes="16,17,18" fps="3"/>
+      <SpriteAnim name="DodgeSouth"				spriteIndexes="5,6,7" fps="3"/>
     </SpriteAnimSet>
     
   </ActorDefinition>
