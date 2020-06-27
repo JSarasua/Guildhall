@@ -525,6 +525,10 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 	if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER )
 	{
 		typeToCheck = ENTITY_TYPE_EVIL_BULLET;
+		if( currentEntity->IsDodging() )
+		{
+			return;
+		}
 	}
 	else
 	{

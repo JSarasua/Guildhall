@@ -57,6 +57,7 @@ protected:
 	float m_timeSinceCreation = 0.f;
 	float m_timeUntilNextGoalPosition = 2.f;
 	Timer m_firingTimer;
+	Timer m_dodgeTimer;
 	PlayerController m_playerController = Invalid_Player;
 	bool m_isWeaponFlipped = true;
 	bool m_isWeaponInFront = true;

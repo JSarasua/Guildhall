@@ -52,6 +52,8 @@ public:
 
 	bool IsGarbage() const;
 	bool IsOffScreen();
+	bool IsDodging() const;
+
 	Vec2 GetForwardVector();
 	float GetOrientationDegrees();
 	float GetWeaponOrientationDegrees() const;
@@ -91,6 +93,7 @@ protected:
 	bool m_canWalk = false;
 	bool m_canFly = false;
 	bool m_canSwim = false;
+	bool m_isDodging = false;
 
 	EntityType m_entityType = ENTITY_TYPE_INVALID;
 };

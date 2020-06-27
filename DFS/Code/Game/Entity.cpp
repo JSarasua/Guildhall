@@ -37,6 +37,11 @@ bool Entity::IsOffScreen()
 	return false;
 }
 
+bool Entity::IsDodging() const
+{
+	return m_isDodging;
+}
+
 Vec2 Entity::GetForwardVector()
 {
 	return m_velocity;

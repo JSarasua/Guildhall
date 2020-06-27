@@ -29,6 +29,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 100;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
 	}
 	else
 	{
@@ -36,6 +37,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
 	}
 }
 
@@ -57,6 +59,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
 	}
 	else
 	{
@@ -64,6 +67,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
 	}
 }
 
@@ -92,6 +96,11 @@ void Actor::Update( float deltaSeconds )
 		Entity::Update(deltaSeconds);
 	}
 
+	if( m_dodgeTimer.HasElapsed() )
+	{
+		m_isDodging = false;
+		
+	}
 }
 
 void Actor::Render() const
@@ -285,6 +294,7 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
+	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
 	
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
 	Vec2 weaponDirection = mousePos - GetPosition();
@@ -313,98 +323,114 @@ void Actor::UpdateFromKeyboard()
 	}
 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
-	if( leftMouseButton.IsPressed() )
+
+
+	if( rightMouseButton.WasJustPressed() )
 	{
-		m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
-		if( m_isFiring )
+		if( m_dodgeTimer.HasElapsed() )
 		{
-			float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
-			g_theGame->AddScreenShake( screenShakeIncrement );
+			m_dodgeTimer.Reset();
+			m_isDodging = true;
+			m_velocity *= 1.75f;
 		}
 	}
 
-	if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
+	if( !m_isDodging )
 	{
-		m_velocity.x = -actorSpeed;
-	}
-	else if( rightArrow.IsPressed() && !leftArrow.IsPressed() )
-	{
-		m_velocity.x = actorSpeed;
-	}
-	else if( leftArrow.IsPressed() && rightArrow.IsPressed() )
-	{
-		m_velocity.x = 0.f;
-	}
+		if( leftMouseButton.IsPressed() )
+		{
+			m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
+			if( m_isFiring )
+			{
+				float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
+				g_theGame->AddScreenShake( screenShakeIncrement );
+			}
+		}
+
+		if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
+		{
+			m_velocity.x = -actorSpeed;
+		}
+		else if( rightArrow.IsPressed() && !leftArrow.IsPressed() )
+		{
+			m_velocity.x = actorSpeed;
+		}
+		else if( leftArrow.IsPressed() && rightArrow.IsPressed() )
+		{
+			m_velocity.x = 0.f;
+		}
 
 
-	if( downArrow.IsPressed() && !upArrow.IsPressed() )
-	{
-		m_velocity.y = -actorSpeed;
-	}
-	else if( upArrow.IsPressed() && !downArrow.IsPressed() )
-	{
-		m_velocity.y = actorSpeed;
-	}
-	else if( upArrow.IsPressed() && downArrow.IsPressed() )
-	{
-		m_velocity.y = 0.f;
+		if( downArrow.IsPressed() && !upArrow.IsPressed() )
+		{
+			m_velocity.y = -actorSpeed;
+		}
+		else if( upArrow.IsPressed() && !downArrow.IsPressed() )
+		{
+			m_velocity.y = actorSpeed;
+		}
+		else if( upArrow.IsPressed() && downArrow.IsPressed() )
+		{
+			m_velocity.y = 0.f;
+		}
+
+		if( leftArrow.WasJustReleased() || rightArrow.WasJustReleased() )
+		{
+			m_velocity.x = 0.f;
+		}
+		if( upArrow.WasJustReleased() || downArrow.WasJustReleased() )
+		{
+			m_velocity.y = 0.f;
+		}
+
+
+
+		if( sKey.IsPressed() && !fKey.IsPressed() )
+		{
+			m_velocity.x = -actorSpeed;
+		}
+		else if( fKey.IsPressed() && !sKey.IsPressed() )
+		{
+			m_velocity.x = actorSpeed;
+		}
+		else if( sKey.IsPressed() && fKey.IsPressed() )
+		{
+			m_velocity.x = 0.f;
+		}
+
+		if( dKey.IsPressed() && !eKey.IsPressed() )
+		{
+			m_velocity.y = -actorSpeed;
+		}
+		else if( eKey.IsPressed() && !dKey.IsPressed() )
+		{
+			m_velocity.y = actorSpeed;
+		}
+		else if( eKey.IsPressed() && dKey.IsPressed() )
+		{
+			m_velocity.y = 0.f;
+		}
+
+		if( sKey.WasJustReleased() || fKey.WasJustReleased() )
+		{
+			m_velocity.x = 0.f;
+		}
+		if( eKey.WasJustReleased() || dKey.WasJustReleased() )
+		{
+			m_velocity.y = 0.f;
+		}
+
+		if( wKey.WasJustPressed() )
+		{
+			DecrementActiveWeapon();
+		}
+
+		if( rKey.WasJustPressed() )
+		{
+			IncrementActiveWeapon();
+		}
 	}
 
-	if( leftArrow.WasJustReleased() || rightArrow.WasJustReleased() )
-	{
-		m_velocity.x = 0.f;
-	}
-	if( upArrow.WasJustReleased() || downArrow.WasJustReleased() )
-	{
-		m_velocity.y = 0.f;
-	}
-
-
-
-	if( sKey.IsPressed() && !fKey.IsPressed() )
-	{
-		m_velocity.x = -actorSpeed;
-	}
-	else if( fKey.IsPressed() && !sKey.IsPressed() )
-	{
-		m_velocity.x = actorSpeed;
-	}
-	else if( sKey.IsPressed() && fKey.IsPressed() )
-	{
-		m_velocity.x = 0.f;
-	}
-
-	if( dKey.IsPressed() && !eKey.IsPressed() )
-	{
-		m_velocity.y = -actorSpeed;
-	}
-	else if( eKey.IsPressed() && !dKey.IsPressed() )
-	{
-		m_velocity.y = actorSpeed;
-	}
-	else if( eKey.IsPressed() && dKey.IsPressed() )
-	{
-		m_velocity.y = 0.f;
-	}
-
-	if( sKey.WasJustReleased() || fKey.WasJustReleased() )
-	{
-		m_velocity.x = 0.f;
-	}
-	if( eKey.WasJustReleased() || dKey.WasJustReleased() )
-	{
-		m_velocity.y = 0.f;
-	}
-
-	if( wKey.WasJustPressed() )
-	{
-		DecrementActiveWeapon();
-	}
-
-	if( rKey.WasJustPressed() )
-	{
-		IncrementActiveWeapon();
-	}
 }
 
 void Actor::UpdateNPC( float deltaSeconds )
