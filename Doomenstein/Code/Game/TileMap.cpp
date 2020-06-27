@@ -5,6 +5,7 @@
 #include "Game/EntityDefinition.hpp"
 #include "Game/Actor.hpp"
 #include "Game/Entity.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -657,6 +658,27 @@ void TileMap::ResolveEntityWallCollisions( Entity* entity )
 
 void TileMap::ResolveEntityWallCollision( Entity* entity, IntVec2 const& direction )
 {
+	bool isPushed = entity->IsPushedByWalls();
+	if( !isPushed )
+	{
+		return;
+	}
 
+	IntVec2 tilePosition = (IntVec2)entity->GetPosition();
+	tilePosition += direction;
+
+	Vec2 tileBottomLeft = Vec2( tilePosition );
+	Vec2 tileTopRight = Vec2( tileBottomLeft + Vec2( 1.f, 1.f ) );
+
+
+	if( IsTileSolidAtCoords( tilePosition ) )
+	{
+		Vec2 entityPos = entity->GetPosition();
+		float entityRadius = entity->GetPhysicsRadius();
+		AABB2 tileaabb = AABB2( tileBottomLeft, tileTopRight );
+		PushDiscOutOfAABB2D( entityPos, entityRadius, tileaabb );
+
+		entity->SetPosition( entityPos );
+	}
 }
 
