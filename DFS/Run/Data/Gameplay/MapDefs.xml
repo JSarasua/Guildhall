@@ -5,6 +5,12 @@
 
   <MapDefinition name="Island" width="30" height="30" fillTile="Grass" edgeTile="Water">
     <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+  
+  <MapDefinition name="JamesMap" width="30" height="30" fillTile="Grass" edgeTile="Water">
+    <GenerationSteps>
       <FromImage iterations="1" fromImageFilePath="Data/Images/James1_30x30.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
     </GenerationSteps>
   </MapDefinition>
