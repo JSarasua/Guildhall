@@ -236,6 +236,7 @@ void Game::RenderMouse()
 	mouseAABB.SetDimensions( Vec2( 0.5f, 0.5f ) );
 	Texture* reticle = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/reticle.png" );
 	g_theRenderer->BindTexture( reticle );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawAABB2Filled( mouseAABB, Rgba8::WHITE );
 }
 
