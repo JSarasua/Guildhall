@@ -12,7 +12,7 @@
 #include "Game/BulletDefinition.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 
-Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef ) :
+Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef ) :
 	m_actorDef(actorDef),
 	Entity(initialPosition, initialVelocity, initialOrientationDegrees, initialAngularVelocity)
 {
@@ -39,7 +39,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	}
 }
 
-Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef, PlayerController playerController ):
+Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef, PlayerController playerController ):
 	m_actorDef( actorDef ),
 	m_playerController( playerController ),
 	Entity( initialPosition, initialVelocity, initialOrientationDegrees, initialAngularVelocity )
@@ -124,6 +124,7 @@ void Actor::Render() const
 	}
 
 	g_theRenderer->BindTexture( &actorTexture );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
 
 	if( m_isWeaponInFront )
@@ -134,7 +135,7 @@ void Actor::Render() const
 
 void Actor::RenderWeapon() const
 {
-	WeaponDefinition* currentWeapon = m_weapons[m_currentWeaponIndex];
+	WeaponDefinition const* currentWeapon = m_weapons[m_currentWeaponIndex];
 	Vec2 weaponCenter = m_weaponOffset + m_position;
 	AABB2 weaponUVs;
 	currentWeapon->GetWeaponSpriteDef()->GetUVs( weaponUVs.mins, weaponUVs.maxs );
@@ -159,6 +160,7 @@ void Actor::RenderWeapon() const
 	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
 	Vec2 debugPivot = weaponBounds.GetPointAtUV( pivotPoint );
 	weaponBounds.Translate( weaponCenter );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->BindTexture( &weaponTexture );
 	if( m_name == "Player" )
 	{
@@ -208,7 +210,7 @@ void Actor::DecrementActiveWeapon()
 	m_firingTimer.SetSeconds( (double)fireRate );
 }
 
-void Actor::AddWeapon( WeaponDefinition* newWeapon )
+void Actor::AddWeapon( WeaponDefinition const* newWeapon )
 {
 	float shotsPerSecond = newWeapon->GetShotsPerSecond();
 	float fireRate = 1.f / shotsPerSecond;
@@ -287,7 +289,7 @@ void Actor::UpdateFromKeyboard()
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
 	Vec2 weaponDirection = mousePos - GetPosition();
 
-	WeaponDefinition* weaponDef = m_weapons[m_currentWeaponIndex];
+	WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
 	if( weaponDirection.x >= 0.f )
 	{
 		m_weaponOffset = weaponDef->GetWeaponOffsetRight();
@@ -456,7 +458,7 @@ void Actor::UpdateNPC( float deltaSeconds )
 		m_weaponOrientationDegrees = m_orientationDegrees;
 		m_velocity = goalDirection * m_actorDef->m_speed;
 
-		WeaponDefinition* weaponDef = m_weapons[m_currentWeaponIndex];
+		WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
 		if( goalDirection.x >= 0.f )
 		{
 			m_weaponOffset = weaponDef->GetWeaponOffsetRight();

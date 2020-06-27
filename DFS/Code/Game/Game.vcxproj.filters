@@ -82,6 +82,9 @@
     <ClCompile Include="BulletDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="EnemySpawner.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -148,6 +151,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="BulletDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySpawner.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

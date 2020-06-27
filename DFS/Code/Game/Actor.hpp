@@ -24,8 +24,8 @@ class Actor : public Entity
 	friend class Map;
 public:
 	Actor() = delete;
-	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef);
-	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition* actorDef, PlayerController playerController);
+	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef);
+	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef, PlayerController playerController);
 	~Actor(){}
 
 	virtual void Startup() override;
@@ -38,7 +38,7 @@ public:
 
 	void IncrementActiveWeapon();
 	void DecrementActiveWeapon();
-	void AddWeapon( WeaponDefinition* newWeapon );
+	void AddWeapon( WeaponDefinition const* newWeapon );
 
 	int GetBulletsPerShot() const;
 	float GetBulletSpreadDegrees() const;
@@ -52,7 +52,7 @@ protected:
 
 protected:
 	std::string m_name;
-	ActorDefinition* m_actorDef = nullptr;
+	ActorDefinition const* m_actorDef = nullptr;
 	Vec2 m_goalPosition = Vec2(-1.f,-1.f);
 	float m_timeSinceCreation = 0.f;
 	float m_timeUntilNextGoalPosition = 2.f;
@@ -62,7 +62,7 @@ protected:
 	bool m_isWeaponInFront = true;
 	Entity* m_enemyActor = nullptr;
 
-	std::vector<WeaponDefinition*> m_weapons;
+	std::vector<WeaponDefinition const*> m_weapons;
 	int m_currentWeaponIndex = 0;
 
 private:

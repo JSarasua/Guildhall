@@ -20,6 +20,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/WeaponDefinition.hpp"
+#include "Game/EnemySpawner.hpp"
 
 
 
@@ -39,7 +40,25 @@ Map::Map( const char* mapDefName )
 }
 
 Map::~Map()
-{}
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		if( m_entities[entityIndex] )
+		{
+			delete m_entities[entityIndex];
+			m_entities[entityIndex] = nullptr;
+		}
+	}
+
+	for( size_t spawnerIndex = 0; spawnerIndex < m_enemySpawners.size(); spawnerIndex++ )
+	{
+		if( m_enemySpawners[spawnerIndex] )
+		{
+			delete m_enemySpawners[spawnerIndex];
+			m_enemySpawners[spawnerIndex] = nullptr;
+		}
+	}
+}
 
 
 void Map::Startup()
@@ -151,6 +170,8 @@ void Map::UpdateTiles( float deltaSeconds )
 
 void Map::UpdateEntities( float deltaSeconds )
 {
+	UpdateSpawners();
+
 	SpawnBullets();
 
 	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
@@ -165,6 +186,14 @@ void Map::UpdateEntities( float deltaSeconds )
 	{
 		PushEntitiesOutOfWalls();
 		ResolveEntitiesCollisions();
+	}
+}
+
+void Map::UpdateSpawners()
+{
+	for( size_t spawnerIndex = 0; spawnerIndex < m_enemySpawners.size(); spawnerIndex++ )
+	{
+		m_enemySpawners[spawnerIndex]->Update();
 	}
 }
 
@@ -260,42 +289,6 @@ void Map::SpawnTiles()
 	{
 		mapGenSteps[mapGenStepIndex]->RunStep(*this);
 	}
-
-// 	//Create Safe zone
-// 	for( int safeZoneIndexX = 1; safeZoneIndexX < 6; safeZoneIndexX++ )
-// 	{
-// 		for( int safeZoneIndexY = 1; safeZoneIndexY < 6; safeZoneIndexY++ )
-// 		{
-// 			int tileIndex = GetTileIndexForTileCoordinates( IntVec2( safeZoneIndexX, safeZoneIndexY ) );
-// 			m_tiles[tileIndex].SetTileType(fillTileDef);
-// 		}
-// 	}
-// 	for( int safeZoneIndexX = m_mapSize.x - 1; safeZoneIndexX > m_mapSize.x - 7; safeZoneIndexX-- )
-// 	{
-// 		for( int safeZoneIndexY = m_mapSize.y - 1; safeZoneIndexY > m_mapSize.y - 7; safeZoneIndexY-- )
-// 		{
-// 			int tileIndex = GetTileIndexForTileCoordinates( IntVec2( safeZoneIndexX, safeZoneIndexY ) );
-// 			m_tiles[tileIndex].SetTileType( fillTileDef );
-// 		}
-// 	}
-// 
-// 	//Border wall
-// 	int tileIndex = 0;
-// 	for( int borderXIndex= 0; borderXIndex < m_mapSize.x; borderXIndex++ )
-// 	{
-// 		m_tiles[borderXIndex].SetTileType(edgeTileDef);
-// 
-// 		tileIndex = m_mapSize.x * (m_mapSize.y - 1) + borderXIndex;
-// 		m_tiles[tileIndex].SetTileType(edgeTileDef);
-// 	}
-// 	for( int borderYIndex= 0; borderYIndex < m_mapSize.y; borderYIndex++ )
-// 	{
-// 		tileIndex = borderYIndex * m_mapSize.x;
-// 		m_tiles[tileIndex].SetTileType(edgeTileDef);
-// 
-// 		tileIndex = borderYIndex * m_mapSize.x + (m_mapSize.x-1);
-// 		m_tiles[tileIndex].SetTileType(edgeTileDef);
-// 	}
 }
 
 void Map::SpawnEntities()
@@ -331,7 +324,12 @@ void Map::SpawnEntities()
 	//m_entities.push_back( enemy2 );
 
 
-
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+	spawner->AddEnemyType( maryActorDef );
+	spawner->AddEnemyType( josenActorDef );
+	spawner->AddWeaponType( smgWeapon );
+	spawner->AddWeaponType( shotgunWeapon );
+	m_enemySpawners.push_back( spawner );
 // 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
@@ -645,6 +643,11 @@ void Map::AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags )
 {
 	int tagIndex = GetTileIndexForTileCoordinates(tileCoords);
 	m_tileMetaData[tagIndex].m_tags.AppendTags(tags);
+}
+
+void Map::SpawnEntity( Entity* entityToSpawn )
+{
+	m_entities.push_back( entityToSpawn );
 }
 
 Tile* Map::GetTileAtPosition( const IntVec2& tileCoords )

@@ -12,6 +12,7 @@ class Actor;
 struct Vertex_PCU;
 class MapDefinition;
 class TileDefinition;
+class EnemySpawner;
 
 class Map
 {
@@ -45,6 +46,9 @@ public:
 	TileMetaData& GetTileMetaDataAtTilePosition( IntVec2 currentCoords );
 
 	void AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags);
+
+	void SpawnEntity( Entity* entityToSpawn );
+
 private:
 	Tile& GetRandomMapTile();
 	Tile& GetRandomAdjacentMapTile(Tile& currentTile);
@@ -59,6 +63,7 @@ private:
 
 	void UpdateTiles( float deltaSeconds );
 	void UpdateEntities( float deltaSeconds );
+	void UpdateSpawners();
 	void UpdateDebugMode();
 	void UpdateEntityMouseIsTouching();
 	void UpdateTileMouseIsTouching();
@@ -80,6 +85,8 @@ protected:
 	std::vector<TileMetaData> m_tileMetaData;
 	std::vector<Entity*> m_entities;
 	std::vector<Vertex_PCU> m_vertsToRender;
+	std::vector<EnemySpawner*> m_enemySpawners;
+
 	IntVec2 m_mapSize;
 	MapDefinition* m_mapDef = nullptr;
 	std::string m_name;
