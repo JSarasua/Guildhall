@@ -325,11 +325,23 @@ void Map::SpawnEntities()
 
 
 	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 24.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
 	spawner->AddEnemyType( maryActorDef );
 	spawner->AddEnemyType( josenActorDef );
 	spawner->AddWeaponType( smgWeapon );
 	spawner->AddWeaponType( shotgunWeapon );
+	spawner2->AddEnemyType( maryActorDef );
+	spawner2->AddEnemyType( josenActorDef );
+	spawner2->AddWeaponType( smgWeapon );
+	spawner2->AddWeaponType( shotgunWeapon );
+	spawner3->AddEnemyType( maryActorDef );
+	spawner3->AddEnemyType( josenActorDef );
+	spawner3->AddWeaponType( smgWeapon );
+	spawner3->AddWeaponType( shotgunWeapon );
 	m_enemySpawners.push_back( spawner );
+	m_enemySpawners.push_back( spawner2 );
+	m_enemySpawners.push_back( spawner3 );
 // 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
