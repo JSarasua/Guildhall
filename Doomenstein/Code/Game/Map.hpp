@@ -29,7 +29,9 @@ public:
 	Entity* GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance );
 
 private:
-	void ResolveEntityCollisions();
+	void ResolveAllEntityVEntityCollisions();
+	void ResolveEntityCollisions( Entity* entity );
+	void ResolveEntityCollision( Entity* entity, Entity* otherEntity );
 	void RenderEntities();
 
 protected:

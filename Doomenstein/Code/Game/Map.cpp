@@ -65,7 +65,7 @@ Map::~Map()
 
 void Map::Update( float deltaSeconds )
 {
-	ResolveEntityCollisions();
+	ResolveAllEntityVEntityCollisions();
 }
 
 void Map::Render()
@@ -73,9 +73,76 @@ void Map::Render()
 	RenderEntities();
 }
 
-void Map::ResolveEntityCollisions()
+void Map::ResolveAllEntityVEntityCollisions()
 {
+	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+	{
+		Entity* entity = m_allEntities[entityIndex];
+		bool isPushed = entity->IsPushedByEntity();
 
+		if( isPushed )
+		{
+			ResolveEntityCollisions( entity );
+		}
+	}
+}
+
+void Map::ResolveEntityCollisions( Entity* entity )
+{
+	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+	{
+		Entity* entityToCheckAgainst = m_allEntities[entityIndex];
+
+		if( entity != entityToCheckAgainst )
+		{
+			ResolveEntityCollision( entity, entityToCheckAgainst );
+		}
+
+	}
+}
+
+void Map::ResolveEntityCollision( Entity* entity, Entity* otherEntity )
+{
+	bool isPushed = entity->IsPushedByEntity();
+	bool canPushEntities = entity->CanPushEntity();
+
+	bool otherEntityIsPushed = otherEntity->IsPushedByEntity();
+	bool otherEntityCanPush = otherEntity->CanPushEntity();
+
+	Vec2 entityPos = entity->GetPosition();
+	Vec2 otherEntityPos = otherEntity->GetPosition();
+
+	float entityRadius = entity->GetPhysicsRadius();
+	float otherEntityRadius = otherEntity->GetPhysicsRadius();
+
+	if( !isPushed && !otherEntityIsPushed )
+	{
+		return;
+	}
+
+	if( !canPushEntities && !otherEntityCanPush )
+	{
+		return;
+	}
+
+	if( canPushEntities && otherEntityIsPushed && isPushed && otherEntityCanPush)
+	{
+		//push both
+		PushDiscsOutOfEachOther2D( entityPos, entityRadius, otherEntityPos, otherEntityRadius );
+	}
+	else if( isPushed && otherEntityCanPush )
+	{
+		//push self
+		PushDiscOutOfDisc2D( entityPos, entityRadius, otherEntityPos, otherEntityRadius );
+	}
+	else if( canPushEntities && otherEntityIsPushed )
+	{
+		//push other
+		PushDiscOutOfDisc2D( otherEntityPos, otherEntityRadius, entityPos, entityRadius );
+	}
+
+	entity->SetPosition( entityPos );
+	otherEntity->SetPosition( otherEntityPos );
 }
 
 void Map::RenderEntities()

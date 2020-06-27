@@ -118,3 +118,23 @@ void Entity::SetIsPossessed( bool isPossessed )
 {
 	m_isPossessed = isPossessed;
 }
+
+bool Entity::IsPushedByEntity() const
+{
+	return m_entityDef->IsPushedByEntities();
+}
+
+bool Entity::IsPushedByWalls() const
+{
+	return m_entityDef->IsPushedByWalls();
+}
+
+bool Entity::CanPushEntity() const
+{
+	return m_entityDef->CanPushEntities();
+}
+
+float Entity::GetPhysicsRadius() const
+{
+	return m_entityDef->GetPhysicsRadius();
+}

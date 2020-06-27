@@ -614,7 +614,9 @@ void TileMap::SpawnEntities()
 {
 	EntityDefinition const* entityDef = EntityDefinition::s_definitions["Pinky"];
 	Actor* actor1 = new Actor( entityDef, Vec2( 2.5, 1.5f ), Vec3( 0.f, 0.f, 30.f ) );
+	Actor* actor2 = new Actor( entityDef, Vec2( 4.5f, 1.5f ), Vec3( 0.f, 0.f, 85.f ) );
 	m_allEntities.push_back( actor1 );
+	m_allEntities.push_back( actor2 );
 }
 
 void TileMap::ResolveAllEntityWallCollisions()

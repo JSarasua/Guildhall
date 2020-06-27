@@ -34,6 +34,12 @@ public:
 	bool IsPossessed() const;
 	void SetIsPossessed( bool isPossessed );
 
+	bool IsPushedByEntity() const;
+	bool IsPushedByWalls() const;
+	bool CanPushEntity() const;
+
+	float GetPhysicsRadius() const;
+
 protected:
 	Vec2 m_position = Vec2(0.f,0.f);
 	//Vec2 m_velocity = Vec2(0.f,0.f);
