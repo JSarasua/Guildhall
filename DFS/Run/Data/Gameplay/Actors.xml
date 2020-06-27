@@ -19,7 +19,10 @@
       <SpriteAnim name="MoveWest"		spriteIndexes="0,0,0"/>
       <SpriteAnim name="MoveNorth"	spriteIndexes="0,0,0"/>
       <SpriteAnim name="MoveSouth"	spriteIndexes="4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19"/>
-      <SpriteAnim name="Idle"				spriteIndexes="0,0,0" fps="3"/>
+      <SpriteAnim name="IdleEast"				spriteIndexes="2,2,2" fps="3"/>
+      <SpriteAnim name="IdleWest"				spriteIndexes="1,1,1" fps="3"/>
+      <SpriteAnim name="IdleNorth"				spriteIndexes="3,3,3" fps="3"/>
+      <SpriteAnim name="IdleSouth"				spriteIndexes="0,0,0" fps="3"/>
     </SpriteAnimSet>
     
   </ActorDefinition>
