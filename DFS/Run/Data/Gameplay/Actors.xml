@@ -27,7 +27,7 @@
   <ActorDefinition
   name="Mary"
   spriteCoords="0,0"
-  spriteTint="255,255,255"
+  spriteTint="0,255,0"
   spritePortraitCoords="4,0"
   turnSpeed="180"
   speed="0.2"
@@ -51,7 +51,7 @@
   <ActorDefinition
   name="Josen"
   spriteCoords="0,0"
-  spriteTint="255,255,255"
+  spriteTint="255,0,0"
   spritePortraitCoords="4,0"
   turnSpeed="180"
   speed="0.2"
