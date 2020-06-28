@@ -29,7 +29,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 100;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
-		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 	}
 	else
 	{
@@ -59,7 +59,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_health = 50;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
-		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 	}
 	else
 	{
@@ -122,7 +122,12 @@ void Actor::Render() const
 
 	const SpriteAnimDefinition& currentSpriteAnimDef = *currentSpriteAnimSet.GetSpriteAnimDefinition(animationName);
 
-	const SpriteDefinition& currentSpriteDef = currentSpriteAnimDef.GetSpriteDefAtTime( m_timeSinceCreation );
+	float spriteTime = m_timeSinceCreation;
+	if( m_isDodging )
+	{
+		spriteTime = (float)m_dodgeTimer.GetElapsedSeconds();
+	}
+	const SpriteDefinition& currentSpriteDef = currentSpriteAnimDef.GetSpriteDefAtTime( spriteTime );
 	AABB2 actorUVs;
 	currentSpriteDef.GetUVs( actorUVs.mins, actorUVs.maxs );
 
