@@ -88,6 +88,9 @@
     <ClCompile Include="Loot.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyBoss.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -160,6 +163,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="Loot.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyBoss.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
