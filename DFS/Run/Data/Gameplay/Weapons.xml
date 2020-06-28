@@ -30,8 +30,8 @@
     bulletType = "bulletTest"
     triggerPosition="0.25,0.5"
     muzzlePosition="0.95,0.6"
-    weaponOffsetRight ="0.3,-0.2"
-    weaponOffsetLeft ="0.2,-0.2"
+    weaponOffsetRight ="0.45,-0.1"
+    weaponOffsetLeft ="0.2,-0.1"
     screenshakeIncrement ="0"
   >
   </WeaponDefinition>
