@@ -2,6 +2,7 @@
 #include "Game/GameCommon.hpp"
 #include "Game/BulletDefinition.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 
 std::map< std::string, WeaponDefinition*> WeaponDefinition::s_definitions;
 
@@ -116,5 +117,15 @@ void WeaponDefinition::InitializeWeaponDefinitions( XmlElement const& rootWeapon
 			s_definitions[weaponDefName] = weaponDef;
 		}
 	}
+}
+
+
+WeaponDefinition const* WeaponDefinition::GetRandomWeapon( RandomNumberGenerator& rng )
+{
+	int numWeapons = (int)s_definitions.size() - 1;
+	int weaponIndex = rng.RollRandomIntInRange( 1, numWeapons );
+	auto iter = s_definitions.begin();
+	std::advance( iter, weaponIndex );
+	return iter->second;
 }
 

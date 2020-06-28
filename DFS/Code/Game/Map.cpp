@@ -314,9 +314,9 @@ void Map::SpawnEntities()
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
 	//player1->AddWeapon( smgWeapon );
-	player1->AddWeapon( rocketLauncherWeapon );
-	player1->AddWeapon( laserWeapon );
-	player1->AddWeapon( flamethrowerWeapon );
+	//player1->AddWeapon( rocketLauncherWeapon );
+	//player1->AddWeapon( laserWeapon );
+	//player1->AddWeapon( flamethrowerWeapon );
 // 	enemy1->AddWeapon(smgWeapon);
 // 	enemy2->AddWeapon(rocketLauncherWeapon);
 
@@ -551,7 +551,7 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 						if( currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
 						{
 							Actor* enemy = (Actor*)currentEntity;
-							Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
+							Loot* loot = new Loot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand )  );
 							m_entities.push_back( loot );
 						}
 					}

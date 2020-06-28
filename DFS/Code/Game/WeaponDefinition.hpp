@@ -15,6 +15,7 @@ public:
 	~WeaponDefinition() {}
 
 	static void InitializeWeaponDefinitions( XmlElement const& rootWeaponDefinitionElement );
+	static WeaponDefinition const* GetRandomWeapon( RandomNumberGenerator& rng );
 	static std::map< std::string, WeaponDefinition*> s_definitions;
 
 	AABB2 const& GetWeaponDrawBounds() const;
