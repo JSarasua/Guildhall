@@ -21,6 +21,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/EnemySpawner.hpp"
+#include "Game/Loot.hpp"
 
 
 
@@ -312,7 +313,7 @@ void Map::SpawnEntities()
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
-	player1->AddWeapon( smgWeapon );
+	//player1->AddWeapon( smgWeapon );
 	player1->AddWeapon( rocketLauncherWeapon );
 	player1->AddWeapon( laserWeapon );
 	player1->AddWeapon( flamethrowerWeapon );
@@ -545,8 +546,27 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 					Bullet* bullet = (Bullet*)m_entities[entityIndex];
 					int bulletDamage = bullet->GetBulletDamage();
 					currentEntity->LoseHealth( bulletDamage );
+					if( !currentEntity->IsAlive() )
+					{
+						if( currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
+						{
+							Actor* enemy = (Actor*)currentEntity;
+							Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
+							m_entities.push_back( loot );
+						}
+					}
 					//currentEntity->Lose1Health();
 					m_entities[entityIndex]->m_isGarbage = true;
+				}
+			}
+			else if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER && m_entities[entityIndex]->m_entityType == ENTITY_TYPE_LOOT )
+			{
+				if( AreEntitiesColliding( currentEntity, m_entities[entityIndex] ) )
+				{
+					Actor* player = (Actor*)currentEntity;
+					Loot* loot = (Loot*)m_entities[entityIndex];
+					player->AddWeapon( loot->GetLootWeapon() );
+					loot->m_isGarbage = true;
 				}
 			}
 		}
@@ -631,6 +651,12 @@ void Map::GarbageCollectEntities()
 		{
 			if( entity->IsGarbage() )
 			{
+				if( entity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
+				{
+					Actor* enemy = (Actor*)entity;
+					Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
+					m_entities.push_back( loot );
+				}
 				delete m_entities[entityIndex];
 				m_entities[entityIndex] = nullptr;
 			}
