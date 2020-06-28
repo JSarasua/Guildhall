@@ -810,7 +810,7 @@ float GetShortestAngularDisplacement( float oldOrientationDegrees, float newOrie
 	{
 		return displacement;
 	}
-	else if( displacement < -180.f )
+	else if( displacement <= -180.f )
 	{
 		return 360.f + displacement;
 	}
