@@ -138,13 +138,13 @@ void Game::LoadAssets()
 	//g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 	g_theRenderer->CreateOrGetTextureFromFile(IMAGETESTPATH);
 
-	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Terrain_8x8.png" );
+	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/BenderAndTiles_12x11.png" );
 	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/bender_12x11.png" );
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
 	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
 	Texture* bulletsSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Extras_4x4.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/reticle.png" );
-	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(8,8));
+	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(12,11));
 	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(12,11));
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
 	g_weaponSpriteSheet = new SpriteSheet(*weaponSpriteSheetTexture, IntVec2(12, 12) );
