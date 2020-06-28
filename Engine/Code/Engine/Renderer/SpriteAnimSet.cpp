@@ -11,7 +11,7 @@ SpriteAnimSet::SpriteAnimSet( const XmlElement& element, SpriteSheet& spriteShee
 	for( const XmlElement* currentElement = element.FirstChildElement(); currentElement; currentElement=currentElement->NextSiblingElement() ) {
 		//std::string attributeName = currentElement->Name();
 		std::string animationName = ParseXMLAttribute(*currentElement, "name", std::string(""));
-		SpriteAnimDefinition* spriteAnimDef = new SpriteAnimDefinition(spriteSheet,*currentElement,framesPerSecond, SpriteAnimPlaybackType::PINGPONG);
+		SpriteAnimDefinition* spriteAnimDef = new SpriteAnimDefinition(spriteSheet,*currentElement,framesPerSecond, SpriteAnimPlaybackType::LOOP);
 
 		m_spriteAnimations[animationName] = spriteAnimDef;
 	}
