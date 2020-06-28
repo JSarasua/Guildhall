@@ -71,6 +71,11 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	}
 }
 
+Actor::~Actor()
+{
+	return;
+}
+
 void Actor::Startup()
 {
 
@@ -221,6 +226,14 @@ void Actor::DecrementActiveWeapon()
 
 void Actor::AddWeapon( WeaponDefinition const* newWeapon )
 {
+	for( size_t weaponIndex = 0; weaponIndex < m_weapons.size(); weaponIndex++ )
+	{
+		if( newWeapon == m_weapons[weaponIndex] )
+		{
+			return;
+		}
+	}
+
 	float shotsPerSecond = newWeapon->GetShotsPerSecond();
 	float fireRate = 1.f / shotsPerSecond;
 	m_weapons.push_back( newWeapon );
@@ -252,6 +265,11 @@ Vec2 Actor::GetMuzzlePosition() const
 BulletDefinition const* Actor::GetBulletDefinition() const
 {
 	return m_weapons[m_currentWeaponIndex]->GetBulletDefinition();
+}
+
+WeaponDefinition const* Actor::GetCurrentWeapon() const
+{
+	return m_weapons[m_currentWeaponIndex];
 }
 
 void Actor::UpdateFromJoystick()

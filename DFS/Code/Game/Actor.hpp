@@ -26,7 +26,7 @@ public:
 	Actor() = delete;
 	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef);
 	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef, PlayerController playerController);
-	~Actor(){}
+	~Actor();
 
 	virtual void Startup() override;
 	virtual void Update( float deltaSeconds );
@@ -45,6 +45,7 @@ public:
 	Vec2 GetMuzzlePosition() const;
 
 	BulletDefinition const* GetBulletDefinition() const;
+	WeaponDefinition const* GetCurrentWeapon() const;
 
 protected:
 	void UpdateFromJoystick();
