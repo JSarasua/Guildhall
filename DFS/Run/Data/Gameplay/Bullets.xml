@@ -10,7 +10,7 @@
     bulletSpeed="4"
     blendMode ="ALPHA"
     damage="5"
-    lifetime="1"
+    lifetime="1.5"
   >
   </BulletDefinition>
 
@@ -21,7 +21,7 @@
     minDrawBounds="-0.3,-0.3"
     maxDrawBounds="0.3,0.3"
     physicsRadius=" 0.3"
-    bulletSpeed="2.5"
+    bulletSpeed="3.5"
     blendMode ="ALPHA"
     damage="50"
     lifetime="3"

@@ -377,6 +377,7 @@ void Map::SpawnBullet( Entity* shooter )
 	BulletDefinition const* bulletDef = actorShooter->GetBulletDefinition();
 	int bulletCount = actorShooter->GetBulletsPerShot();
 	float bulletSpread = actorShooter->GetBulletSpreadDegrees();
+	float bulletSpeedMultiplier = 1.f;
 
 	//Vec2 bulletPosition = shooter->GetBulletStartPosition();
 	Vec2 bulletPosition = actorShooter->GetMuzzlePosition();
@@ -391,6 +392,11 @@ void Map::SpawnBullet( Entity* shooter )
 		bulletType = ENTITY_TYPE_EVIL_BULLET;
 	}
 
+	if( shooter->m_entityType == ENTITY_TYPE_NPC_ENEMY )
+	{
+		bulletSpeedMultiplier = 0.5f;
+	}
+
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( !m_entities[entityIndex] )
@@ -399,7 +405,7 @@ void Map::SpawnBullet( Entity* shooter )
 			{
 				float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 				float bulletOrientationWithSpread = bulletOrientation + spread;
-				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef );
+				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier );
 
 				bulletCount--;
 				if( bulletCount <= 0 )
@@ -418,7 +424,7 @@ void Map::SpawnBullet( Entity* shooter )
 	{
 		float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 		float bulletOrientationWithSpread = bulletOrientation + spread;
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef ) );
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier ) );
 	}
 
 	shooter->SetIsFiring( false );
