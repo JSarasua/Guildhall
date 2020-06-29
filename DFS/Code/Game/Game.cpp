@@ -250,12 +250,19 @@ void Game::RenderUI()
 	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	AABB2 topBox = gameCamera.GetBoxAtTop( 0.1f );
 	AABB2 topLeftBox = topBox.GetBoxAtLeft( 0.3f );
-	AABB2 topRightBox = topBox.GetBoxAtRight( 0.2f );
+	AABB2 topRightBox = topBox.GetBoxAtRight( 0.15f );
+	topRightBox.SetDimensions( Vec2( 1.16f, 0.7f ) * 10.f );
 
 	std::string mousePositionString = Stringf( "Health: %i", m_player->GetHealth() );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawAlignedTextAtPosition( mousePositionString.c_str(), topLeftBox, 3.f, ALIGN_CENTERED, Rgba8::BLUE );
+	SpriteDefinition const* weaponSprite = m_player->GetCurrentWeapon()->GetWeaponSpriteDef();
+	Texture const& weaponTexture = weaponSprite->GetTexture();
+	AABB2 weaponUVs;
+	weaponSprite->GetUVs( weaponUVs.mins, weaponUVs.maxs );
 
+	g_theRenderer->BindTexture( &weaponTexture );
+	g_theRenderer->DrawAABB2Filled( topRightBox, Rgba8::WHITE, weaponUVs.mins, weaponUVs.maxs );
 	RenderConsole();
 }
 
