@@ -391,6 +391,7 @@ void Game::AddScreenShake( float screenShakeIncrement )
 
 void Game::UpdateConsoleTest( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 	g_theConsole->Update();
 // 	static float consoleTimer = 0.f;
 // 
@@ -602,6 +603,7 @@ void Game::UpdateLoading( float deltaSeconds )
 
 void Game::UpdateAttract( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 	m_world->Update( 0.f );
 }
 

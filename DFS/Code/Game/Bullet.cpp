@@ -27,6 +27,8 @@ Bullet::Bullet( const Vec2& initialPosition, BulletDefinition const* bulletDef, 
 Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier ):
 	Entity( initialPosition, Vec2::MakeFromPolarDegrees( orientationDegrees, BULLET_SPEED ), orientationDegrees, 0.f )
 {
+	UNUSED( faction );
+
 	m_bulletDefinition = bulletDef;
 	m_physicsRadius = bulletDef->GetPhysicsRadius();
 	m_cosmeticRadius = BULLET_COSMETIC_RADIUS;

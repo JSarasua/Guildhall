@@ -538,6 +538,8 @@ void Actor::UpdateNPC( float deltaSeconds )
 
 void Actor::UpdateBoss( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	if( m_currentBossState == Moving )
 	{
 		m_goalPosition = m_enemyActor->GetPosition();
