@@ -71,5 +71,10 @@ protected:
 	float m_eyeHeight = 0.f;
 	float m_physicsRadius = 0.f;
 	float m_walkSpeed = 0.f;
+	
+	Vec2 m_drawSize;
+	std::string m_billBoardType;
+
+	EntitySpriteAnimStates* m_spriteAnimStates = nullptr;
 
 };

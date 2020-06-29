@@ -30,19 +30,23 @@ EntityDefinition::EntityDefinition( XmlElement const& element )
 
 
 	XmlElement const* appearanceElement = element.FirstChildElement( "Appearance" );
-	UNUSED( appearanceElement );
-	// 	std::string m_name;
-// 	std::string m_type;
-// 	bool m_isValid = false;
-// 
-// 	bool m_canBePushedByWalls = false;
-// 	bool m_canBePushedByEntities = false;
-// 	bool m_canPushEntities = false;
-// 	float m_mass = 1.f;
-// 	float m_height = 0.f;
-// 	float m_eyeHeight = 0.f;
-// 	float m_physicsRadius = 0.f;
-// 	float m_walkSpeed = 0.f;
+	if( appearanceElement )
+	{
+		m_drawSize = ParseXMLAttribute( *appearanceElement, "size", Vec2( 0.f, 0.f ) );
+		m_billBoardType = ParseXMLAttribute( *appearanceElement, "billboard", "INVALID" );
+
+		if( m_billBoardType == "INVALID" )
+		{
+			m_billBoardType = "CameraFacingXY";
+			g_theConsole->ErrorString( "ERROR: Did not find billboard attribute in Appearance" );
+		}
+
+		g_theConsole->GuaranteeOrError( !m_drawSize.IsAlmostEqual( Vec2() ), "ERROR: Need draw size not = to 0" );
+		
+		m_spriteAnimStates = new EntitySpriteAnimStates( *appearanceElement );
+	}
+
+
 	m_isValid = true;
 }
 
