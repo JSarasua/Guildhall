@@ -14,6 +14,10 @@
     muzzlePosition="0.75,0.67"
     weaponOffsetRight ="0.15,-0.1"
     weaponOffsetLeft ="-0.15,-0.1"
+    weaponOffsetTopRight ="0.15,-0.1"
+    weaponOffsetTopLeft ="-0.15,-0.1"
+    weaponOffsetBottomRight ="0.15,-0.1"
+    weaponOffsetBottomLeft ="-0.15,-0.1"
     screenshakeIncrement ="0"
   >
   </WeaponDefinition>
