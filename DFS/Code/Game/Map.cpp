@@ -272,7 +272,7 @@ void Map::SpawnTiles()
 	std::string fillTile = m_mapDef->m_fillTile;
 	std::string edgeTile = m_mapDef->m_edgeTile;
 	TileDefinition* fillTileDef = TileDefinition::s_definitions[fillTile.c_str()];
-	TileDefinition* edgeTileDef = TileDefinition::s_definitions[edgeTile.c_str()];
+	//TileDefinition* edgeTileDef = TileDefinition::s_definitions[edgeTile.c_str()];
 	int numOfTiles = m_mapSize.x * m_mapSize.y;
 
 	for( int mapIndex = 0; mapIndex < numOfTiles; mapIndex++ )
@@ -310,7 +310,7 @@ void Map::SpawnEntities()
 	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
 	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
-	WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
+	//WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
@@ -328,25 +328,43 @@ void Map::SpawnEntities()
 
 	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
 	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
-	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 24.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
-	spawner->AddEnemyType( maryActorDef );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, player1, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, player1, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, player1, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, player1, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+
+
 	spawner->AddEnemyType( josenActorDef );
 	spawner->AddWeaponType( smgWeapon );
 	spawner->AddWeaponType( shotgunWeapon );
-	spawner2->AddEnemyType( maryActorDef );
 	spawner2->AddEnemyType( josenActorDef );
 	spawner2->AddWeaponType( smgWeapon );
 	spawner2->AddWeaponType( shotgunWeapon );
-	spawner3->AddEnemyType( maryActorDef );
 	spawner3->AddEnemyType( josenActorDef );
 	spawner3->AddWeaponType( smgWeapon );
 	spawner3->AddWeaponType( shotgunWeapon );
+	spawner5->AddEnemyType( maryActorDef );
+	spawner6->AddEnemyType( maryActorDef );
+	spawner7->AddEnemyType( maryActorDef );
+	spawner8->AddEnemyType( maryActorDef );
+	spawner4->AddEnemyType( josenActorDef );
+	spawner5->AddEnemyType( josenActorDef );
+	spawner4->AddWeaponType( shotgunWeapon );
+	spawner5->AddWeaponType( pistolWeapon );
+	spawner6->AddWeaponType( flamethrowerWeapon );
+	spawner7->AddWeaponType( pistolWeapon );
+	spawner8->AddWeaponType( smgWeapon );
 	m_enemySpawners.push_back( spawner );
 	m_enemySpawners.push_back( spawner2 );
 	m_enemySpawners.push_back( spawner3 );
-// 	m_entities.push_back( new Actor(Vec2(3.f, 3.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_2));
-// 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
-// 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
+	m_enemySpawners.push_back( spawner4 );
+	m_enemySpawners.push_back( spawner5 );
+	m_enemySpawners.push_back( spawner6 );
+	m_enemySpawners.push_back( spawner7 );
+	m_enemySpawners.push_back( spawner8 );
+
 
 	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, player1, this );
 	bossSpawner->AddEnemyType( bossActorDef );
@@ -432,7 +450,7 @@ void Map::SpawnBullet( Entity* shooter )
 
 void Map::SpawnBossBullets( Actor* boss )
 {
-
+	UNUSED( boss );
 }
 
 void Map::PushEntityOutOfWalls(Entity* currentEntity)
