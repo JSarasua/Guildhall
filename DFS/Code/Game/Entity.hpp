@@ -71,6 +71,8 @@ public:
 
 	void SetPosition(const Vec2& newPosition);
 
+	int GetHealth() const { return m_health; };
+
 
 
 protected:

@@ -247,6 +247,15 @@ void Game::RenderUI()
 // 	RenderBlackboardTest();
 // 	RenderMouseTest();
 //	m_world->RenderDebug();
+	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	AABB2 topBox = gameCamera.GetBoxAtTop( 0.1f );
+	AABB2 topLeftBox = topBox.GetBoxAtLeft( 0.3f );
+	AABB2 topRightBox = topBox.GetBoxAtRight( 0.2f );
+
+	std::string mousePositionString = Stringf( "Health: %i", m_player->GetHealth() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->DrawAlignedTextAtPosition( mousePositionString.c_str(), topLeftBox, 3.f, ALIGN_CENTERED, Rgba8::BLUE );
+
 	RenderConsole();
 }
 
