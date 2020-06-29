@@ -19,6 +19,27 @@ enum PlayerController
 	MaxNumPlayers
 };
 
+enum eBossAttacks
+{
+	InvalidAttack = -1,
+
+	CircleOfBullets,
+	RotatingLaser,
+	RandomFire,
+
+	MaxNumBossAttacks
+};
+
+enum eBossState
+{
+	InvalidState = -1,
+
+	Moving,
+	Attacking,
+
+	MaxBossStates
+};
+
 class Actor : public Entity
 {
 	friend class Map;
@@ -67,8 +88,14 @@ protected:
 	std::vector<WeaponDefinition const*> m_weapons;
 	int m_currentWeaponIndex = 0;
 
+	eBossAttacks m_currentBossAttack = InvalidAttack;
+	eBossState m_currentBossState = InvalidState;
+	int m_currentAttackIndex = 0;
+	Timer m_bossWaitTimer;
+
 private:
 	void UpdateNPC( float deltaSeconds );
+	void UpdateBoss( float deltaSeconds );
 	void GetNewGoalPosition();
 	std::string GetCurrentAnimationName() const;
 };

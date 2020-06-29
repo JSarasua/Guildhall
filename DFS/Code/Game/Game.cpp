@@ -139,7 +139,7 @@ void Game::LoadAssets()
 	g_theRenderer->CreateOrGetTextureFromFile(IMAGETESTPATH);
 
 	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/BenderAndTiles_12x11.png" );
-	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/bender_12x11.png" );
+	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/BenderAndTiles_12x11.png" );
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
 	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
 	Texture* bulletsSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Extras_4x4.png" );

@@ -298,6 +298,7 @@ void Map::SpawnEntities()
 
 	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
 	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
+	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
 
 	Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
 // 	Actor* enemy1 = new Actor( Vec2( 8.f, 2.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
@@ -347,7 +348,10 @@ void Map::SpawnEntities()
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_3));
 // 	m_entities.push_back( new Actor(Vec2(2.f, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_4));
 
-
+	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, player1, this );
+	bossSpawner->AddEnemyType( bossActorDef );
+	bossSpawner->AddWeaponType( rocketLauncherWeapon );
+	m_enemySpawners.push_back( bossSpawner );
 }
 
 
@@ -391,15 +395,23 @@ void Map::SpawnBullet( Entity* shooter )
 	{
 		if( !m_entities[entityIndex] )
 		{
-			float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
-			float bulletOrientationWithSpread = bulletOrientation + spread;
-			m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef );
-
-			bulletCount--;
-			if( bulletCount <= 0 )
+/*			if( m_entities[entityIndex]->m_entityType != ENTITY_TYPE_BOSS )*/
 			{
-				break;
+				float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
+				float bulletOrientationWithSpread = bulletOrientation + spread;
+				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef );
+
+				bulletCount--;
+				if( bulletCount <= 0 )
+				{
+					break;
+				}
 			}
+// 			else
+// 			{
+// 				SpawnBossBullets( actorShooter );
+// 			}
+
 		}
 	}
 	for( bulletCount; bulletCount > 0; bulletCount-- )
@@ -410,6 +422,11 @@ void Map::SpawnBullet( Entity* shooter )
 	}
 
 	shooter->SetIsFiring( false );
+}
+
+void Map::SpawnBossBullets( Actor* boss )
+{
+
 }
 
 void Map::PushEntityOutOfWalls(Entity* currentEntity)
@@ -508,7 +525,7 @@ void Map::ResolveEntitiesCollisions()
 		Entity* currentEntity = m_entities[entityIndex];
 		if( !currentEntity->IsGarbage() )
 		{
-			if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER || currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
+			if( currentEntity->m_entityType == ENTITY_TYPE_PLAYER || currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY || currentEntity->m_entityType == ENTITY_TYPE_BOSS )
 			{
 				ResolveEntityCollisions( currentEntity );
 			}

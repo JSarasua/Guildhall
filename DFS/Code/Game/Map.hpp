@@ -57,6 +57,7 @@ private:
 	void SpawnEntities();
 	void SpawnBullets();
 	void SpawnBullet( Entity* shooter );
+	void SpawnBossBullets( Actor* boss );
 
 	void RenderTiles();
 	void RenderEntities();

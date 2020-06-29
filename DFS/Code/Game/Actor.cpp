@@ -31,6 +31,17 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 	}
+	else if( m_name == "Boss" )
+	{
+		m_entityType = ENTITY_TYPE_BOSS;
+		m_health = 1000;
+		m_isDead = false;
+		m_firingTimer.SetSeconds( 0.1 );
+		m_bossWaitTimer.SetSeconds( Clock::GetMaster(), 3.0 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+		m_currentBossAttack = CircleOfBullets;
+		m_currentBossState = Moving;
+	}
 	else
 	{
 		m_entityType = ENTITY_TYPE_NPC_ENEMY;
@@ -56,10 +67,21 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 50;
+		m_health = 100;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+	}
+	else if( m_name == "Boss" )
+	{
+		m_entityType = ENTITY_TYPE_BOSS;
+		m_health = 1000;
+		m_isDead = false;
+		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.1 );
+		m_bossWaitTimer.SetSeconds( Clock::GetMaster(), 3.0 );
+		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+		m_currentBossAttack = CircleOfBullets;
+		m_currentBossState = Moving;
 	}
 	else
 	{
@@ -94,6 +116,11 @@ void Actor::Update( float deltaSeconds )
 		UpdateFromJoystick();
 		UpdateFromKeyboard();
 		m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
+	}
+	else if( m_name == "Boss" )
+	{
+		UpdateBoss( deltaSeconds );
+		Entity::Update( deltaSeconds );
 	}
 	else
 	{
@@ -245,7 +272,10 @@ void Actor::AddWeapon( WeaponDefinition const* newWeapon )
 
 	if( m_weapons.size() == 1 )
 	{
-		m_firingTimer.SetSeconds( (double)fireRate );
+		if( m_entityType != ENTITY_TYPE_BOSS )
+		{
+			m_firingTimer.SetSeconds( (double)fireRate );
+		}
 	}
 }
 
@@ -459,31 +489,6 @@ void Actor::UpdateFromKeyboard()
 void Actor::UpdateNPC( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-	//static float timeUntilNextGoalPosition = 2.f;
-
-// 
-// 	if( m_goalPosition == Vec2( -1.f, -1.f ) ) //Unitialized
-// 	{
-// 		GetNewGoalPosition();
-// 	}
-// 	if( GetDistance2D( m_goalPosition, m_position ) < 0.1f )	//Reached goal location
-// 	{
-// 		m_goalPosition = m_position;
-// 		//GetNewGoalPosition();
-// 	}
-// 	if( m_timeUntilNextGoalPosition < 0.f )	//
-// 	{
-// 		const FloatRange& actorWaitingTime = m_actorDef->m_waitingTime;
-// 		m_timeUntilNextGoalPosition = actorWaitingTime.GetRandomInRange(g_theGame->m_rand);
-// 		GetNewGoalPosition();
-// 	}
-// 	else if( m_hasCollided )
-// 	{
-// 		m_goalPosition = m_position;
-// 		m_hasCollided = false;
-// 	}
-// 
-// 	m_timeUntilNextGoalPosition -= deltaSeconds;
 
 	if( m_enemyActor )
 	{
@@ -531,6 +536,72 @@ void Actor::UpdateNPC( float deltaSeconds )
 
 }
 
+void Actor::UpdateBoss( float deltaSeconds )
+{
+	if( m_currentBossState == Moving )
+	{
+		m_goalPosition = m_enemyActor->GetPosition();
+
+		Vec2 goalDirection = (m_goalPosition - m_position).GetNormalized();
+		m_orientationDegrees = goalDirection.GetAngleDegrees();
+		m_weaponOrientationDegrees = m_orientationDegrees;
+		m_velocity = goalDirection * m_actorDef->m_speed;
+
+
+		if( m_bossWaitTimer.HasElapsed() )
+		{
+			m_currentBossState = Attacking;
+			m_bossWaitTimer.Reset();
+			m_firingTimer.Reset();
+		}
+	}
+	else if( m_currentBossState == Attacking )
+	{
+		m_velocity *= 0.f;
+
+		if( m_currentBossAttack == CircleOfBullets )
+		{
+			if( (bool)m_firingTimer.CheckAndDecrementAll() )
+			{
+				m_weaponOrientationDegrees += 20.f;
+				m_isFiring = true;
+			}
+		}
+		else if( m_currentBossAttack == RandomFire )
+		{
+			m_goalPosition = m_enemyActor->GetPosition();
+
+			Vec2 goalDirection = (m_goalPosition - m_position).GetNormalized();
+			m_orientationDegrees = goalDirection.GetAngleDegrees();
+			m_weaponOrientationDegrees = m_orientationDegrees;
+
+			if( (bool)m_firingTimer.CheckAndDecrementAll() )
+			{
+				m_weaponOrientationDegrees += g_theGame->m_rand.RollRandomFloatInRange(-30.f, 30.f );
+				m_isFiring = true;
+			}
+		}
+
+
+		if( m_bossWaitTimer.HasElapsed() )
+		{
+			m_currentBossState = Moving;
+
+			if( m_currentBossAttack == CircleOfBullets )
+			{
+				m_firingTimer.SetSeconds( 0.1 );
+				m_currentBossAttack = RandomFire;
+			}
+			else if( m_currentBossAttack == RandomFire )
+			{
+				m_firingTimer.SetSeconds( 0.075 );
+				m_currentBossAttack = CircleOfBullets;
+			}
+			m_bossWaitTimer.Reset();
+		}
+	}
+}
+
 void Actor::GetNewGoalPosition()
 {
 	Vec2 deltaPosition;
@@ -567,21 +638,37 @@ std::string Actor::GetCurrentAnimationName() const
 	}
 	else if( m_velocity.GetLength() == 0.f )
 	{
-		if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 45.f )
+		if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "IdleEast";
 		}
-		else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 45.f )
+		else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "IdleNorthEast";
+		}
+		else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "IdleNorth";
 		}
-		else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 45.f )
+		else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "IdleNorthWest";
+		}
+		else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "IdleWest";
 		}
-		else
+		else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "IdleSouthWest";
+		}
+		else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "IdleSouth";
+		}
+		else
+		{
+			currentAnimationName = "IdleSouthEast";
 		}
 	}
 	else
