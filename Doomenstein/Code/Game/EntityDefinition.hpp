@@ -10,11 +10,12 @@ class SpriteAnimDefinition;
 struct SpriteAnimMap
 {
 public:
-	SpriteAnimMap( XmlElement const& entityAnimStateElem );
+	SpriteAnimMap( XmlElement const& entityAnimStateElem, SpriteSheet* spriteSheet );
 	~SpriteAnimMap();
 
 	SpriteAnimDefinition const* GetSpriteAnimDefinition( Vec2 const& localDirection ) const;
-
+	void AddSpriteIndexesToMapIfValid( std::string const& direction, std::string const& indexString );
+	std::vector<int> GetSpriteIndexes( std::string const& indexString );
 private:
 	SpriteSheet* m_spriteSheet = nullptr;
 	std::map< std::string, SpriteAnimDefinition* > m_spriteanims;
