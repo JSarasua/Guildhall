@@ -58,6 +58,10 @@ public:
 	std::string const& GetName() const;
 	std::string const& GetType() const;
 
+	Vec2 const& GetDrawSize() const { return m_drawSize; };
+	std::string const& GetBillboardType() const { return m_billBoardType; }
+	EntitySpriteAnimStates const* GetSpriteAnimStates() const { return m_spriteAnimStates; }
+
 protected:
 	std::string m_name;
 	std::string m_type;
