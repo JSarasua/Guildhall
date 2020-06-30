@@ -81,6 +81,20 @@ void EntityDefinition::InitializeEntityDefinitions( XmlElement const& rootEntity
 	}
 }
 
+EntityDefinition const* EntityDefinition::GetEntityDefinitionByName( std::string const& entityName )
+{
+	auto entityIter = s_definitions.find( entityName );
+	if( entityIter != s_definitions.end() )
+	{
+		return entityIter->second;
+	}
+	else
+	{
+		g_theConsole->ErrorString( Stringf( "Error: Could not find entity type named \"%s\"", entityName.c_str() ) );
+		return nullptr;
+	}
+}
+
 float EntityDefinition::GetEyeHeight() const
 {
 	return m_eyeHeight;
@@ -174,7 +188,7 @@ SpriteAnimDefinition const* SpriteAnimMap::GetSpriteAnimDefinition( Vec2 const& 
 	iter = m_spriteanims.find( "frontLeft" );
 	if( iter != m_spriteanims.end() )
 	{
-		float localDot = DotProduct2D( localDirection, Vec2( SQRT_TWO, SQRT_TWO ) );
+		float localDot = DotProduct2D( localDirection, Vec2( SQRT_ONEHALF, SQRT_ONEHALF ) );
 		if( localDot > currentMaxDot )
 		{
 			currentMaxDot = localDot;
@@ -185,7 +199,7 @@ SpriteAnimDefinition const* SpriteAnimMap::GetSpriteAnimDefinition( Vec2 const& 
 	iter = m_spriteanims.find( "frontRight" );
 	if( iter != m_spriteanims.end() )
 	{
-		float localDot = DotProduct2D( localDirection, Vec2( SQRT_TWO, -SQRT_TWO ) );
+		float localDot = DotProduct2D( localDirection, Vec2( SQRT_ONEHALF, -SQRT_ONEHALF ) );
 		if( localDot > currentMaxDot )
 		{
 			currentMaxDot = localDot;
@@ -218,7 +232,7 @@ SpriteAnimDefinition const* SpriteAnimMap::GetSpriteAnimDefinition( Vec2 const& 
 	iter = m_spriteanims.find( "backLeft" );
 	if( iter != m_spriteanims.end() )
 	{
-		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_TWO, SQRT_TWO ) );
+		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_ONEHALF, SQRT_ONEHALF ) );
 		if( localDot > currentMaxDot )
 		{
 			currentMaxDot = localDot;
@@ -229,7 +243,7 @@ SpriteAnimDefinition const* SpriteAnimMap::GetSpriteAnimDefinition( Vec2 const& 
 	iter = m_spriteanims.find( "backRight" );
 	if( iter != m_spriteanims.end() )
 	{
-		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_TWO, SQRT_TWO ) );
+		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_ONEHALF, SQRT_ONEHALF ) );
 		if( localDot > currentMaxDot )
 		{
 			currentMaxDot = localDot;

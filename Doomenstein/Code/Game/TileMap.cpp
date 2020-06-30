@@ -608,7 +608,17 @@ void TileMap::ParseEntities( XmlElement const& entitiesElement )
 		//return;
 	}
 
-	SpawnEntities();
+	for( XmlElement const* entityElement = playerStartElement->NextSiblingElement(); entityElement; entityElement = entityElement->NextSiblingElement() )
+	{
+		std::string entityType = entityElement->Name();
+		std::string entityName = ParseXMLAttribute( *entityElement, "name", "INVALID" );
+		Vec2 position = ParseXMLAttribute( *entityElement, "pos", Vec2(-1.f,-1.f) );
+		float yaw = ParseXMLAttribute( *entityElement, "yaw", 0.f );
+
+		Map::SpawnNewEntityOfType( entityName, position, Vec3( 0.f, 0.f, yaw ) );
+	}
+
+	//SpawnEntities();
 }
 
 void TileMap::SpawnEntities()

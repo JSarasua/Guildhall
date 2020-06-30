@@ -102,6 +102,9 @@ v2f_t VertexFunction( vs_input_t input )
 float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 color = tDiffuse.Sample( sSampler, input.uv );
+
+	clip( color.a - 0.001 );
+
 	return color * input.color;
 
 	// we'll outoupt our UV coordinates as color here

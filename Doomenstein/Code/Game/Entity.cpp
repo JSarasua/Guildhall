@@ -3,6 +3,7 @@
 #include "Engine/Math/Mat44.hpp"
 #include "Game/EntityDefinition.hpp"
 #include "Engine/Math/Transform.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 
 Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees ) :
@@ -13,6 +14,7 @@ Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, 
 
 void Entity::Update( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 //	m_orientationDegrees += m_angularVelocity * deltaSeconds;
 //	m_position = TransformPosition2D(m_position, 1.f, m_orientationDegrees, m_velocity * deltaSeconds);
 }

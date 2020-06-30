@@ -44,6 +44,7 @@ public:
 	~EntityDefinition() {}
 
 	static void InitializeEntityDefinitions( XmlElement const& rootEntityDefinitionElement );
+	static EntityDefinition const* GetEntityDefinitionByName( std::string const& entityName );
 	static std::map< std::string, EntityDefinition* > s_definitions;
 
 	float GetEyeHeight() const;

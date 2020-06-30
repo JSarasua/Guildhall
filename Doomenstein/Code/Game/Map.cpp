@@ -1,14 +1,16 @@
-#include "Map.hpp"
-#include "Tile.hpp"
-#include "Entity.hpp"
-#include "Game/GameCommon.hpp"
-#include "Engine/Math/AABB2.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Game/Game.hpp"
-#include "Engine/Core/EngineCommon.hpp"
+#include "Game/Map.hpp"
+#include "Game/Actor.hpp"
 #include "Game/App.hpp"
-#include "Engine/Core/Vertex_PCU.hpp"
+#include "Game/Entity.hpp"
+#include "Game/EntityDefinition.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Tile.hpp"
+#include "Engine/Math/AABB2.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
+#include "Engine/Core/Vertex_PCU.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -16,6 +18,56 @@ extern RenderContext* g_theRenderer;
 
 Map::Map()
 {}
+
+Entity* Map::SpawnNewEntityOfType( std::string const& entityDefName, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees )
+{
+	EntityDefinition const* entityDef = EntityDefinition::GetEntityDefinitionByName( entityDefName );
+
+	return SpawnNewEntityOfType( entityDef, initialPosition, initialPitchRollYawDegrees );
+}
+
+Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees )
+{
+	Entity* newEntity = nullptr;
+
+	if( !entityDef )
+	{
+		g_theConsole->ErrorString( Stringf("Error: null entity definition" ) );
+		return nullptr;
+	}
+
+	std::string entityType = entityDef->GetType();
+
+	if( entityType == "Actor" )
+	{
+		newEntity = new Actor( entityDef, initialPosition, initialPitchRollYawDegrees );
+		m_allEntities.push_back( newEntity );
+		return newEntity;
+	}
+	else if( entityType == "Entity" )
+	{
+		newEntity = new Entity( entityDef, initialPosition, initialPitchRollYawDegrees );
+		m_allEntities.push_back( newEntity );
+		return newEntity;
+	}
+// 	else if( entityType == "Projectile" )
+// 	{
+// 		newEntity = new Projectile( entityDef, initialPosition, initialPitchRollYawDegrees );
+// 		m_allEntities.push_back( newEntity );
+// 		return newEntity;
+// 	}
+// 	else if( entityType == "Portal" )
+// 	{
+// 		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees );
+// 		m_allEntities.push_back( newEntity );
+// 		return newEntity;
+// 	}
+	else
+	{
+		g_theConsole->ErrorString( Stringf("Error: entity type \"%s\" not implemented", entityType.c_str() ) );
+		return nullptr;
+	}
+}
 
 bool Map::IsValid() const
 {
@@ -65,6 +117,8 @@ Map::~Map()
 
 void Map::Update( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	ResolveAllEntityVEntityCollisions();
 }
 

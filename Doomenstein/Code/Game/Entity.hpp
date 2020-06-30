@@ -13,9 +13,9 @@ public:
 	virtual ~Entity() {}
 	Entity(  EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees );
 
-	virtual void Startup() = 0;
+	virtual void Startup() {}
 	virtual void Update(float deltaSeconds);
-	virtual void Render() const = 0;
+	virtual void Render() const {}
 
 	bool IsOffScreen();
 	Vec3 GetForwardVector() const;

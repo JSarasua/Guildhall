@@ -103,6 +103,8 @@ float4 FragmentFunction( v2f_t input ) : SV_Target0
 {
 	float4 color = tDiffuse.Sample( sSampler, input.uv );
 
+	clip( color.a - 0.001 );
+
 	if( color.r == 1 && color.g == 1 && color.b == 1 )
 	{
 		color.r = sin( input.uv.x * SYSTEM_TIME_SECONDS );

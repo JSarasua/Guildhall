@@ -609,6 +609,8 @@ void Game::UpdateEntities( float deltaSeconds )
 
 void Game::UpdateCamera( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	if( m_possessedEntity )
 	{
 		Vec3 entityPosition = m_possessedEntity->GetPosition();
@@ -618,7 +620,6 @@ void Game::UpdateCamera( float deltaSeconds )
 		Vec3 pitchRollYaw = m_possessedEntity->GetRotationPitchRollYawDegrees();
 		m_camera.SetRotationPitchRollYawDegrees( pitchRollYaw );
 	}
-
 }
 
 void Game::RenderGame()

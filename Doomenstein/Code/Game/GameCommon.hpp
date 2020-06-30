@@ -29,4 +29,4 @@ constexpr float PLAYER_MAX_SPEED = 2.f;
 
 //constexpr float CAMERAABLATIONPERSECOND = 1.f;
 
-constexpr float SQRT_TWO = 0.70710678118f;
+constexpr float SQRT_ONEHALF = 0.70710678118f;

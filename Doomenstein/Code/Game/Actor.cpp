@@ -19,7 +19,7 @@ Actor::Actor( EntityDefinition const* entityDef, Vec2 const& initialPosition, Ve
 
 void Actor::Update( float deltaSeconds )
 {
-
+	UNUSED( deltaSeconds );
 }
 
 void Actor::Render() const
