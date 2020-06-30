@@ -12,3 +12,8 @@ void Portal::Update( float deltaSeconds )
 	UNUSED( deltaSeconds );
 }
 
+void Portal::Render() const
+{
+	Entity::Render();
+}
+

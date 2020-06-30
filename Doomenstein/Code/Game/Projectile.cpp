@@ -12,3 +12,8 @@ void Projectile::Update( float deltaSeconds )
 	UNUSED( deltaSeconds );
 }
 
+void Projectile::Render() const
+{
+	Entity::Render();
+}
+

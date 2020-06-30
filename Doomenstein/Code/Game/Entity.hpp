@@ -15,7 +15,7 @@ public:
 
 	virtual void Startup() {}
 	virtual void Update(float deltaSeconds);
-	virtual void Render() const {}
+	virtual void Render() const;
 
 	bool IsOffScreen();
 	Vec3 GetForwardVector() const;

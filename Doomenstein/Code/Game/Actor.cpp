@@ -24,16 +24,7 @@ void Actor::Update( float deltaSeconds )
 
 void Actor::Render() const
 {
-	float eyeHeight = m_entityDef->GetEyeHeight();
-	float physicsRadius = m_entityDef->GetPhysicsRadius();
-	float height = m_entityDef->GetHeight();
-	Vec3 position = Vec3( m_position, eyeHeight );
-	DebugAddWorldWireCylinder( m_position, physicsRadius, height, Rgba8::WHITE, Rgba8::WHITE, 0.f );
-
-	LineSegment3 forwardVec = LineSegment3( Vec3(m_position, eyeHeight), Vec3(m_position, eyeHeight) + GetForwardVector() );
-	DebugAddWorldArrow( forwardVec, Rgba8::RED, 0.f );
-
-
+	Entity::Render();
 
 	std::vector<Vec3> vertsCounterClockwise = GetBillboardedVertsCounterClockwise( m_entityDef->GetBillboardType() );
 	EntitySpriteAnimStates const* spriteAnimStates = m_entityDef->GetSpriteAnimStates();

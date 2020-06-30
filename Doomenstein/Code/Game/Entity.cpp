@@ -4,6 +4,8 @@
 #include "Game/EntityDefinition.hpp"
 #include "Engine/Math/Transform.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Math/LineSegment3.hpp"
 
 
 Entity::Entity( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees ) :
@@ -17,6 +19,18 @@ void Entity::Update( float deltaSeconds )
 	UNUSED( deltaSeconds );
 //	m_orientationDegrees += m_angularVelocity * deltaSeconds;
 //	m_position = TransformPosition2D(m_position, 1.f, m_orientationDegrees, m_velocity * deltaSeconds);
+}
+
+void Entity::Render() const
+{
+	float eyeHeight = m_entityDef->GetEyeHeight();
+	float physicsRadius = m_entityDef->GetPhysicsRadius();
+	float height = m_entityDef->GetHeight();
+	Vec3 position = Vec3( m_position, eyeHeight );
+	DebugAddWorldWireCylinder( m_position, physicsRadius, height, Rgba8::CYAN, Rgba8::CYAN, 0.f );
+
+	LineSegment3 forwardVec = LineSegment3( Vec3( m_position, eyeHeight ), Vec3( m_position, eyeHeight ) + GetForwardVector() );
+	DebugAddWorldArrow( forwardVec, Rgba8::RED, 0.f );
 }
 
 bool Entity::IsOffScreen()
