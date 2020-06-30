@@ -70,6 +70,12 @@
     <ClCompile Include="Actor.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Portal.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -118,6 +124,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="Actor.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Portal.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

@@ -18,6 +18,8 @@
     <Actor name="Pinky" pos="4.5,3.5" yaw="70"/>
     <Actor name="Marine" pos="3.5,1.5" yaw="90"/>
     <Actor name="Marine" pos="4.5,1.5" yaw="130"/>
+    <Projectile name="Plasma Bolt" pos="2.5,3.5" yaw="30"/>
+    <Portal name="Teleporter" pos="2.5,3.5" yaw="30"/>
     
   </Entities>
 

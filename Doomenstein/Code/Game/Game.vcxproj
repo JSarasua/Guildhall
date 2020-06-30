@@ -197,6 +197,8 @@
     <ClCompile Include="MapMaterialType.cpp" />
     <ClCompile Include="MapRegionType.cpp" />
     <ClCompile Include="MapTile.cpp" />
+    <ClCompile Include="Portal.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="World.cpp" />
@@ -215,6 +217,8 @@
     <ClInclude Include="MapMaterialType.hpp" />
     <ClInclude Include="MapRegionType.hpp" />
     <ClInclude Include="MapTile.hpp" />
+    <ClInclude Include="Portal.hpp" />
+    <ClInclude Include="Projectile.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileMap.hpp" />
     <ClInclude Include="World.hpp" />

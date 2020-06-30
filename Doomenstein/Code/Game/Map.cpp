@@ -5,6 +5,8 @@
 #include "Game/EntityDefinition.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/Portal.hpp"
+#include "Game/Projectile.hpp"
 #include "Game/Tile.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -50,18 +52,18 @@ Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const
 		m_allEntities.push_back( newEntity );
 		return newEntity;
 	}
-// 	else if( entityType == "Projectile" )
-// 	{
-// 		newEntity = new Projectile( entityDef, initialPosition, initialPitchRollYawDegrees );
-// 		m_allEntities.push_back( newEntity );
-// 		return newEntity;
-// 	}
-// 	else if( entityType == "Portal" )
-// 	{
-// 		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees );
-// 		m_allEntities.push_back( newEntity );
-// 		return newEntity;
-// 	}
+	else if( entityType == "Projectile" )
+	{
+		newEntity = new Projectile( entityDef, initialPosition, initialPitchRollYawDegrees );
+		m_allEntities.push_back( newEntity );
+		return newEntity;
+	}
+	else if( entityType == "Portal" )
+	{
+		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees );
+		m_allEntities.push_back( newEntity );
+		return newEntity;
+	}
 	else
 	{
 		g_theConsole->ErrorString( Stringf("Error: entity type \"%s\" not implemented", entityType.c_str() ) );

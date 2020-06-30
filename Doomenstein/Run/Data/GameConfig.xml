@@ -1,4 +1,4 @@
 <GameConfig
 	windowAspect="1.777"
-  startMap="TwistyMaze.xml"
+  startMap="EmptyRoom.xml"
 />
