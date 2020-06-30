@@ -128,6 +128,11 @@ float TileMap::GetPlayerStartYaw()
 	return m_playerStartYaw;
 }
 
+RaycastResult TileMap::Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore )
+{
+	return RaycastResult();
+}
+
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )
 {
 	Vec3 tileOffset = Vec3( 0.5f, 0.5f, 0.5f );

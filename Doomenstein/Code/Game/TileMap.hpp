@@ -19,6 +19,7 @@ public:
 	virtual void SetPlayerToStart() override;
 	virtual Vec2 const& GetPlayerStartPosition() override;
 	virtual float GetPlayerStartYaw() override;
+	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore );
 
 private:
 

@@ -11,6 +11,21 @@ class Player;
 struct Vertex_PCU;
 class EntityDefinition;
 
+struct RaycastResult
+{
+	Entity* entityToIgnore = nullptr;
+	Vec3	startPosition;
+	Vec3	forwardNormalOfRaycast;
+	float	maxDistance;
+	bool	didImpact = false;
+	Vec3	impactPosition;
+	Entity* impactEntity = nullptr;
+	float	impactFraction = 0.f;
+	float	impactDistance = 0.f;
+	Vec3	impactSurfaceNormal;
+
+};
+
 class Map
 {
 public:
@@ -31,6 +46,8 @@ public:
 	bool IsValid() const;
 
 	Entity* GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance );
+
+	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore ) = 0;
 
 private:
 	void ResolveAllEntityVEntityCollisions();
