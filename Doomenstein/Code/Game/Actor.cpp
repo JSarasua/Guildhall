@@ -38,7 +38,7 @@ void Actor::Render() const
 	std::vector<Vec3> vertsCounterClockwise = GetBillboardedVertsCounterClockwise( m_entityDef->GetBillboardType() );
 	EntitySpriteAnimStates const* spriteAnimStates = m_entityDef->GetSpriteAnimStates();
 	Vec2 localDirToCamera = GetLocalDirectionToMainCamera();
-	SpriteAnimDefinition const* spriteAnimDef = spriteAnimStates->GetSpriteAnimDefinition( "Walk", Vec2( 1.f, 0.f ) );
+	SpriteAnimDefinition const* spriteAnimDef = spriteAnimStates->GetSpriteAnimDefinition( "Walk", localDirToCamera );
 	SpriteDefinition const& spriteDef = spriteAnimDef->GetSpriteDefAtTime( 0.f );
 	Texture const& spriteTexture = spriteDef.GetTexture();
 

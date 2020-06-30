@@ -5,6 +5,7 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteAnimDefinition.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -160,16 +161,95 @@ SpriteAnimMap::~SpriteAnimMap()
 
 SpriteAnimDefinition const* SpriteAnimMap::GetSpriteAnimDefinition( Vec2 const& localDirection ) const
 {
+	float currentMaxDot = 0.f;
+	
 	auto iter = m_spriteanims.find( "front" );
-
+	auto currentMaxDotIter = iter;
 	if( iter != m_spriteanims.end() )
 	{
-		return iter->second;
+		currentMaxDot = DotProduct2D( localDirection, Vec2 ( 1.f, 0.f ) );
+		currentMaxDotIter = iter;
 	}
-	else
+
+	iter = m_spriteanims.find( "frontLeft" );
+	if( iter != m_spriteanims.end() )
 	{
-		return nullptr;
+		float localDot = DotProduct2D( localDirection, Vec2( SQRT_TWO, SQRT_TWO ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
 	}
+
+	iter = m_spriteanims.find( "frontRight" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( SQRT_TWO, -SQRT_TWO ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+	iter = m_spriteanims.find( "left" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( 0.f, 1.f ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+	iter = m_spriteanims.find( "right" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( 0.f, -1.f ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+	iter = m_spriteanims.find( "backLeft" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_TWO, SQRT_TWO ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+	iter = m_spriteanims.find( "backRight" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( -SQRT_TWO, SQRT_TWO ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+	iter = m_spriteanims.find( "back" );
+	if( iter != m_spriteanims.end() )
+	{
+		float localDot = DotProduct2D( localDirection, Vec2( -1.f, 0.f ) );
+		if( localDot > currentMaxDot )
+		{
+			currentMaxDot = localDot;
+			currentMaxDotIter = iter;
+		}
+	}
+
+
+	return currentMaxDotIter->second;
 }
 
 void SpriteAnimMap::AddSpriteIndexesToMapIfValid( std::string const& direction, std::string const& indexString )

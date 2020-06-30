@@ -28,3 +28,5 @@ constexpr float PLAYER_PHYSICS_RADIUS = 0.3f;
 constexpr float PLAYER_MAX_SPEED = 2.f;
 
 //constexpr float CAMERAABLATIONPERSECOND = 1.f;
+
+constexpr float SQRT_TWO = 0.70710678118f;
