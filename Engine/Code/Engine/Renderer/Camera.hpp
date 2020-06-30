@@ -66,7 +66,7 @@ public:
 	void SetScreenShakeIntensity( float newIntensity );
 	float GetCurrentScreenShakeIntensity() const;
 
-	Vec3 GetPosition();
+	Vec3 GetPosition() const;
 	Vec3 GetRotation();
 	Vec3 GetDirection() const;
 

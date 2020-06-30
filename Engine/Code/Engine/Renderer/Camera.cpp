@@ -85,7 +85,7 @@ float Camera::GetCurrentScreenShakeIntensity() const
 	return m_screenShakeIntensity;
 }
 
-Vec3 Camera::GetPosition()
+Vec3 Camera::GetPosition() const
 {
 	return m_transform.m_position;
 }
