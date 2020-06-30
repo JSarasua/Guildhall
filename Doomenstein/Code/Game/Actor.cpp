@@ -37,6 +37,7 @@ void Actor::Render() const
 
 	std::vector<Vec3> vertsCounterClockwise = GetBillboardedVertsCounterClockwise( m_entityDef->GetBillboardType() );
 	EntitySpriteAnimStates const* spriteAnimStates = m_entityDef->GetSpriteAnimStates();
+	Vec2 localDirToCamera = GetLocalDirectionToMainCamera();
 	SpriteAnimDefinition const* spriteAnimDef = spriteAnimStates->GetSpriteAnimDefinition( "Walk", Vec2( 1.f, 0.f ) );
 	SpriteDefinition const& spriteDef = spriteAnimDef->GetSpriteDefAtTime( 0.f );
 	Texture const& spriteTexture = spriteDef.GetTexture();
@@ -144,5 +145,22 @@ std::vector<Vec3> Actor::GetBillboardedVertsCounterClockwise( std::string const&
 	verts.push_back( topLeft );
 
 	return verts;
+}
+
+Vec2 Actor::GetLocalDirectionToMainCamera() const
+{
+	Vec2 cameraPos = g_theGame->GetCameraPostion();
+	Vec2 normal = cameraPos - m_position;
+	normal.Normalize();
+
+	Vec2 forward = GetForwardVector();
+	forward.Normalize();
+	Vec2 leftDir = forward.GetRotated90Degrees();
+
+	Vec2 localDirectionToMainCamera;
+	localDirectionToMainCamera.x = DotProduct2D( normal, forward );
+	localDirectionToMainCamera.y = DotProduct2D( normal, leftDir );
+
+	return localDirectionToMainCamera;
 }
 

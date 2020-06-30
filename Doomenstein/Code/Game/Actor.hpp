@@ -15,4 +15,5 @@ public:
 
 private:
 	std::vector<Vec3> GetBillboardedVertsCounterClockwise( std::string const& billboardType ) const;
+	Vec2	GetLocalDirectionToMainCamera() const;
 };
