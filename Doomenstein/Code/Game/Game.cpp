@@ -1178,6 +1178,21 @@ void Game::SetPlayerRotation( Vec3 const& pitchRollYawDegrees )
 	m_camera.SetRotationPitchRollYawDegrees( pitchRollYawDegrees );
 }
 
+Vec3 Game::GetCameraPostion() const
+{
+	return m_camera.GetPosition();
+}
+
+Vec3 Game::GetCameraForward() const
+{
+	return m_camera.GetDirection();
+}
+
+Mat44 Game::GetCameraModelMatrix() const
+{
+	return m_camera.GetCameraScreenRotationMatrix();
+}
+
 void Game::RenderDevConsole()
 {
 	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);

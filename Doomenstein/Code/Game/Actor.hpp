@@ -14,5 +14,5 @@ public:
 	virtual void Render() const override;
 
 private:
-
+	std::vector<Vec3> GetBillboardedVertsCounterClockwise( std::string const& billboardType ) const;
 };

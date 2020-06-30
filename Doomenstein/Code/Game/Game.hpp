@@ -94,6 +94,10 @@ public:
 	void SetPlayerPosition( Vec3 const& playerPos );
 	void SetPlayerRotation( Vec3 const& pitchRollYawDegrees );
 
+	Vec3 GetCameraPostion() const;
+	Vec3 GetCameraForward() const;
+	Mat44 GetCameraModelMatrix() const;
+
 private:
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();
@@ -143,7 +147,7 @@ private:
 	Camera m_UICamera;
 	float m_maxCameraShake = 0.f;
 	Camera m_camera;
-	Vec2 m_cameraPosition;
+	//Vec2 m_cameraPosition;
 
 	int m_currentLevel = 0;
 
