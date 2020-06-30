@@ -197,28 +197,32 @@ float Vec2::GetAngleDegrees() const
 //-----------------------------------------------------------------------------------------------
 Vec2 Vec2::GetRotated90Degrees() const
 {
-	float radius = GetLength();
-	float angle = Atan2Degrees(y,x);
-	angle += 90;
+	return Vec2( -y, x );
 
-	Vec2 rotatedVec;
-	rotatedVec.x = radius * CosDegrees(angle);
-	rotatedVec.y = radius * SinDegrees(angle);
-	return rotatedVec;
+// 	float radius = GetLength();
+// 	float angle = Atan2Degrees(y,x);
+// 	angle += 90;
+// 
+// 	Vec2 rotatedVec;
+// 	rotatedVec.x = radius * CosDegrees(angle);
+// 	rotatedVec.y = radius * SinDegrees(angle);
+// 	return rotatedVec;
 }
 
 
 //-----------------------------------------------------------------------------------------------
 Vec2 Vec2::GetRotatedMinus90Degrees() const
 {
-	float radius = GetLength();
-	float angle = Atan2Degrees( y, x );
-	angle -= 90;
+	return Vec2( y, -x );
 
-	Vec2 rotatedVec;
-	rotatedVec.x = radius * CosDegrees( angle );
-	rotatedVec.y = radius * SinDegrees( angle );
-	return rotatedVec;
+// 	float radius = GetLength();
+// 	float angle = Atan2Degrees( y, x );
+// 	angle -= 90;
+// 
+// 	Vec2 rotatedVec;
+// 	rotatedVec.x = radius * CosDegrees( angle );
+// 	rotatedVec.y = radius * SinDegrees( angle );
+// 	return rotatedVec;
 }
 
 
