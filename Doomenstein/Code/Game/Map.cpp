@@ -104,6 +104,52 @@ Entity* Map::GetClosestEntityInSector( Vec3 const& position, Vec2 const& forward
 	return closestEntity;
 }
 
+Entity* Map::GetEntityAtImpactPosition( Vec3 const& position, Vec3& surfaceNormal, Entity const* entityToIgnore )
+{
+	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+	{
+		Entity* entity = m_allEntities[entityIndex];
+
+		if( entity == entityToIgnore )
+		{
+			continue;
+		}
+
+		if( entity )
+		{
+			Vec2 position2D = position;
+
+			Vec2 entityPosition = entity->GetPosition();
+			float entityRadius = entity->GetPhysicsRadius();
+			float entityZHeight = entity->GetHeight();
+			float zToCheck = position.z;
+			if( zToCheck >= 0.f && zToCheck <= entityZHeight )
+			{
+				if( IsPointInsideDisc2D( position2D, entityPosition, entityRadius ) )
+				{
+					if( AlmostEqualsFloat( zToCheck, entityZHeight, 0.005f ) )
+					{
+						surfaceNormal = Vec3( 0.f, 0.f, 1.f );
+						return entity;
+					}
+					else
+					{
+						Vec2 surfacNormal2D = position2D - entityPosition;
+						surfacNormal2D.Normalize();
+						surfaceNormal = surfacNormal2D;
+						return entity;
+					}
+				}
+			}
+
+
+		}
+
+	}
+
+	return nullptr;
+}
+
 Map::~Map()
 {
 	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )

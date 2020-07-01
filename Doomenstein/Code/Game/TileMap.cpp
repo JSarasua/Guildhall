@@ -6,6 +6,8 @@
 #include "Game/Actor.hpp"
 #include "Game/Entity.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/LineSegment3.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 
 extern RenderContext* g_theRenderer;
 
@@ -88,6 +90,15 @@ void TileMap::Update( float deltaSeconds )
 
 	Map::Update( deltaSeconds );
 	ResolveAllEntityWallCollisions();
+
+	Entity const* possessedEntity = g_theGame->GetPossessedEntity();
+	if( possessedEntity )
+	{
+		Vec3 forwardVector = possessedEntity->GetForwardVector();
+		Vec3 entityPosition = possessedEntity->GetEyeHeightPosition();
+		float maxDistance = 10.f;
+		m_currentRaycastResult = Raycast( entityPosition, forwardVector, maxDistance, possessedEntity );
+	}
 }
 
 void TileMap::Render()
@@ -109,6 +120,24 @@ void TileMap::Render()
 	}
 
 	Map::Render();
+
+
+	//DebugRender Raycast
+
+		if( m_currentRaycastResult.didImpact )
+		{
+			Vec3 startPosition = m_currentRaycastResult.startPosition;
+			Vec3 impactPosition = m_currentRaycastResult.impactPosition;
+			Vec3 impactSurfaceNormal = m_currentRaycastResult.impactSurfaceNormal;
+			Vec3 surfaceNormalToDraw = impactSurfaceNormal * 0.5f;
+
+			LineSegment3 raycastLine = LineSegment3( startPosition, impactPosition );
+			LineSegment3 impactSurfaceNormalLine = LineSegment3( impactPosition, impactPosition + surfaceNormalToDraw );
+		
+			DebugAddWorldLine( raycastLine, Rgba8::BLUE, 0.f );
+			DebugAddWorldArrow( impactSurfaceNormalLine, Rgba8::GREEN, 0.f );
+		}
+
 }
 
 void TileMap::SetPlayerToStart()
@@ -128,9 +157,107 @@ float TileMap::GetPlayerStartYaw()
 	return m_playerStartYaw;
 }
 
-RaycastResult TileMap::Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore )
+RaycastResult TileMap::Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
 {
-	return RaycastResult();
+	return RaycastStepAndSample( startPosition, forwardNormal, maxDistance, entityToIgnore );
+}
+
+RaycastResult TileMap::RaycastStepAndSample( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
+{
+	RaycastResult result;
+	result.startPosition = startPosition;
+	result.forwardNormalOfRaycast = forwardNormal;
+	result.maxDistance = maxDistance;
+	result.entityToIgnore = entityToIgnore;
+
+	float increment = 0.001f;
+	float currentDistance = 0.f;
+
+	while( currentDistance < maxDistance )
+	{
+
+		Vec3 currentPos = startPosition + (forwardNormal*currentDistance);
+		if( currentPos.z >= 1.f )
+		{
+			result.didImpact = true;
+			result.impactPosition = currentPos;
+			result.impactFraction = currentDistance / maxDistance;
+			result.impactDistance = currentDistance;
+			result.impactSurfaceNormal = Vec3( 0.f, 0.f, -1.f );
+
+			return result;
+		}
+		else if( currentPos.z <= 0.f )
+		{
+			result.didImpact = true;
+			result.impactPosition = currentPos;
+			result.impactFraction = currentDistance / maxDistance;
+			result.impactDistance = currentDistance;
+			result.impactSurfaceNormal = Vec3( 0.f, 0.f, 1.f );
+
+			return result;
+		}
+
+		Vec3 surfaceNormal;
+		Entity* impactEntity = GetEntityAtImpactPosition( currentPos, surfaceNormal, entityToIgnore );
+		if( impactEntity )
+		{
+			result.didImpact = true;
+			result.impactPosition = currentPos;
+			result.impactFraction = currentDistance / maxDistance;
+			result.impactDistance = currentDistance;
+			result.impactSurfaceNormal = surfaceNormal;
+			result.impactEntity = impactEntity;
+
+			return result;
+		}
+		
+		IntVec2 currentPos2DIntVec = IntVec2( currentPos );
+		if( IsTileSolidAtCoords( currentPos2DIntVec ) )
+		{
+			result.didImpact = true;
+			result.impactPosition = currentPos;
+			result.impactFraction = currentDistance / maxDistance;
+			result.impactDistance = currentDistance;
+			//result.impactSurfaceNormal = Vec3( 0.f, 0.f, 1.f );
+
+			Vec2 currentPos2DVecFloored = Vec2( currentPos2DIntVec );
+			Vec2 currentPos2DVec = Vec2( currentPos );
+
+			Vec2 tilePenetration = currentPos2DVec - currentPos2DVecFloored;
+			
+			float distToLeftTile = tilePenetration.x;
+			float distToRightTile = 1.f - tilePenetration.x;
+			float distToTopTile = 1.f - tilePenetration.y;
+			float distToBottomTile = tilePenetration.y;
+
+			Vec3 currentSurfaceNormal = Vec3( -1.f, 0.f, 0.f );
+			float currentClosestTileDist = distToLeftTile;
+			if( currentClosestTileDist > distToRightTile )
+			{
+				currentSurfaceNormal = Vec3( 1.f, 0.f, 0.f );
+				currentClosestTileDist = distToRightTile;
+			}
+			if( currentClosestTileDist > distToTopTile )
+			{
+				currentSurfaceNormal = Vec3( 0.f, 1.f, 0.f );
+				currentClosestTileDist = distToTopTile;
+			}
+			if( currentClosestTileDist > distToBottomTile )
+			{
+				currentSurfaceNormal = Vec3( 0.f, -1.f, 0.f );
+				currentClosestTileDist = distToBottomTile;
+			}
+			result.impactSurfaceNormal = currentSurfaceNormal;
+
+
+			return result;
+		}
+
+		currentDistance += increment;
+	}
+
+	return result;
 }
 
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )

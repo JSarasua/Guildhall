@@ -98,6 +98,8 @@ public:
 	Vec3 GetCameraForward() const;
 	Mat44 GetCameraModelMatrix() const;
 
+	Entity const* GetPossessedEntity() const;
+
 private:
 	void IncrementCurrentLight();
 	void DecrementCurrentLight();

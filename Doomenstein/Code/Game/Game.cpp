@@ -1194,6 +1194,11 @@ Mat44 Game::GetCameraModelMatrix() const
 	return m_camera.GetCameraScreenRotationMatrix();
 }
 
+Entity const* Game::GetPossessedEntity() const
+{
+	return m_possessedEntity;
+}
+
 void Game::RenderDevConsole()
 {
 	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);

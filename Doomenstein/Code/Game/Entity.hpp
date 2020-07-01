@@ -22,10 +22,11 @@ public:
 	bool IsAlive();
 	void SetAlive();
 	const Vec2 GetPosition();
-	Vec3 GetEyeHeightPosition();
+	Vec3 GetEyeHeightPosition() const;
 	virtual void Lose1Health();
 	virtual void LoseAllHealth();
 	const Rgba8& GetColor();
+	float GetHeight() const;
 
 	void SetPosition(const Vec2& newPosition);
 	Vec3 const& GetRotationPitchRollYawDegrees() const;

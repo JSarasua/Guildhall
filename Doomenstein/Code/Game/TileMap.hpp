@@ -19,8 +19,9 @@ public:
 	virtual void SetPlayerToStart() override;
 	virtual Vec2 const& GetPlayerStartPosition() override;
 	virtual float GetPlayerStartYaw() override;
-	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore );
+	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore );
 
+	RaycastResult RaycastStepAndSample( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore );
 private:
 
 	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile );

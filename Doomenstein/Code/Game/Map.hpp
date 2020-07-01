@@ -13,13 +13,13 @@ class EntityDefinition;
 
 struct RaycastResult
 {
-	Entity* entityToIgnore = nullptr;
+	Entity const* entityToIgnore = nullptr;
 	Vec3	startPosition;
 	Vec3	forwardNormalOfRaycast;
 	float	maxDistance;
 	bool	didImpact = false;
 	Vec3	impactPosition;
-	Entity* impactEntity = nullptr;
+	Entity const* impactEntity = nullptr;
 	float	impactFraction = 0.f;
 	float	impactDistance = 0.f;
 	Vec3	impactSurfaceNormal;
@@ -46,8 +46,9 @@ public:
 	bool IsValid() const;
 
 	Entity* GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance );
+	Entity* GetEntityAtImpactPosition( Vec3 const& position, Vec3& surfaceNormal, Entity const* entityToIgnore );
 
-	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity* entityToIgnore ) = 0;
+	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore ) = 0;
 
 private:
 	void ResolveAllEntityVEntityCollisions();
@@ -59,6 +60,8 @@ protected:
 	bool m_isValid = false;
 
 	std::vector<Entity*> m_allEntities;
+
+	RaycastResult m_currentRaycastResult;
 
 private:
 };

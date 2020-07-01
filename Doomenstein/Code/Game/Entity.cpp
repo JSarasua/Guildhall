@@ -63,7 +63,7 @@ const Vec2 Entity::GetPosition()
 	return m_position;
 }
 
-Vec3 Entity::GetEyeHeightPosition()
+Vec3 Entity::GetEyeHeightPosition() const
 {
 	float eyeHeight = m_entityDef->GetEyeHeight();
 	return Vec3( m_position, eyeHeight );
@@ -91,6 +91,11 @@ void Entity::LoseAllHealth()
 const Rgba8& Entity::GetColor()
 {
 	return m_color;
+}
+
+float Entity::GetHeight() const
+{
+	return m_entityDef->GetHeight();
 }
 
 void Entity::SetPosition( const Vec2& newPosition )
