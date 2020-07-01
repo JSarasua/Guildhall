@@ -1,6 +1,6 @@
 Jonathan Sarasua
-SDST-A1
-Due: 6/3/2020
+SDST-A3
+Due: 7/1/2020
 
 W = Move Forward
 S = Move Backward
@@ -9,15 +9,9 @@ D = Move Right
 C = Move Up
 Space = Move Down
 Mouse = Rotate camera
-F1 = Play Sound
+F1 = Toggle Debug Draw
+F3 = Possess
 
 Problems:
-Currently there is a bunch of weird behavior occurring. 
-	1. I get a D3D11 error that only occurs on my machine, but it didn't when I had Butler compile it.
-	The error doesn't stop the game running, but it does show memory leaks that aren't part of my game.
-	2. I sporadically got a write access error on my inputsystem when closing down. It seemed to stop happening
-	after I changed the order of my shutdown, but taking a deeper dive would probably be a good idea. The error message is
-	like the below except **this** changes each time. The value stays constant:
-		Exception thrown: write access violation.
-		**this** was 0x1A276D9D9D0.
-	3. For a little while I started getting Visual Studio errors, but it may have been caused by having 2 visual studios open
+I ended up using Step and Sample for raycast. I ran into issues during wall collisions for the fast method, so I ended up stopping.
+My error checking isn't great for entities

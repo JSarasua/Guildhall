@@ -2,7 +2,7 @@
   ​
   <Actor name="Marine">
     <Physics radius="0.18" height="0.62" eyeHeight="0.58" walkSpeed="1.0"/>
-    <Appearance size="1.5,1.5" billboard="CameraFacingXY" spriteSheet="Data/Images/Actor_Marine_7x12.png" layout="7,12">
+    <Appearance size="1.5,1.5" billboard="CameraOpposingXY" spriteSheet="Data/Images/Actor_Marine_7x12.png" layout="7,12">
       <Walk front="0" left="14" back="28" right="42"/>
       <Attack front="0"/>
       <Pain front="0"/>
