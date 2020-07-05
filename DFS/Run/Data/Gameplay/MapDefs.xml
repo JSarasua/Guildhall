@@ -3,19 +3,19 @@
 
 <MapDefinitions>
 
-  <MapDefinition name="Island" width="30" height="30" fillTile="Grass" edgeTile="Water">
+  <MapDefinition name="Island" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
     <GenerationSteps>
       <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
     </GenerationSteps>
   </MapDefinition>
   
-  <MapDefinition name="JamesMap" width="30" height="30" fillTile="Grass" edgeTile="Water">
+  <MapDefinition name="JamesMap" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
     <GenerationSteps>
       <FromImage iterations="1" fromImageFilePath="Data/Images/James1_30x30.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
     </GenerationSteps>
   </MapDefinition>
 
-  <MapDefinition name="TestLevel" width="100" height="100" fillTile="Grass" edgeTile="Water">
+  <MapDefinition name="TestLevel" width="100" height="100" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
     <GenerationSteps>
       <Mutate iterations="1" ifTileType="Lava" setTags="ImageTest" chanceToMutate="0.001"/>
       <FromImage iterations="1" ifTags="ImageTest" fromImageFilePath="Data/Images/FromImageTest_JMSWUZHERE.png" rotations="0"/>

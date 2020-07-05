@@ -24,4 +24,5 @@ protected:
 	std::string m_fillTile;
 	std::string m_edgeTile;
 	std::vector<MapGenStep*> m_mapGenSteps;
+	Vec2 m_startPosition;
 };

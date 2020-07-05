@@ -27,7 +27,7 @@ public:
 	void Update( float deltaSeconds );
 	void Render();
 	void RenderDebug() const;
-
+	void MoveToNextMap();
 
 	Actor* GetPlayer();
 	void GetPlayers(std::vector<Actor*>& players);
@@ -35,6 +35,9 @@ public:
 private:
 	Map* m_currentMap = nullptr;
 	Game* m_game = nullptr;
+
+	std::vector<Map*> m_maps;
+	int m_currentMapIndex = 0;
 public:
 	IntVec2 getCurrentMapBounds() const;
 };

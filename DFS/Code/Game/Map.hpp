@@ -1,15 +1,16 @@
 #pragma once
 #include "Engine/Math/IntVec2.hpp"
+#include "Engine/Math/vec2.hpp"
 #include <vector>
 #include <string>
 
 struct TileMetaData;
 struct Tags;
+struct Vertex_PCU;
 class Tile;
 class Entity;
 class Game;
 class Actor;
-struct Vertex_PCU;
 class MapDefinition;
 class TileDefinition;
 class EnemySpawner;
@@ -48,6 +49,8 @@ public:
 	void AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags);
 
 	void SpawnEntity( Entity* entityToSpawn );
+	void AddPlayer( Actor* player );
+	void DeletePlayer();
 
 private:
 	Tile& GetRandomMapTile();
@@ -81,6 +84,8 @@ private:
 
 	void GarbageCollectEntities();
 
+
+
 protected:
 	std::vector<Tile> m_tiles;
 	std::vector<TileMetaData> m_tileMetaData;
@@ -91,6 +96,7 @@ protected:
 	IntVec2 m_mapSize;
 	MapDefinition* m_mapDef = nullptr;
 	std::string m_name;
+	Vec2 m_startPosition;
 
 	//Debug
 	Entity* m_entityMouseIsTouching = nullptr;

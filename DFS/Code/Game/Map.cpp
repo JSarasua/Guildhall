@@ -36,6 +36,7 @@ Map::Map( const char* mapDefName )
 	
 	m_name = m_mapDef->m_name;
 	m_mapSize = m_mapDef->m_mapDimensions;
+	m_startPosition = m_mapDef->m_startPosition;
 	SpawnTiles();
 	SpawnEntities();
 }
@@ -64,6 +65,8 @@ Map::~Map()
 
 void Map::Startup()
 {
+	m_entities[0]->SetPosition( m_startPosition );
+
 	for( int tileIndex = 0; tileIndex < m_tiles.size(); tileIndex++ )
 	{
 		m_tiles[tileIndex].AppendVerts(m_vertsToRender);
@@ -301,10 +304,6 @@ void Map::SpawnEntities()
 	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
 
 	Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
-// 	Actor* enemy1 = new Actor( Vec2( 8.f, 2.f ), Vec2( 0.f, 0.f ), 0.f, 0.f, maryActorDef );
-// 	Actor* enemy2 = new Actor( Vec2( 4.5f, 4.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, josenActorDef );
-// 	enemy1->SetEnemy( player1 );
-// 	enemy2->SetEnemy( player1 );
 	
 	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
 	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
@@ -314,16 +313,8 @@ void Map::SpawnEntities()
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
 	player1->AddWeapon( pistolWeapon );
 	player1->AddWeapon( shotgunWeapon );
-	//player1->AddWeapon( smgWeapon );
-	//player1->AddWeapon( rocketLauncherWeapon );
-	//player1->AddWeapon( laserWeapon );
-	//player1->AddWeapon( flamethrowerWeapon );
-// 	enemy1->AddWeapon(smgWeapon);
-// 	enemy2->AddWeapon(rocketLauncherWeapon);
 
-	m_entities.push_back( player1 );
-	//m_entities.push_back( enemy1 );
-	//m_entities.push_back( enemy2 );
+	m_entities.push_back( nullptr );
 
 
 	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
@@ -714,6 +705,41 @@ void Map::GarbageCollectEntities()
 
 		}
 	}
+}
+
+void Map::AddPlayer( Actor* player )
+{
+	if( m_entities[0] )
+	{
+		delete m_entities[0];
+		m_entities[0] = nullptr;
+	}
+	if( nullptr != player )
+	{
+		m_entities[0] = player;
+	}
+	else
+	{
+		ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
+		Actor* player1 = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
+
+		WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+		WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+		player1->AddWeapon( pistolWeapon );
+		player1->AddWeapon( shotgunWeapon );
+
+		m_entities[0] = player1;
+	}
+}
+
+void Map::DeletePlayer()
+{
+	if( m_entities[0] )
+	{
+		delete m_entities[0];
+		m_entities[0] = nullptr;
+	}
+
 }
 
 TileMetaData& Map::GetTileMetaDataAtTilePosition( IntVec2 currentCoords )

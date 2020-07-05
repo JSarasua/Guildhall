@@ -11,6 +11,7 @@ MapDefinition::MapDefinition( const XmlElement& element )
 	m_mapDimensions.y	= ParseXMLAttribute( element, "height", 0 );
 	m_fillTile			= ParseXMLAttribute( element, "fillTile", "INVALID" );
 	m_edgeTile			= ParseXMLAttribute( element, "edgeTile", "INVALID" );
+	m_startPosition		= ParseXMLAttribute( element, "startPosition", Vec2() );
 
 	const XmlElement* generationStepsElement = nullptr;
 	for( const XmlElement* childElement = element.FirstChildElement(); childElement; childElement = childElement->NextSiblingElement() )
