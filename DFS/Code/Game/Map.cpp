@@ -297,13 +297,13 @@ void Map::SpawnTiles()
 
 void Map::SpawnEntities()
 {
-	ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
+	//ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
 
 	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
 	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
 	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
 
-	Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
+	//Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
 	
 	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
 	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
@@ -311,20 +311,20 @@ void Map::SpawnEntities()
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 	//WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
-	player1->AddWeapon( pistolWeapon );
-	player1->AddWeapon( shotgunWeapon );
+// 	player1->AddWeapon( pistolWeapon );
+// 	player1->AddWeapon( shotgunWeapon );
 
 	m_entities.push_back( nullptr );
 
 
-	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
-	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
-	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, player1, this );
-	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
-	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, player1, this );
-	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, player1, this );
-	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, player1, this );
-	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, player1, this );
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
 
 
 	spawner->AddEnemyType( josenActorDef );
@@ -357,7 +357,7 @@ void Map::SpawnEntities()
 	m_enemySpawners.push_back( spawner8 );
 
 
-	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, player1, this );
+	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, nullptr, this );
 	bossSpawner->AddEnemyType( bossActorDef );
 	bossSpawner->AddWeaponType( rocketLauncherWeapon );
 	m_enemySpawners.push_back( bossSpawner );
@@ -709,11 +709,14 @@ void Map::GarbageCollectEntities()
 
 void Map::AddPlayer( Actor* player )
 {
+	Actor* playerToAdd = player;
+
 	if( m_entities[0] )
 	{
 		delete m_entities[0];
 		m_entities[0] = nullptr;
 	}
+
 	if( nullptr != player )
 	{
 		m_entities[0] = player;
@@ -721,14 +724,20 @@ void Map::AddPlayer( Actor* player )
 	else
 	{
 		ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
-		Actor* player1 = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
+		playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
 
 		WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
 		WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
-		player1->AddWeapon( pistolWeapon );
-		player1->AddWeapon( shotgunWeapon );
+		playerToAdd->AddWeapon( pistolWeapon );
+		playerToAdd->AddWeapon( shotgunWeapon );
 
-		m_entities[0] = player1;
+		m_entities[0] = playerToAdd;
+		
+	}
+
+	for( size_t spawnerIndex = 0; spawnerIndex < m_enemySpawners.size(); spawnerIndex++ )
+	{
+		m_enemySpawners[spawnerIndex]->SetPlayer( playerToAdd );
 	}
 }
 

@@ -30,14 +30,22 @@ void EnemySpawner::AddWeaponType( WeaponDefinition const* weaponType )
 	m_weapons.push_back( weaponType );
 }
 
+void EnemySpawner::SetPlayer( Actor* player )
+{
+	m_player = player;
+}
+
 void EnemySpawner::Update()
 {
 	if( !m_isSpawning )
 	{
-		if( IsPointInsideDisc2D( m_player->GetPosition(), m_position, m_playerCheckRadius ) )
+		if( m_player )
 		{
-			m_isSpawning = true;
-			m_spawnTimer.Reset();
+			if( IsPointInsideDisc2D( m_player->GetPosition(), m_position, m_playerCheckRadius ) )
+			{
+				m_isSpawning = true;
+				m_spawnTimer.Reset();
+			}
 		}
 	}
 	else

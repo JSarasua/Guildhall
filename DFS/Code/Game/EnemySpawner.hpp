@@ -18,6 +18,7 @@ public:
 
 	void AddEnemyType( ActorDefinition const* enemyType );
 	void AddWeaponType( WeaponDefinition const* weaponType );
+	void SetPlayer( Actor* player );
 
 	void Update();
 
