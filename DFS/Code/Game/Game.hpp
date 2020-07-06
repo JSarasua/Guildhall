@@ -114,6 +114,7 @@ private:
 	std::vector<Camera> m_cameras;
 	//Vec2 m_cameraPosition;
 	Vec2 m_mousePositionOnMainCamera;
+	Vec2 m_mousePositionOnUICamera;
 
 	//DevConsole
 	bool m_isDevConsoleTestActive = false;
@@ -142,9 +143,18 @@ private:
 	XmlDocument* m_tileDefDoc	= nullptr;
 	XmlDocument* m_actorDefDoc	= nullptr;
 
-	eGameState m_gameState = LOADING;
+
+	AABB2 m_pausedMenu;
+	AABB2 m_pausedResumeButton;
+	AABB2 m_pausedRestartButton;
+	AABB2 m_pausedQuitButton;
+
+	Rgba8 m_pausedResumeButtonTint= Rgba8::WHITE;
+	Rgba8 m_pausedRestartButtonTint = Rgba8::WHITE;
+	Rgba8 m_pausedQuitButtonTint = Rgba8::WHITE;
 
 public:
+	eGameState m_gameState = LOADING;
 	//Rand for game to use
 	RandomNumberGenerator m_rand;
 

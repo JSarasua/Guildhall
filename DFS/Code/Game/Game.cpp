@@ -63,7 +63,6 @@ void Game::Startup()
 	m_UICamera.SetProjectionOrthographic( m_UICamera.m_outputSize, 0.f, 100.f );
 	m_UICamera.SetPosition( Vec2(UI_CAMERA_X, UI_CAMERA_Y) * 0.5f );
 
-
 	Rgba8 clearColor = Rgba8::BLACK;
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
@@ -88,6 +87,8 @@ void Game::Update( float deltaSeconds )
 	case ATTRACT: UpdateAttract( deltaSeconds );
 		break;
 	case PLAYING: UpdatePlaying( deltaSeconds );
+		break;
+	case PAUSED: UpdatePaused( deltaSeconds );
 		break;
 	default: ERROR_AND_DIE( "Invalid Game State" );
 		break;
@@ -115,8 +116,8 @@ void Game::Render()
 // 		break;
 // 	case VICTORY: RenderVictory();
 // 		break;
-// 	case PAUSED: RenderPaused();
-// 		break;
+ 	case PAUSED: RenderPaused();
+ 		break;
 	case PLAYING: RenderPlaying();
 		break;
 	default: ERROR_AND_DIE( "Invalid Game State" );
@@ -297,6 +298,27 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		}
 	}
 
+	if( m_gameState == PAUSED )
+	{
+		if( leftMouseButton.WasJustReleased() )
+		{
+			if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+			{
+				RebuildWorld();
+				g_theApp->UnPauseGame();
+			}
+			else if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
+			{
+				g_theApp->UnPauseGame();
+			}
+			else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
+			{
+				g_theApp->HandleQuitRequested();
+			}
+		}
+
+	}
+
 	
 
 
@@ -317,6 +339,7 @@ void Game::RebuildWorld()
 
 	m_world = new World(this);
 	m_world->Startup();
+	m_player = m_world->GetPlayer();
 }
 
 AABB2 Game::GetUICamera() const
@@ -577,6 +600,10 @@ void Game::UpdateDebugMouse()
 	Vec2 mouseDrawPosOnCamera = orthoBounds.GetPointAtUV( mouseNormalizedPos );
 
 	m_mousePositionOnMainCamera = mouseDrawPosOnCamera;
+
+	AABB2 orthoBoundsUI( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	Vec2 mouseDrawPosOnUICamera = orthoBoundsUI.GetPointAtUV( mouseNormalizedPos );
+	m_mousePositionOnUICamera = mouseDrawPosOnUICamera;
 }
 
 void Game::UpdateLoading( float deltaSeconds )
@@ -612,6 +639,37 @@ void Game::UpdateAttract( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 	m_world->Update( 0.f );
+}
+
+void Game::UpdatePaused( float deltaSeconds )
+{
+	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	Vec2 uiDims = uiBounds.GetDimensions();
+	m_pausedMenu = uiBounds;
+	m_pausedMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
+	AABB2 carvingPauseMenu = m_pausedMenu;
+	m_pausedResumeButton = carvingPauseMenu.CarveBoxOffTop( 0.3333f );
+	m_pausedRestartButton = carvingPauseMenu.CarveBoxOffTop( 0.5f );
+	m_pausedQuitButton = carvingPauseMenu;
+
+	UpdateDebugMouse();
+
+	m_pausedResumeButtonTint= Rgba8::WHITE;
+	m_pausedRestartButtonTint = Rgba8::WHITE;
+	m_pausedQuitButtonTint = Rgba8::WHITE;
+
+	if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
+	{
+		m_pausedResumeButtonTint= Rgba8::YELLOW;
+	}
+	else if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+	{
+		m_pausedRestartButtonTint = Rgba8::YELLOW;
+	}
+	else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
+	{
+		m_pausedQuitButtonTint = Rgba8::YELLOW;
+	}
 }
 
 void Game::UpdatePlaying( float deltaSeconds )
@@ -672,6 +730,57 @@ void Game::RenderAttract()
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 }
 
+void Game::RenderPaused()
+{
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
+	m_UICamera.SetColorTarget( 0, colorTarget );
+
+	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderGame();
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->BeginCamera( m_UICamera );
+	RenderUI();
+
+	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->DrawAABB2Filled( gameCamera, Rgba8( 0, 0, 0, 128 ) );
+	g_theRenderer->DrawAABB2Filled( m_pausedMenu, Rgba8( 0, 0, 0, 220 ) );
+	g_theRenderer->DrawAlignedTextAtPosition( "RESUME", m_pausedResumeButton, 5.f, Vec2( 0.5f, 0.7f ), m_pausedResumeButtonTint );
+	g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_pausedRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_pausedRestartButtonTint );
+	g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_pausedQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_pausedQuitButtonTint );
+	g_theRenderer->EndCamera( m_UICamera );
+
+	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderMouse();
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
+}
+
 void Game::RenderPlaying()
 {
 	g_theRenderer->ClearScreen( Rgba8::BLACK );
@@ -694,6 +803,7 @@ void Game::RenderPlaying()
 	g_theRenderer->BeginCamera( m_UICamera );
 	RenderUI();
 	g_theRenderer->EndCamera( m_UICamera );
+
 
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 	m_camera.SetColorTarget( nullptr );

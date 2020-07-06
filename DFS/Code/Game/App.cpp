@@ -178,21 +178,23 @@ bool App::QuitRequested( const EventArgs* args )
 void App::TogglePause()
 {
 	m_isPaused = !m_isPaused;
-	Clock* masterClock = Clock::GetMaster();
-
 	if( m_isPaused )
 	{
-		masterClock->Pause();
+		PauseGame();
 	}
 	else
 	{
-		masterClock->Resume();
+		UnPauseGame();
 	}
 }
 
 void App::PauseGame()
 {
 	m_isPaused = true;
+	if( g_theGame->m_gameState == PLAYING )
+	{
+		g_theGame->m_gameState = PAUSED;
+	}
 
 	Clock* masterClock = Clock::GetMaster();
 	masterClock->Pause();
@@ -201,6 +203,10 @@ void App::PauseGame()
 void App::UnPauseGame()
 {
 	m_isPaused = false;
+	if( g_theGame->m_gameState == PAUSED )
+	{
+		g_theGame->m_gameState = PLAYING;
+	}
 
 	Clock* masterClock = Clock::GetMaster();
 	masterClock->Resume();
