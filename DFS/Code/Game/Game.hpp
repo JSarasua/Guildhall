@@ -154,8 +154,10 @@ private:
 	Rgba8 m_pausedQuitButtonTint = Rgba8::WHITE;
 
 	AABB2 m_deadMenu;
+	AABB2 m_deadYOUDIED;
 	AABB2 m_deadRestartButton;
 	AABB2 m_deadQuitButton;
+	Rgba8 m_deadYOUDIEDTint = Rgba8::RED;
 	Rgba8 m_deadRestartButtonTint = Rgba8::WHITE;
 	Rgba8 m_deadQuitButtonTint = Rgba8::WHITE;
 	Timer m_deathTimer;

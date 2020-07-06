@@ -684,11 +684,13 @@ void Game::UpdateDeath( float deltaSeconds )
 	m_deadMenu = uiBounds;
 	m_deadMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
 	AABB2 carvingDeadMenu = m_deadMenu;
+	m_deadYOUDIED = carvingDeadMenu.CarveBoxOffTop( 0.3333f );
 	m_deadRestartButton = carvingDeadMenu.CarveBoxOffTop( 0.5f );
 	m_deadQuitButton = carvingDeadMenu;
 
 	UpdateDebugMouse();
 
+	m_deadYOUDIEDTint = Rgba8::RED;
 	m_deadRestartButtonTint = Rgba8::WHITE;
 	m_deadQuitButtonTint = Rgba8::WHITE;
 
@@ -840,8 +842,9 @@ void Game::RenderDeath()
 	if( m_deathTimer.HasElapsed() )
 	{
 		g_theRenderer->DrawAABB2Filled( m_deadMenu, backgroundTint );
-		g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_deadRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_deadRestartButtonTint );
-		g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_deadQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_deadQuitButtonTint );
+		g_theRenderer->DrawAlignedTextAtPosition( "YOU DIED", m_deadYOUDIED, 8.f, ALIGN_CENTERED, m_deadYOUDIEDTint );
+		g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_deadRestartButton, 5.f, ALIGN_CENTERED, m_deadRestartButtonTint );
+		g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_deadQuitButton, 5.f, ALIGN_CENTERED, m_deadQuitButtonTint );
 	}
 
 	g_theRenderer->EndCamera( m_UICamera );
