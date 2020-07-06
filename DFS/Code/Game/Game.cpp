@@ -67,6 +67,9 @@ void Game::Startup()
 	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 
 	g_theInput->HideSystemCursor();
+
+	m_deathTimer.SetSeconds( 5.0 );
+	m_deathTimer.Stop();
 }
 
 void Game::Shutdown(){}
@@ -90,10 +93,23 @@ void Game::Update( float deltaSeconds )
 		break;
 	case PAUSED: UpdatePaused( deltaSeconds );
 		break;
+	case DEATH: UpdateDeath( deltaSeconds );
+		break;
 	default: ERROR_AND_DIE( "Invalid Game State" );
 		break;
 	}
 
+	if( m_player )
+	{
+		if( !m_player->IsAlive() )
+		{
+			if( m_gameState == PLAYING || m_gameState == PAUSED )
+			{
+				m_gameState = DEATH;
+				m_deathTimer.Reset();
+			}
+		}
+	}
 
 
 	//UpdateCameras();
@@ -112,8 +128,8 @@ void Game::Render()
 		break;
 	case ATTRACT: RenderAttract();
 		break;
-// 	case DEATH: RenderDeath();
-// 		break;
+ 	case DEATH: RenderDeath();
+ 		break;
 // 	case VICTORY: RenderVictory();
 // 		break;
  	case PAUSED: RenderPaused();
@@ -317,6 +333,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			}
 		}
 
+	}
+
+	if( m_gameState == DEATH )
+	{
+		if( m_deathTimer.HasElapsed() )
+		{
+			if( leftMouseButton.WasJustReleased() )
+			{
+				if( m_deadRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+				{
+					RebuildWorld();
+					g_theApp->UnPauseGame();
+					m_gameState = PLAYING;
+				}
+				else if( m_deadQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
+				{
+					g_theApp->HandleQuitRequested();
+				}
+			}
+		}
 	}
 
 	
@@ -641,6 +677,35 @@ void Game::UpdateAttract( float deltaSeconds )
 	m_world->Update( 0.f );
 }
 
+void Game::UpdateDeath( float deltaSeconds )
+{
+	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	Vec2 uiDims = uiBounds.GetDimensions();
+	m_deadMenu = uiBounds;
+	m_deadMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
+	AABB2 carvingDeadMenu = m_deadMenu;
+	m_deadRestartButton = carvingDeadMenu.CarveBoxOffTop( 0.5f );
+	m_deadQuitButton = carvingDeadMenu;
+
+	UpdateDebugMouse();
+
+	m_deadRestartButtonTint = Rgba8::WHITE;
+	m_deadQuitButtonTint = Rgba8::WHITE;
+
+	if( m_deathTimer.HasElapsed() )
+	{
+		if( m_deadRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+		{
+			m_deadRestartButtonTint = Rgba8::YELLOW;
+		}
+		else if( m_deadQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
+		{
+			m_deadQuitButtonTint = Rgba8::YELLOW;
+		}
+	}
+
+}
+
 void Game::UpdatePaused( float deltaSeconds )
 {
 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
@@ -728,6 +793,77 @@ void Game::RenderAttract()
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
+}
+
+void Game::RenderDeath()
+{
+
+
+	Rgba8 backgroundTint = Rgba8( 0, 0, 0, 0 );
+	if( m_deathTimer.HasElapsed() )
+	{
+		backgroundTint.a = 255;
+	}
+	else
+	{
+		float elapsedTime = (float)m_deathTimer.GetElapsedSeconds();
+		float totalTime = (float)m_deathTimer.GetSecondsRemaining() + elapsedTime;
+
+		float tint = 255.f * (elapsedTime / totalTime);
+		backgroundTint.a = (unsigned char)tint;
+	}
+
+	g_theRenderer->ClearScreen( Rgba8::BLACK );
+
+	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+	m_camera.SetColorTarget( 0, colorTarget );
+	m_UICamera.SetColorTarget( 0, colorTarget );
+
+	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderGame();
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->BeginCamera( m_UICamera );
+	RenderUI();
+
+	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->DrawAABB2Filled( gameCamera, backgroundTint );
+
+	if( m_deathTimer.HasElapsed() )
+	{
+		g_theRenderer->DrawAABB2Filled( m_deadMenu, backgroundTint );
+		g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_deadRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_deadRestartButtonTint );
+		g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_deadQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_deadQuitButtonTint );
+	}
+
+	g_theRenderer->EndCamera( m_UICamera );
+
+	g_theRenderer->BeginCamera( m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderMouse();
+	g_theRenderer->EndCamera( m_camera );
+
+	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+	m_camera.SetColorTarget( nullptr );
+	g_theRenderer->ReleaseRenderTarget( colorTarget );
+	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( &m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
 }
 
 void Game::RenderPaused()

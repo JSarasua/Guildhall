@@ -7,12 +7,13 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Core/Image.hpp"
+#include "Engine/Time/Timer.hpp"
 
 enum eGameState
 {
 	LOADING,
 	ATTRACT,
-// 	DEATH,
+ 	DEATH,
 // 	VICTORY,
 	PAUSED,
 	PLAYING,
@@ -148,10 +149,16 @@ private:
 	AABB2 m_pausedResumeButton;
 	AABB2 m_pausedRestartButton;
 	AABB2 m_pausedQuitButton;
-
 	Rgba8 m_pausedResumeButtonTint= Rgba8::WHITE;
 	Rgba8 m_pausedRestartButtonTint = Rgba8::WHITE;
 	Rgba8 m_pausedQuitButtonTint = Rgba8::WHITE;
+
+	AABB2 m_deadMenu;
+	AABB2 m_deadRestartButton;
+	AABB2 m_deadQuitButton;
+	Rgba8 m_deadRestartButtonTint = Rgba8::WHITE;
+	Rgba8 m_deadQuitButtonTint = Rgba8::WHITE;
+	Timer m_deathTimer;
 
 public:
 	eGameState m_gameState = LOADING;
