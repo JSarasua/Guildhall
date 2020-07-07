@@ -29,8 +29,13 @@ void Entity::Render() const
 	Vec3 position = Vec3( m_position, eyeHeight );
 	DebugAddWorldWireCylinder( m_position, physicsRadius, height, Rgba8::CYAN, Rgba8::CYAN, 0.f );
 
-	LineSegment3 forwardVec = LineSegment3( Vec3( m_position, eyeHeight ), Vec3( m_position, eyeHeight ) + GetForwardVector() );
-	DebugAddWorldArrow( forwardVec, Rgba8::RED, 0.f );
+
+	if( !IsPossessed() )
+	{
+		LineSegment3 forwardVec = LineSegment3( Vec3( m_position, eyeHeight ), Vec3( m_position, eyeHeight ) + GetForwardVector() );
+		DebugAddWorldArrow( forwardVec, Rgba8::RED, 0.f );
+	}
+
 }
 
 bool Entity::IsOffScreen()

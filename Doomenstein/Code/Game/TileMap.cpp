@@ -414,8 +414,6 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 		distOfFirstYCrossing = distOfNextYCrossing;
 	}
 
-// 	int tileX = firstVerticalIntersectionX;
-// 	int tileY = firstHorizontalIntersectionY;
 	int tileX = startTileX;
 	int tileY = startTileY;
 
