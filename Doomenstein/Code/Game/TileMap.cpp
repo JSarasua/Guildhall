@@ -672,26 +672,46 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 			Vec2 localEntityPosTranslated = entityPos - startPosition;
 
 			Vec2 iFwd = forwardNormal;
+			iFwd.Normalize();
 			Vec2 jFwd = iFwd.GetRotated90Degrees();
 			Vec2 localEntityPos;
 			localEntityPos.x = DotProduct2D( localEntityPosTranslated, iFwd );
 			localEntityPos.y = DotProduct2D( localEntityPosTranslated, jFwd );
 
-			float xDist = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
+			//float xDist = -SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
 
-			if( xDist < currentMaxDistance )
+			float xDistMin = -SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
+			float xDistMax = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
+
+
+			Vec3 iFwdXYZ = Vec3( iFwd );
+			iFwdXYZ.Normalize();
+
+			//localdist = Max ray projected onto 2D ray
+			//localdist/maxdist
+			// xdistmin / (localdist/maxdist)
+			// xdistmin * (maxdist/localdist)
+			float localDist = DotProduct3D( forwardNormal * maxDistance, iFwdXYZ );
+			float To3DConversion = maxDistance / localDist;
+			float xDistMinXYZ = xDistMin * To3DConversion;
+			//float xDistMaxXYZ = xDistMax * To3DConversion;
+
+
+			if( xDistMinXYZ < currentMaxDistance && xDistMinXYZ > 0.f )
 			{
-				currentMaxDistance = xDist;
+
+				//Do z height check then do the below
+				currentMaxDistance = xDistMinXYZ;
 				
 				result.didImpact = true;
-				result.impactDistance = xDist;
-				result.impactFraction = xDist / maxDistance;
+				result.impactDistance = xDistMinXYZ;
+				result.impactFraction = xDistMinXYZ / maxDistance;
 
-				Vec2 impactPos2D =  forwardNormal * xDist;
+				Vec2 impactPos2D =  forwardNormal * xDistMinXYZ + startPosition;
 				Vec2 impactNormal = impactPos2D - entityPos;
 				impactNormal.Normalize();
 				result.impactSurfaceNormal = impactNormal;
-				result.impactPosition = forwardNormal * xDist + startPosition;
+				result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
 			}
 		}
 	}
