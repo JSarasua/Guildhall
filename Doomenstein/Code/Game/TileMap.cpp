@@ -378,7 +378,8 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 
 	if( canCheckX )
 	{
-		distPerXCrossing =  absFloat( rayDisplacement.x ) / currentMaxDistance;
+		//distPerXCrossing =  absFloat( rayDisplacement.x ) / currentMaxDistance;
+		distPerXCrossing = currentMaxDistance / absFloat( rayDisplacement.x );
 		
 		if( forwardNormal.x > 0.f )
 		{
@@ -391,13 +392,15 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 		
 		offsetToLeadingEdgeX = (tileStepX + 1) / 2;
 		firstVerticalIntersectionX = (startTileX + offsetToLeadingEdgeX);
-		distOfNextXCrossing = absFloat( (float)(firstVerticalIntersectionX) - startPosition.x ) / distPerXCrossing;
-		distOfFirstXCrossing = distOfNextXCrossing;
+		//distOfNextXCrossing = absFloat( (float)(firstVerticalIntersectionX) - startPosition.x ) / distPerXCrossing;
+		distOfFirstXCrossing = absFloat( (float)(firstVerticalIntersectionX) - startPosition.x ) * distPerXCrossing;
+		distOfNextXCrossing = distOfFirstXCrossing;
 	}
 
 	if( canCheckY )
 	{
-		distPerYCrossing = absFloat( rayDisplacement.y ) / currentMaxDistance;
+		//distPerYCrossing = absFloat( rayDisplacement.y ) / currentMaxDistance;
+		distPerYCrossing = currentMaxDistance / absFloat( rayDisplacement.y );
 
 		if( forwardNormal.y > 0.f )
 		{
@@ -410,8 +413,9 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 
 		offsetToLeadingEdgeY = (tileStepY + 1) / 2;
 		firstHorizontalIntersectionY = (startTileY + offsetToLeadingEdgeY);
-		distOfNextYCrossing = absFloat( (float)(firstHorizontalIntersectionY) - startPosition.y ) / distPerYCrossing;
-		distOfFirstYCrossing = distOfNextYCrossing;
+		//distOfNextYCrossing = absFloat( (float)(firstHorizontalIntersectionY) - startPosition.y ) / distPerYCrossing;
+		distOfFirstYCrossing = absFloat( (float)(firstHorizontalIntersectionY) - startPosition.y ) * distPerYCrossing;
+		distOfNextYCrossing = distOfFirstYCrossing;
 	}
 
 	int tileX = startTileX;
@@ -452,7 +456,8 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 			}
 			else
 			{
-				distOfNextXCrossing = absFloat( (float)(tileX - startTileX) ) / distPerXCrossing + distOfFirstXCrossing;
+				//distOfNextXCrossing = absFloat( (float)(tileX - startTileX) ) / distPerXCrossing + distOfFirstXCrossing;
+				distOfNextXCrossing += distPerXCrossing;
 			}
 		}
 		else
@@ -485,7 +490,8 @@ RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& 
 			}
 			else
 			{
-				distOfNextYCrossing = absFloat( (float)(tileY - startTileY) ) / distPerYCrossing + distOfFirstYCrossing;
+				//distOfNextYCrossing = distOfFirstYCrossing + absFloat( (float)(tileY - startTileY) ) / distPerYCrossing;
+				distOfNextYCrossing += distPerYCrossing;
 			}
 		}
 	}
@@ -664,6 +670,7 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 		Vec2 entityPos = entity->GetPosition();
 		float entityRadius = entity->GetPhysicsRadius();
 		Vec2 nearestPoint = GetNearestPointOnInfiniteLine2D( entityPos, startPosition, startPosition + forwardNormal );
+		//do dot product here
 		if( IsPointInsideDisc2D( nearestPoint, entityPos, entityRadius ) )
 		{
 			//rays start local is 0,0
@@ -671,12 +678,14 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 
 			Vec2 iFwd = forwardNormal;
 			iFwd.Normalize();
+			//change jFwd to jLeft
 			Vec2 jFwd = iFwd.GetRotated90Degrees();
 			Vec2 localEntityPos;
 			localEntityPos.x = DotProduct2D( localEntityPosTranslated, iFwd );
 			localEntityPos.y = DotProduct2D( localEntityPosTranslated, jFwd );
 
 			//Since we are in local space, we are looking for the minimum and maximum distance along X (I)
+			//float distanceOffset = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) );
 			float xDistMin = -SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
 			float xDistMax = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
 
@@ -723,6 +732,7 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 						result.impactSurfaceNormal = impactNormal;
 						result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
 					}
+					//Collided with bottom of entity
 					else if( forwardNormalZ > 0.f )
 					{
 
@@ -736,6 +746,7 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 						result.impactSurfaceNormal = Vec3( 0.f, 0.f, -1.f );
 						result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
 					}
+					//Collided with top of entity
 					else if( forwardNormalZ < 0.f )
 					{
 						xDistMinXYZ = minimumValidDistance;
