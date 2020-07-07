@@ -52,6 +52,12 @@ public:
 	void AddPlayer( Actor* player );
 	void DeletePlayer();
 
+	bool IsBossDead() const;
+
+	void SpawnSpawnersLevel1();
+	void SpawnSpawnersLevel2();
+	void SpawnSpawnersLevel3();
+
 private:
 	Tile& GetRandomMapTile();
 	Tile& GetRandomAdjacentMapTile(Tile& currentTile);

@@ -13,10 +13,21 @@ void World::Startup()
 {
 	//Create 
 	//m_currentMap = new Map(IntVec2(INT_MAP_SIZE_X,INT_MAP_SIZE_Y), m_game);
-	m_currentMap = new Map("Island");
+	m_currentMap = new Map("Level1");
+	m_currentMap->SpawnSpawnersLevel1();
 	m_currentMap->AddPlayer( nullptr );
 	m_currentMap->Startup();
 	m_maps.push_back( m_currentMap );
+	
+// 	Map* level2 = new Map("Level2");
+// 	level2->SpawnSpawnersLevel2();
+// 	level2->Startup();
+// 	m_maps.push_back( level2 );
+
+	Map* level3 = new Map( "Level3" );
+	level3->SpawnSpawnersLevel3();
+	level3->Startup();
+	m_maps.push_back( level3 );
 }
 
 void World::Shutdown()
@@ -34,6 +45,13 @@ void World::Shutdown()
 void World::Update( float deltaSeconds )
 {
 	m_currentMap->Update(deltaSeconds);
+
+	//Check if boss is dead
+
+	if( m_currentMap->IsBossDead() )
+	{
+		MoveToNextMap();
+	}
 }
 
 void World::Render()
@@ -49,6 +67,10 @@ void World::RenderDebug() const
 void World::MoveToNextMap()
 {
 	Actor* player = GetPlayer();
+
+// 	m_maps[m_currentMapIndex]->Shutdown();
+// 	delete m_maps[m_currentMapIndex];
+// 	m_maps[m_currentMapIndex] = nullptr;
 
 	m_currentMapIndex++;
 	if( m_currentMapIndex >= m_maps.size() )

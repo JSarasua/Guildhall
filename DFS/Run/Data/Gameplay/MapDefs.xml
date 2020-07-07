@@ -3,9 +3,21 @@
 
 <MapDefinitions>
 
-  <MapDefinition name="Island" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
+  <MapDefinition name="Level1" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
     <GenerationSteps>
       <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+  <MapDefinition name="Level2" width="90" height="90" fillTile="Grass" edgeTile="Water" startPosition="45.5,45.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level2Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+  <MapDefinition name="Level3" width="60" height="60" fillTile="Grass" edgeTile="Water" startPosition="55.5,55.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level3Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
     </GenerationSteps>
   </MapDefinition>
   

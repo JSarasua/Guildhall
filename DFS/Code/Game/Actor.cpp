@@ -218,9 +218,9 @@ void Actor::RenderWeapon() const
 	}
 
 
-	g_theRenderer->DrawDisc( m_position, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
-	g_theRenderer->DrawDisc( m_position + m_weaponOffset + debugPivot, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
-	g_theRenderer->DrawDisc( GetMuzzlePosition(), 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+// 	g_theRenderer->DrawDisc( m_position, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+// 	g_theRenderer->DrawDisc( m_position + m_weaponOffset + debugPivot, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
+// 	g_theRenderer->DrawDisc( GetMuzzlePosition(), 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
 
 	//DebugAddWorldPoint( Vec3( pivotPoint ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
 }

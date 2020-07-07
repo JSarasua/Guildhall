@@ -308,9 +308,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		}
 
 		const KeyButtonState& f5Key = g_theInput->GetKeyStates( 0x74 );
+		const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 		if( f5Key.WasJustPressed() )
 		{
 			RebuildWorld();
+		}
+		if( f6Key.WasJustPressed() )
+		{
+			m_world->MoveToNextMap();
 		}
 	}
 

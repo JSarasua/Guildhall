@@ -43,7 +43,7 @@ Map::Map( const char* mapDefName )
 
 Map::~Map()
 {
-	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	for( size_t entityIndex = 1; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( m_entities[entityIndex] )
 		{
@@ -65,7 +65,7 @@ Map::~Map()
 
 void Map::Startup()
 {
-	m_entities[0]->SetPosition( m_startPosition );
+	//m_entities[0]->SetPosition( m_startPosition );
 
 	for( int tileIndex = 0; tileIndex < m_tiles.size(); tileIndex++ )
 	{
@@ -297,70 +297,8 @@ void Map::SpawnTiles()
 
 void Map::SpawnEntities()
 {
-	//ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
-
-	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
-	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
-	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
-
-	//Actor* player1 = new Actor(Vec2(2.5, 2.5f),Vec2(0.f,0.f), 0.f, 0.f, playerActorDef, Player_1);
-	
-	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
-	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
-	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
-	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
-	//WeaponDefinition* laserWeapon = WeaponDefinition::s_definitions["LaserGun"];
-	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
-// 	player1->AddWeapon( pistolWeapon );
-// 	player1->AddWeapon( shotgunWeapon );
-
 	m_entities.push_back( nullptr );
 
-
-	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
-	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
-	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
-	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
-	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-
-
-	spawner->AddEnemyType( josenActorDef );
-	spawner->AddWeaponType( smgWeapon );
-	spawner->AddWeaponType( shotgunWeapon );
-	spawner2->AddEnemyType( josenActorDef );
-	spawner2->AddWeaponType( smgWeapon );
-	spawner2->AddWeaponType( shotgunWeapon );
-	spawner3->AddEnemyType( josenActorDef );
-	spawner3->AddWeaponType( smgWeapon );
-	spawner3->AddWeaponType( shotgunWeapon );
-	spawner5->AddEnemyType( maryActorDef );
-	spawner6->AddEnemyType( maryActorDef );
-	spawner7->AddEnemyType( maryActorDef );
-	spawner8->AddEnemyType( maryActorDef );
-	spawner4->AddEnemyType( josenActorDef );
-	spawner5->AddEnemyType( josenActorDef );
-	spawner4->AddWeaponType( shotgunWeapon );
-	spawner5->AddWeaponType( pistolWeapon );
-	spawner6->AddWeaponType( flamethrowerWeapon );
-	spawner7->AddWeaponType( pistolWeapon );
-	spawner8->AddWeaponType( smgWeapon );
-	m_enemySpawners.push_back( spawner );
-	m_enemySpawners.push_back( spawner2 );
-	m_enemySpawners.push_back( spawner3 );
-	m_enemySpawners.push_back( spawner4 );
-	m_enemySpawners.push_back( spawner5 );
-	m_enemySpawners.push_back( spawner6 );
-	m_enemySpawners.push_back( spawner7 );
-	m_enemySpawners.push_back( spawner8 );
-
-
-	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, nullptr, this );
-	bossSpawner->AddEnemyType( bossActorDef );
-	bossSpawner->AddWeaponType( rocketLauncherWeapon );
-	m_enemySpawners.push_back( bossSpawner );
 }
 
 
@@ -689,6 +627,7 @@ void Map::GarbageCollectEntities()
 					Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
 					m_entities.push_back( loot );
 				}
+
 				delete m_entities[entityIndex];
 				m_entities[entityIndex] = nullptr;
 			}
@@ -739,6 +678,8 @@ void Map::AddPlayer( Actor* player )
 	{
 		m_enemySpawners[spawnerIndex]->SetPlayer( playerToAdd );
 	}
+
+	playerToAdd->SetPosition( m_startPosition );
 }
 
 void Map::DeletePlayer()
@@ -749,6 +690,194 @@ void Map::DeletePlayer()
 		m_entities[0] = nullptr;
 	}
 
+}
+
+bool Map::IsBossDead() const
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		Entity* entity = m_entities[entityIndex];
+		if( entity )
+		{
+			if( entity->m_entityType == ENTITY_TYPE_BOSS )
+			{
+				if( !entity->IsAlive() )
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+void Map::SpawnSpawnersLevel1()
+{
+	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
+	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
+	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
+
+	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
+	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
+	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
+
+
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+
+
+	spawner->AddEnemyType( josenActorDef );
+	spawner->AddWeaponType( smgWeapon );
+	spawner->AddWeaponType( shotgunWeapon );
+	spawner2->AddEnemyType( josenActorDef );
+	spawner2->AddWeaponType( smgWeapon );
+	spawner2->AddWeaponType( shotgunWeapon );
+	spawner3->AddEnemyType( josenActorDef );
+	spawner3->AddWeaponType( smgWeapon );
+	spawner3->AddWeaponType( shotgunWeapon );
+	spawner5->AddEnemyType( maryActorDef );
+	spawner6->AddEnemyType( maryActorDef );
+	spawner7->AddEnemyType( maryActorDef );
+	spawner8->AddEnemyType( maryActorDef );
+	spawner4->AddEnemyType( josenActorDef );
+	spawner5->AddEnemyType( josenActorDef );
+	spawner4->AddWeaponType( shotgunWeapon );
+	spawner5->AddWeaponType( pistolWeapon );
+	spawner6->AddWeaponType( flamethrowerWeapon );
+	spawner7->AddWeaponType( pistolWeapon );
+	spawner8->AddWeaponType( smgWeapon );
+	m_enemySpawners.push_back( spawner );
+	m_enemySpawners.push_back( spawner2 );
+	m_enemySpawners.push_back( spawner3 );
+	m_enemySpawners.push_back( spawner4 );
+	m_enemySpawners.push_back( spawner5 );
+	m_enemySpawners.push_back( spawner6 );
+	m_enemySpawners.push_back( spawner7 );
+	m_enemySpawners.push_back( spawner8 );
+
+
+	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 5.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, nullptr, this );
+	bossSpawner->AddEnemyType( bossActorDef );
+	bossSpawner->AddWeaponType( rocketLauncherWeapon );
+	m_enemySpawners.push_back( bossSpawner );
+}
+
+void Map::SpawnSpawnersLevel2()
+{
+	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
+	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
+	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
+
+	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
+	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
+	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
+
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 27.f, 60.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 10.f, 54.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 10.f, 82.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 36.f, 80.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 22.f, 38.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 10.f, 24.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 10.f, 9.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 36.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+
+	spawner->AddEnemyType( josenActorDef );
+	spawner->AddWeaponType( smgWeapon );
+	spawner->AddWeaponType( shotgunWeapon );
+	spawner2->AddEnemyType( josenActorDef );
+	spawner2->AddWeaponType( smgWeapon );
+	spawner2->AddWeaponType( shotgunWeapon );
+	spawner3->AddEnemyType( josenActorDef );
+	spawner3->AddWeaponType( smgWeapon );
+	spawner3->AddWeaponType( shotgunWeapon );
+	spawner5->AddEnemyType( maryActorDef );
+	spawner6->AddEnemyType( maryActorDef );
+	spawner7->AddEnemyType( maryActorDef );
+	spawner8->AddEnemyType( maryActorDef );
+	spawner4->AddEnemyType( josenActorDef );
+	spawner5->AddEnemyType( josenActorDef );
+	spawner4->AddWeaponType( shotgunWeapon );
+	spawner5->AddWeaponType( pistolWeapon );
+	spawner6->AddWeaponType( flamethrowerWeapon );
+	spawner7->AddWeaponType( pistolWeapon );
+	spawner8->AddWeaponType( smgWeapon );
+	m_enemySpawners.push_back( spawner );
+	m_enemySpawners.push_back( spawner2 );
+	m_enemySpawners.push_back( spawner3 );
+	m_enemySpawners.push_back( spawner4 );
+	m_enemySpawners.push_back( spawner5 );
+	m_enemySpawners.push_back( spawner6 );
+	m_enemySpawners.push_back( spawner7 );
+	m_enemySpawners.push_back( spawner8 );
+
+
+	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 80.f, 25.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 5.f, nullptr, this );
+	bossSpawner->AddEnemyType( bossActorDef );
+	bossSpawner->AddWeaponType( rocketLauncherWeapon );
+	m_enemySpawners.push_back( bossSpawner );
+}
+
+void Map::SpawnSpawnersLevel3()
+{
+	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];
+	ActorDefinition* josenActorDef = ActorDefinition::s_definitions["Josen"];
+	ActorDefinition* bossActorDef = ActorDefinition::s_definitions["Boss"];
+
+	WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+	WeaponDefinition* smgWeapon = WeaponDefinition::s_definitions["SMG"];
+	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
+	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
+
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 40.f, 53.f ), FloatRange( 0.f, 3.f ), IntRange( 4, 7 ), 8.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 20.f, 40.f ), FloatRange( 0.f, 1.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 8.f, 55.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 8.f, 23.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 8.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 34.f, 30.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 51.f, 40.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+
+	spawner->AddEnemyType( josenActorDef );
+	spawner->AddWeaponType( smgWeapon );
+	spawner->AddWeaponType( shotgunWeapon );
+	spawner2->AddEnemyType( josenActorDef );
+	spawner2->AddWeaponType( smgWeapon );
+	spawner2->AddWeaponType( shotgunWeapon );
+	spawner3->AddEnemyType( josenActorDef );
+	spawner3->AddWeaponType( smgWeapon );
+	spawner3->AddWeaponType( shotgunWeapon );
+	spawner5->AddEnemyType( maryActorDef );
+	spawner6->AddEnemyType( maryActorDef );
+	spawner7->AddEnemyType( maryActorDef );
+	spawner4->AddEnemyType( josenActorDef );
+	spawner5->AddEnemyType( josenActorDef );
+	spawner4->AddWeaponType( shotgunWeapon );
+	spawner5->AddWeaponType( pistolWeapon );
+	spawner6->AddWeaponType( flamethrowerWeapon );
+	spawner7->AddWeaponType( pistolWeapon );
+	m_enemySpawners.push_back( spawner );
+	m_enemySpawners.push_back( spawner2 );
+	m_enemySpawners.push_back( spawner3 );
+	m_enemySpawners.push_back( spawner4 );
+	m_enemySpawners.push_back( spawner5 );
+	m_enemySpawners.push_back( spawner6 );
+	m_enemySpawners.push_back( spawner7 );
+
+	EnemySpawner* bossSpawner = new EnemySpawner( Vec2( 45.f, 15.f ), FloatRange( 0.f, 0.f ), IntRange( 1, 1 ), 8.f, nullptr, this );
+	bossSpawner->AddEnemyType( bossActorDef );
+	bossSpawner->AddWeaponType( rocketLauncherWeapon );
+	m_enemySpawners.push_back( bossSpawner );
 }
 
 TileMetaData& Map::GetTileMetaDataAtTilePosition( IntVec2 currentCoords )
