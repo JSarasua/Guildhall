@@ -159,8 +159,8 @@ float TileMap::GetPlayerStartYaw()
 
 RaycastResult TileMap::Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
 {
-	//return RaycastFast( startPosition, forwardNormal, maxDistance, entityToIgnore );
-	return RaycastStepAndSample( startPosition, forwardNormal, maxDistance, entityToIgnore );
+	return RaycastFast( startPosition, forwardNormal, maxDistance, entityToIgnore );
+	//return RaycastStepAndSample( startPosition, forwardNormal, maxDistance, entityToIgnore );
 }
 
 RaycastResult TileMap::RaycastStepAndSample( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
@@ -263,6 +263,26 @@ RaycastResult TileMap::RaycastStepAndSample( Vec3 const& startPosition, Vec3 con
 
 RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
 {
+	RaycastResult ceilingAndFloorCheck = RaycastFastCeilingAndFloor( startPosition, forwardNormal, maxDistance, entityToIgnore );
+	RaycastResult wallsCheck = RaycastFastWalls( startPosition, forwardNormal, ceilingAndFloorCheck.impactDistance, entityToIgnore );
+	RaycastResult entitiesCheck = RaycastFastEntities( startPosition, forwardNormal, wallsCheck.impactDistance, entityToIgnore );
+
+	if( entitiesCheck.didImpact )
+	{
+		return entitiesCheck;
+	}
+	else if( wallsCheck.didImpact )
+	{
+		return wallsCheck;
+	}
+	else
+	{
+		return ceilingAndFloorCheck;
+	}
+}
+
+RaycastResult TileMap::RaycastFastCeilingAndFloor( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
+{
 	RaycastResult result;
 	result.startPosition = startPosition;
 	result.forwardNormalOfRaycast = forwardNormal;
@@ -274,6 +294,7 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 	Entity* impactEntity = nullptr;
 	UNUSED( impactEntity );
 	UNUSED( entityToIgnore );
+
 	//Ceiling Check
 	float startZ = startPosition.z;
 	float normalZ = forwardNormal.z;
@@ -310,31 +331,55 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 		}
 	}
 
+	return result;
+}
+
+RaycastResult TileMap::RaycastFastWalls( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
+{
+	UNUSED( entityToIgnore );
+
+	RaycastResult result;
+	result.startPosition = startPosition;
+	result.forwardNormalOfRaycast = forwardNormal;
+	result.maxDistance = maxDistance;
+
+	result.impactDistance = maxDistance;
+
+
+
+	//Need to find distanceToImpact
+	//Check first x crossing impact
+	//Check first y crossing impact
+	//Check impacts in x direction at each crossing
+	//Check impacts in y direction at each crossing
+
+	float currentMaxDistance = maxDistance;
+	
 	bool canCheckX = !AlmostEqualsFloat( forwardNormal.x, 0.f, 0.001f );
 	bool canCheckY = !AlmostEqualsFloat( forwardNormal.y, 0.f, 0.001f );
-
+	
 	Vec3 rayDisplacement = forwardNormal * maxDistance;
-
-	float distOfNextXCrossing = 999999999.f;
-	int firstVerticalIntersectionX = 0;
-	int offsetToLeadingEdgeX = 0;
-	int tileStepX = 0;
-	int startTileX = 0;
-	float distPerXCrossing = 0.f;
+	
+	float distOfNextXCrossing = 999999999.f;		//current total distance
+	float distOfFirstXCrossing = 0.f;
+	int firstVerticalIntersectionX = 0;				//
+	int offsetToLeadingEdgeX = 0;					//offset either 0 or 1 to determin which edge in your tile to check ( 0=left, 1=right )
+	int tileStepX = 0;								//Offset from the start tile to current tile to check
+	int startTileX = (int)startPosition.x;			//Tile you begin in
+	float distPerXCrossing = 0.f;					//Total distance in the forward direction to go from one crossing to the next
 
 	float distOfNextYCrossing = 999999999.f;
+	float distOfFirstYCrossing = 0.f;
 	int firstHorizontalIntersectionY = 0;
 	int offsetToLeadingEdgeY = 0;
 	int tileStepY = 0;
-	int startTileY = 0;
+	int startTileY = (int)startPosition.y;
 	float distPerYCrossing = 0.f;
-	//Wall check
+
 	if( canCheckX )
 	{
-		startTileX = (int)startPosition.x;
-		float maxXDisplacement = forwardNormal.x * currentMaxDistance;
-		distPerXCrossing =  currentMaxDistance / absFloat( maxXDisplacement );
-
+		distPerXCrossing =  absFloat( rayDisplacement.x ) / currentMaxDistance;
+		
 		if( forwardNormal.x > 0.f )
 		{
 			tileStepX = 1;
@@ -343,17 +388,16 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 		{
 			tileStepX = -1;
 		}
-
+		
 		offsetToLeadingEdgeX = (tileStepX + 1) / 2;
-		firstVerticalIntersectionX = ( startTileX + offsetToLeadingEdgeX );
-		distOfNextXCrossing = absFloat( (float)(firstVerticalIntersectionX - startPosition.x) ) * distPerXCrossing;
+		firstVerticalIntersectionX = (startTileX + offsetToLeadingEdgeX);
+		distOfNextXCrossing = absFloat( (float)(firstVerticalIntersectionX) - startPosition.x ) / distPerXCrossing;
+		distOfFirstXCrossing = distOfNextXCrossing;
 	}
 
 	if( canCheckY )
 	{
-		startTileY = (int)startPosition.y;
-		float maxYDisplacement = forwardNormal.y * currentMaxDistance;
-		distPerYCrossing =  currentMaxDistance / absFloat( maxYDisplacement );
+		distPerYCrossing = absFloat( rayDisplacement.y ) / currentMaxDistance;
 
 		if( forwardNormal.y > 0.f )
 		{
@@ -366,25 +410,28 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 
 		offsetToLeadingEdgeY = (tileStepY + 1) / 2;
 		firstHorizontalIntersectionY = (startTileY + offsetToLeadingEdgeY);
-		distOfNextYCrossing = absFloat( (float)(firstHorizontalIntersectionY - startPosition.y) ) * distPerYCrossing;
-
+		distOfNextYCrossing = absFloat( (float)(firstHorizontalIntersectionY) - startPosition.y ) / distPerYCrossing;
+		distOfFirstYCrossing = distOfNextYCrossing;
 	}
 
-	int tileX = firstVerticalIntersectionX;
-	int tileY = firstHorizontalIntersectionY;
+// 	int tileX = firstVerticalIntersectionX;
+// 	int tileY = firstHorizontalIntersectionY;
+	int tileX = startTileX;
+	int tileY = startTileY;
 
-
+	IntVec2 firstXIntersection = IntVec2( tileX, startTileY );
+	IntVec2 firstYIntersection = IntVec2( startTileX, tileY );
+	
 	while( true )
 	{
 		if( distOfNextXCrossing < distOfNextYCrossing )
 		{
-			if( distOfNextXCrossing > currentMaxDistance )
+			if( distOfNextXCrossing >= maxDistance )
 			{
 				break;
 			}
 
 			tileX += tileStepX;
-			distOfNextXCrossing = absFloat( (float)(tileX - startTileX) ) * distPerXCrossing;
 
 			if( IsTileSolidAtCoords( IntVec2( tileX, tileY ) ) )
 			{
@@ -392,7 +439,7 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 				result.impactPosition = startPosition + forwardNormal * distOfNextXCrossing;
 				result.impactDistance = distOfNextXCrossing;
 				result.impactFraction = distOfNextXCrossing / currentMaxDistance;
-
+				
 				if( tileStepX == 1 )
 				{
 					result.impactSurfaceNormal = Vec3( -1.f, 0.f, 0.f );
@@ -401,25 +448,23 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 				{
 					result.impactSurfaceNormal = Vec3( 1.f, 0.f, 0.f );
 				}
-
+				
 				currentMaxDistance = distOfNextXCrossing;
 				break;
 			}
 			else
 			{
-
-				continue;
+				distOfNextXCrossing = absFloat( (float)(tileX - startTileX) ) / distPerXCrossing + distOfFirstXCrossing;
 			}
 		}
 		else
 		{
-			if( distOfNextYCrossing > currentMaxDistance )
+			if( distOfNextYCrossing >= maxDistance )
 			{
 				break;
 			}
 
 			tileY += tileStepY;
-			distOfNextYCrossing = absFloat( (float)(tileY - startTileY) ) * distPerYCrossing;
 
 			if( IsTileSolidAtCoords( IntVec2( tileX, tileY ) ) )
 			{
@@ -442,13 +487,167 @@ RaycastResult TileMap::RaycastFast( Vec3 const& startPosition, Vec3 const& forwa
 			}
 			else
 			{
-
-				continue;
+				distOfNextYCrossing = absFloat( (float)(tileY - startTileY) ) / distPerYCrossing + distOfFirstYCrossing;
 			}
 		}
 	}
 
-	//EntityCheck
+	return result;
+
+
+// 	float currentMaxDistance = maxDistance;
+// 
+// 	bool canCheckX = !AlmostEqualsFloat( forwardNormal.x, 0.f, 0.001f );
+// 	bool canCheckY = !AlmostEqualsFloat( forwardNormal.y, 0.f, 0.001f );
+// 
+// 	Vec3 rayDisplacement = forwardNormal * maxDistance;
+// 
+// 	float distOfNextXCrossing = 999999999.f;
+// 	int firstVerticalIntersectionX = 0;
+// 	int offsetToLeadingEdgeX = 0;
+// 	int tileStepX = 0;
+// 	int startTileX = 0;
+// 	float distPerXCrossing = 0.f;
+// 
+// 	float distOfNextYCrossing = 999999999.f;
+// 	int firstHorizontalIntersectionY = 0;
+// 	int offsetToLeadingEdgeY = 0;
+// 	int tileStepY = 0;
+// 	int startTileY = 0;
+// 	float distPerYCrossing = 0.f;
+// 
+// 	//Wall check
+// 	if( canCheckX )
+// 	{
+// 		startTileX = (int)startPosition.x;
+// 		float maxXDisplacement = forwardNormal.x * currentMaxDistance;
+// 		distPerXCrossing =  currentMaxDistance / absFloat( maxXDisplacement );
+// 
+// 		if( forwardNormal.x > 0.f )
+// 		{
+// 			tileStepX = 1;
+// 		}
+// 		else if( forwardNormal.x < 0.f )
+// 		{
+// 			tileStepX = -1;
+// 		}
+// 
+// 		offsetToLeadingEdgeX = (tileStepX + 1) / 2;
+// 		firstVerticalIntersectionX = (startTileX + offsetToLeadingEdgeX);
+// 		distOfNextXCrossing = absFloat( (float)(firstVerticalIntersectionX - startPosition.x) ) * distPerXCrossing;
+// 	}
+// 
+// 	if( canCheckY )
+// 	{
+// 		startTileY = (int)startPosition.y;
+// 		float maxYDisplacement = forwardNormal.y * currentMaxDistance;
+// 		distPerYCrossing =  currentMaxDistance / absFloat( maxYDisplacement );
+// 
+// 		if( forwardNormal.y > 0.f )
+// 		{
+// 			tileStepY = 1;
+// 		}
+// 		else if( forwardNormal.y < 0.f )
+// 		{
+// 			tileStepY = -1;
+// 		}
+// 
+// 		offsetToLeadingEdgeY = (tileStepY + 1) / 2;
+// 		firstHorizontalIntersectionY = (startTileY + offsetToLeadingEdgeY);
+// 		distOfNextYCrossing = absFloat( (float)(firstHorizontalIntersectionY - startPosition.y) ) * distPerYCrossing;
+// 
+// 	}
+// 
+// 	int tileX = firstVerticalIntersectionX;
+// 	int tileY = firstHorizontalIntersectionY;
+// 
+// 
+// 	while( true )
+// 	{
+// 		if( distOfNextXCrossing < distOfNextYCrossing )
+// 		{
+// 			if( distOfNextXCrossing > currentMaxDistance )
+// 			{
+// 				break;
+// 			}
+// 
+// 			tileX += tileStepX;
+// 			distOfNextXCrossing = absFloat( (float)(tileX - startTileX) ) * distPerXCrossing;
+// 
+// 			if( IsTileSolidAtCoords( IntVec2( tileX, tileY ) ) )
+// 			{
+// 				result.didImpact = true;
+// 				result.impactPosition = startPosition + forwardNormal * distOfNextXCrossing;
+// 				result.impactDistance = distOfNextXCrossing;
+// 				result.impactFraction = distOfNextXCrossing / currentMaxDistance;
+// 
+// 				if( tileStepX == 1 )
+// 				{
+// 					result.impactSurfaceNormal = Vec3( -1.f, 0.f, 0.f );
+// 				}
+// 				else
+// 				{
+// 					result.impactSurfaceNormal = Vec3( 1.f, 0.f, 0.f );
+// 				}
+// 
+// 				currentMaxDistance = distOfNextXCrossing;
+// 				break;
+// 			}
+// 			else
+// 			{
+// 
+// 				continue;
+// 			}
+// 		}
+// 		else
+// 		{
+// 			if( distOfNextYCrossing > currentMaxDistance )
+// 			{
+// 				break;
+// 			}
+// 
+// 			tileY += tileStepY;
+// 			distOfNextYCrossing = absFloat( (float)(tileY - startTileY) ) * distPerYCrossing;
+// 
+// 			if( IsTileSolidAtCoords( IntVec2( tileX, tileY ) ) )
+// 			{
+// 				result.didImpact = true;
+// 				result.impactPosition = startPosition + forwardNormal * distOfNextYCrossing;
+// 				result.impactDistance = distOfNextYCrossing;
+// 				result.impactFraction = distOfNextYCrossing / currentMaxDistance;
+// 
+// 				if( tileStepY == 1 )
+// 				{
+// 					result.impactSurfaceNormal = Vec3( 0.f, -1.f, 0.f );
+// 				}
+// 				else
+// 				{
+// 					result.impactSurfaceNormal = Vec3( 0.f, 1.f, 0.f );
+// 				}
+// 
+// 				currentMaxDistance = distOfNextYCrossing;
+// 				break;
+// 			}
+// 			else
+// 			{
+// 
+// 				continue;
+// 			}
+// 		}
+// 	}
+// 
+// 	return result;
+}
+
+RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore )
+{
+	RaycastResult result;
+	result.startPosition = startPosition;
+	result.forwardNormalOfRaycast = forwardNormal;
+	result.maxDistance = maxDistance;
+
+	result.impactDistance = maxDistance;
+
 	return result;
 }
 
