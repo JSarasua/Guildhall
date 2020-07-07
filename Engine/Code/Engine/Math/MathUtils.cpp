@@ -40,6 +40,11 @@ bool AlmostEqualsFloat( float a, float b, float epsilon /*= 0.01f*/ )
 	return false;
 }
 
+float SquareRootFloat( float value )
+{
+	return sqrtf( value );
+}
+
 float ConvertDegreesToRadians( float orientationDegrees )
 {
 	float degreesToRadiansScale =  3.14159265f / 180.f;

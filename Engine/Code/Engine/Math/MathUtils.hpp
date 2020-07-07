@@ -15,6 +15,8 @@ float		absFloat(float initialValue);
 float		SignFloat( float val );
 bool		AlmostEqualsFloat( float a, float b, float epsilon = 0.01f);
 
+float		SquareRootFloat( float value );
+
 float		Max( float a, float b );
 float		Min( float a, float b );
 int			MaxInt( int a, int b );

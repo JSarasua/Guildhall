@@ -645,8 +645,56 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 	result.startPosition = startPosition;
 	result.forwardNormalOfRaycast = forwardNormal;
 	result.maxDistance = maxDistance;
-
 	result.impactDistance = maxDistance;
+
+	float currentMaxDistance = maxDistance;
+
+	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+	{
+		//for each entity check if there was an impact
+		//if there was an impact calculate distance to impact
+		Entity* entity = m_allEntities[entityIndex];
+		if( nullptr == entity )
+		{
+			continue;
+		}
+		if( entity == entityToIgnore )
+		{
+			continue;
+		}
+
+		Vec2 entityPos = entity->GetPosition();
+		float entityRadius = entity->GetPhysicsRadius();
+		Vec2 nearestPoint = GetNearestPointOnInfiniteLine2D( entityPos, startPosition, startPosition + forwardNormal );
+		if( IsPointInsideDisc2D( nearestPoint, entityPos, entityRadius ) )
+		{
+			//rays start local is 0,0
+			Vec2 localEntityPosTranslated = entityPos - startPosition;
+
+			Vec2 iFwd = forwardNormal;
+			Vec2 jFwd = iFwd.GetRotated90Degrees();
+			Vec2 localEntityPos;
+			localEntityPos.x = DotProduct2D( localEntityPosTranslated, iFwd );
+			localEntityPos.y = DotProduct2D( localEntityPosTranslated, jFwd );
+
+			float xDist = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
+
+			if( xDist < currentMaxDistance )
+			{
+				currentMaxDistance = xDist;
+				
+				result.didImpact = true;
+				result.impactDistance = xDist;
+				result.impactFraction = xDist / maxDistance;
+
+				Vec2 impactPos2D =  forwardNormal * xDist;
+				Vec2 impactNormal = impactPos2D - entityPos;
+				impactNormal.Normalize();
+				result.impactSurfaceNormal = impactNormal;
+				result.impactPosition = forwardNormal * xDist + startPosition;
+			}
+		}
+	}
 
 	return result;
 }
