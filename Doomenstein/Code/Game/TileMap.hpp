@@ -27,6 +27,8 @@ public:
 	RaycastResult RaycastFastCeilingAndFloor( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore );
 	RaycastResult RaycastFastWalls( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore );
 	RaycastResult RaycastFastEntities( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore );
+	float GetMinimumDistanceInValidRange( float startPosition, float dimensionPerDistance, FloatRange const& validValuesInDimension, FloatRange const& validDistanceRange );
+
 private:
 
 	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile );

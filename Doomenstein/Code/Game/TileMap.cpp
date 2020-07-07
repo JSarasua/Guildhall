@@ -678,15 +678,14 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 			localEntityPos.x = DotProduct2D( localEntityPosTranslated, iFwd );
 			localEntityPos.y = DotProduct2D( localEntityPosTranslated, jFwd );
 
-			//float xDist = -SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
-
+			//Since we are in local space, we are looking for the minimum and maximum distance along X (I)
 			float xDistMin = -SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
 			float xDistMax = SquareRootFloat( entityRadius*entityRadius - (-localEntityPos.y)*(-localEntityPos.y) ) + localEntityPos.x;
-
 
 			Vec3 iFwdXYZ = Vec3( iFwd );
 			iFwdXYZ.Normalize();
 
+			//We lose some of the distance only going in the iFwd direction, so we must convert to the actual XYZ distance
 			//localdist = Max ray projected onto 2D ray
 			//localdist/maxdist
 			// xdistmin / (localdist/maxdist)
@@ -694,29 +693,142 @@ RaycastResult TileMap::RaycastFastEntities( Vec3 const& startPosition, Vec3 cons
 			float localDist = DotProduct3D( forwardNormal * maxDistance, iFwdXYZ );
 			float To3DConversion = maxDistance / localDist;
 			float xDistMinXYZ = xDistMin * To3DConversion;
-			//float xDistMaxXYZ = xDistMax * To3DConversion;
+			float xDistMaxXYZ = xDistMax * To3DConversion;
 
-
+			//If the minimum distance is a valid value compare against height
 			if( xDistMinXYZ < currentMaxDistance && xDistMinXYZ > 0.f )
 			{
+				FloatRange xyCollisionDistanceRange = FloatRange( xDistMinXYZ, xDistMaxXYZ );
+				FloatRange zValidHeightRange = FloatRange( 0.f, entity->GetHeight() );
+				float forwardNormalZ = forwardNormal.z;
+				float rayStartZ = startPosition.z;
 
-				//Do z height check then do the below
-				currentMaxDistance = xDistMinXYZ;
-				
-				result.didImpact = true;
-				result.impactDistance = xDistMinXYZ;
-				result.impactFraction = xDistMinXYZ / maxDistance;
+				float minimumValidDistance = GetMinimumDistanceInValidRange( rayStartZ, forwardNormalZ, zValidHeightRange, xyCollisionDistanceRange );
 
-				Vec2 impactPos2D =  forwardNormal * xDistMinXYZ + startPosition;
-				Vec2 impactNormal = impactPos2D - entityPos;
-				impactNormal.Normalize();
-				result.impactSurfaceNormal = impactNormal;
-				result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
+				if( minimumValidDistance < 0.f )
+				{
+					continue;
+				}
+				else
+				{
+					if( AlmostEqualsFloat( minimumValidDistance, xDistMinXYZ ) )
+					{
+						currentMaxDistance = xDistMinXYZ;
+
+						result.didImpact = true;
+						result.impactDistance = xDistMinXYZ;
+						result.impactFraction = xDistMinXYZ / maxDistance;
+
+						Vec2 impactPos2D =  forwardNormal * xDistMinXYZ + startPosition;
+						Vec2 impactNormal = impactPos2D - entityPos;
+						impactNormal.Normalize();
+						result.impactSurfaceNormal = impactNormal;
+						result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
+					}
+					else if( forwardNormalZ > 0.f )
+					{
+
+						xDistMinXYZ = minimumValidDistance;
+						currentMaxDistance = xDistMinXYZ;
+
+						result.didImpact = true;
+						result.impactDistance = xDistMinXYZ;
+						result.impactFraction = xDistMinXYZ / maxDistance;
+
+						result.impactSurfaceNormal = Vec3( 0.f, 0.f, -1.f );
+						result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
+					}
+					else if( forwardNormalZ < 0.f )
+					{
+						xDistMinXYZ = minimumValidDistance;
+						currentMaxDistance = xDistMinXYZ;
+
+						result.didImpact = true;
+						result.impactDistance = xDistMinXYZ;
+						result.impactFraction = xDistMinXYZ / maxDistance;
+
+						result.impactSurfaceNormal = Vec3( 0.f, 0.f, 1.f );
+						result.impactPosition = forwardNormal * xDistMinXYZ + startPosition;
+					}
+					else
+					{
+						//Shouldn't be here
+					}
+				}
 			}
 		}
 	}
 
 	return result;
+}
+
+float TileMap::GetMinimumDistanceInValidRange( float startPosition, float dimensionPerDistance, FloatRange const& validValuesInDimension, FloatRange const& validDistanceRange )
+{
+	float entranceDistance = 0.f;
+	float exitDistance = 0.f;
+
+
+	if( AlmostEqualsFloat( dimensionPerDistance, 0.f, 0.001f ) )
+	{
+		if( validValuesInDimension.IsInRange( startPosition ) )
+		{
+			return validDistanceRange.minimum;
+		}
+		else
+		{
+			return -1.f;
+		}
+	}
+	else
+	{
+		float distanceToMaxValue = (validValuesInDimension.maximum - startPosition) / dimensionPerDistance;
+		float distanceToMinValue = (validValuesInDimension.minimum - startPosition) / dimensionPerDistance;
+
+		//start above, going up
+		if( startPosition > validValuesInDimension.maximum && dimensionPerDistance > 0.f )
+		{
+			return -1.f;
+		}
+		//start below, going down
+		else if( startPosition < validValuesInDimension.minimum && dimensionPerDistance < 0.f )
+		{
+			return -1.f;
+		}
+		//start above, going down
+		else if( startPosition > validValuesInDimension.maximum && dimensionPerDistance < 0.f )
+		{
+			entranceDistance = distanceToMaxValue;
+			exitDistance = distanceToMinValue;
+		}
+		//start below, going up
+		else if( startPosition < validValuesInDimension.minimum && dimensionPerDistance > 0.f )
+		{
+			entranceDistance = distanceToMinValue;
+			exitDistance = distanceToMinValue;
+		}
+		//start inside, going up
+		else if( dimensionPerDistance > 0.f )
+		{
+			entranceDistance = 0.f;
+			exitDistance = distanceToMaxValue;
+		}
+		//start inside, going down
+		else if( dimensionPerDistance < 0.f )
+		{
+			entranceDistance = 0.f;
+			exitDistance = distanceToMinValue;
+		}
+
+		FloatRange entranceExitDistanceRange( entranceDistance, exitDistance );
+		if( entranceExitDistanceRange.DoesOverlap( validDistanceRange ) )
+		{
+			return entranceExitDistanceRange.GetMinimumInOverlap( validDistanceRange );
+		}
+		else
+		{
+			return -1.f;
+		}
+	}
 }
 
 void TileMap::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList, MapTile const& tile   )
