@@ -2,6 +2,7 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 FloatRange::FloatRange( float minAndMax ):
 	minimum( minAndMax ),
@@ -46,6 +47,32 @@ bool FloatRange::DoesOverlap( const FloatRange& otherRange ) const
 		return true;
 	}
 	return false;
+}
+
+float FloatRange::GetMinimumInOverlap( FloatRange const& otherRange ) const
+{
+	float currentMinimum = 99999999999.f;
+	if( otherRange.IsInRange( minimum ) )
+	{
+		currentMinimum = minimum;
+	}
+
+	if( otherRange.IsInRange( maximum ) )
+	{
+		currentMinimum = Min( currentMinimum, maximum );
+	}
+
+	if( IsInRange( otherRange.minimum ) )
+	{
+		currentMinimum = Min( currentMinimum, otherRange.minimum );
+	}
+
+	if( IsInRange( otherRange.maximum ) )
+	{
+		currentMinimum = Min( currentMinimum, otherRange.maximum );
+	}
+
+	return currentMinimum;
 }
 
 std::string FloatRange::GetAsString() const

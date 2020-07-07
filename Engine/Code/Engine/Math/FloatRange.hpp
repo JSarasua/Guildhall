@@ -19,6 +19,7 @@ public:
  	//Accessors
 	bool		IsInRange( float value ) const;
 	bool		DoesOverlap( const FloatRange& otherRange ) const;
+	float		GetMinimumInOverlap( FloatRange const& otherRange ) const;
 	std::string	GetAsString() const;
 	float		GetRandomInRange( RandomNumberGenerator& rng ) const;
 
