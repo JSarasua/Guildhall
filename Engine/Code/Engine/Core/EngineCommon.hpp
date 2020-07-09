@@ -6,6 +6,7 @@
 /*#include "Engine/Input/InputSystem.hpp"*/
 
 class InputSystem;
+class JobSystem;
 
 #define UNUSED(x) (void)(x);
 typedef unsigned int uint;
@@ -25,6 +26,7 @@ extern DevConsole* g_theConsole;
 extern NamedStrings* g_gameConfigBlackboard;
 extern EventSystem* g_theEventSystem;
 extern InputSystem* g_theInput;
+extern JobSystem* g_theJobSystem;
 
 
 enum class eYawPitchRollRotationOrder
