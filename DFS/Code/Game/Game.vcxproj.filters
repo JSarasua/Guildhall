@@ -91,6 +91,9 @@
     <ClCompile Include="EnemyBoss.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="AudioDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -168,6 +171,9 @@
     <ClInclude Include="EnemyBoss.hpp">
       <Filter>General</Filter>
     </ClInclude>
+    <ClInclude Include="AudioDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\Run\Data\GameConfig.xml">
@@ -195,6 +201,9 @@
       <Filter>Data\Gameplay</Filter>
     </Xml>
     <Xml Include="..\..\Run\Data\Gameplay\Weapons.xml">
+      <Filter>Data\Gameplay</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Gameplay\AudioFiles.xml">
       <Filter>Data\Gameplay</Filter>
     </Xml>
   </ItemGroup>

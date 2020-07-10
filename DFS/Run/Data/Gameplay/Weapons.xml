@@ -19,6 +19,7 @@
     weaponOffsetBottomRight ="0.15,-0.1"
     weaponOffsetBottomLeft ="-0.15,-0.1"
     screenshakeIncrement ="0"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 
@@ -37,6 +38,7 @@
     weaponOffsetRight ="0.45,-0.1"
     weaponOffsetLeft ="0.2,-0.1"
     screenshakeIncrement ="0"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 
@@ -55,6 +57,7 @@
     weaponOffsetRight ="0.3,-0.2"
     weaponOffsetLeft ="-0.1,-0.2"
     screenshakeIncrement ="0"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 
@@ -73,6 +76,7 @@
     weaponOffsetRight ="0.1,0"
     weaponOffsetLeft ="-0.1,0"
     screenshakeIncrement ="0.5"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 
@@ -91,6 +95,7 @@
     weaponOffsetRight ="0.3,-0.2"
     weaponOffsetLeft ="-0.1,-0.2"
     screenshakeIncrement ="0"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 
@@ -109,6 +114,7 @@
     weaponOffsetRight ="0.1,-0.1"
     weaponOffsetLeft ="-0.25,-0.1"
     screenshakeIncrement ="0"
+    shootSound ="PlayerShootNormal.ogg"
   >
   </WeaponDefinition>
 

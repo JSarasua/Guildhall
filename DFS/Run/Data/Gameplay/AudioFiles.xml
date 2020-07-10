@@ -1,0 +1,45 @@
+<AudioFiles>
+  <AudioDefinition
+    LoadingMusic="Anticipation.mp3"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    AttractMusic="AttractMusic.mp3"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    GameplayMusic="GameplayMusic.mp3"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    PlayerDeath="PlayerDied.wav"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    PlayerHit="PlayerHit.wav"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    VictorySound="Victory.mp3"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    AttractMusic="AttractMusic.mp3"
+    IsLooped="false"
+  >
+  </AudioDefinition>
+
+
+</AudioFiles>

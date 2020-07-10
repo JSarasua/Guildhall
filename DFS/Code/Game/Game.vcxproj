@@ -188,6 +188,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="AudioDefinition.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletDefinition.cpp" />
     <ClCompile Include="EnemyBoss.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="App.hpp" />
+    <ClInclude Include="AudioDefinition.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="BulletDefinition.hpp" />
     <ClInclude Include="EnemyBoss.hpp" />
@@ -242,6 +244,7 @@
     <Xml Include="..\..\Run\Data\GameConfig.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Actors.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Adventures.xml" />
+    <Xml Include="..\..\Run\Data\Gameplay\AudioFiles.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Bullets.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\MapDefs.xml" />
     <Xml Include="..\..\Run\Data\Gameplay\Portals.xml" />
