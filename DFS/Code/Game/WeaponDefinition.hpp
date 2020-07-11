@@ -45,6 +45,24 @@ protected:
 	Vec2 m_muzzlePosition;
 	Vec2 m_weaponOffsetRight;
 	Vec2 m_weaponOffsetLeft;
+
+	Vec2 m_weaponOffsetIdleEast;
+	Vec2 m_weaponOffsetIdleWest;
+	Vec2 m_weaponOffsetIdleNorth;
+	Vec2 m_weaponOffsetIdleSouth;
+	Vec2 m_weaponOffsetIdleNorthEast;
+	Vec2 m_weaponOffsetIdleNorthWest;
+	Vec2 m_weaponOffsetIdleSouthEast;
+	Vec2 m_weaponOffsetIdleSouthWest;
+	Vec2 m_weaponOffsetMovingEast;
+	Vec2 m_weaponOffsetMovingWest;
+	Vec2 m_weaponOffsetMovingNorth;
+	Vec2 m_weaponOffsetMovingSouth;
+	Vec2 m_weaponOffsetMovingNorthEast;
+	Vec2 m_weaponOffsetMovingNorthWest;
+	Vec2 m_weaponOffsetMovingSouthEast;
+	Vec2 m_weaponOffsetMovingSouthWest;
+
 	float m_screenShakeIncrement = 0.f;
 	
 	BulletDefinition* m_bulletDef = nullptr;

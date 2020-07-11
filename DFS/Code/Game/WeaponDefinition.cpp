@@ -98,6 +98,25 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_muzzlePosition			= ParseXMLAttribute( element, "muzzlePosition", Vec2( 0.5f, 0.5f ) );
 	m_weaponOffsetRight			= ParseXMLAttribute( element, "weaponOffsetRight", Vec2( 0.5f, 0.5f ) );
 	m_weaponOffsetLeft			= ParseXMLAttribute( element, "weaponOffsetLeft", Vec2( 0.5f, 0.5f ) );
+	
+// 	m_weaponOffsetIdleEast;				ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleWest;				ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleNorth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleSouth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleNorthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleNorthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleSouthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetIdleSouthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingEast;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingWest;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingNorth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingSouth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingNorthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingNorthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingSouthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+// 	m_weaponOffsetMovingSouthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+
+	
 	m_screenShakeIncrement		= ParseXMLAttribute( element, "screenshakeIncrement", 0.f );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
 	std::string shootSoundStr	= ParseXMLAttribute( element, "shootSound", "INVALID" );

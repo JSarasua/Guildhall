@@ -3,7 +3,7 @@
     Name="LoadingMusic"
     Sound="Anticipation.mp3"
     IsLooped="false"
-    IsBackgroundMusic ="false"
+    IsBackgroundMusic ="true"
     IsSFX ="false"
   >
   </AudioDefinition>
@@ -12,7 +12,7 @@
     Name="AttractMusic"
     Sound="AttractMusic.mp3"
     IsLooped="false"
-    IsBackgroundMusic ="false"
+    IsBackgroundMusic ="true"
     IsSFX ="false"
   >
   </AudioDefinition>
@@ -21,7 +21,7 @@
     Name="GamePlayMusic"
     Sound="GameplayMusic.mp3"
     IsLooped="false"
-    IsBackgroundMusic ="false"
+    IsBackgroundMusic ="true"
     IsSFX ="false"
   >
   </AudioDefinition>
@@ -50,6 +50,15 @@
     IsLooped="false"
     IsBackgroundMusic ="false"
     IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+  Name="RocketShot"
+  Sound="Bonus_Sound_FX/Explosion_Dull.wav"
+  IsLooped="false"
+  IsBackgroundMusic ="false"
+  IsSFX ="false"
   >
   </AudioDefinition>
 

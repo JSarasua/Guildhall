@@ -4,7 +4,7 @@
 std::map< std::string, AudioDefinition*> AudioDefinition::s_definitions;
 
 float AudioDefinition::s_masterVolume = 1.f;
-float AudioDefinition::s_backgroundMusicVolume = 1.f;
+float AudioDefinition::s_backgroundMusicVolume = 0.3f;
 float AudioDefinition::s_SFXVolume = 1.f;
 
 void AudioDefinition::PlaySound()
@@ -47,7 +47,7 @@ AudioDefinition::AudioDefinition( XmlElement const& element )
 	m_soundID = g_theAudio->CreateOrGetSound( soundStringFile );
 
 	m_isLooped = ParseXMLAttribute( element, "IsLooped", false );
-	m_isBackgroundMusic = ParseXMLAttribute( element, "IsBackgroundMuisc", false );
+	m_isBackgroundMusic = ParseXMLAttribute( element, "IsBackgroundMusic", false );
 	m_isSFX = ParseXMLAttribute( element, "IsSFX", false );
 }
 

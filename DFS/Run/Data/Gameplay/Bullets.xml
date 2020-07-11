@@ -24,7 +24,7 @@
     bulletSpeed="3.5"
     blendMode ="ALPHA"
     damage="50"
-    lifetime="3"
+    lifetime="4"
   >
   </BulletDefinition>
 
