@@ -5,7 +5,7 @@
 
   <MapDefinition name="Level1" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
     <GenerationSteps>
-      <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map_V2.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
     </GenerationSteps>
   </MapDefinition>
 
