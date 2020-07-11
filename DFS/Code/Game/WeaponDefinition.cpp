@@ -3,6 +3,7 @@
 #include "Game/BulletDefinition.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
+#include "Game/AudioDefinition.hpp"
 
 std::map< std::string, WeaponDefinition*> WeaponDefinition::s_definitions;
 
@@ -78,6 +79,11 @@ float WeaponDefinition::GetScreenShakeIncremenet() const
 	return m_screenShakeIncrement;
 }
 
+AudioDefinition* WeaponDefinition::GetAudioDefinition() const
+{
+	return m_shootSound;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -94,7 +100,7 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_weaponOffsetLeft			= ParseXMLAttribute( element, "weaponOffsetLeft", Vec2( 0.5f, 0.5f ) );
 	m_screenShakeIncrement		= ParseXMLAttribute( element, "screenshakeIncrement", 0.f );
 	std::string bulletType		= ParseXMLAttribute( element, "bulletType", "INVALID" );
-
+	std::string shootSoundStr	= ParseXMLAttribute( element, "shootSound", "INVALID" );
 
 	int spriteIndex = g_weaponSpriteSheet->GetSpriteIndex( spriteCoords );
 	AABB2 spriteUVs;
@@ -103,6 +109,7 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_weaponSpriteDef = new SpriteDefinition( *g_weaponSpriteSheet, spriteIndex, spriteUVs.mins, spriteUVs.maxs );
 
 	m_bulletDef = BulletDefinition::s_definitions[bulletType];
+	m_shootSound = AudioDefinition::GetAudioDefinition( shootSoundStr );
 }
 
 void WeaponDefinition::InitializeWeaponDefinitions( XmlElement const& rootWeaponDefinitionElement )

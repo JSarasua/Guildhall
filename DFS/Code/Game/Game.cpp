@@ -23,6 +23,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/BulletDefinition.hpp"
+#include "Game/AudioDefinition.hpp"
 
 
 
@@ -298,6 +299,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			m_gameState = PLAYING;
 			g_theApp->UnPauseGame();
+
+
+			AudioDefinition::StopAllSounds();
+
+			AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+			gamePlayAudio->PlaySound();
 		}
 	}
 	if( m_gameState == PLAYING )
@@ -311,7 +318,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 		if( f5Key.WasJustPressed() )
 		{
+			AudioDefinition* gamePlaySound = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+			gamePlaySound->StopSound();
 			RebuildWorld();
+			
+			gamePlaySound->PlaySound();
 		}
 		if( f6Key.WasJustPressed() )
 		{
@@ -351,6 +362,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 					RebuildWorld();
 					g_theApp->UnPauseGame();
 					m_gameState = PLAYING;
+
+					AudioDefinition::StopAllSounds();
+					AudioDefinition* gamePlaySound = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+					gamePlaySound->PlaySound();
 				}
 				else if( m_deadQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
 				{
@@ -606,16 +621,19 @@ void Game::InitializeDefinitions()
 	m_actorDefDoc	= new XmlDocument;
 	XmlDocument bulletDefDoc;
 	XmlDocument weaponDefDoc;
+	XmlDocument audioDefDoc;
 
-	const XmlElement& tileDef = GetRootElement(*m_tileDefDoc, "Data/Gameplay/TileDefs.xml");
-	const XmlElement& mapDef = GetRootElement(*m_mapDefDoc, "Data/Gameplay/MapDefs.xml");
-	const XmlElement& actorDef = GetRootElement(*m_actorDefDoc, "Data/Gameplay/Actors.xml");
+	XmlElement const& audioDef = GetRootElement( audioDefDoc, "Data/Gameplay/AudioFiles.xml" );
+	XmlElement const& tileDef = GetRootElement( *m_tileDefDoc, "Data/Gameplay/TileDefs.xml" );
+	XmlElement const& mapDef = GetRootElement( *m_mapDefDoc, "Data/Gameplay/MapDefs.xml" );
+	XmlElement const& actorDef = GetRootElement( *m_actorDefDoc, "Data/Gameplay/Actors.xml" );
 	XmlElement const& bulletsDef = GetRootElement( bulletDefDoc, "Data/Gameplay/Bullets.xml");
 	XmlElement const& weaponDef = GetRootElement( weaponDefDoc, "Data/Gameplay/Weapons.xml");
 
-	TileDefinition::InitializeTileDefinitions(tileDef);
-	MapDefinition::InitializeMapDefinitions(mapDef);
-	ActorDefinition::InitializeActorDefinitions(actorDef);
+	AudioDefinition::InitializeAudioDefinitions( audioDef );
+	TileDefinition::InitializeTileDefinitions( tileDef );
+	MapDefinition::InitializeMapDefinitions( mapDef );
+	ActorDefinition::InitializeActorDefinitions( actorDef );
 	BulletDefinition::InitializeBulletDefinitions( bulletsDef );
 	WeaponDefinition::InitializeWeaponDefinitions( weaponDef );
 }
@@ -666,11 +684,19 @@ void Game::UpdateLoading( float deltaSeconds )
 		InitializeDefinitions();
 		m_world->Startup();
 		m_player = m_world->GetPlayer();
+
+		AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
+		attractScreenSound->PlaySound();
 	}
 	else if( m_frameCounter == 0 )
 	{
 		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
 		g_theAudio->PlaySound( loadingSound );
+	}
+
+	if( m_frameCounter == 2 )
+	{
+
 	}
 
 	m_frameCounter++;

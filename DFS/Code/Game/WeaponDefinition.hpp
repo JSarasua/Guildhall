@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 
+class AudioDefinition;
 class BulletDefinition;
 
 class WeaponDefinition
@@ -30,6 +31,7 @@ public:
 	Vec2 const& GetWeaponOffsetLeft() const;
 	Vec2 const& GetWeaponOffsetRight() const;
 	float GetScreenShakeIncremenet() const;
+	AudioDefinition* GetAudioDefinition() const;
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;
@@ -46,4 +48,5 @@ protected:
 	float m_screenShakeIncrement = 0.f;
 	
 	BulletDefinition* m_bulletDef = nullptr;
+	AudioDefinition* m_shootSound = nullptr;
 };

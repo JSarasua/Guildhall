@@ -11,6 +11,7 @@
 #include "Game/WeaponDefinition.hpp"
 #include "Game/BulletDefinition.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Game/AudioDefinition.hpp"
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef ) :
 	m_actorDef(actorDef),
@@ -397,6 +398,9 @@ void Actor::UpdateFromKeyboard()
 			{
 				float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
 				g_theGame->AddScreenShake( screenShakeIncrement );
+				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
+				shootSound->StopSound();
+				shootSound->PlaySound();
 			}
 		}
 
