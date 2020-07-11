@@ -368,7 +368,7 @@ void Actor::UpdateFromKeyboard()
 	float weaponDirectionDegrees = weaponDirection.GetAngleDegrees();
 	bool isMoving = !m_velocity.IsAlmostEqual( Vec2( 0.f, 0.f ) );
 	m_weaponOffset = weaponDef->GetWeaponOffset( weaponDirectionDegrees, isMoving );
-	if( GetShortestAngularDistance( 90.f, weaponDirectionDegrees ) < 67.5f )
+	if( GetShortestAngularDistance( 112.5f, weaponDirectionDegrees ) < 90.f )
 	{
 		m_isWeaponInFront = false;
 	}
