@@ -32,6 +32,7 @@ public:
 	Vec2 const& GetWeaponOffsetRight() const;
 	float GetScreenShakeIncremenet() const;
 	AudioDefinition* GetAudioDefinition() const;
+	Vec2 const& GetWeaponOffset( float orientationDegrees, bool m_isMoving ) const;
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;

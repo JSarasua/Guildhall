@@ -356,18 +356,19 @@ void Actor::UpdateFromKeyboard()
 	WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
 	if( weaponDirection.x >= 0.f )
 	{
-		m_weaponOffset = weaponDef->GetWeaponOffsetRight();
+		//m_weaponOffset = weaponDef->GetWeaponOffsetRight();
 		m_isWeaponFlipped = true;
 	}
 	else
 	{
-		m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
+		//m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
 		m_isWeaponFlipped = false;
 	}
 
-
 	float weaponDirectionDegrees = weaponDirection.GetAngleDegrees();
-	if( GetShortestAngularDistance( 90.f, weaponDirectionDegrees ) < 45.f )
+	bool isMoving = !m_velocity.IsAlmostEqual( Vec2( 0.f, 0.f ) );
+	m_weaponOffset = weaponDef->GetWeaponOffset( weaponDirectionDegrees, isMoving );
+	if( GetShortestAngularDistance( 90.f, weaponDirectionDegrees ) < 67.5f )
 	{
 		m_isWeaponInFront = false;
 	}

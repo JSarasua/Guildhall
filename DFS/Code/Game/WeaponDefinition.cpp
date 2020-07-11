@@ -84,6 +84,83 @@ AudioDefinition* WeaponDefinition::GetAudioDefinition() const
 	return m_shootSound;
 }
 
+Vec2 const& WeaponDefinition::GetWeaponOffset( float orientationDegrees, bool m_isMoving ) const
+{
+	if( m_isMoving )
+	{
+		if( GetShortestAngularDistance( 0.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetMovingEast;
+		}
+		else if( GetShortestAngularDistance( 45.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetMovingNorthEast;
+		}
+		else if( GetShortestAngularDistance( 90.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetMovingNorth;
+		}
+		else if( GetShortestAngularDistance( 135.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetMovingNorthWest;
+		}
+		else if( GetShortestAngularDistance( 180.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetMovingWest;
+		}
+		else if( GetShortestAngularDistance( 225.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetMovingSouthWest;
+		}
+		else if( GetShortestAngularDistance( 270.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetMovingSouth;
+		}
+		else if( GetShortestAngularDistance( 315.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetMovingSouthEast;
+		}
+	}
+	else
+	{
+		if( GetShortestAngularDistance( 0.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetIdleEast;
+		}
+		else if( GetShortestAngularDistance( 45.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetIdleNorthEast;
+		}
+		else if( GetShortestAngularDistance( 90.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetIdleNorth;
+		}
+		else if( GetShortestAngularDistance( 135.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetIdleNorthWest;
+		}
+		else if( GetShortestAngularDistance( 180.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetIdleWest;
+		}
+		else if( GetShortestAngularDistance( 225.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetIdleSouthWest;
+		}
+		else if( GetShortestAngularDistance( 270.f, orientationDegrees ) <= 22.5f )
+		{
+			return m_weaponOffsetIdleSouth;
+		}
+		else if( GetShortestAngularDistance( 315.f, orientationDegrees ) < 22.5f )
+		{
+			return m_weaponOffsetIdleSouthEast;
+		}
+	}
+
+	//Should never be here.
+	return m_weaponOffsetIdleEast;
+}
+
 WeaponDefinition::WeaponDefinition( XmlElement const& element )
 {
 	m_name						= ParseXMLAttribute( element, "name", "INVALID" );
@@ -99,22 +176,22 @@ WeaponDefinition::WeaponDefinition( XmlElement const& element )
 	m_weaponOffsetRight			= ParseXMLAttribute( element, "weaponOffsetRight", Vec2( 0.5f, 0.5f ) );
 	m_weaponOffsetLeft			= ParseXMLAttribute( element, "weaponOffsetLeft", Vec2( 0.5f, 0.5f ) );
 	
-// 	m_weaponOffsetIdleEast;				ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleWest;				ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleNorth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleSouth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleNorthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleNorthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleSouthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetIdleSouthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingEast;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingWest;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingNorth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingSouth;			ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingNorthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingNorthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingSouthEast;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
-// 	m_weaponOffsetMovingSouthWest;		ParseXmlAttribute( element, "", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleEast				= ParseXMLAttribute( element, "weaponOffsetIdleEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleWest				= ParseXMLAttribute( element, "weaponOffsetIdleWest", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleNorth				= ParseXMLAttribute( element, "weaponOffsetIdleNorth", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleSouth				= ParseXMLAttribute( element, "weaponOffsetIdleSouth", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleNorthEast			= ParseXMLAttribute( element, "weaponOffsetIdleNorthEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleNorthWest			= ParseXMLAttribute( element, "weaponOffsetIdleNorthWest", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleSouthEast			= ParseXMLAttribute( element, "weaponOffsetIdleSouthEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetIdleSouthWest			= ParseXMLAttribute( element, "weaponOffsetIdleSouthWest", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingEast			= ParseXMLAttribute( element, "weaponOffsetMovingEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingWest			= ParseXMLAttribute( element, "weaponOffsetMovingWest", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingNorth			= ParseXMLAttribute( element, "weaponOffsetMovingNorth", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingSouth			= ParseXMLAttribute( element, "weaponOffsetMovingSouth", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingNorthEast		= ParseXMLAttribute( element, "weaponOffsetMovingNorthEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingNorthWest		= ParseXMLAttribute( element, "weaponOffsetMovingNorthWest", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingSouthEast		= ParseXMLAttribute( element, "weaponOffsetMovingSouthEast", Vec2( 0.5f, 0.5f ) );
+	m_weaponOffsetMovingSouthWest		= ParseXMLAttribute( element, "weaponOffsetMovingSouthWest", Vec2( 0.5f, 0.5f ) );
 
 	
 	m_screenShakeIncrement		= ParseXMLAttribute( element, "screenshakeIncrement", 0.f );
