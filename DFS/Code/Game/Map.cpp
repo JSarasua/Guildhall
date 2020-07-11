@@ -414,6 +414,15 @@ void Map::PushEntityOutOfWalls(Entity* currentEntity)
 	PushEntityOutOfWall( currentEntity, topRightTile);
 	PushEntityOutOfWall( currentEntity, bottomLeftTile);
 	PushEntityOutOfWall( currentEntity, bottomRightTile);
+
+	if( currentEntity->m_entityType == ENTITY_TYPE_GOOD_BULLET || currentEntity->m_entityType == ENTITY_TYPE_EVIL_BULLET )
+	{
+		Tile const& currentTile = m_tiles[GetTileIndexForTileCoordinates( entityPostionInt )];
+		if( !currentTile.m_tileDef->m_allowsWalking )
+		{
+			currentEntity->m_isGarbage = true;
+		}
+	}
 }
 
 
@@ -450,6 +459,10 @@ void Map::PushEntityOutOfWall( Entity* entityToPush, const Tile& tile )
 	if( entityPosition != entityToPush->m_position )
 	{
 		entityToPush->m_hasCollided = true;
+		if( entityToPush->m_entityType == ENTITY_TYPE_GOOD_BULLET || entityToPush->m_entityType == ENTITY_TYPE_EVIL_BULLET )
+		{
+			entityToPush->m_isGarbage = true;
+		}
 	}
 	entityToPush->SetPosition(entityPosition);
 }
@@ -461,8 +474,8 @@ void Map::PushEntitiesOutOfWalls()
 	{
 		if( !m_entities[entityIndex]->IsGarbage() )
 		{
-			EntityType entityType = m_entities[entityIndex]->m_entityType;
-			if( entityType != ENTITY_TYPE_GOOD_BULLET &&  entityType != ENTITY_TYPE_EVIL_BULLET )
+			//EntityType entityType = m_entities[entityIndex]->m_entityType;
+			//if( entityType != ENTITY_TYPE_GOOD_BULLET &&  entityType != ENTITY_TYPE_EVIL_BULLET )
 			{
 				PushEntityOutOfWalls(m_entities[entityIndex]);
 			}

@@ -22,6 +22,7 @@ Bullet::Bullet( const Vec2& initialPosition, BulletDefinition const* bulletDef, 
 	m_physicsRadius = bulletDef->GetPhysicsRadius();
 	m_velocity.SetLength( bulletDef->GetBulletSpeed() * speedMultiplier );
 	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
+	m_canWalk = true;
 }
 
 Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier ):
@@ -33,6 +34,7 @@ Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityTyp
 	m_physicsRadius = bulletDef->GetPhysicsRadius();
 	m_cosmeticRadius = BULLET_COSMETIC_RADIUS;
 	m_entityType = type;
+	m_canWalk = true;
 
 	m_velocity.SetLength( bulletDef->GetBulletSpeed() * speedMultiplier );
 	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
