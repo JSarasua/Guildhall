@@ -152,6 +152,9 @@ private:
 	Rgba8 m_pausedResumeButtonTint= Rgba8::WHITE;
 	Rgba8 m_pausedRestartButtonTint = Rgba8::WHITE;
 	Rgba8 m_pausedQuitButtonTint = Rgba8::WHITE;
+	bool m_isMouseOverPausedResume = false;
+	bool m_isMouseOverPausedRestart = false;
+	bool m_isMouseOverPausedQuit = false;
 
 	AABB2 m_deadMenu;
 	AABB2 m_deadYOUDIED;

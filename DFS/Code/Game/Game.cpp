@@ -167,6 +167,11 @@ void Game::LoadAssets()
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
 	g_weaponSpriteSheet = new SpriteSheet(*weaponSpriteSheetTexture, IntVec2(12, 12) );
 	g_bulletsSpriteSheet = new SpriteSheet( *bulletsSpriteSheetTexture, IntVec2( 4, 4 ) );
+
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenu.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuPlay.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuRestart.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuQuit.png" );
 }
 
 void Game::UpdateCamera( float deltaSeconds )
@@ -744,29 +749,39 @@ void Game::UpdatePaused( float deltaSeconds )
 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	Vec2 uiDims = uiBounds.GetDimensions();
 	m_pausedMenu = uiBounds;
-	m_pausedMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
+	m_pausedMenu.SetDimensions( Vec2( uiDims.x, uiDims.x ) * 0.5f );
 	AABB2 carvingPauseMenu = m_pausedMenu;
-	m_pausedResumeButton = carvingPauseMenu.CarveBoxOffTop( 0.3333f );
-	m_pausedRestartButton = carvingPauseMenu.CarveBoxOffTop( 0.5f );
-	m_pausedQuitButton = carvingPauseMenu;
+	Vec2 buttonDimension = carvingPauseMenu.GetDimensions();
+	buttonDimension.x *= 0.3f;
+	carvingPauseMenu.SetDimensions( buttonDimension );
+	carvingPauseMenu.CarveBoxOffTop( 0.43f );
+	m_pausedResumeButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
+	m_pausedRestartButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
+	m_pausedQuitButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
 
 	UpdateDebugMouse();
 
 	m_pausedResumeButtonTint= Rgba8::WHITE;
 	m_pausedRestartButtonTint = Rgba8::WHITE;
 	m_pausedQuitButtonTint = Rgba8::WHITE;
+	m_isMouseOverPausedResume = false;
+	m_isMouseOverPausedRestart = false;
+	m_isMouseOverPausedQuit = false;
 
 	if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
 	{
 		m_pausedResumeButtonTint= Rgba8::YELLOW;
+		m_isMouseOverPausedResume = true;
 	}
 	else if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
 	{
 		m_pausedRestartButtonTint = Rgba8::YELLOW;
+		m_isMouseOverPausedRestart = true;
 	}
 	else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
 	{
 		m_pausedQuitButtonTint = Rgba8::YELLOW;
+		m_isMouseOverPausedQuit = true;
 	}
 }
 
@@ -922,13 +937,33 @@ void Game::RenderPaused()
 	RenderUI();
 
 	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-	g_theRenderer->BindTexture( nullptr );
+	Texture* pauseTexture = nullptr;
+
+	if( m_isMouseOverPausedQuit )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuQuit.png" );
+	}
+	else if( m_isMouseOverPausedRestart )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuRestart.png" );
+	}
+	else if( m_isMouseOverPausedResume )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuPlay.png" );
+	}
+	else
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenu.png" );
+	}
+
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->DrawAABB2Filled( gameCamera, Rgba8( 0, 0, 0, 128 ) );
-	g_theRenderer->DrawAABB2Filled( m_pausedMenu, Rgba8( 0, 0, 0, 220 ) );
-	g_theRenderer->DrawAlignedTextAtPosition( "RESUME", m_pausedResumeButton, 5.f, Vec2( 0.5f, 0.7f ), m_pausedResumeButtonTint );
-	g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_pausedRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_pausedRestartButtonTint );
-	g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_pausedQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_pausedQuitButtonTint );
+	g_theRenderer->BindTexture( pauseTexture );
+	g_theRenderer->DrawAABB2Filled( m_pausedMenu, Rgba8::WHITE );
+// 	g_theRenderer->DrawAlignedTextAtPosition( "RESUME", m_pausedResumeButton, 5.f, Vec2( 0.5f, 0.7f ), m_pausedResumeButtonTint );
+// 	g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_pausedRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_pausedRestartButtonTint );
+// 	g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_pausedQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_pausedQuitButtonTint );
 	g_theRenderer->EndCamera( m_UICamera );
 
 	g_theRenderer->BeginCamera( m_camera );
