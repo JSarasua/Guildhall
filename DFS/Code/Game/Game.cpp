@@ -293,8 +293,8 @@ void Game::RenderUI()
 	topRightBox.SetDimensions( Vec2( 1.16f, 0.7f ) * 10.f );
 
 	g_theRenderer->BindTexture( nullptr );
-	g_theRenderer->DrawAABB2Filled( underHealthBox, Rgba8::RED );
-	g_theRenderer->DrawAABB2Filled( playerHealthBox, Rgba8::GREEN );
+	g_theRenderer->DrawAABB2Filled( underHealthBox, Rgba8( 235, 86, 82 ) );
+	g_theRenderer->DrawAABB2Filled( playerHealthBox, Rgba8( 51, 189, 75 ) );
 	g_theRenderer->BindTexture( healthBarTex );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawAABB2Filled( topLeftBox, Rgba8::WHITE );
