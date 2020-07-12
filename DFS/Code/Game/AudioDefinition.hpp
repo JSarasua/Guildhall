@@ -14,6 +14,11 @@ public:
 	static void InitializeAudioDefinitions( XmlElement const& rootAudioElement );
 	static AudioDefinition* GetAudioDefinition( std::string soundName );
 	static void StopAllSounds();
+	static void UpdateAllVolumes();
+	static void ChangeMasterVolume( float newMasterVolume );
+	static void ChangeBackgroundMusicVolume( float newBackgroundMusicVolume );
+	static void ChangeSFXVolumme( float newSFXVolume );
+
 	static std::map< std::string, AudioDefinition*> s_definitions;
 
 	static float s_masterVolume;
@@ -22,6 +27,7 @@ public:
 
 	void PlaySound();
 	void StopSound();
+	void UpdateVolume();
 protected:
 	SoundID m_soundID;
 	bool m_isLooped = false;

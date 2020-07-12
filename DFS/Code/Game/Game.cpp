@@ -406,7 +406,48 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	
 
+	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
+	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
+	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+	const KeyButtonState& ctrlKey = g_theInput->GetKeyStates( CTRL_KEY );
 
+	float currentMasterVolume = AudioDefinition::s_masterVolume;
+	float currentBGVolume = AudioDefinition::s_backgroundMusicVolume;
+	float currentSFXVolume = AudioDefinition::s_SFXVolume;
+
+	if( shiftKey.IsPressed() )
+	{
+		if( minusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeBackgroundMusicVolume( currentBGVolume - 0.05f );
+		}
+		else if( plusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeBackgroundMusicVolume( currentBGVolume + 0.05f );
+		}
+	}
+	else if( ctrlKey.IsPressed() )
+	{
+		if( minusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeSFXVolumme( currentSFXVolume - 0.05f );
+		}
+		else if( plusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeSFXVolumme( currentSFXVolume + 0.05f );
+		}
+	}
+	else
+	{
+		if( minusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeMasterVolume( currentMasterVolume - 0.05f );
+		}
+		else if( plusKey.WasJustPressed() )
+		{
+			AudioDefinition::ChangeMasterVolume( currentMasterVolume + 0.05f );
+		}
+	}
 
 }
 
