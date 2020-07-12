@@ -156,14 +156,14 @@ void Game::LoadAssets()
 	//g_theRenderer->CreateOrGetBitmapFont("Fonts/SquirrelFixedFont.png");
 	g_theRenderer->CreateOrGetTextureFromFile(IMAGETESTPATH);
 
-	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tileSpriteSheet_4x4.png" );
-	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/BenderAndTiles_12x11.png" );
+	Texture* tileSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/noLightTileSpriteSheet_4x4.png" );
+	Texture* actorSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/bender_14x14_New.png" );
 	Texture* portraitSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/KushnariovaPortraits_8x8.png" );
 	Texture* weaponSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/weapons.png" );
 	Texture* bulletsSpriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Extras_4x4.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/reticle.png" );
 	g_tileSpriteSheet = new SpriteSheet(*tileSpriteSheetTexture,IntVec2(4,4));
-	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(12,11));
+	g_actorSpriteSheet = new SpriteSheet(*actorSpriteSheetTexture, IntVec2(14,14));
 	g_portraitSpriteSheet = new SpriteSheet(*portraitSpriteSheetTexture, IntVec2(8,8));
 	g_weaponSpriteSheet = new SpriteSheet(*weaponSpriteSheetTexture, IntVec2(12, 12) );
 	g_bulletsSpriteSheet = new SpriteSheet( *bulletsSpriteSheetTexture, IntVec2( 4, 4 ) );

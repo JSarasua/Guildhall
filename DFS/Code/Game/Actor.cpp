@@ -386,7 +386,7 @@ void Actor::UpdateFromKeyboard()
 		{
 			m_dodgeTimer.Reset();
 			m_isDodging = true;
-			m_velocity *= 1.75f;
+			//m_velocity *= 1.75f;
 		}
 	}
 
@@ -680,21 +680,37 @@ std::string Actor::GetCurrentAnimationName() const
 	}
 	else
 	{
-		if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 45.f )
+		if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "MoveEast";
 		}
-		else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 45.f )
+		else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "MoveNorthEast";
+		}
+		else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "MoveNorth";
 		}
-		else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 45.f )
+		else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "MoveNorthWest";
+		}
+		else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "MoveWest";
 		}
-		else
+		else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+		{
+			currentAnimationName = "MoveSouthWest";
+		}
+		else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
 		{
 			currentAnimationName = "MoveSouth";
+		}
+		else
+		{
+			currentAnimationName = "MoveSouthEast";
 		}
 	}
 
