@@ -226,9 +226,16 @@ void WeaponDefinition::InitializeWeaponDefinitions( XmlElement const& rootWeapon
 WeaponDefinition const* WeaponDefinition::GetRandomWeapon( RandomNumberGenerator& rng )
 {
 	int numWeapons = (int)s_definitions.size() - 1;
-	int weaponIndex = rng.RollRandomIntInRange( 1, numWeapons );
+	int weaponIndex = rng.RollRandomIntInRange( 0, numWeapons );
 	auto iter = s_definitions.begin();
 	std::advance( iter, weaponIndex );
+
+	while( iter->second->m_name == "Pistol" )
+	{
+		weaponIndex = rng.RollRandomIntInRange( 0, numWeapons );
+		iter = s_definitions.begin();
+		std::advance( iter, weaponIndex );
+	}
 	return iter->second;
 }
 

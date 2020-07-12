@@ -539,8 +539,12 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 						if( currentEntity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
 						{
 							Actor* enemy = (Actor*)currentEntity;
-							Loot* loot = new Loot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand )  );
-							m_entities.push_back( loot );
+							bool doesLootDrop = g_theGame->m_rand.RollPercentChance( 0.25f );
+							if( doesLootDrop )
+							{
+								Loot* loot = new Loot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand ) );
+								m_entities.push_back( loot );
+							}
 						}
 					}
 					//currentEntity->Lose1Health();
