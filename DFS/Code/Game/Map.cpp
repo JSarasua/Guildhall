@@ -156,12 +156,17 @@ void Map::RenderTiles()
 
 void Map::RenderEntities()
 {
-	for( int entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	for( int entityIndex = 1; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( !m_entities[entityIndex]->IsGarbage() )
 		{
 			m_entities[entityIndex]->Render();
 		}
+	}
+
+	if( !m_entities[0]->IsGarbage() )
+	{
+		m_entities[0]->Render();
 	}
 }
 
