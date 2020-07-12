@@ -165,7 +165,7 @@ void Actor::Render() const
 	//const AABB2& actorUVs = m_actorDef->m_spriteUVs;
 	const Texture& actorTexture = g_actorSpriteSheet->GetTexture();
 
-	if( !m_isWeaponInFront && !m_isDodging )
+	if( !m_isWeaponInFront && !m_isDodging && !m_isDead )
 	{
 		RenderWeapon();
 	}
@@ -174,7 +174,7 @@ void Actor::Render() const
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
 
-	if( m_isWeaponInFront && !m_isDodging )
+	if( m_isWeaponInFront && !m_isDodging && !m_isDead )
 	{
 		RenderWeapon();
 	}
