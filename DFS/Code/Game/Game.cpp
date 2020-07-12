@@ -172,6 +172,10 @@ void Game::LoadAssets()
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuPlay.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuRestart.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuQuit.png" );
+
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
 }
 
 void Game::UpdateCamera( float deltaSeconds )
@@ -300,16 +304,22 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( m_gameState == ATTRACT )
 	{
-		if( leftMouseButton.WasJustPressed() || spaceKey.WasJustPressed() )
+		if( leftMouseButton.WasJustReleased() )
 		{
-			m_gameState = PLAYING;
-			g_theApp->UnPauseGame();
+			if( m_isMouseOverMainMenuPlay )
+			{
+				m_gameState = PLAYING;
+				g_theApp->UnPauseGame();
 
+				AudioDefinition::StopAllSounds();
+				AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+				gamePlayAudio->PlaySound();
+			}
+			else if( m_isMouseOverMainMenuQuit )
+			{
+				g_theApp->HandleQuitRequested();
+			}
 
-			AudioDefinition::StopAllSounds();
-
-			AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
-			gamePlayAudio->PlaySound();
 		}
 	}
 	if( m_gameState == PLAYING )
@@ -711,6 +721,32 @@ void Game::UpdateAttract( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 	m_world->Update( 0.f );
+
+	UpdateDebugMouse();
+
+	AABB2 mainMenuBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+	AABB2 playButtonBounds = mainMenuBounds;
+	AABB2 quitButtonBounds;
+	Vec2 buttonDimensions = mainMenuBounds.GetDimensions();
+	buttonDimensions *= 0.1f;
+	playButtonBounds.SetDimensions( buttonDimensions );
+	playButtonBounds.Translate( Vec2( 0.f, -1.f ) );
+	quitButtonBounds = playButtonBounds;
+	quitButtonBounds.Translate( Vec2( 0.f, -1.f ) );
+
+
+	m_isMouseOverMainMenuPlay = false;
+	m_isMouseOverMainMenuQuit = false;
+
+	if( playButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
+	{
+		m_isMouseOverMainMenuPlay = true;
+	}
+	else if( quitButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
+	{
+		m_isMouseOverMainMenuQuit = true;
+	}
+
 }
 
 void Game::UpdateDeath( float deltaSeconds )
@@ -830,14 +866,33 @@ void Game::RenderAttract()
 
 	g_theRenderer->BeginCamera( m_camera );
 
+	Texture* mainMenuTex;
+	
+	if( m_isMouseOverMainMenuPlay )
+	{
+		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
+	}
+	else if( m_isMouseOverMainMenuQuit )
+	{
+		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
+	}
+	else
+	{
+		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
+	}
+	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+
+
 	g_theRenderer->SetModelMatrix( Mat44() );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindTexture( mainMenuTex );
 	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
 
-	g_theRenderer->DrawTextAtPosition( "Bullet Hell Dungeon", Vec2( -4.75f, 1.f ), 0.5f );
-	g_theRenderer->DrawTextAtPosition( "[SPACE] or [LMB] to Play", Vec2( -3.f, -2.f ), 0.25f );
+	RenderMouse();
+// 	g_theRenderer->DrawTextAtPosition( "Bullet Hell Dungeon", Vec2( -4.75f, 1.f ), 0.5f );
+// 	g_theRenderer->DrawTextAtPosition( "[SPACE] or [LMB] to Play", Vec2( -3.f, -2.f ), 0.25f );
 	g_theRenderer->EndCamera( m_camera );
 
 	g_theRenderer->CopyTexture( backbuffer, colorTarget );

@@ -156,6 +156,9 @@ private:
 	bool m_isMouseOverPausedRestart = false;
 	bool m_isMouseOverPausedQuit = false;
 
+	bool m_isMouseOverMainMenuPlay = false;
+	bool m_isMouseOverMainMenuQuit = false;
+
 	AABB2 m_deadMenu;
 	AABB2 m_deadYOUDIED;
 	AABB2 m_deadRestartButton;
