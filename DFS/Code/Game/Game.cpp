@@ -801,15 +801,17 @@ void Game::RenderLoading()
 	m_camera.SetColorTarget( 0, colorTarget );
 	
 	g_theRenderer->BeginCamera( m_camera );
+	Texture* loadingScreenTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/LoadingScreen.png" );
 	
 	g_theRenderer->SetModelMatrix( Mat44() );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindTexture( loadingScreenTex );
 	g_theRenderer->BindShader( (Shader*)nullptr );
+	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
 
-
-	g_theRenderer->DrawTextAtPosition( "LOADING", Vec2( -3.f, -3.f ), 1.f );
+	//g_theRenderer->DrawTextAtPosition( "LOADING", Vec2( -3.f, -3.f ), 1.f );
 	
 	g_theRenderer->EndCamera( m_camera );
 
