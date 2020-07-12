@@ -176,6 +176,8 @@ void Game::LoadAssets()
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
+
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/HealthBar.png" );
 }
 
 void Game::UpdateCamera( float deltaSeconds )
@@ -274,15 +276,28 @@ void Game::RenderUI()
 // 	RenderBlackboardTest();
 // 	RenderMouseTest();
 //	m_world->RenderDebug();
+	Texture* healthBarTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/HealthBar.png" );
+	float playerHealth = (float)m_player->GetHealth();
+	float playerHealthFraction = playerHealth / 100.f;
+
 	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	AABB2 topBox = gameCamera.GetBoxAtTop( 0.1f );
 	AABB2 topLeftBox = topBox.GetBoxAtLeft( 0.3f );
+	AABB2 underHealthBox = topLeftBox.GetBoxAtRight( 0.81f );
+	Vec2 underHealthBoxDims = underHealthBox.GetDimensions();
+	underHealthBoxDims.y *= 0.2f;
+	underHealthBox.SetDimensions( underHealthBoxDims );
+	underHealthBox.maxs.x -= 3.f;
+	AABB2 playerHealthBox = underHealthBox.GetBoxAtLeft( playerHealthFraction );
 	AABB2 topRightBox = topBox.GetBoxAtRight( 0.15f );
 	topRightBox.SetDimensions( Vec2( 1.16f, 0.7f ) * 10.f );
 
-	std::string mousePositionString = Stringf( "Health: %i", m_player->GetHealth() );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->DrawAABB2Filled( underHealthBox, Rgba8::RED );
+	g_theRenderer->DrawAABB2Filled( playerHealthBox, Rgba8::GREEN );
+	g_theRenderer->BindTexture( healthBarTex );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->DrawAlignedTextAtPosition( mousePositionString.c_str(), topLeftBox, 3.f, ALIGN_CENTERED, Rgba8::BLUE );
+	g_theRenderer->DrawAABB2Filled( topLeftBox, Rgba8::WHITE );
 	SpriteDefinition const* weaponSprite = m_player->GetCurrentWeapon()->GetWeaponSpriteDef();
 	Texture const& weaponTexture = weaponSprite->GetTexture();
 	AABB2 weaponUVs;
@@ -300,7 +315,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	XboxController const& controller = g_theInput->GetXboxController(0);
 	
 	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
-	KeyButtonState const& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 
 	if( m_gameState == ATTRACT )
 	{
@@ -751,6 +765,8 @@ void Game::UpdateAttract( float deltaSeconds )
 
 void Game::UpdateDeath( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	Vec2 uiDims = uiBounds.GetDimensions();
 	m_deadMenu = uiBounds;
@@ -782,6 +798,8 @@ void Game::UpdateDeath( float deltaSeconds )
 
 void Game::UpdatePaused( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
+
 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	Vec2 uiDims = uiBounds.GetDimensions();
 	m_pausedMenu = uiBounds;
