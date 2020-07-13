@@ -44,7 +44,7 @@ void App::Startup()
 	g_theGame->Startup();
 	g_theConsole->Startup();
 
-	g_theEventSystem->SubscribeToEvent("QUIT", CONSOLECOMMAND, QuitRequested);
+	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
 }
 
 void App::Shutdown()
@@ -222,7 +222,7 @@ void App::CheckButtonPresses()
 
 	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
 	{
-		g_theEventSystem->FireEvent("QUIT", CONSOLECOMMAND, nullptr);
+		g_theEventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
 		//HandleQuitRequested();
 	}
 
