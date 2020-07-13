@@ -170,6 +170,14 @@ void Actor::Render() const
 		RenderWeapon();
 	}
 
+	//Uncomment if flipping actor
+// 	if( !m_isWeaponFlipped )
+// 	{
+// 		float minX = actorUVs.mins.x;
+// 		actorUVs.mins.x = actorUVs.maxs.x;
+// 		actorUVs.maxs.x = minX;
+// 	}
+
 	g_theRenderer->BindTexture( &actorTexture );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawRotatedAABB2Filled(actorBounds,actorTint,actorUVs.mins,actorUVs.maxs,0.f);
@@ -211,6 +219,39 @@ void Actor::RenderWeapon() const
 		weaponUVs.maxs = uvMins;
 	}
 
+	float weaponOrientation = Entity::GetWeaponOrientationDegrees();
+// 	if( GetShortestAngularDistance( weaponOrientation, 0.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( 0.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 45.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( 45.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 90.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( 90.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 135.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( 135.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 180.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( 180.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 225.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( -135.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 270.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( -90.f, weaponOrientation, 0.5f );
+// 	}
+// 	else if( GetShortestAngularDistance( weaponOrientation, 315.f ) < 22.5f )
+// 	{
+// 		weaponOrientation = Interpolate( -45.f, weaponOrientation, 0.5f );
+// 	}
 
 	Vec2 pivotPoint = currentWeapon->GetTriggerPositionUV();
 	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
@@ -220,7 +261,7 @@ void Actor::RenderWeapon() const
 	g_theRenderer->BindTexture( &weaponTexture );
 	if( m_name == "Player" )
 	{
-		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, Entity::GetWeaponOrientationDegrees(), pivotPoint );
+		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, weaponOrientation, pivotPoint );
 	}
 	else
 	{
@@ -636,6 +677,195 @@ std::string Actor::GetCurrentAnimationName() const
 		currentAnimationName = "Dead";
 		return currentAnimationName;
 	}
+
+// 	if( !m_isWeaponFlipped )
+// 	{
+// 		if( m_isDodging )
+// 		{
+// 			float velocityOrientation = m_velocity.GetAngleDegrees();
+// 
+// 			if( GetShortestAngularDistance( 0.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeEast";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "DodgeSouth";
+// 			}
+// 		}
+// 		else if( m_velocity.GetLength() == 0.f )
+// 		{
+// 			if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleSouthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleSouth";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "IdleSouthEast";
+// 			}
+// 		}
+// 		else
+// 		{
+// 			if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveSouthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveSouth";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "MoveSouthEast";
+// 			}
+// 		}
+// 	}
+// 	else
+// 	{
+// 		if( m_isDodging )
+// 		{
+// 			float velocityOrientation = m_velocity.GetAngleDegrees();
+// 
+// 			if( GetShortestAngularDistance( 0.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, velocityOrientation ) < 45.f )
+// 			{
+// 				currentAnimationName = "DodgeWest";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "DodgeSouth";
+// 			}
+// 		}
+// 		else if( m_velocity.GetLength() == 0.f )
+// 		{
+// 			if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleNorthWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleSouthWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "IdleSouth";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "IdleSouthEast";
+// 			}
+// 		}
+// 		else
+// 		{
+// 			if( GetShortestAngularDistance( 0.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 45.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorthEast";
+// 			}
+// 			else if( GetShortestAngularDistance( 90.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorth";
+// 			}
+// 			else if( GetShortestAngularDistance( 135.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveNorthWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 180.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 225.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveSouthWest";
+// 			}
+// 			else if( GetShortestAngularDistance( 270.f, m_weaponOrientationDegrees ) < 22.5f )
+// 			{
+// 				currentAnimationName = "MoveSouth";
+// 			}
+// 			else
+// 			{
+// 				currentAnimationName = "MoveSouthEast";
+// 			}
+// 		}
+// 	}
 
 	if( m_isDodging )
 	{
