@@ -14,7 +14,7 @@ enum eGameState
 	LOADING,
 	ATTRACT,
  	DEATH,
-// 	VICTORY,
+ 	VICTORY,
 	PAUSED,
 	PLAYING,
 
@@ -37,10 +37,11 @@ public:
 	void Update(float deltaSeconds);
 	void Render();
 
-	Vec2 GetMousePositionOnMainCamera();
-	AABB2 GetUICamera() const;
-	AABB2 GetCamera() const;
-	void AddScreenShake( float screenShakeIncrement );
+	Vec2	GetMousePositionOnMainCamera();
+	AABB2	GetUICamera() const;
+	AABB2	GetCamera() const;
+	void	AddScreenShake( float screenShakeIncrement );
+	void	TriggerVictoryState();
 
 private:
 	//Update State

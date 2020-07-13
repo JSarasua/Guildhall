@@ -72,14 +72,17 @@ void World::MoveToNextMap()
 // 	delete m_maps[m_currentMapIndex];
 // 	m_maps[m_currentMapIndex] = nullptr;
 
-	m_currentMapIndex++;
-	if( m_currentMapIndex >= m_maps.size() )
+	int newMapIndex = m_currentMapIndex + 1;
+	if( newMapIndex >= m_maps.size() )
 	{
-		m_currentMapIndex = 0;
+		g_theGame->TriggerVictoryState();
 	}
-
-	m_currentMap = m_maps[m_currentMapIndex];
-	m_currentMap->AddPlayer( player );
+	else
+	{
+		m_currentMapIndex = newMapIndex;
+		m_currentMap = m_maps[m_currentMapIndex];
+		m_currentMap->AddPlayer( player );
+	}
 }
 
 Actor* World::GetPlayer()
