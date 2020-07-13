@@ -184,6 +184,15 @@ void Actor::RenderWeapon() const
 {
 	WeaponDefinition const* currentWeapon = m_weapons[m_currentWeaponIndex];
 	Vec2 weaponCenter = m_weaponOffset + m_position;
+	float spriteTime = m_timeSinceCreation;
+	if( !m_velocity.IsAlmostEqual( Vec2( 0.f, 0.f ) ) )
+	{
+		float weaponBounceX = 0.025f * SinDegrees( spriteTime * 360.f * 2.f + 45.f );
+		float weaponBounceY = 0.01f * SinDegrees( spriteTime * 360.f * 2.f + 135.f );
+		Vec2 weaponBounce = Vec2( weaponBounceX, weaponBounceY );
+		weaponBounce.RotateDegrees( m_weaponOrientationDegrees );
+		weaponCenter += weaponBounce;
+	}
 	AABB2 weaponUVs;
 	currentWeapon->GetWeaponSpriteDef()->GetUVs( weaponUVs.mins, weaponUVs.maxs );
 	Texture const& weaponTexture = currentWeapon->GetWeaponSpriteDef()->GetTexture();
