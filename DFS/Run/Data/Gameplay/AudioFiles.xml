@@ -11,7 +11,7 @@
   <AudioDefinition
     Name="AttractMusic"
     Sound="AttractMusic.mp3"
-    IsLooped="false"
+    IsLooped="true"
     IsBackgroundMusic ="true"
     IsSFX ="false"
   >
@@ -20,7 +20,7 @@
   <AudioDefinition
     Name="GamePlayMusic"
     Sound="GameplayMusic.mp3"
-    IsLooped="false"
+    IsLooped="true"
     IsBackgroundMusic ="true"
     IsSFX ="false"
   >
