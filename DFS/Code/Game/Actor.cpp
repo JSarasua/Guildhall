@@ -444,7 +444,7 @@ void Actor::UpdateFromKeyboard()
 	{
 		if( leftMouseButton.IsPressed() )
 		{
-			m_isFiring = (bool)m_firingTimer.CheckAndDecrementAll();
+			m_isFiring = m_firingTimer.HasElapsed();
 			if( m_isFiring )
 			{
 				float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
@@ -452,6 +452,7 @@ void Actor::UpdateFromKeyboard()
 				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
 				shootSound->StopSound();
 				shootSound->PlaySound();
+				m_firingTimer.Reset();
 			}
 		}
 
