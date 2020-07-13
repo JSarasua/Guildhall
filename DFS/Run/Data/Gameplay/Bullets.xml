@@ -20,7 +20,7 @@
     spriteTint="255,255,255"
     minDrawBounds="-0.3,-0.3"
     maxDrawBounds="0.3,0.3"
-    physicsRadius=" 0.3"
+    physicsRadius=" 0.25"
     bulletSpeed="3.5"
     blendMode ="ALPHA"
     damage="50"
