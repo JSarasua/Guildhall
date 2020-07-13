@@ -161,12 +161,16 @@ private:
 
 	AABB2 m_deadMenu;
 	AABB2 m_deadYOUDIED;
-	AABB2 m_deadRestartButton;
-	AABB2 m_deadQuitButton;
+	AABB2 m_deadContinueButton;
 	Rgba8 m_deadYOUDIEDTint = Rgba8::RED;
-	Rgba8 m_deadRestartButtonTint = Rgba8::WHITE;
-	Rgba8 m_deadQuitButtonTint = Rgba8::WHITE;
+
 	Timer m_deathTimer;
+	bool m_isMouseOverDeadContinue = false;
+
+	Timer m_victoryTimer;
+	AABB2 m_victoryMenu;
+	AABB2 m_victoryContinueButton;
+	bool m_isMouseOverVictoryContinue = false;
 
 public:
 	eGameState m_gameState = LOADING;

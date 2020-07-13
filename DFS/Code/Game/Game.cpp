@@ -69,7 +69,7 @@ void Game::Startup()
 
 	g_theInput->HideSystemCursor();
 
-	m_deathTimer.SetSeconds( 5.0 );
+	m_deathTimer.SetSeconds( 2.5 );
 	m_deathTimer.Stop();
 }
 
@@ -386,19 +386,15 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			if( leftMouseButton.WasJustReleased() )
 			{
-				if( m_deadRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+				if( m_deadContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
 				{
 					RebuildWorld();
 					g_theApp->UnPauseGame();
-					m_gameState = PLAYING;
+					m_gameState = ATTRACT;
 
 					AudioDefinition::StopAllSounds();
-					AudioDefinition* gamePlaySound = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
-					gamePlaySound->PlaySound();
-				}
-				else if( m_deadQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
-				{
-					g_theApp->HandleQuitRequested();
+// 					AudioDefinition* gamePlaySound = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+// 					gamePlaySound->PlaySound();
 				}
 			}
 		}
@@ -811,30 +807,48 @@ void Game::UpdateDeath( float deltaSeconds )
 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	Vec2 uiDims = uiBounds.GetDimensions();
 	m_deadMenu = uiBounds;
-	m_deadMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
-	AABB2 carvingDeadMenu = m_deadMenu;
-	m_deadYOUDIED = carvingDeadMenu.CarveBoxOffTop( 0.3333f );
-	m_deadRestartButton = carvingDeadMenu.CarveBoxOffTop( 0.5f );
-	m_deadQuitButton = carvingDeadMenu;
+	m_deadMenu.SetDimensions( uiDims * 0.8f );
+	m_deadContinueButton = m_deadMenu.GetBoxAtBottom( 0.5f );
+	Vec2 deadContinueButtonDims = m_deadContinueButton.GetDimensions();
+	deadContinueButtonDims = deadContinueButtonDims * Vec2( 0.2f, 0.2f );
+	m_deadContinueButton.SetDimensions( deadContinueButtonDims );
+	m_deadContinueButton.Translate( Vec2( 0.f, 7.f ) );
 
 	UpdateDebugMouse();
 
-	m_deadYOUDIEDTint = Rgba8::RED;
-	m_deadRestartButtonTint = Rgba8::WHITE;
-	m_deadQuitButtonTint = Rgba8::WHITE;
 
+	m_isMouseOverDeadContinue = false;
 	if( m_deathTimer.HasElapsed() )
 	{
-		if( m_deadRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+		if( m_deadContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
 		{
-			m_deadRestartButtonTint = Rgba8::YELLOW;
-		}
-		else if( m_deadQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
-		{
-			m_deadQuitButtonTint = Rgba8::YELLOW;
+			m_isMouseOverDeadContinue = true;
 		}
 	}
 
+}
+
+void Game::UpdateVictory( float deltaSeconds )
+{
+	UNUSED( deltaSeconds );
+
+	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+	Vec2 uiDims = uiBounds.GetDimensions();
+	m_victoryMenu = uiBounds;
+	m_victoryMenu.SetDimensions( uiDims * Vec2( 0.3f, 0.5f ) );
+	m_victoryContinueButton = m_victoryMenu;
+	
+
+	UpdateDebugMouse();
+
+	m_isMouseOverVictoryContinue = false;
+	if( m_victoryTimer.HasElapsed() )
+	{
+		if( m_victoryContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
+		{
+			m_isMouseOverVictoryContinue = true;
+		}
+	}
 }
 
 void Game::UpdatePaused( float deltaSeconds )
@@ -966,14 +980,14 @@ void Game::RenderDeath()
 	Rgba8 backgroundTint = Rgba8( 0, 0, 0, 0 );
 	if( m_deathTimer.HasElapsed() )
 	{
-		backgroundTint.a = 255;
+		backgroundTint.a = 150;
 	}
 	else
 	{
 		float elapsedTime = (float)m_deathTimer.GetElapsedSeconds();
 		float totalTime = (float)m_deathTimer.GetSecondsRemaining() + elapsedTime;
 
-		float tint = 255.f * (elapsedTime / totalTime);
+		float tint = 150.f * (elapsedTime / totalTime);
 		backgroundTint.a = (unsigned char)tint;
 	}
 
@@ -1001,12 +1015,22 @@ void Game::RenderDeath()
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawAABB2Filled( gameCamera, backgroundTint );
 
+	Texture* deathMenuTex = nullptr;
+	
+	if( m_isMouseOverDeadContinue )
+	{
+		deathMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenuContinue.png" );
+	}
+	else
+	{
+		deathMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenu.png" );
+	}
+
+
 	if( m_deathTimer.HasElapsed() )
 	{
-		g_theRenderer->DrawAABB2Filled( m_deadMenu, backgroundTint );
-		g_theRenderer->DrawAlignedTextAtPosition( "YOU DIED", m_deadYOUDIED, 8.f, ALIGN_CENTERED, m_deadYOUDIEDTint );
-		g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_deadRestartButton, 5.f, ALIGN_CENTERED, m_deadRestartButtonTint );
-		g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_deadQuitButton, 5.f, ALIGN_CENTERED, m_deadQuitButtonTint );
+ 		g_theRenderer->BindTexture( deathMenuTex );
+		g_theRenderer->DrawAABB2Filled( m_deadMenu, Rgba8::WHITE );
 	}
 
 	g_theRenderer->EndCamera( m_UICamera );
