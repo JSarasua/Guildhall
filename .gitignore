@@ -118,3 +118,5 @@ $RECYCLE.BIN/
 !**/Run/*.dll
 !**/ThirdParty/**/*.lib
 DFS/BulletHellDungeon.zip
+DFS/BulletHellDungeonMilestone3/
+DFS/BulletHellDungeonMilestone3.zip
