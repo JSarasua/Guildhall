@@ -296,6 +296,8 @@ void Game::RenderUI()
 	AABB2 playerHealthBox = underHealthBox.GetBoxAtLeft( playerHealthFraction );
 	AABB2 topRightBox = topBox.GetBoxAtRight( 0.15f );
 	topRightBox.SetDimensions( Vec2( 1.16f, 0.7f ) * 10.f );
+	AABB2 weaponBorderBox = topRightBox;
+	weaponBorderBox.SetDimensions( weaponBorderBox.GetDimensions() * 2.f );
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->DrawAABB2Filled( underHealthBox, Rgba8( 235, 86, 82 ) );
@@ -308,6 +310,9 @@ void Game::RenderUI()
 	AABB2 weaponUVs;
 	weaponSprite->GetUVs( weaponUVs.mins, weaponUVs.maxs );
 
+	Texture* weaponBorderTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/WeaponBorder.png" );
+	g_theRenderer->BindTexture( weaponBorderTex );
+	g_theRenderer->DrawAABB2Filled( weaponBorderBox, Rgba8::WHITE );
 	g_theRenderer->BindTexture( &weaponTexture );
 	g_theRenderer->DrawAABB2Filled( topRightBox, Rgba8::WHITE, weaponUVs.mins, weaponUVs.maxs );
 	RenderConsole();
