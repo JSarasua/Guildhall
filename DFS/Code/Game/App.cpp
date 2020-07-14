@@ -11,7 +11,7 @@
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
-const char* APP_NAME = "Testgame2D";	// ...becomes ??? (Change this per project!)
+const char* APP_NAME = "Bullet Hell Dungeon";	// ...becomes ??? (Change this per project!)
 
 
 App::App()
