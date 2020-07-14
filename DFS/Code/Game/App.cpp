@@ -220,9 +220,10 @@ void App::CheckButtonPresses()
 		g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
 	}
 
-	if( g_theInput->GetKeyStates( 0x1B ).IsPressed() ) //ESC
+	if( g_theInput->GetKeyStates( 0x1B ).WasJustPressed() ) //ESC
 	{
-		g_theEventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
+		TogglePause();
+		//g_theEventSystem->FireEvent("quit", CONSOLECOMMAND, nullptr);
 		//HandleQuitRequested();
 	}
 
