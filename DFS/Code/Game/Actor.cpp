@@ -430,6 +430,7 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
 	float deltaMouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
@@ -464,7 +465,7 @@ void Actor::UpdateFromKeyboard()
 
 
 
-	if( rightMouseButton.WasJustPressed() )
+	if( rightMouseButton.WasJustPressed() || spaceKey.WasJustPressed() )
 	{
 		if( m_dodgeTimer.HasElapsed() )
 		{
