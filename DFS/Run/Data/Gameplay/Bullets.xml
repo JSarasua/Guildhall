@@ -9,7 +9,7 @@
     physicsRadius=" 0.03"
     bulletSpeed="4"
     blendMode ="ALPHA"
-    damage="5"
+    damage="8"
     lifetime="1.5"
   >
   </BulletDefinition>
@@ -51,8 +51,8 @@
     physicsRadius=" 0.2"
     bulletSpeed="3"
     blendMode ="ADDITIVE"
-    damage="2"
-    lifetime="0.5"
+    damage="5"
+    lifetime="0.7"
   >
   </BulletDefinition>
 
