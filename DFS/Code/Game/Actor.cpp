@@ -27,7 +27,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 100;
+		m_health = PLAYER_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
@@ -50,6 +50,8 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
+		m_aiCooldownTimer.SetSeconds( Clock::GetMaster(), 1.0 );
+		m_aiStartupTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 	}
 }
 
@@ -68,7 +70,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	if( m_name == "Player" )
 	{
 		m_entityType = ENTITY_TYPE_PLAYER;
-		m_health = 100;
+		m_health = PLAYER_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
@@ -91,6 +93,8 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
+		m_aiCooldownTimer.SetSeconds( Clock::GetMaster(), 1.0 );
+		m_aiStartupTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 	}
 }
 
@@ -545,6 +549,10 @@ void Actor::UpdateFromKeyboard()
 void Actor::UpdateNPC( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+	if( !m_aiStartupTimer.HasElapsed() )
+	{
+		return;
+	}
 
 	if( m_enemyActor )
 	{
@@ -554,7 +562,16 @@ void Actor::UpdateNPC( float deltaSeconds )
 	float goalDistance = GetDistance2D( m_goalPosition, m_position );
 	if( goalDistance < 5.f && (bool)m_firingTimer.CheckAndDecrementAll() )
 	{
-		m_isFiring = true;
+		if( m_aiCooldownTimer.HasElapsed() )
+		{
+			m_aiIsFiringState = !m_aiIsFiringState;
+			m_aiCooldownTimer.Reset();
+		}
+		if( m_aiIsFiringState )
+		{
+			m_isFiring = true;
+		}
+
 	}
 
 	if( m_goalPosition == m_position )

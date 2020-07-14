@@ -283,7 +283,7 @@ void Game::RenderUI()
 //	m_world->RenderDebug();
 	Texture* healthBarTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/HealthBar.png" );
 	float playerHealth = (float)m_player->GetHealth();
-	float playerHealthFraction = playerHealth / 100.f;
+	float playerHealthFraction = playerHealth / (float)PLAYER_HEALTH;
 
 	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 	AABB2 topBox = gameCamera.GetBoxAtTop( 0.1f );

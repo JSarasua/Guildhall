@@ -59,6 +59,15 @@ void EnemySpawner::Update()
 				float spawnRadius = m_spawnRadius.GetRandomInRange( randGen );
 				Vec2 randomOffset = Vec2::MakeFromPolarDegrees( randOrientation, spawnRadius );
 				Vec2 spawnPosition = m_position + randomOffset;
+
+				while( !m_map->IsTileSolid( IntVec2( spawnPosition ) ) )
+				{
+					randOrientation = randGen.RollRandomFloatInRange( 0.f, 359.9f );
+					spawnRadius = m_spawnRadius.GetRandomInRange( randGen );
+					randomOffset = Vec2::MakeFromPolarDegrees( randOrientation, spawnRadius );
+					spawnPosition = m_position + randomOffset;
+				}
+
 				Actor* entityToSpawn = new Actor( spawnPosition, Vec2(), 0.f, 0.f, m_enemyTypes[0] );
 				entityToSpawn->SetEnemy( m_player );
 				entityToSpawn->AddWeapon( m_weapons[0] );

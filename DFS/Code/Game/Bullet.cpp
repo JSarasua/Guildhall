@@ -14,18 +14,8 @@ constexpr float BULLET_SPEED = 10.f;
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
 
-Bullet::Bullet( const Vec2& initialPosition, BulletDefinition const* bulletDef, float speedMultiplier ):
-	Entity( initialPosition, Vec2::MakeFromPolarDegrees( m_orientationDegrees, BULLET_SPEED ), 0.f, 0.f )
-{
-	m_position = initialPosition;
-	m_bulletDefinition = bulletDef;
-	m_physicsRadius = bulletDef->GetPhysicsRadius();
-	m_velocity.SetLength( bulletDef->GetBulletSpeed() * speedMultiplier );
-	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
-	m_canWalk = true;
-}
 
-Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier ):
+Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier, Vec2 const& entityVelocity ):
 	Entity( initialPosition, Vec2::MakeFromPolarDegrees( orientationDegrees, BULLET_SPEED ), orientationDegrees, 0.f )
 {
 	UNUSED( faction );
@@ -36,7 +26,8 @@ Bullet::Bullet( const Vec2& initialPosition, float orientationDegrees, EntityTyp
 	m_entityType = type;
 	m_canWalk = true;
 
-	m_velocity.SetLength( bulletDef->GetBulletSpeed() * speedMultiplier );
+	float entityVelocityLength = entityVelocity.GetLength();
+	m_velocity.SetLength( bulletDef->GetBulletSpeed() * speedMultiplier + entityVelocityLength );
 	m_lifetime.SetSeconds( (double)bulletDef->GetLifeTime() );
 
 }

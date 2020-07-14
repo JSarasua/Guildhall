@@ -11,6 +11,7 @@ class AudioSystem;
 /*class InputSystem;*/
 class SpriteSheet;
 
+constexpr int PLAYER_HEALTH = 200;
 constexpr float CLIENT_ASPECT = 16.f/9.f;
 
 //Given Constants

@@ -330,6 +330,8 @@ void Map::SpawnBullet( Entity* shooter )
 	int bulletCount = actorShooter->GetBulletsPerShot();
 	float bulletSpread = actorShooter->GetBulletSpreadDegrees();
 	float bulletSpeedMultiplier = 1.f;
+	Vec2 actorVelocity = shooter->GetForwardVector();
+	actorVelocity *= 0.5f;
 
 	//Vec2 bulletPosition = shooter->GetBulletStartPosition();
 	Vec2 bulletPosition = actorShooter->GetMuzzlePosition();
@@ -357,7 +359,7 @@ void Map::SpawnBullet( Entity* shooter )
 			{
 				float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 				float bulletOrientationWithSpread = bulletOrientation + spread;
-				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier );
+				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity );
 
 				bulletCount--;
 				if( bulletCount <= 0 )
@@ -376,7 +378,7 @@ void Map::SpawnBullet( Entity* shooter )
 	{
 		float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 		float bulletOrientationWithSpread = bulletOrientation + spread;
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier ) );
+		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity ) );
 	}
 
 	shooter->SetIsFiring( false );
@@ -748,13 +750,13 @@ void Map::SpawnSpawnersLevel1()
 
 
 	EnemySpawner* spawner = new EnemySpawner( Vec2( 14.f, 3.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 4.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
-	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
-	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 3.f, 9.f ), FloatRange( 0.f, 2.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 26.f, 2.f ), FloatRange( 0.f, 3.f ), IntRange( 2, 4 ), 6.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 26.f, 10.f ), FloatRange( 0.f, 1.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 20.f, 15.f ), FloatRange( 0.f, 1.f ), IntRange( 3, 5 ), 4.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 11.f, 14.f ), FloatRange( 0.f, 1.5f ), IntRange( 3, 5 ), 4.f, nullptr, this );
 	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 26.f, 25.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
-	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 20.f, 27.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 17.f, 27.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
 
 
 	spawner->AddEnemyType( josenActorDef );
@@ -805,14 +807,14 @@ void Map::SpawnSpawnersLevel2()
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
 
-	EnemySpawner* spawner = new EnemySpawner( Vec2( 27.f, 60.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 10.f, 54.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 10.f, 82.f ), FloatRange( 0.f, 1.f ), IntRange( 2, 4 ), 5.f, nullptr, this );
-	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 36.f, 80.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
-	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 22.f, 38.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 3 ), 4.f, nullptr, this );
-	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 10.f, 24.f ), FloatRange( 0.f, 1.5f ), IntRange( 2, 4 ), 4.f, nullptr, this );
-	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 10.f, 9.f ), FloatRange( 0.f, 2.f ), IntRange( 3, 5 ), 5.f, nullptr, this );
-	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 36.f, 9.f ), FloatRange( 0.f, 1.f ), IntRange( 1, 2 ), 5.f, nullptr, this );
+	EnemySpawner* spawner = new EnemySpawner( Vec2( 27.f, 60.f ), FloatRange( 0.f, 3.f ), IntRange( 3, 5 ), 6.f, nullptr, this );
+	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 10.f, 54.f ), FloatRange( 0.f, 4.f ), IntRange( 3, 6 ), 6.f, nullptr, this );
+	EnemySpawner* spawner3 = new EnemySpawner( Vec2( 10.f, 82.f ), FloatRange( 0.f, 4.f ), IntRange( 3, 6 ), 6.f, nullptr, this );
+	EnemySpawner* spawner4 = new EnemySpawner( Vec2( 36.f, 80.f ), FloatRange( 0.f, 4.f ), IntRange( 3, 6 ), 5.f, nullptr, this );
+	EnemySpawner* spawner5 = new EnemySpawner( Vec2( 22.f, 38.f ), FloatRange( 0.f, 3.f ), IntRange( 3, 6 ), 6.f, nullptr, this );
+	EnemySpawner* spawner6 = new EnemySpawner( Vec2( 10.f, 24.f ), FloatRange( 0.f, 4.f ), IntRange( 3, 6 ), 6.f, nullptr, this );
+	EnemySpawner* spawner7 = new EnemySpawner( Vec2( 10.f, 9.f ), FloatRange( 0.f, 4.f ), IntRange( 3, 6 ), 7.f, nullptr, this );
+	EnemySpawner* spawner8 = new EnemySpawner( Vec2( 36.f, 9.f ), FloatRange( 0.f, 3.f ), IntRange( 3, 6 ), 7.f, nullptr, this );
 
 	spawner->AddEnemyType( josenActorDef );
 	spawner->AddWeaponType( smgWeapon );
@@ -1025,4 +1027,18 @@ bool Map::IsValidTileCoordinates( const IntVec2& tileCoords ) const
 	}
 
 	return true;
+}
+
+bool Map::IsTileSolid( IntVec2 const& tileCoords )
+{
+	if( IsValidTileCoordinates( tileCoords ) )
+	{
+		Tile const* tile = GetTileAtPosition( tileCoords );
+		if( tile && tile->m_tileDef->m_allowsWalking )
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

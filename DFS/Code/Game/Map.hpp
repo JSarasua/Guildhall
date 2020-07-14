@@ -36,6 +36,7 @@ public:
 	int GetTileIndexForTileCoordinates( const IntVec2& tileCoords );
 	IntVec2 GetTileCoordinatesForTileIndex( int tileIndex ) const;
 	bool IsValidTileCoordinates( const IntVec2& tileCoords ) const;
+	bool IsTileSolid( IntVec2 const& tileCoords );
 
 	Actor* GetPlayer();
 	void GetPlayers(std::vector<Actor*>& players);

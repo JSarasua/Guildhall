@@ -80,6 +80,9 @@ protected:
 	float m_timeUntilNextGoalPosition = 2.f;
 	Timer m_firingTimer;
 	Timer m_dodgeTimer;
+	Timer m_aiCooldownTimer;	//How long each burst of fire will be
+	Timer m_aiStartupTimer;
+	bool m_aiIsFiringState = false;
 	PlayerController m_playerController = Invalid_Player;
 	bool m_isWeaponFlipped = true;
 	bool m_isWeaponInFront = true;

@@ -10,8 +10,7 @@ class Bullet : public Entity
 {
 public:
 
-	Bullet( const Vec2& initialPosition, BulletDefinition const* bulletDef, float speedMultiplier = 1.f );
-	Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier = 1.f  );
+	Bullet( const Vec2& initialPosition, float orientationDegrees, EntityType type, EntityFaction faction, BulletDefinition const* bulletDef, float speedMultiplier, Vec2 const& entityVelocity );
 	~Bullet() {}
 
 	virtual void Startup() override;
