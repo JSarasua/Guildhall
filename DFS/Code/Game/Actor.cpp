@@ -31,6 +31,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+		m_playerInvulnerabilityTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 	}
 	else if( m_name == "Boss" )
 	{
@@ -74,6 +75,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+		m_playerInvulnerabilityTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 	}
 	else if( m_name == "Boss" )
 	{
@@ -118,6 +120,10 @@ void Actor::Update( float deltaSeconds )
 
 	if( m_name == "Player" )
 	{
+		if( m_playerInvulnerabilityTimer.HasElapsed() )
+		{
+			m_didJustTookDamage = false;
+		}
 		UpdateFromJoystick();
 		UpdateFromKeyboard();
 		m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
@@ -165,7 +171,7 @@ void Actor::Render() const
 
 	AABB2 actorBounds = m_actorDef->m_drawBounds;
 	actorBounds.Translate(m_position);
-	const Rgba8& actorTint = m_actorDef->m_tint;
+	Rgba8 actorTint = m_actorDef->m_tint;
 	//const AABB2& actorUVs = m_actorDef->m_spriteUVs;
 	const Texture& actorTexture = g_actorSpriteSheet->GetTexture();
 
@@ -181,6 +187,10 @@ void Actor::Render() const
 // 		actorUVs.mins.x = actorUVs.maxs.x;
 // 		actorUVs.maxs.x = minX;
 // 	}
+	if( m_didJustTookDamage )
+	{
+		 actorTint.a =(unsigned char)( 128.f + 128.f * CosDegrees( 360.f * (float)m_playerInvulnerabilityTimer.GetElapsedSeconds() ) );
+	}
 
 	g_theRenderer->BindTexture( &actorTexture );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
@@ -190,6 +200,25 @@ void Actor::Render() const
 	{
 		RenderWeapon();
 	}
+}
+
+void Actor::LoseHealth( int damage )
+{
+	if( m_name == "Player" )
+	{
+		if( m_playerInvulnerabilityTimer.HasElapsed() )
+		{
+			m_didJustTookDamage = true;
+			Entity::LoseHealth( damage );
+			g_theGame->AddScreenShake( 1.f );
+			m_playerInvulnerabilityTimer.Reset();
+		}
+	}
+	else
+	{
+		Entity::LoseHealth( damage );
+	}
+
 }
 
 void Actor::RenderWeapon() const
@@ -403,6 +432,7 @@ void Actor::UpdateFromKeyboard()
 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
+	float deltaMouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
 	
 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
 	Vec2 weaponDirection = mousePos - GetPosition();
@@ -541,6 +571,15 @@ void Actor::UpdateFromKeyboard()
 		if( rKey.WasJustPressed() )
 		{
 			IncrementActiveWeapon();
+		}
+
+		if( deltaMouseWheelScroll > 0.f )
+		{
+			IncrementActiveWeapon();
+		}
+		else if( deltaMouseWheelScroll < 0.f )
+		{
+			DecrementActiveWeapon();
 		}
 	}
 

@@ -53,6 +53,8 @@ public:
 	virtual void Update( float deltaSeconds );
 	virtual void Render() const override;
 
+	virtual void LoseHealth( int damage ) override;
+
 	void RenderWeapon() const;
 
 	void SetEnemy( Entity* enemy );
@@ -82,6 +84,9 @@ protected:
 	Timer m_dodgeTimer;
 	Timer m_aiCooldownTimer;	//How long each burst of fire will be
 	Timer m_aiStartupTimer;
+	Timer m_playerInvulnerabilityTimer;
+	bool m_didJustTookDamage = false;
+
 	bool m_aiIsFiringState = false;
 	PlayerController m_playerController = Invalid_Player;
 	bool m_isWeaponFlipped = true;
