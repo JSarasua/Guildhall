@@ -690,9 +690,9 @@ void Map::AddPlayer( Actor* player )
 		playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
 
 		WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
-		WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+		//WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 		playerToAdd->AddWeapon( pistolWeapon );
-		playerToAdd->AddWeapon( shotgunWeapon );
+		//playerToAdd->AddWeapon( shotgunWeapon );
 
 		m_entities[0] = playerToAdd;
 		
