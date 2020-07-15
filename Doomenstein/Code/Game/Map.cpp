@@ -18,17 +18,19 @@ extern App* g_theApp;
 extern RenderContext* g_theRenderer;
 
 
-Map::Map()
-{}
+Map::Map( std::string const& name )
+{
+	m_name = name;
+}
 
-Entity* Map::SpawnNewEntityOfType( std::string const& entityDefName, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees )
+Entity* Map::SpawnNewEntityOfType( std::string const& entityDefName, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees, std::string const& teleporterDestMap, Vec2 const& teleporterDestPos, float teleporterDestYawOffset  )
 {
 	EntityDefinition const* entityDef = EntityDefinition::GetEntityDefinitionByName( entityDefName );
 
-	return SpawnNewEntityOfType( entityDef, initialPosition, initialPitchRollYawDegrees );
+	return SpawnNewEntityOfType( entityDef, initialPosition, initialPitchRollYawDegrees, teleporterDestMap, teleporterDestPos, teleporterDestYawOffset  );
 }
 
-Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees )
+Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& initialPitchRollYawDegrees, std::string const& teleporterDestMap, Vec2 const& teleporterDestPos, float teleporterDestYawOffset )
 {
 	Entity* newEntity = nullptr;
 
@@ -60,8 +62,9 @@ Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const
 	}
 	else if( entityType == "Portal" )
 	{
-		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees );
+		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees, teleporterDestMap, teleporterDestPos, teleporterDestYawOffset );
 		m_allEntities.push_back( newEntity );
+		m_portals.push_back( (Portal*)newEntity );
 		return newEntity;
 	}
 	else
@@ -166,7 +169,7 @@ Map::~Map()
 void Map::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
-
+	ResolveAllPortalVEntityCollisions();
 	ResolveAllEntityVEntityCollisions();
 }
 
@@ -185,6 +188,60 @@ void Map::ResolveAllEntityVEntityCollisions()
 		if( isPushed )
 		{
 			ResolveEntityCollisions( entity );
+		}
+	}
+}
+
+void Map::ResolveAllPortalVEntityCollisions()
+{
+	for( size_t portalIndex = 0; portalIndex < m_portals.size(); portalIndex++ )
+	{
+		Portal* portal = m_portals[portalIndex];
+
+		if( portal )
+		{
+			for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+			{
+				Entity* entity = m_allEntities[entityIndex];
+				if( entity && portal != entity )
+				{
+					ResolvePortalVEntityCollision( portal, entity );
+				}
+
+			}
+
+		}
+	}
+}
+
+void Map::ResolvePortalVEntityCollision( Portal* portal, Entity* entity )
+{
+	Vec2 entityPos = entity->GetPosition();
+	Vec2 portalPos = portal->GetPosition();
+
+	float entityRadius = entity->GetPhysicsRadius();
+	float portalRadius = portal->GetPhysicsRadius();
+
+	bool isOverlap = DoDiscsOverlap( entityPos, entityRadius, portalPos, portalRadius );
+
+	if( isOverlap )
+	{
+		std::string mapName = portal->GetDestMap();
+		if( m_name == mapName )
+		{
+			Vec3 pitchRollYaw = entity->GetRotationPitchRollYawDegrees();
+
+
+			entity->SetPosition( portal->GetDestPosition() );
+			pitchRollYaw.z += portal->GetDestYawOffset();
+			entity->RotatePitchRollYawDegrees( pitchRollYaw );
+		}
+		else
+		{
+			if( entity->IsPossessed() )
+			{
+				//g_theEventSystem->FireEvent( )
+			}
 		}
 	}
 }

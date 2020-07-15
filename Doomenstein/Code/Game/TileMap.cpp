@@ -1327,7 +1327,11 @@ void TileMap::ParseEntities( XmlElement const& entitiesElement )
 		Vec2 position = ParseXMLAttribute( *entityElement, "pos", Vec2(-1.f,-1.f) );
 		float yaw = ParseXMLAttribute( *entityElement, "yaw", 0.f );
 
-		Map::SpawnNewEntityOfType( entityName, position, Vec3( 0.f, 0.f, yaw ) );
+		float destYawOffset = ParseXMLAttribute( *entityElement, "destYawOffset", 0.f );
+		std::string destMap = ParseXMLAttribute( *entityElement, "destMap", "" );
+		Vec2 destPos = ParseXMLAttribute( *entityElement, "destPos", Vec2() );
+
+		Map::SpawnNewEntityOfType( entityName, position, Vec3( 0.f, 0.f, yaw ), destMap, destPos, destYawOffset );
 	}
 
 	//SpawnEntities();

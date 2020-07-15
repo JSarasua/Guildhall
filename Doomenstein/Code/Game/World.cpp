@@ -24,6 +24,7 @@ void World::Startup()
 		XmlDocument currentMapDoc		= new XmlDocument;
 		XmlElement const& currentMapDefElement = GetRootElement( currentMapDoc, filePath.c_str() );
 		Map* newMap = new TileMap( currentMapDefElement );
+		newMap->m_name = filePaths[fileIndex];
 		
 		m_maps[filePaths[fileIndex]] = newMap;
 	}
