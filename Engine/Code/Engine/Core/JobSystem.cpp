@@ -1,9 +1,10 @@
 #include "Engine/Core/JobSystem.hpp"
 #include <chrono>
-
+#include <atomic>
 JobSystem* g_theJobSystem = nullptr;
 
-bool g_isQuitting = false;
+
+std::atomic<bool> g_isQuitting = false;
 
 JobSystem::JobSystem()
 {
@@ -12,11 +13,35 @@ JobSystem::JobSystem()
 
 JobSystem::~JobSystem()
 {
+
+}
+
+void JobSystem::Shutdown()
+{
 	g_isQuitting = true;
 
 	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
 	{
 		m_workerThreads[workerIndex]->m_workerThread->join();
+	}
+
+	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
+	{
+		delete m_workerThreads[workerIndex];
+	}
+
+	while( m_jobsQueued.size() > 0 )
+	{
+		Job* currentJob = m_jobsQueued.front();
+		delete currentJob;
+		m_jobsQueued.pop_front();
+	}
+
+	while( m_jobsCompleted.size() > 0 )
+	{
+		Job* currentJob = m_jobsCompleted.front();
+		delete currentJob;
+		m_jobsCompleted.pop_front();
 	}
 }
 
@@ -79,6 +104,10 @@ void WorkerThread::WorkerMain()
 			g_theJobSystem->m_jobsQueuedLock.unlock();
 
 			jobToWork->Execute();
+
+			g_theJobSystem->m_jobsCompletedLock.lock();
+			g_theJobSystem->m_jobsCompleted.push_back( jobToWork );
+			g_theJobSystem->m_jobsCompletedLock.unlock();
 		}
 		else
 		{
@@ -87,4 +116,11 @@ void WorkerThread::WorkerMain()
 			std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
 		}
 	}
+}
+
+Job::Job()
+{
+	static int jobID = 0;
+	m_jobID = jobID;
+	jobID++;
 }

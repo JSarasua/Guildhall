@@ -13,7 +13,6 @@ public:
 	
 	void WorkerMain();
 
-
 protected:
 	std::thread* m_workerThread = nullptr;
 };
@@ -29,7 +28,6 @@ public:
 	virtual void Execute() = 0;
 	virtual void CallBackFunction() = 0;
 
-
 protected:
 	int m_jobID = 0;
 };
@@ -43,6 +41,7 @@ public:
 	JobSystem();
 	~JobSystem();
 
+	void Shutdown();
 	void AddWorkerThread();
 	void AddWorkerThreads( int numberOfThreadsToAdd );
 	void ClaimAndDeleteCompletedJobs();
