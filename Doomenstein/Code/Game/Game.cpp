@@ -767,35 +767,35 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.IsPressed() )
 	{
-		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
-		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
-		float range = currentInnerCosTheta - currentOuterCosTheta;
-
-		float max = 1.f;
-		float min = -1.f + range;
-
-		float newInnerCosTheta = currentInnerCosTheta - 0.5f * deltaSeconds;
-		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
-		float newOuterCosTheta = newInnerCosTheta - range;
-
-		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
-		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
+// 		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
+// 		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
+// 		float range = currentInnerCosTheta - currentOuterCosTheta;
+// 
+// 		float max = 1.f;
+// 		float min = -1.f + range;
+// 
+// 		float newInnerCosTheta = currentInnerCosTheta - 0.5f * deltaSeconds;
+// 		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
+// 		float newOuterCosTheta = newInnerCosTheta - range;
+// 
+// 		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
+// 		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
 	}
 	if( num2Key.IsPressed() )
 	{
-		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
-		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
-		float range = currentInnerCosTheta - currentOuterCosTheta;
-
-		float max = 1.f;
-		float min = -1.f + range;
-
-		float newInnerCosTheta = currentInnerCosTheta + 0.5f * deltaSeconds;
-		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
-		float newOuterCosTheta = newInnerCosTheta - range;
-
-		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
-		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
+// 		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
+// 		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
+// 		float range = currentInnerCosTheta - currentOuterCosTheta;
+// 
+// 		float max = 1.f;
+// 		float min = -1.f + range;
+// 
+// 		float newInnerCosTheta = currentInnerCosTheta + 0.5f * deltaSeconds;
+// 		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
+// 		float newOuterCosTheta = newInnerCosTheta - range;
+// 
+// 		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
+// 		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
 	}
 	if( num3Key.IsPressed() )
 	{

@@ -24,13 +24,14 @@ App::App()
 	g_theGame = new Game();
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
+	g_theJobSystem = new JobSystem();
 }
 
 App::~App() {}
 
 void App::Startup()
 {
-
+	g_theJobSystem->AddWorkerThreads( 6 );
 	Clock::SystemStartup();
 
 	XmlDocument gameConfigDoc;
@@ -71,9 +72,10 @@ void App::Startup()
 
 void App::Shutdown()
 {
+	g_theJobSystem->Shutdown();
+	delete g_theJobSystem;
+	
 	delete m_devConsoleCamera;
-
-
 	delete g_theAudio;
 	delete g_gameConfigBlackboard;
 	g_theGame->Shutdown();
@@ -208,6 +210,8 @@ bool App::QuitRequested( const EventArgs& args )
 
 void App::CheckButtonPresses()
 {
+	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
+	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& tildeKey = g_theInput->GetKeyStates( 0xC0 );	//tilde: ~
 	if( tildeKey.WasJustPressed() )
 	{
@@ -243,6 +247,15 @@ void App::CheckButtonPresses()
 	{
 		m_isSpedUp = false;
 	}
+
+	if( num1Key.WasJustPressed() )
+	{
+		SpinUpWork();
+	}
+	if( num2Key.WasJustPressed() )
+	{
+		g_theJobSystem->ClaimAndDeleteCompletedJobs();
+	}
 }
 
 void App::CheckController()
@@ -257,4 +270,48 @@ void App::CheckController()
 	{
 		m_debugGameMode = !m_debugGameMode;
 	}
+}
+
+void App::SpinUpWork()
+{
+	int numberOfJobs = 1000;
+	int currentJobCount = 0;
+	while( currentJobCount < numberOfJobs )
+	{
+		Job* jobToDo = new AppJob();
+		g_theJobSystem->PostJob( jobToDo );
+		currentJobCount++;
+	}
+}
+
+AppJob::AppJob() : Job()
+{
+
+}
+
+void AppJob::Execute()
+{
+	DebuggerPrintf( Stringf( "Starting Work on Job: %i\n", m_jobID ).c_str() );
+	size_t vectorSize = 1000;
+	std::vector<float> bigVector;
+	bigVector.resize( vectorSize );
+
+	for( size_t vectorIndex = 0; vectorIndex < bigVector.size(); vectorIndex++ )
+	{
+		bigVector[vectorIndex] = (float)vectorIndex;
+	}
+
+	for( size_t vectorIndex = 0; vectorIndex < bigVector.size(); vectorIndex++ )
+	{
+		for( size_t vectorIndex1 = vectorIndex; vectorIndex1 < bigVector.size(); vectorIndex1++ )
+		{
+			float currentFloat = bigVector[vectorIndex1];
+			bigVector[vectorIndex] *= currentFloat + CosDegrees( currentFloat ) * SinDegrees( currentFloat ) + CosDegrees( 2.11f * currentFloat );
+		}
+	}
+}
+
+void AppJob::CallBackFunction()
+{
+	DebuggerPrintf( Stringf( "Claimed Job: %i\n", m_jobID ).c_str() );
 }

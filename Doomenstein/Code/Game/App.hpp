@@ -8,8 +8,16 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Game.hpp"
+#include "Engine/Core/JobSystem.hpp"
 
 
+class AppJob : public Job
+{
+public:
+	AppJob();
+	virtual void Execute() override;
+	virtual void CallBackFunction() override;
+};
 
 class App
 {
@@ -47,6 +55,8 @@ public:
 private:
 	void CheckButtonPresses();
 	void CheckController();
+
+	void SpinUpWork();
 
 public:
 	//Game* m_game = nullptr;
