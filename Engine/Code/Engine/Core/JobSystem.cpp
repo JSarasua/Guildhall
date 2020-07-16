@@ -37,6 +37,13 @@ void JobSystem::Shutdown()
 		m_jobsQueued.pop_front();
 	}
 
+	while( m_jobsRunning.size() > 0 )
+	{
+		Job* currentJob = m_jobsRunning.front();
+		delete currentJob;
+		m_jobsRunning.pop_front();
+	}
+
 	while( m_jobsCompleted.size() > 0 )
 	{
 		Job* currentJob = m_jobsCompleted.front();
@@ -103,7 +110,38 @@ void WorkerThread::WorkerMain()
 			g_theJobSystem->m_jobsQueued.pop_front();
 			g_theJobSystem->m_jobsQueuedLock.unlock();
 
+			g_theJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunningPreRun = g_theJobSystem->m_jobsRunning;
+			bool didAddJob = false;
+			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunningPreRun.size(); jobsRunningIndex++ )
+			{
+				Job* currentJob = jobsRunningPreRun[jobsRunningIndex];
+				if( !currentJob )
+				{
+					jobsRunningPreRun[jobsRunningIndex] = jobToWork;
+					didAddJob = true;
+					break;
+				}
+			}
+			if( !didAddJob )
+			{
+				jobsRunningPreRun.push_back( jobToWork );
+			}
+			g_theJobSystem->m_jobsRunningLock.unlock();
+
 			jobToWork->Execute();
+
+			g_theJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunning = g_theJobSystem->m_jobsRunning;
+			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunning.size(); jobsRunningIndex++ )
+			{
+				Job* currentJob = jobsRunning[jobsRunningIndex];
+				if( jobToWork == currentJob )
+				{
+					jobsRunning[jobsRunningIndex] = nullptr;
+				}
+			}
+			g_theJobSystem->m_jobsRunningLock.unlock();
 
 			g_theJobSystem->m_jobsCompletedLock.lock();
 			g_theJobSystem->m_jobsCompleted.push_back( jobToWork );

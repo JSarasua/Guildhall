@@ -49,8 +49,10 @@ public:
 
 protected:
 	std::deque<Job*> m_jobsQueued;
+	std::deque<Job*> m_jobsRunning;
 	std::deque<Job*> m_jobsCompleted;
 	std::mutex m_jobsQueuedLock;
+	std::mutex m_jobsRunningLock;
 	std::mutex m_jobsCompletedLock;
 
 	std::vector<WorkerThread*> m_workerThreads;
