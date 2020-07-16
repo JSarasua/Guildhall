@@ -4,10 +4,12 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/EntityDefinition.hpp"
 
+class Map;
+
 class Portal : public Entity
 {
 public:
-	Portal( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees, std::string const& destMap, Vec2 const& destPos, float destYawOffset );
+	Portal( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees, std::string const& destMap, Vec2 const& destPos, float destYawOffset, Map* parentMap );
 
 	virtual void Startup() override {}
 	virtual void Update( float deltaSeconds ) override;
@@ -25,4 +27,5 @@ private:
 	std::string m_destMap;
 	Vec2 m_destPos;
 	float m_destYawOffset = 0.f;
+	Map* m_mapPortalIsIn = nullptr;
 };

@@ -19,8 +19,9 @@
     <Actor name="Marine" pos="3.5,1.5" yaw="90"/>
     <Actor name="Marine" pos="4.5,1.5" yaw="130"/>
     <Projectile name="Plasma Bolt" pos="2.5,3.5" yaw="30"/>
-    <Portal name="Teleporter" pos="2.5,3.5" yaw="30" destMap="EmptyRoom.xml" destPos="5,4" destYawOffset="0"/>
-    
+    <Portal name="Teleporter" pos="2.5,3.5" yaw="30" destPos="2,1.5" destYawOffset="0"/>
+    <Portal name="Teleporter" pos="1.5,3.5" yaw="30" destMap="SingleBlock.xml" destPos="0.5,0.5" destYawOffset="0"/>
+
   </Entities>
 
 </MapDefinition>

@@ -1199,6 +1199,16 @@ Entity const* Game::GetPossessedEntity() const
 	return m_possessedEntity;
 }
 
+Map* Game::GetMapByName( std::string const& mapName )
+{
+	return m_world->GetMapByName( mapName );
+}
+
+void Game::WarpPlayerWithEntity( Entity* entityToWarp, std::string const& destMap, Vec2 const& destPos, float destYawOffset )
+{
+	m_world->WarpPlayerWithEntity( entityToWarp, destMap, destPos, destYawOffset );
+}
+
 void Game::RenderDevConsole()
 {
 	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);

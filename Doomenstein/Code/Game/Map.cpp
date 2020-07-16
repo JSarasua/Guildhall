@@ -62,7 +62,7 @@ Entity* Map::SpawnNewEntityOfType( EntityDefinition const* entityDef, Vec2 const
 	}
 	else if( entityType == "Portal" )
 	{
-		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees, teleporterDestMap, teleporterDestPos, teleporterDestYawOffset );
+		newEntity = new Portal( entityDef, initialPosition, initialPitchRollYawDegrees, teleporterDestMap, teleporterDestPos, teleporterDestYawOffset, this );
 		m_allEntities.push_back( newEntity );
 		m_portals.push_back( (Portal*)newEntity );
 		return newEntity;
@@ -153,6 +153,26 @@ Entity* Map::GetEntityAtImpactPosition( Vec3 const& position, Vec3& surfaceNorma
 	return nullptr;
 }
 
+void Map::RemoveEntity( Entity* entity )
+{
+	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
+	{
+		Entity* currentEntity = m_allEntities[entityIndex];
+		if( currentEntity )
+		{
+			if( currentEntity == entity )
+			{
+				m_allEntities[entityIndex] = nullptr;
+			}
+		}
+	}
+}
+
+void Map::AddEntity( Entity* entity )
+{
+	m_allEntities.push_back( entity );
+}
+
 Map::~Map()
 {
 	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
@@ -183,12 +203,16 @@ void Map::ResolveAllEntityVEntityCollisions()
 	for( size_t entityIndex = 0; entityIndex < m_allEntities.size(); entityIndex++ )
 	{
 		Entity* entity = m_allEntities[entityIndex];
-		bool isPushed = entity->IsPushedByEntity();
-
-		if( isPushed )
+		if( entity )
 		{
-			ResolveEntityCollisions( entity );
+			bool isPushed = entity->IsPushedByEntity();
+
+			if( isPushed )
+			{
+				ResolveEntityCollisions( entity );
+			}
 		}
+
 	}
 }
 
@@ -224,23 +248,22 @@ void Map::ResolvePortalVEntityCollision( Portal* portal, Entity* entity )
 
 	bool isOverlap = DoDiscsOverlap( entityPos, entityRadius, portalPos, portalRadius );
 
+	Vec2 destPos = portal->GetDestPosition();
+	float destYawOffset = portal->GetDestYawOffset();
+
 	if( isOverlap )
 	{
 		std::string mapName = portal->GetDestMap();
-		if( m_name == mapName )
+		if( m_name == mapName || mapName == "" )
 		{
-			Vec3 pitchRollYaw = entity->GetRotationPitchRollYawDegrees();
-
-
-			entity->SetPosition( portal->GetDestPosition() );
-			pitchRollYaw.z += portal->GetDestYawOffset();
-			entity->RotatePitchRollYawDegrees( pitchRollYaw );
+			entity->SetPosition( destPos );
+			entity->RotatePitchRollYawDegrees( Vec3( 0.f, 0.f, destYawOffset ) );
 		}
 		else
 		{
 			if( entity->IsPossessed() )
 			{
-				//g_theEventSystem->FireEvent( )
+				g_theGame->WarpPlayerWithEntity( entity, mapName, destPos, destYawOffset );
 			}
 		}
 	}
@@ -252,11 +275,13 @@ void Map::ResolveEntityCollisions( Entity* entity )
 	{
 		Entity* entityToCheckAgainst = m_allEntities[entityIndex];
 
-		if( entity != entityToCheckAgainst )
+		if( entityToCheckAgainst )
 		{
-			ResolveEntityCollision( entity, entityToCheckAgainst );
+			if( entity != entityToCheckAgainst )
+			{
+				ResolveEntityCollision( entity, entityToCheckAgainst );
+			}
 		}
-
 	}
 }
 

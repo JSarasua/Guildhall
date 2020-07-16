@@ -13,7 +13,9 @@
 	</MapRows>
 	<Entities>
 		<PlayerStart pos="0.5,0.5" yaw="45"/>
-	</Entities>
+    <Portal name="Teleporter" pos="2.5,3.5" yaw="30" destMap="EmptyRoom.xml" destPos="2,1.5" destYawOffset="0"/>
+
+  </Entities>
 
 </MapDefinition>
 

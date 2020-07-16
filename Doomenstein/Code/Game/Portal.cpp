@@ -1,6 +1,6 @@
 #include "Game/Portal.hpp"
+#include "Game/Map.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Math/LineSegment3.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -13,12 +13,13 @@
 
 extern RenderContext* g_theRenderer;
 
-Portal::Portal( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees, std::string const& destMap, Vec2 const& destPos, float destYawOffset  ) :
+Portal::Portal( EntityDefinition const* entityDef, Vec2 const& initialPosition, Vec3 const& pitchRollYawDegrees, std::string const& destMap, Vec2 const& destPos, float destYawOffset, Map* parentMap  ) :
 	Entity( entityDef, initialPosition, pitchRollYawDegrees )
 {
 	m_destMap = destMap;
 	m_destPos = destPos;
 	m_destYawOffset = destYawOffset;
+	m_mapPortalIsIn = parentMap;
 }
 
 void Portal::Update( float deltaSeconds )

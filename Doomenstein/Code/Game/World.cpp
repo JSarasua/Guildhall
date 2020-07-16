@@ -156,8 +156,56 @@ bool World::WarpPlayer( EventArgs const& args )
 	return true;
 }
 
+void World::WarpPlayerWithEntity( Entity* entityToWarp, std::string const& destMap, Vec2 const& destPos, float destYawOffset )
+{
+	//Update Position
+	Vec3 entityPosition = entityToWarp->GetPosition();
+	entityPosition.x = destPos.x;
+	entityPosition.y = destPos.y;
+	entityToWarp->SetPosition( entityPosition );
+
+	Vec3 entityRotation = entityToWarp->GetRotationPitchRollYawDegrees();
+	entityToWarp->RotatePitchRollYawDegrees( Vec3( 0.f, 0.f, destYawOffset ) );
+
+	if( destMap != "" )
+	{
+		//mapName.append( ".xml" );
+		auto mapIter = m_maps.find( destMap );
+		if( mapIter == m_maps.end() )
+		{
+			g_theConsole->ErrorString( Stringf( "%s not found in maps", destMap.c_str() ) );
+		}
+		else
+		{
+			m_currentMap->RemoveEntity( entityToWarp );
+			g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Warping to %s...", mapIter->first.c_str() ) );
+			m_currentMap = mapIter->second;
+			m_currentMap->AddEntity( entityToWarp );
+		}
+
+		//warp to map
+	}
+
+
+
+
+
+}
+
 Entity* World::GetClosestEntityInSector( Vec3 const& position, Vec2 const& forwardVector, float forwardSpread, float maxDistance )
 {
 	return m_currentMap->GetClosestEntityInSector( position, forwardVector, forwardSpread, maxDistance );
+}
+
+Map* World::GetMapByName( std::string const& mapName )
+{
+	Map* mapToGet = nullptr;
+	auto mapIter = m_maps.find( mapName );
+	if( mapIter != m_maps.end() )
+	{
+		mapToGet = mapIter->second;
+	}
+
+	return mapToGet;
 }
 

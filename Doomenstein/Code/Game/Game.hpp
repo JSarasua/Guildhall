@@ -1,6 +1,7 @@
 #pragma once
-#include "Entity.hpp"
-#include "GameCommon.hpp"
+#include "Game/Entity.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Map.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Core/NamedStrings.hpp"
@@ -99,6 +100,10 @@ public:
 	Mat44 GetCameraModelMatrix() const;
 
 	Entity const* GetPossessedEntity() const;
+
+	Map* GetMapByName( std::string const& mapName );
+	void WarpPlayerWithEntity( Entity* entityToWarp, std::string const& destMap, Vec2 const& destPos, float destYawOffset );
+
 
 private:
 	void IncrementCurrentLight();

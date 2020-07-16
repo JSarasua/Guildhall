@@ -53,6 +53,9 @@ public:
 
 	virtual RaycastResult Raycast( Vec3 const& startPosition, Vec3 const& forwardNormal, float maxDistance, Entity const* entityToIgnore ) = 0;
 
+	//Warping helper methods
+	void RemoveEntity( Entity* entity );
+	void AddEntity( Entity* entity );
 private:
 	void ResolveAllEntityVEntityCollisions();
 	void ResolveAllPortalVEntityCollisions();
