@@ -19,15 +19,15 @@ void World::Startup()
 	m_currentMap->Startup();
 	m_maps.push_back( m_currentMap );
 	
-// 	Map* level2 = new Map("Level2");
-// 	level2->SpawnSpawnersLevel2();
-// 	level2->Startup();
-// 	m_maps.push_back( level2 );
+	Map* level2 = new Map("Level2");
+	level2->SpawnSpawnersLevel2();
+	level2->Startup();
+	m_maps.push_back( level2 );
 
-	Map* level3 = new Map( "Level3" );
-	level3->SpawnSpawnersLevel3();
-	level3->Startup();
-	m_maps.push_back( level3 );
+// 	Map* level3 = new Map( "Level3" );
+// 	level3->SpawnSpawnersLevel3();
+// 	level3->Startup();
+// 	m_maps.push_back( level3 );
 }
 
 void World::Shutdown()
