@@ -89,5 +89,23 @@
   >
   </AudioDefinition>
 
+  <AudioDefinition
+  Name="Flame"
+  Sound="Bonus_Sound_FX/Flamethrower.flac"
+  IsLooped="true"
+  IsBackgroundMusic ="false"
+  IsSFX ="true"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="Laser"
+    Sound="Bonus_Sound_FX/Laser.wav"
+    IsLooped="true"
+    IsBackgroundMusic ="false"
+    IsSFX ="true"
+  >
+  </AudioDefinition>
+
 
 </AudioFiles>

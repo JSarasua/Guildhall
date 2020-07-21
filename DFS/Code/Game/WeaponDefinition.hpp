@@ -33,6 +33,7 @@ public:
 	float GetScreenShakeIncremenet() const;
 	AudioDefinition* GetAudioDefinition() const;
 	Vec2 const& GetWeaponOffset( float orientationDegrees, bool m_isMoving ) const;
+	std::string const& GetWeaponName() const { return m_name; }
 
 protected:
 	SpriteDefinition* m_weaponSpriteDef = nullptr;

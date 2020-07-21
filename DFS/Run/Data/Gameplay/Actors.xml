@@ -37,7 +37,6 @@
       <SpriteAnim name="DodgeNorth"				spriteIndexes="47,48,49,50,51,52,53,54,56,57,58,59,60,61,62" fps="27"/>
       <SpriteAnim name="DodgeSouth"				spriteIndexes="0,1,2,3,4,5,6,7,8,9,10,11,12,14,15" fps="27"/>
     </SpriteAnimSet>
-    
   </ActorDefinition>
 
   <ActorDefinition

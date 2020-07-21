@@ -148,11 +148,6 @@ void Actor::Update( float deltaSeconds )
 
 void Actor::Render() const
 {
-// 	if( !IsAlive() )
-// 	{
-// 		return;
-// 	}
-
 	const SpriteAnimSet& currentSpriteAnimSet = *m_actorDef->m_actorAnimations;
 
 	std::string animationName = GetCurrentAnimationName();
@@ -172,7 +167,6 @@ void Actor::Render() const
 	AABB2 actorBounds = m_actorDef->m_drawBounds;
 	actorBounds.Translate(m_position);
 	Rgba8 actorTint = m_actorDef->m_tint;
-	//const AABB2& actorUVs = m_actorDef->m_spriteUVs;
 	const Texture& actorTexture = g_actorSpriteSheet->GetTexture();
 
 	if( !m_isWeaponInFront && !m_isDodging && !m_isDead )
@@ -253,38 +247,7 @@ void Actor::RenderWeapon() const
 	}
 
 	float weaponOrientation = Entity::GetWeaponOrientationDegrees();
-// 	if( GetShortestAngularDistance( weaponOrientation, 0.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( 0.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 45.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( 45.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 90.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( 90.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 135.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( 135.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 180.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( 180.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 225.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( -135.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 270.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( -90.f, weaponOrientation, 0.5f );
-// 	}
-// 	else if( GetShortestAngularDistance( weaponOrientation, 315.f ) < 22.5f )
-// 	{
-// 		weaponOrientation = Interpolate( -45.f, weaponOrientation, 0.5f );
-// 	}
+
 
 	Vec2 pivotPoint = currentWeapon->GetTriggerPositionUV();
 	AABB2 weaponBounds = currentWeapon->GetWeaponDrawBounds();
@@ -301,7 +264,7 @@ void Actor::RenderWeapon() const
 		g_theRenderer->DrawRotatedAABB2Filled( weaponBounds, weaponTint, weaponUVs.mins, weaponUVs.maxs, m_orientationDegrees, pivotPoint );
 	}
 
-
+//Debug drawing
 // 	g_theRenderer->DrawDisc( m_position, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
 // 	g_theRenderer->DrawDisc( m_position + m_weaponOffset + debugPivot, 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
 // 	g_theRenderer->DrawDisc( GetMuzzlePosition(), 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
@@ -439,6 +402,7 @@ void Actor::UpdateFromKeyboard()
 	Vec2 weaponDirection = mousePos - GetPosition();
 
 	WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
+	std::string weaponName = weaponDef->GetWeaponName();
 	if( weaponDirection.x >= 0.f )
 	{
 		//m_weaponOffset = weaponDef->GetWeaponOffsetRight();
@@ -485,9 +449,33 @@ void Actor::UpdateFromKeyboard()
 				float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
 				g_theGame->AddScreenShake( screenShakeIncrement );
 				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
-				shootSound->StopSound();
-				shootSound->PlaySound();
+
+				if( weaponName == "Flamethrower" || weaponName == "LaserGun" )
+				{
+					if( shootSound->IsPlaying() )
+					{
+
+					}
+					else
+					{
+						shootSound->PlaySound();
+					}
+				}
+				else
+				{
+					shootSound->StopSound();
+					shootSound->PlaySound();
+				}
+
 				m_firingTimer.Reset();
+			}
+		}
+		if( leftMouseButton.WasJustReleased() )
+		{
+			if( weaponName == "Flamethrower" || weaponName == "LaserGun" )
+			{
+				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
+				shootSound->StopSound();
 			}
 		}
 

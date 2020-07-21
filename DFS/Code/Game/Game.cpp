@@ -113,6 +113,7 @@ void Game::Update( float deltaSeconds )
 			{
 				m_gameState = DEATH;
 				m_deathTimer.Reset();
+				AudioDefinition::StopAllSounds();
 			}
 		}
 	}

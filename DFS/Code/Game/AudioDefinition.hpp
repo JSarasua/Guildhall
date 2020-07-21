@@ -28,6 +28,7 @@ public:
 	void PlaySound();
 	void StopSound();
 	void UpdateVolume();
+	bool IsPlaying() const;
 protected:
 	SoundID m_soundID;
 	bool m_isLooped = false;

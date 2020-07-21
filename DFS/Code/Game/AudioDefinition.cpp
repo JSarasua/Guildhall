@@ -63,6 +63,11 @@ void AudioDefinition::UpdateVolume()
 	}
 }
 
+bool AudioDefinition::IsPlaying() const
+{
+	return m_isPlaying;
+}
+
 AudioDefinition::AudioDefinition( XmlElement const& element )
 {
 	std::string soundStringFile = "Data/Audio/";
