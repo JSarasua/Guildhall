@@ -184,6 +184,12 @@ void Game::LoadAssets()
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
 
 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/HealthBar.png" );
+
+ 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/VictoryMenuContinue.png" );
+ 	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/VictoryMenu.png" );
+
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenu.png" );
+	g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenuContinue.png" );
 }
 
 void Game::UpdateCamera( float deltaSeconds )
