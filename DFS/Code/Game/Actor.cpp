@@ -36,7 +36,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	else if( m_name == "Boss" )
 	{
 		m_entityType = ENTITY_TYPE_BOSS;
-		m_health = 1000;
+		m_health = BOSS_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( 0.1 );
 		m_bossWaitTimer.SetSeconds( Clock::GetMaster(), 3.0 );
@@ -47,7 +47,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	else
 	{
 		m_entityType = ENTITY_TYPE_NPC_ENEMY;
-		m_health = 50;
+		m_health = ENEMY_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );
@@ -80,7 +80,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	else if( m_name == "Boss" )
 	{
 		m_entityType = ENTITY_TYPE_BOSS;
-		m_health = 1000;
+		m_health = BOSS_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.1 );
 		m_bossWaitTimer.SetSeconds( Clock::GetMaster(), 3.0 );
@@ -91,7 +91,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 	else
 	{
 		m_entityType = ENTITY_TYPE_NPC_ENEMY;
-		m_health = 50;
+		m_health = ENEMY_HEALTH;
 		m_isDead = false;
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 1.0 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.2 );

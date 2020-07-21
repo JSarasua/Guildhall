@@ -12,6 +12,8 @@ class AudioSystem;
 class SpriteSheet;
 
 constexpr int PLAYER_HEALTH = 100;
+constexpr int ENEMY_HEALTH = 30;
+constexpr int BOSS_HEALTH = 1000;
 constexpr float CLIENT_ASPECT = 16.f/9.f;
 
 //Given Constants
