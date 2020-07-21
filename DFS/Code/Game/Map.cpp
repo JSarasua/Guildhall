@@ -736,6 +736,30 @@ bool Map::IsBossDead() const
 	return false;
 }
 
+int Map::GetBossHealth() const
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		Entity* entity = m_entities[entityIndex];
+		if( entity )
+		{
+			if( entity->m_entityType == ENTITY_TYPE_BOSS )
+			{
+				if( !entity->IsAlive() )
+				{
+					return -1;
+				}
+				else
+				{
+					return entity->GetHealth();
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
 void Map::SpawnSpawnersLevel1()
 {
 	ActorDefinition* maryActorDef = ActorDefinition::s_definitions["Mary"];

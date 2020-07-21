@@ -300,9 +300,23 @@ void Game::RenderUI()
 	AABB2 weaponBorderBox = topRightBox;
 	weaponBorderBox.SetDimensions( weaponBorderBox.GetDimensions() * 2.f );
 
+	float bossHealth = (float)GetBossHealth();
+	float bossHealthFraction = bossHealth/1000.f;
+
+	AABB2 bossHealthBox = gameCamera.GetBoxAtBottom( 0.2f );
+	bossHealthBox.SetDimensions( Vec2( 120.f, 3.f ) );
+	AABB2 bossCurrentHealthBox = bossHealthBox.GetBoxAtLeft( bossHealthFraction );
+
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->DrawAABB2Filled( underHealthBox, Rgba8( 235, 86, 82 ) );
 	g_theRenderer->DrawAABB2Filled( playerHealthBox, Rgba8( 51, 189, 75 ) );
+
+	if( bossHealthFraction >= 0.f )
+	{
+		g_theRenderer->DrawAABB2Filled( bossHealthBox, Rgba8( 235, 86, 82 ) );
+		g_theRenderer->DrawAABB2Filled( bossCurrentHealthBox, Rgba8( 51, 189, 75 ) );
+	}
+
 	g_theRenderer->BindTexture( healthBarTex );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 	g_theRenderer->DrawAABB2Filled( topLeftBox, Rgba8::WHITE );
@@ -492,6 +506,11 @@ void Game::RebuildWorld()
 	m_world = new World(this);
 	m_world->Startup();
 	m_player = m_world->GetPlayer();
+}
+
+int Game::GetBossHealth() const
+{
+	return m_world->GetBossHealth();
 }
 
 AABB2 Game::GetUICamera() const

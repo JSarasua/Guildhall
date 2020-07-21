@@ -99,6 +99,7 @@ private:
 	//Misc
 	IntVec2 GetCurrentMapBounds() const;
 	void	RebuildWorld();
+	int		GetBossHealth() const;
 
 private:
 	World* m_world = nullptr;

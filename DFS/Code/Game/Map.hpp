@@ -54,6 +54,7 @@ public:
 	void DeletePlayer();
 
 	bool IsBossDead() const;
+	int GetBossHealth() const;
 
 	void SpawnSpawnersLevel1();
 	void SpawnSpawnersLevel2();

@@ -95,6 +95,11 @@ void World::GetPlayers( std::vector<Actor*>& players )
 	m_currentMap->GetPlayers(players);
 }
 
+int World::GetBossHealth() const
+{
+	return m_currentMap->GetBossHealth();
+}
+
 IntVec2 World::getCurrentMapBounds() const
 {
 	return m_currentMap->GetMapBounds();
