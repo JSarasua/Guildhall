@@ -279,6 +279,11 @@ void Actor::SetEnemy( Entity* enemy )
 
 void Actor::IncrementActiveWeapon()
 {
+	if( m_weapons.size() > 1 )
+	{
+		m_weapons[m_currentWeaponIndex]->GetAudioDefinition()->StopSound();
+	}
+
 	m_currentWeaponIndex++;
 	if( m_currentWeaponIndex >= m_weapons.size() )
 	{
@@ -292,6 +297,11 @@ void Actor::IncrementActiveWeapon()
 
 void Actor::DecrementActiveWeapon()
 {
+	if( m_weapons.size() > 1 )
+	{
+		m_weapons[m_currentWeaponIndex]->GetAudioDefinition()->StopSound();
+	}
+
 	m_currentWeaponIndex--;
 	if( m_currentWeaponIndex < 0 )
 	{
@@ -435,7 +445,7 @@ void Actor::UpdateFromKeyboard()
 		{
 			m_dodgeTimer.Reset();
 			m_isDodging = true;
-			//m_velocity *= 1.75f;
+			m_weapons[m_currentWeaponIndex]->GetAudioDefinition()->StopSound();
 		}
 	}
 

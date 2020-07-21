@@ -830,6 +830,7 @@ void Map::SpawnSpawnersLevel2()
 	WeaponDefinition* rocketLauncherWeapon = WeaponDefinition::s_definitions["RocketLauncher"];
 	WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 	WeaponDefinition* flamethrowerWeapon = WeaponDefinition::s_definitions["Flamethrower"];
+	//WeaponDefinition* laserGun = WeaponDefinition::s_definitions["LaserGun"];
 
 	EnemySpawner* spawner = new EnemySpawner( Vec2( 5.f, 31.f ), FloatRange( 0.f, 5.f ), IntRange( 3, 5 ), 6.f, nullptr, this );
 	EnemySpawner* spawner2 = new EnemySpawner( Vec2( 12.f, 32.f ), FloatRange( 0.f, 5.f ), IntRange( 3, 6 ), 6.f, nullptr, this );

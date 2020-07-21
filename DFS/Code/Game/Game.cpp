@@ -600,6 +600,7 @@ void Game::TriggerVictoryState()
 {
 	m_gameState = VICTORY;
 	m_victoryTimer.Reset();
+	AudioDefinition::StopAllSounds();
 }
 
 void Game::UpdateConsoleTest( float deltaSeconds )
