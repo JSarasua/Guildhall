@@ -1,6 +1,6 @@
 Jonathan Sarasua
-SDST-A3
-Due: 7/1/2020
+SDST-A4
+Due: 7/17/2020
 
 W = Move Forward
 S = Move Backward
@@ -11,7 +11,8 @@ Space = Move Down
 Mouse = Rotate camera
 F1 = Toggle Debug Draw
 F3 = Possess
+1 = Start Work 1000 pieces of work (Sine and Cosine math in a double for loop)
+2 = Claim work
 
 Problems:
-I ended up using Step and Sample for raycast. I ran into issues during wall collisions for the fast method, so I ended up stopping.
-My error checking isn't great for entities
+No problems this assignment. I did not do any extras and I don't auto possess an entity on startup

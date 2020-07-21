@@ -20,7 +20,6 @@ App::App()
 	g_gameConfigBlackboard = new NamedStrings();
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
-	//m_game = new Game();
 	g_theGame = new Game();
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
@@ -31,7 +30,7 @@ App::~App() {}
 
 void App::Startup()
 {
-	g_theJobSystem->AddWorkerThreads( 6 );
+	g_theJobSystem->AddWorkerThreads( 12 );
 	Clock::SystemStartup();
 
 	XmlDocument gameConfigDoc;
