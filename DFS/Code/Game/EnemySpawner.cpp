@@ -68,9 +68,15 @@ void EnemySpawner::Update()
 					spawnPosition = m_position + randomOffset;
 				}
 
-				Actor* entityToSpawn = new Actor( spawnPosition, Vec2(), 0.f, 0.f, m_enemyTypes[0] );
+				int numOfEnemyTypes = (int)m_enemyTypes.size() - 1;
+				int randomEnemyType = randGen.RollRandomIntInRange( 0, numOfEnemyTypes );
+
+				int numOfWeaponTypes = (int)m_weapons.size() - 1;
+				int randomWeaponType = randGen.RollRandomIntInRange( 0, numOfWeaponTypes );
+
+				Actor* entityToSpawn = new Actor( spawnPosition, Vec2(), 0.f, 0.f, m_enemyTypes[randomEnemyType] );
 				entityToSpawn->SetEnemy( m_player );
-				entityToSpawn->AddWeapon( m_weapons[0] );
+				entityToSpawn->AddWeapon( m_weapons[randomWeaponType] );
 				m_map->SpawnEntity( entityToSpawn );
 				m_numberOfEnemiesSpawned++;
 			}
