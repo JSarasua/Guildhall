@@ -4,6 +4,7 @@
 
 extern RenderContext* g_theRenderer;
 Window* g_theWindow = nullptr;
+Game* g_theGame = nullptr;
 
 void DrawLine( Vec2 startPoint, Vec2 endPoint, Rgba8 color, float thickness )
 {

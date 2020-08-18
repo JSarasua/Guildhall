@@ -8,6 +8,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Game.hpp"
+#include "Game/GameCommon.hpp"
 
 
 
@@ -49,7 +50,6 @@ private:
 	void CheckController();
 
 public:
-	Game* m_game = nullptr;
 
 private:
 	bool m_isQuitting = false;

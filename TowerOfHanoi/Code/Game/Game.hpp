@@ -6,6 +6,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Game/MonteCarlo.hpp"
 #include <vector>
 #include <deque>
 #include <queue>
@@ -18,20 +19,15 @@ class Player;
 class Shader;
 class ShaderState;
 class World;
+class MonteCarlo;
 
 struct light_t;
 struct Vertex_PCUTBN;
+struct inputMove_t;
+struct gameState_t;
 
-struct gameState_t
-{
-	std::deque<int> columns[3];
-};
 
-struct inputMove_t
-{
-	int m_columnToPop = 0;
-	int m_columnToPush = 0;
-};
+
 
 struct fresnel_t
 {
@@ -101,13 +97,14 @@ public:
 	bool TestEventSystem( EventArgs const& args );
 	bool TestEventSystem2( EventArgs const& args );
 
-private:
-	void InitializeGameState();
-	std::vector<inputMove_t> ValidMovesAtGameState( gameState_t const& gameState );
+	std::vector<inputMove_t> GetValidMovesAtGameState( gameState_t const& gameState );
 	bool IsGameStateWon( gameState_t const& gameState );
 	void UpdateGameStateIfValid( inputMove_t const& inputMove );
 	void UpdateGameStateIfValid( inputMove_t const& inputMove, gameState_t& gameState );
 	bool IsMoveValidForGameState( inputMove_t const& inputMove, gameState_t const& gameState );
+
+private:
+	void InitializeGameState();
 
 	void IncrementShader();
 	void DecrementShader();
@@ -140,13 +137,6 @@ private:
 	Mat44 m_frontCubeModelMatrix;
 	Mat44 m_leftCubeModelMatrix;
 	Mat44 m_frontleftCubeModelMatrix;
-
-	//Mat44 m_loadedMeshModelMatrix;
-	//Mat44 m_circleOfSpheresModelMatrix;
-	//Mat44 m_quadModelMatrix;
-	//Mat44 m_sphereModelMatrix;
-	//Mat44 m_triPlanarSphereModelMatrix;
-	//int m_numberOfCirclingCubes = 0;
 
 	Clock* m_gameClock = nullptr;
 
@@ -208,6 +198,7 @@ public:
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
 
+	MonteCarlo m_mcAI;
 	gameState_t m_currentGameState;
 	inputMove_t m_currentInputMove;
 	bool m_isInputPop = true;

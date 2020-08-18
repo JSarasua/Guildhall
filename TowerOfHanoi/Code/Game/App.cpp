@@ -20,7 +20,7 @@ App::App()
 	g_gameConfigBlackboard = new NamedStrings();
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
-	m_game = new Game();
+	g_theGame = new Game();
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
 }
@@ -50,7 +50,7 @@ void App::Startup()
 
 	DebugRenderSystemStartup( g_theRenderer );
 	
-	m_game->Startup();
+	g_theGame->Startup();
 	g_theConsole->Startup();
 
 	m_devConsoleCamera = new Camera();
@@ -72,8 +72,8 @@ void App::Shutdown()
 
 	delete g_theAudio;
 	delete g_gameConfigBlackboard;
-	m_game->Shutdown();
-	delete m_game;
+	g_theGame->Shutdown();
+	delete g_theGame;
 	g_theConsole->Shutdown();
 	delete g_theConsole;
 	DebugRenderSystemShutdown();
@@ -155,13 +155,13 @@ void App::Update()
 	CheckButtonPresses();
 	CheckController();
 
-	m_game->Update();
+	g_theGame->Update();
 }
 
 
 void App::Render()
 {
-	m_game->Render();
+	g_theGame->Render();
 
 	g_theRenderer->BeginCamera(*m_devConsoleCamera);
 	g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
@@ -179,10 +179,10 @@ void App::EndFrame()
 
 void App::RestartGame()
 {
-	m_game->Shutdown();
-	delete m_game;
-	m_game = new Game();
-	m_game->Startup();
+	g_theGame->Shutdown();
+	delete g_theGame;
+	g_theGame = new Game();
+	g_theGame->Startup();
 }
 
 bool App::GetDebugGameMode()

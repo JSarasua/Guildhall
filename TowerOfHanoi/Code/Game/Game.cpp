@@ -163,6 +163,8 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
 
 	InitializeGameState();
+	m_mcAI.SetGameState( m_currentGameState );
+	m_mcAI.SetMaxDepth( 100 );
 }
 
 void Game::Shutdown()
@@ -355,7 +357,7 @@ bool Game::SetAmbientColor( const EventArgs* args )
 bool Game::SetAttenuation( const EventArgs* args )
 {
 	Vec3 attenuation = args->GetValue( "attenuation", Vec3( 0.f, 1.f, 0.f ) );
-	g_theApp->m_game->SetAttenuation( attenuation );
+	g_theGame->SetAttenuation( attenuation );
 
 	return true;
 }
@@ -411,7 +413,7 @@ void Game::InitializeGameState()
 
 }
 
-std::vector<inputMove_t> Game::ValidMovesAtGameState( gameState_t const& gameState )
+std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& gameState )
 {
 	bool isCol0NotEmpty = !gameState.columns[0].empty();
 	bool isCol1NotEmpty = !gameState.columns[1].empty();
@@ -881,7 +883,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
-// 	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
+ 	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
 // 	const KeyButtonState& num5Key = g_theInput->GetKeyStates( '5' );
 // 	const KeyButtonState& num6Key = g_theInput->GetKeyStates( '6' );
 // 	const KeyButtonState& num7Key = g_theInput->GetKeyStates( '7' );
@@ -890,7 +892,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
 // 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
 // 	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
-// 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+ 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
 // 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 // 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 // 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
@@ -964,6 +966,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			m_currentInputMove.m_columnToPush = 2;
 			m_isInputPop = !m_isInputPop;
 		}
+	}
+	if( num4Key.WasJustPressed() )
+	{
+		//run sims
+		m_mcAI.RunSimulations( 1000 );
+		m_mcAI.UpdateBestMove();
+		UpdateGameStateIfValid( m_mcAI.GetBestMove() );
+	}
+	if( rKey.WasJustPressed() )
+	{
+		InitializeGameState();
+		m_mcAI.SetGameState( m_currentGameState );
+		m_mcAI.SetMaxDepth( 100 );
 	}
 }
 
