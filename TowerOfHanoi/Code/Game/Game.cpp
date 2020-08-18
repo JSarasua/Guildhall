@@ -241,6 +241,7 @@ void Game::Update()
 	float col0X = 0.01f;
 	float col1X = 0.1f;
 	float col2X = 0.3f;
+	float victoryHeight = 0.9f;
 
 	float currentCol0Height = baseHeight;
 	float currentCol1Height = baseHeight;
@@ -267,7 +268,12 @@ void Game::Update()
 		int rowValue = m_currentGameState.columns[2][rowIndex];
 
 		currentCol2Height = baseHeight + baseHeightIncr * (float)rowIndex;
-		DebugAddScreenText( Vec4( col2X, currentCol1Height, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, Stringf("%i", rowValue).c_str() );
+		DebugAddScreenText( Vec4( col2X, currentCol2Height, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, Stringf("%i", rowValue).c_str() );
+	}
+
+	if( IsGameStateWon( m_currentGameState ) )
+	{
+		DebugAddScreenText( Vec4( col0X, victoryHeight, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, "YOU WON!" );
 	}
 
 
@@ -464,6 +470,11 @@ std::vector<inputMove_t> Game::ValidMovesAtGameState( gameState_t const& gameSta
 bool Game::IsGameStateWon( gameState_t const& gameState )
 {
 	std::deque<int> const& col2 = gameState.columns[2];
+
+	if( col2.size() != 5 )
+	{
+		return false;
+	}
 
 	if( col2[0] == 5 && col2[1] == 4 && col2[2] == 3 && col2[3] == 2 && col2[4] == 1 )
 	{
@@ -849,419 +860,111 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+// 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+// 	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+// 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+// 	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
-	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
-	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
-	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
-	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
-	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
-	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
-	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
-	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
-	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
-	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
-	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
-	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
-	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
+// 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+// 	const KeyButtonState& aKey = g_theInput->GetKeyStates( 'A' );
+// 	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
+// 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+// 	const KeyButtonState& cKey = g_theInput->GetKeyStates( 'C' );
+// 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+// 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
+// 	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
+// 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
+// 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
+// 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
+// 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
+// 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
-	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
-	const KeyButtonState& num5Key = g_theInput->GetKeyStates( '5' );
-	const KeyButtonState& num6Key = g_theInput->GetKeyStates( '6' );
-	const KeyButtonState& num7Key = g_theInput->GetKeyStates( '7' );
-	const KeyButtonState& num8Key = g_theInput->GetKeyStates( '8' );
-	const KeyButtonState& num9Key = g_theInput->GetKeyStates( '9' );
-	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
-	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
-	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
-	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
-	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
-	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
-	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
-	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
-	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
-	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
-	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
-	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
-	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
-	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
-	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
-	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
-	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
-	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
-	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
-	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
-	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
-	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
-	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
-	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
-	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
-	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
+// 	const KeyButtonState& num4Key = g_theInput->GetKeyStates( '4' );
+// 	const KeyButtonState& num5Key = g_theInput->GetKeyStates( '5' );
+// 	const KeyButtonState& num6Key = g_theInput->GetKeyStates( '6' );
+// 	const KeyButtonState& num7Key = g_theInput->GetKeyStates( '7' );
+// 	const KeyButtonState& num8Key = g_theInput->GetKeyStates( '8' );
+// 	const KeyButtonState& num9Key = g_theInput->GetKeyStates( '9' );
+// 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
+// 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
+// 	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
+// 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+// 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
+// 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
+// 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
+// 	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
+// 	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+// 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
+// 	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
+// 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
+// 	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
+// 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
+// 	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
+// 	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
+// 	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
+// 	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
+// 	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
+// 	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
+// 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
+// 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
+// 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
+// 	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
+// 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
+// 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
+	const KeyButtonState& enterKey = g_theInput->GetKeyStates( ENTER_KEY );
 
-	if( jKey.WasJustPressed() )
+	if( enterKey.WasJustPressed() )
 	{
-		DecrementCurrentLight();
-	}
-	if( kKey.WasJustPressed() )
-	{
-		IncrementCurrentLight();
-	}
-	if( zKey.WasJustPressed() )
-	{
-		m_lights[m_currentLightIndex].direction = m_camera.GetDirection();
-		if( m_lights[m_currentLightIndex].isDirectional == 1.f )
+		if( IsMoveValidForGameState( m_currentInputMove, m_currentGameState ) )
 		{
-			m_lights[m_currentLightIndex].isDirectional = 0.f;
+			UpdateGameStateIfValid( m_currentInputMove );
+			m_currentInputMove.m_columnToPop = 0;
+			m_currentInputMove.m_columnToPush = 0;
+			m_isInputPop = true;
+		}
+	}
+
+	if( num1Key.WasJustPressed() )
+	{
+		if( m_isInputPop )
+		{
+			m_currentInputMove.m_columnToPop = 0;
+			m_isInputPop = !m_isInputPop;
 		}
 		else
 		{
-			m_lights[m_currentLightIndex].isDirectional = 1.f;
+			m_currentInputMove.m_columnToPush = 0;
+			m_isInputPop = !m_isInputPop;
 		}
-
 	}
-	if( xKey.WasJustPressed() )
+	if( num2Key.WasJustPressed() )
 	{
-		if( m_lights[m_currentLightIndex].cosOuterAngle == -1.f )
+		if( m_isInputPop )
 		{
-			m_lights[m_currentLightIndex].cosInnerAngle = 0.98f;
-			m_lights[m_currentLightIndex].cosOuterAngle = 0.96f;
+			m_currentInputMove.m_columnToPop = 1;
+			m_isInputPop = !m_isInputPop;
 		}
 		else
 		{
-			m_lights[m_currentLightIndex].cosInnerAngle = -0.98f;
-			m_lights[m_currentLightIndex].cosOuterAngle = -1.f;
+			m_currentInputMove.m_columnToPush = 1;
+			m_isInputPop = !m_isInputPop;
 		}
 	}
-	if( uKey.IsPressed() )
+	if( num3Key.WasJustPressed() )
 	{
-		m_dissolveAmount -= 0.5f * deltaSeconds;
-		m_dissolveAmount = Clampf( m_dissolveAmount, 0.f, 1.f );
+		if( m_isInputPop )
+		{
+			m_currentInputMove.m_columnToPop = 2;
+			m_isInputPop = !m_isInputPop;
+		}
+		else
+		{
+			m_currentInputMove.m_columnToPush = 2;
+			m_isInputPop = !m_isInputPop;
+		}
 	}
-	if( iKey.IsPressed() )
-	{
-		m_dissolveAmount += 0.5f * deltaSeconds;
-		m_dissolveAmount = Clampf( m_dissolveAmount, 0.f, 1.f );
-	}
-	if( qKey.WasJustPressed() )
-	{
-		SetLightPosition( m_camera.GetPosition() );
-	}
-
-	if( f1Key.WasJustPressed() )
-	{
-		SoundID soundID = g_theAudio->CreateOrGetSound( "Data/Audio/TestSound.mp3" );
-		float volume = m_rand.RollRandomFloatInRange( 0.5f, 1.f );
-		float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
-		float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
-
-		g_theAudio->PlaySound( soundID, false, volume, balance, speed );
-	}
-
-	if( f11Key.WasJustPressed() )
-	{
-		g_theWindow->ToggleBorder();
-	}
-
-	if( num1Key.IsPressed() )
-	{
-		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
-		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
-		float range = currentInnerCosTheta - currentOuterCosTheta;
-
-		float max = 1.f;
-		float min = -1.f + range;
-
-		float newInnerCosTheta = currentInnerCosTheta - 0.5f * deltaSeconds;
-		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
-		float newOuterCosTheta = newInnerCosTheta - range;
-
-		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
-		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
-	}
-	if( num2Key.IsPressed() )
-	{
-		float currentInnerCosTheta = m_lights[m_currentLightIndex].cosInnerAngle;
-		float currentOuterCosTheta = m_lights[m_currentLightIndex].cosOuterAngle;
-		float range = currentInnerCosTheta - currentOuterCosTheta;
-
-		float max = 1.f;
-		float min = -1.f + range;
-
-		float newInnerCosTheta = currentInnerCosTheta + 0.5f * deltaSeconds;
-		newInnerCosTheta = Clampf( newInnerCosTheta, min, max );
-		float newOuterCosTheta = newInnerCosTheta - range;
-
-		m_lights[m_currentLightIndex].cosInnerAngle = newInnerCosTheta;
-		m_lights[m_currentLightIndex].cosOuterAngle = newOuterCosTheta;
-	}
-	if( num3Key.IsPressed() )
-	{
-		float fogMin = m_fogRange * 0.5f;
-		float newFogDistance = m_fogDistance - 10.f * deltaSeconds;
-
-		newFogDistance = Max( newFogDistance, fogMin );
-		m_fogDistance = newFogDistance;
-
-		float newNearFog = newFogDistance - fogMin;
-		float newFarFog = newFogDistance + fogMin;
-		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
-		g_theRenderer->EnableFog( newNearFog, newFarFog, lerpColor );
-	}
-	if( num4Key.IsPressed() )
-	{
-		float fogMin = m_fogRange * 0.5f;
-		float newFogDistance = m_fogDistance + 10.f * deltaSeconds;
-
-		newFogDistance = Max( newFogDistance, fogMin );
-		m_fogDistance = newFogDistance;
-
-		float newNearFog = newFogDistance - fogMin;
-		float newFarFog = newFogDistance + fogMin;
-		Rgba8 lerpColor = Rgba8::LerpColorAsHSL( m_fogRed, m_fogBlue, m_fogColorLerp );
-		g_theRenderer->EnableFog( newNearFog, newFarFog, lerpColor );
-	}
-	if( num5Key.IsPressed() )
-	{
-		m_greyscaleAmount -= deltaSeconds;
-		m_greyscaleAmount = Clampf( m_greyscaleAmount, 0.f, 1.f );
-	}
-	if( num6Key.IsPressed() )
-	{
-		m_greyscaleAmount += deltaSeconds;
-		m_greyscaleAmount = Clampf( m_greyscaleAmount, 0.f, 1.f );
-	}
-	if( num7Key.IsPressed() )
-	{
-		m_tintAmount -= deltaSeconds;
-		m_tintAmount = Clampf( m_tintAmount, 0.f, 1.f );
-	}
-	if( num8Key.IsPressed() )
-	{
-		m_tintAmount += deltaSeconds;
-		m_tintAmount = Clampf( m_tintAmount, 0.f, 1.f );
-	}
-	if( num9Key.IsPressed() )
-	{
-		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
-		float currentAmbientIntensity = currentAmbientLight.w;
-
-		float newAmbientIntensity = currentAmbientIntensity - ( 0.5f*deltaSeconds );
-		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
-		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
-	}
-	if( num0Key.IsPressed() )
-	{
-		Vec4 currentAmbientLight = g_theRenderer->GetAmbientLight();
-		float currentAmbientIntensity = currentAmbientLight.w;
-
-		float newAmbientIntensity = currentAmbientIntensity + (0.5f*deltaSeconds);
-		newAmbientIntensity = Clampf( newAmbientIntensity, 0.f, 1.f );
-		g_theRenderer->SetAmbientIntensity( newAmbientIntensity );
-	}
-	if( lBracketKey.IsPressed() )
-	{
-		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
-
-		float newSpecularFactor = currentSpecularFactor - 0.5f * deltaSeconds;
-		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		g_theRenderer->SetSpecularFactor( newSpecularFactor );
-		m_testMaterial->m_specularFactor = newSpecularFactor;
-	}
-	if( rBracketKey.IsPressed() )
-	{
-		float currentSpecularFactor = g_theRenderer->GetSpecularFactor();
-
-		float newSpecularFactor = currentSpecularFactor + 0.5f * deltaSeconds;
-		newSpecularFactor = Clampf( newSpecularFactor, 0.f, 1.f );
-		g_theRenderer->SetSpecularFactor( newSpecularFactor );
-		m_testMaterial->m_specularFactor = newSpecularFactor;
-	}
-	if( semiColonKey.IsPressed() )
-	{
-		float currentSpecularPower = g_theRenderer->GetSpecularPower();
-
-		float newSpecularPower = currentSpecularPower - 20.f * deltaSeconds;
-		newSpecularPower = Max( newSpecularPower, 1.f );
-		g_theRenderer->SetSpecularPower( newSpecularPower );
-		m_testMaterial->m_specularPower = newSpecularPower;
-	}
-	if( singleQuoteKey.IsPressed() )
-	{
-		float currentSpecularPower = g_theRenderer->GetSpecularPower();
-
-		float newSpecularPower = currentSpecularPower + 20.f * deltaSeconds;
-		newSpecularPower = Max( newSpecularPower, 1.f );
-		g_theRenderer->SetSpecularPower( newSpecularPower );
-		m_testMaterial->m_specularPower = newSpecularPower;
-	}
-	if( commaKey.WasJustPressed() )
-	{
-		DecrementShader();
-	}
-	if( periodKey.WasJustPressed() )
-	{
-		IncrementShader();
-	}
-	if( vKey.WasJustPressed() )
-	{
-		DecrementNormalTexture();
-	}
-	if( bKey.WasJustPressed() )
-	{
-		IncrementNormalTexture();
-	}
-	if( nKey.WasJustPressed() )
-	{
-		DecrementRenderTexture();
-	}
-	if( mKey.WasJustPressed() )
-	{
-		IncrementRenderTexture();
-	}
-	if( gKey.IsPressed() )
-	{
-		float currentGamma = g_theRenderer->GetGamma();
-		float newGamma = currentGamma - 2.f * deltaSeconds;
-		g_theRenderer->SetGamma( newGamma );
-	}
-	if( hKey.IsPressed() )
-	{
-		float currentGamma = g_theRenderer->GetGamma();
-		float newGamma = currentGamma + 2.f * deltaSeconds;
-		g_theRenderer->SetGamma( newGamma );
-	}
-	if( f5Key.WasJustPressed() )
-	{
-		m_lights[m_currentLightIndex].position = Vec3( 0.f, 0.f, 0.f );
-		m_isLightFollowingCamera = false;
-		m_isLightAnimated = false;
-	}
-	if( f6Key.WasJustPressed() )
-	{
-		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
-		m_isLightFollowingCamera = false;
-		m_isLightAnimated = false;
-	}
-	if( f7Key.WasJustPressed() )
-	{
-		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
-		m_isLightFollowingCamera = true;
-		m_isLightAnimated = false;
-	}
-	if( f8Key.WasJustPressed() )
-	{
-		m_lights[m_currentLightIndex].position = m_lightAnimatedPosition;
-		m_isLightFollowingCamera = false;
-		m_isLightAnimated = true;
-	}
-
-	if( rKey.WasJustPressed() )
-	{
-		Vec3 startPos = m_camera.GetPosition();
-		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
-		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
-
-		endPos = cameraModel.TransformPosition3D( endPos );
-		endPos += startPos;
-		LineSegment3 line = LineSegment3( startPos, endPos );
-		DebugAddWorldLine( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
-	}
-	if( fKey.WasJustPressed() )
-	{
-		Vec3 startPos = m_camera.GetPosition();
-		Vec3 endPos = Vec3( 0.f, 0.f, -5.f );
-		Mat44 cameraModel = m_camera.GetModelRotationMatrix();
-
-		endPos = cameraModel.TransformPosition3D( endPos );
-		endPos += startPos;
-		LineSegment3 line = LineSegment3( startPos, endPos );
-		DebugAddWorldArrow( line, Rgba8::GREEN, Rgba8::BLUE, 10.f, DEBUG_RENDER_USE_DEPTH );
-	}
-	if( tKey.WasJustPressed() )
-	{
-		//ToggleAttenuation();
-		ToggleBloom();
-	}
-	if( plusKey.IsPressed() )
-	{
-		float currentLightIntensity = m_lights[m_currentLightIndex].intensity;
-
-		float newLightIntensity = currentLightIntensity + 2.f * deltaSeconds;
-		newLightIntensity = Max( newLightIntensity, 0.f );
-		m_lights[m_currentLightIndex].intensity = newLightIntensity;
-	}
-	if( minusKey.IsPressed() )
-	{
-		float currentLightIntensity = m_lights[m_currentLightIndex].intensity;
-
-		float newLightIntensity = currentLightIntensity - 2.f * deltaSeconds;
-		newLightIntensity = Max( newLightIntensity, 0.f );
-		m_lights[m_currentLightIndex].intensity = newLightIntensity;
-	}
-
-	Vec3 translator;
-
-	if( wKey.IsPressed() )
-	{
-		translator.x +=  1.f * deltaSeconds;
-	}
-	if( sKey.IsPressed() )
-	{
-		translator.x -=  1.f * deltaSeconds;
-	}
-	if( aKey.IsPressed() )
-	{
-		translator.y +=  1.f * deltaSeconds;
-	}
-	if( dKey.IsPressed() )
-	{
-		translator.y -=  1.f * deltaSeconds;
-	}
-	if( cKey.IsPressed() )
-	{
-		translator.z +=  1.f * deltaSeconds;
-	}
-	if( spaceKey.IsPressed() )
-	{
-		translator.z -=  1.f * deltaSeconds;
-	}
-
-	if( shiftKey.IsPressed() )
-	{
-		translator *= 2.f;
-	}
-
-	m_camera.TranslateRelativeToViewOnlyYaw( translator );
-
-	Vec3 rotator;
-	if( upArrow.IsPressed() )
-	{
-		rotator.x += 1.f * deltaSeconds;
-	}
-	if( downArrow.IsPressed() )
-	{
-		rotator.x -= 1.f * deltaSeconds;
-	}
-	if( leftArrow.IsPressed() )
-	{
-		rotator.z += 1.f * deltaSeconds;
-	}
-	if( rightArrow.IsPressed() )
-	{
-		rotator.z -= 1.f * deltaSeconds;
-	}
-
-	Vec2 mouseChange = g_theInput->GetMouseDeltaPos();
-
-	rotator.x += mouseChange.y * 0.1f;
-	rotator.z -= mouseChange.x * 0.1f;
-	m_camera.RotatePitchRollYawDegrees( rotator );
-
 }
 
 IntVec2 Game::GetCurrentMapBounds() const

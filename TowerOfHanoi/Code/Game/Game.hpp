@@ -209,6 +209,8 @@ public:
 	RandomNumberGenerator m_rand;
 
 	gameState_t m_currentGameState;
+	inputMove_t m_currentInputMove;
+	bool m_isInputPop = true;
 
 private:
 	void RenderDevConsole();
