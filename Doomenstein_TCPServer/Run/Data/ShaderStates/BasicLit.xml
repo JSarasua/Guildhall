@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ShaderState
+  ShaderFilePath="Data/Shaders/Phong.hlsl"
+  BlendMode="SOLID"
+  DepthCompareMode="COMPARE_LESS_THAN_OR_EQUAL"
+  WindingOrder="WIND_COUNTERCLOCKWISE"
+  CullMode="CULL_BACK"
+  FillMode="FILL_SOLID"
+  WriteDepth="true"
+  />

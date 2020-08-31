@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="General">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{c1cab804-90f0-4c86-9e04-f526d076d395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShaderStates">
+      <UniqueIdentifier>{da0e0c03-1253-4fd4-a34c-f67886d685f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{1f004756-735c-41a7-9148-a7b24c9b7329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameConfig">
+      <UniqueIdentifier>{4a0d1909-9c36-4f49-8845-cc57c2e31342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Maps">
+      <UniqueIdentifier>{96ae0c9d-2be5-42c4-a712-5dd49bc80472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Definitions">
+      <UniqueIdentifier>{1ec80f21-9f44-48ca-a030-30531e1c6ddc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main_Windows.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="GameCommon.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMap.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapTile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapRegionType.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MapMaterialType.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="EntityDefinition.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Portal.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="GameCommon.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonColors.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="World.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMap.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapTile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapRegionType.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MapMaterialType.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Portal.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\Run\Data\Shaders\Triangle.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Default.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\InvertColor.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Phong.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Normals.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Bitangents.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\SurfaceNormals.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Tangents.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Fresnel.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Dissolve.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Triplanar.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\ShaderUtils.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\Projection.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\ImageEffect.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\AddEffect.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\BlurEffect.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\TransformColorEffect.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\Run\Data\Shaders\WorldOpaque.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\Run\Data\ShaderStates\BasicLit.xml">
+      <Filter>ShaderStates</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Materials\TestMaterial.xml">
+      <Filter>Materials</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\GameConfig.xml">
+      <Filter>GameConfig</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\EmptyRoom.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\SingleBlock.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TestRoom.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\TwistyMaze.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Maps\UVTest.xml">
+      <Filter>Maps</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\EntityTypes.xml">
+      <Filter>Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapMaterialTypes.xml">
+      <Filter>Definitions</Filter>
+    </Xml>
+    <Xml Include="..\..\Run\Data\Definitions\MapRegionTypes.xml">
+      <Filter>Definitions</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>

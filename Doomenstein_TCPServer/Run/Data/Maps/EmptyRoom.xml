@@ -1,0 +1,29 @@
+<MapDefinition type="TileMap" version="1" dimensions="8,5">
+
+	<Legend>
+		<Tile glyph="#" regionType="CobblestoneWall"/>
+		<Tile glyph="." regionType="StoneFloor"/>
+	</Legend>
+	<MapRows>
+		<MapRow tiles="########"/>
+		<MapRow tiles="#......#"/>
+		<MapRow tiles="#......#"/>
+		<MapRow tiles="#......#"/>
+		<MapRow tiles="########"/>
+	</MapRows>
+	<Entities>
+		<PlayerStart pos="1.5,1.5" yaw="30"/>
+    <Actor name="Pinky" pos="2.5,2.5" yaw="210"/>
+    <Actor name="Pinky" pos="3.5,3.5" yaw="30"/>
+    <Actor name="Pinky" pos="4.5,3.5" yaw="70"/>
+    <Actor name="Marine" pos="3.5,1.5" yaw="90"/>
+    <Actor name="Marine" pos="4.5,1.5" yaw="130"/>
+    <Projectile name="Plasma Bolt" pos="2.5,3.5" yaw="30"/>
+    <Portal name="Teleporter" pos="2.5,3.5" yaw="30" destPos="2,1.5" destYawOffset="0"/>
+    <Portal name="Teleporter" pos="1.5,3.5" yaw="30" destMap="SingleBlock.xml" destPos="0.5,0.5" destYawOffset="0"/>
+
+  </Entities>
+
+</MapDefinition>
+
+

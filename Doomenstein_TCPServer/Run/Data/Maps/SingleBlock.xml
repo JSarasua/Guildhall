@@ -1,0 +1,22 @@
+<MapDefinition type="TileMap" version="1" dimensions="7,5">
+
+	<Legend>
+		<Tile glyph="#" regionType="WoodWall"/>
+		<Tile glyph="." regionType="StoneFloor"/>
+	</Legend>
+	<MapRows>
+		<MapRow tiles="......."/>
+		<MapRow tiles="......."/>
+		<MapRow tiles="...#..."/>
+		<MapRow tiles="......."/>
+		<MapRow tiles="......."/>
+	</MapRows>
+	<Entities>
+		<PlayerStart pos="0.5,0.5" yaw="45"/>
+    <Portal name="Teleporter" pos="2.5,3.5" yaw="30" destMap="EmptyRoom.xml" destPos="2,1.5" destYawOffset="0"/>
+
+  </Entities>
+
+</MapDefinition>
+
+
