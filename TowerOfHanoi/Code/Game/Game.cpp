@@ -163,8 +163,7 @@ void Game::Startup()
 	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
 
 	InitializeGameState();
-	m_mcAI.SetGameState( m_currentGameState );
-	m_mcAI.SetMaxDepth( 100 );
+
 }
 
 void Game::Shutdown()
@@ -411,6 +410,8 @@ void Game::InitializeGameState()
 	m_currentGameState.columns[0].push_back( 2 );
 	m_currentGameState.columns[0].push_back( 1 );
 
+	m_mcAI.SetGameState( m_currentGameState );
+	m_mcAI.SetMaxDepth( 15 );
 }
 
 std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& gameState )
@@ -430,7 +431,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move2.m_columnToPop = 0;
 
 		move1.m_columnToPush = 1;
-		move1.m_columnToPush = 2;
+		move2.m_columnToPush = 2;
 		
 		moves.push_back( move1 );
 		moves.push_back( move2 );
@@ -445,7 +446,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move2.m_columnToPop = 1;
 
 		move1.m_columnToPush = 0;
-		move1.m_columnToPush = 2;
+		move2.m_columnToPush = 2;
 		
 		moves.push_back( move1 );
 		moves.push_back( move2 );
@@ -460,7 +461,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move2.m_columnToPop = 2;
 
 		move1.m_columnToPush = 0;
-		move1.m_columnToPush = 1;
+		move2.m_columnToPush = 1;
 		
 		moves.push_back( move1 );
 		moves.push_back( move2 );
@@ -494,6 +495,8 @@ void Game::UpdateGameStateIfValid( inputMove_t const& inputMove )
 		m_currentGameState.columns[inputMove.m_columnToPop].pop_back();
 
 		m_currentGameState.columns[inputMove.m_columnToPush].push_back( valueToPop );
+	
+		//m_mcAI.SetGameState( m_currentGameState );
 	}
 }
 
@@ -505,6 +508,8 @@ void Game::UpdateGameStateIfValid( inputMove_t const& inputMove, gameState_t& ga
 		gameState.columns[inputMove.m_columnToPop].pop_back();
 
 		gameState.columns[inputMove.m_columnToPush].push_back( valueToPop );
+
+		//m_mcAI.SetGameState( m_currentGameState );
 	}
 }
 
@@ -925,6 +930,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			m_currentInputMove.m_columnToPop = 0;
 			m_currentInputMove.m_columnToPush = 0;
 			m_isInputPop = true;
+
+			m_mcAI.SetGameState( m_currentGameState );
 		}
 	}
 
@@ -970,15 +977,17 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num4Key.WasJustPressed() )
 	{
 		//run sims
-		m_mcAI.RunSimulations( 1000 );
+		m_mcAI.RunSimulations( 10000 );
 		m_mcAI.UpdateBestMove();
 		UpdateGameStateIfValid( m_mcAI.GetBestMove() );
+
+		m_mcAI.SetGameState( m_currentGameState );
 	}
 	if( rKey.WasJustPressed() )
 	{
 		InitializeGameState();
 		m_mcAI.SetGameState( m_currentGameState );
-		m_mcAI.SetMaxDepth( 100 );
+		m_mcAI.SetMaxDepth( 50 );
 	}
 }
 
