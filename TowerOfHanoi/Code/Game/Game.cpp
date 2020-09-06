@@ -470,6 +470,32 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 	return moves;
 }
 
+int Game::GetNumberOfValidMovesAtGameState( gameState_t const& gameState )
+{
+	bool isCol0NotEmpty = !gameState.columns[0].empty();
+	bool isCol1NotEmpty = !gameState.columns[1].empty();
+	bool isCol2NotEmpty = !gameState.columns[2].empty();
+
+	int numberOfValidMoves = 0;
+
+	if( isCol0NotEmpty )
+	{
+		numberOfValidMoves += 2;
+	}
+
+	if( isCol1NotEmpty )
+	{
+		numberOfValidMoves += 2;
+	}
+
+	if( isCol2NotEmpty )
+	{
+		numberOfValidMoves += 2;
+	}
+
+	return numberOfValidMoves;
+}
+
 bool Game::IsGameStateWon( gameState_t const& gameState )
 {
 	std::deque<int> const& col2 = gameState.columns[2];

@@ -98,6 +98,7 @@ public:
 	bool TestEventSystem2( EventArgs const& args );
 
 	std::vector<inputMove_t> GetValidMovesAtGameState( gameState_t const& gameState );
+	int GetNumberOfValidMovesAtGameState( gameState_t const& gameState );
 	bool IsGameStateWon( gameState_t const& gameState );
 	void UpdateGameStateIfValid( inputMove_t const& inputMove );
 	void UpdateGameStateIfValid( inputMove_t const& inputMove, gameState_t& gameState );
