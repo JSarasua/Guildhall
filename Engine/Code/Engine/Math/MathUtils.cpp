@@ -14,6 +14,7 @@
 
 int absInt( int initialValue )
 {
+
 	return abs( initialValue );
 }
 
@@ -38,6 +39,11 @@ bool AlmostEqualsFloat( float a, float b, float epsilon /*= 0.01f*/ )
 	}
 
 	return false;
+}
+
+float NaturalLog( float val )
+{
+	return logf( val );
 }
 
 float SquareRootFloat( float value )

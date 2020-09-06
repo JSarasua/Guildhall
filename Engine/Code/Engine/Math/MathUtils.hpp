@@ -14,6 +14,7 @@ int			absInt(int initialValue);
 float		absFloat(float initialValue);
 float		SignFloat( float val );
 bool		AlmostEqualsFloat( float a, float b, float epsilon = 0.01f);
+float		NaturalLog( float val );
 
 float		SquareRootFloat( float value );
 
