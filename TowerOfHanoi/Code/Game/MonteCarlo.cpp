@@ -1,6 +1,7 @@
 #include "Game/MonteCarlo.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Math/MathUtils.hpp"
 
 void MonteCarlo::SetGameState( gameState_t const& gameState )
 {
@@ -133,3 +134,119 @@ int MonteCarlo::GetMoveToSimIndex()
 	return currentBestMoveToSimIndex;
 }
 
+mctsTreeNode_t::mctsTreeNode_t()
+{
+	m_isCurrentHead = true;
+}
+
+mctsTreeNode_t::mctsTreeNode_t( mctsTreeNode_t* parentNode, gameState_t gameState )
+{
+	m_parentNode = parentNode;
+	m_currentGameState = gameState;
+
+	if( m_parentNode )
+	{
+		m_isCurrentHead = false;
+	}
+	else
+	{
+		m_isCurrentHead = true;
+	}
+}
+
+mctsTreeNode_t::~mctsTreeNode_t()
+{
+	for( size_t childNodeIndex = 0; childNodeIndex < m_childNodes.size(); childNodeIndex++ )
+	{
+		delete m_childNodes[childNodeIndex];
+	}
+}
+
+int mctsTreeNode_t::GetNumberOfSimulationsAtParent()
+{
+	if( nullptr != m_parentNode )
+	{
+		return m_parentNode->GetNumberOfSimulations();
+	}
+	else
+	{
+		//Not sure if this is correct
+		return GetNumberOfSimulations();
+	}
+}
+
+int mctsTreeNode_t::GetNumberOfSimulations()
+{
+	return m_nodeMetaData.m_numberOfSimulationsAtNode;
+}
+
+int mctsTreeNode_t::GetNumberOfWins()
+{
+	return m_nodeMetaData.m_numberOfWinsAtNode;
+}
+
+float mctsTreeNode_t::GetUCBValueAtNode( float explorationParameter /*= SQRT_2 */ )
+{
+	float numberOfSimulations = (float)GetNumberOfSimulations();
+	float numberOfSimulationsAtParent = (float)GetNumberOfSimulationsAtParent();
+	float numberOfWins = (float)GetNumberOfWins();
+
+
+	float ucb = numberOfWins/numberOfSimulations + explorationParameter * SquareRootFloat( NaturalLog( numberOfSimulationsAtParent ) / numberOfSimulations );
+
+	return ucb;
+}
+
+void mctsTreeNode_t::BackPropagateResult( bool didWin )
+{
+	m_nodeMetaData.m_numberOfWinsAtNode += (int)didWin;
+	m_nodeMetaData.m_numberOfSimulationsAtNode++;
+
+	if( m_parentNode && !m_isCurrentHead )
+	{
+		m_parentNode->BackPropagateResult( didWin );
+	}
+}
+
+bool mctsTreeNode_t::CanExpand()
+{
+	int numberOfChildren = (int)m_childNodes.size();
+	int numberOfValidMoves = g_theGame->GetNumberOfValidMovesAtGameState( m_currentGameState );
+
+	if( numberOfChildren < numberOfValidMoves )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+mctsTreeNode_t* mctsTreeNode_t::ExpandNode()
+{
+	//GetValidChildNode
+
+	return nullptr;
+}
+
+mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect()
+{
+	float currentBestUCBValue = GetUCBValueAtNode();
+	mctsTreeNode_t* currentBestNode = this;
+
+
+	for( size_t childNodeIndex = 0; childNodeIndex < m_childNodes.size(); childNodeIndex++ )
+	{
+		mctsTreeNode_t* childNodeBestUCB = m_childNodes[childNodeIndex]->GetBestNodeToSelect();
+		float childNodeUCBValue = childNodeBestUCB->GetUCBValueAtNode();
+
+		if( childNodeUCBValue > currentBestUCBValue )
+		{
+			currentBestUCBValue = childNodeUCBValue;
+			currentBestNode = childNodeBestUCB;
+		}
+	}
+
+	return currentBestNode;
+}
