@@ -3,13 +3,25 @@
 #include "Game/Game.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
+int constexpr g_maxDepth = 15;
+
 void MonteCarlo::SetGameState( gameState_t const& gameState )
 {
-	m_currentGameState = gameState;
-	m_currentPotentialMoves = g_theGame->GetValidMovesAtGameState( m_currentGameState );
-	m_currentBestMove = m_currentPotentialMoves[0];
-	m_potentialMoveMetaData.clear();
-	m_potentialMoveMetaData.resize( m_currentPotentialMoves.size() );
+// 	m_currentGameState = gameState;
+// 	m_currentPotentialMoves = g_theGame->GetValidMovesAtGameState( m_currentGameState );
+// 	m_currentBestMove = m_currentPotentialMoves[0];
+// 	m_potentialMoveMetaData.clear();
+// 	m_potentialMoveMetaData.resize( m_currentPotentialMoves.size() );
+
+
+	if( m_headNode )
+	{
+		delete m_headNode;
+		m_headNode = nullptr;
+	}
+
+	m_headNode = new mctsTreeNode_t( nullptr, gameState );
+	m_currentHeadNode = m_headNode;
 }
 
 void MonteCarlo::SetMaxDepth( int maxDepth )
@@ -19,19 +31,29 @@ void MonteCarlo::SetMaxDepth( int maxDepth )
 
 void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
-	if( m_currentPotentialMoves.size() == 1 )
-	{
-		m_currentBestMove = m_currentPotentialMoves[0];
-		return;
-	}
+// 	if( m_currentPotentialMoves.size() == 1 )
+// 	{
+// 		m_currentBestMove = m_currentPotentialMoves[0];
+// 		return;
+// 	}
 
 	for( int simIndex = 0; simIndex < numberOfSimulations; simIndex++ )
 	{
-		//check which move to sim at
-		int moveToSimIndex = GetMoveToSimIndex();
-		RunSimulationOnMove( moveToSimIndex );
-		//gameState_t gameS
-		//sim
+		//OLD WAY
+// 		//check which move to sim at
+// 		int moveToSimIndex = GetMoveToSimIndex();
+// 		RunSimulationOnMove( moveToSimIndex );
+// 		//gameState_t gameS
+// 		//sim
+
+		//Select Node
+		mctsTreeNode_t* selectedNode = m_currentHeadNode->GetBestNodeToSelect();
+		//Expand Node
+		mctsTreeNode_t* expandedNode = selectedNode->ExpandNode();
+		//Simulate
+		bool result = RunSimulationOnNode( expandedNode );
+		//BackPropagate
+		expandedNode->BackPropagateResult( result );
 	}
 }
 
@@ -78,27 +100,58 @@ void MonteCarlo::RunSimulationOnMove( int moveIndex )
 	return;
 }
 
-void MonteCarlo::UpdateBestMove()
+bool MonteCarlo::RunSimulationOnNode( mctsTreeNode_t* node )
 {
-	int currentBestIndex = 0;
-	float currentMaxWinRatio = 0.f;
 
-	for( size_t moveIndex = 0; moveIndex < m_potentialMoveMetaData.size(); moveIndex++ )
+	int currentDepth = node->GetDepth();
+	while( currentDepth < m_maxDepth )
 	{
-		MoveMetaData const& moveData = m_potentialMoveMetaData[moveIndex];
+		gameState_t currentGameState = node->GetGameState();
+		std::vector<inputMove_t> potentialMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
+		int maxMoves = (int)potentialMoves.size() - 1;
+		int moveIndexChoice = g_theGame->m_rand.RollRandomIntInRange( 0, maxMoves );
+		inputMove_t const& moveToMake = potentialMoves[moveIndexChoice];
 
-		if( moveData.m_doesMoveWin )
+		g_theGame->UpdateGameStateIfValid( moveToMake, currentGameState );
+
+		if( g_theGame->IsGameStateWon( currentGameState ) )
 		{
-			float moveWinRatio = (float)moveData.m_numberOfWins/(float)moveData.m_numOfGames;
-			if( moveWinRatio > currentMaxWinRatio )
-			{
-				currentMaxWinRatio = moveWinRatio;
-				currentBestIndex = (int)moveIndex;
-			}
+			return true;
 		}
+
+		currentDepth++;
 	}
 
-	m_currentBestMove = m_currentPotentialMoves[currentBestIndex];
+	return false;
+}
+
+void MonteCarlo::UpdateBestMove()
+{
+// 	int currentBestIndex = 0;
+// 	float currentMaxWinRatio = 0.f;
+// 
+// 	for( size_t moveIndex = 0; moveIndex < m_potentialMoveMetaData.size(); moveIndex++ )
+// 	{
+// 		MoveMetaData const& moveData = m_potentialMoveMetaData[moveIndex];
+// 
+// 		if( moveData.m_doesMoveWin )
+// 		{
+// 			float moveWinRatio = (float)moveData.m_numberOfWins/(float)moveData.m_numOfGames;
+// 			if( moveWinRatio > currentMaxWinRatio )
+// 			{
+// 				currentMaxWinRatio = moveWinRatio;
+// 				currentBestIndex = (int)moveIndex;
+// 			}
+// 		}
+// 	}
+// 
+// 	m_currentBestMove = m_currentPotentialMoves[currentBestIndex];
+
+	m_currentBestMove = m_currentHeadNode->GetBestInput();
+
+	return;
+
+	
 }
 
 inputMove_t MonteCarlo::GetBestMove()
@@ -134,15 +187,48 @@ int MonteCarlo::GetMoveToSimIndex()
 	return currentBestMoveToSimIndex;
 }
 
+void MonteCarlo::UpdateHeadNode( inputMove_t const& input )
+{
+	mctsTreeNode_t* newHeadNode = m_currentHeadNode->GetOrCreateChildFromInput( input );
+
+	GUARANTEE_OR_DIE( newHeadNode, "new head node doesn't exist" );
+
+	if( newHeadNode )
+	{
+		m_currentHeadNode->m_isCurrentHead = false;
+		m_currentHeadNode = newHeadNode;
+		m_currentHeadNode->m_isCurrentHead = true;
+
+	}
+
+
+}
+
 mctsTreeNode_t::mctsTreeNode_t()
 {
 	m_isCurrentHead = true;
 }
 
-mctsTreeNode_t::mctsTreeNode_t( mctsTreeNode_t* parentNode, gameState_t gameState )
+mctsTreeNode_t::mctsTreeNode_t( mctsTreeNode_t* parentNode, gameState_t const& gameState )
 {
 	m_parentNode = parentNode;
 	m_currentGameState = gameState;
+
+	if( m_parentNode )
+	{
+		m_isCurrentHead = false;
+	}
+	else
+	{
+		m_isCurrentHead = true;
+	}
+}
+
+mctsTreeNode_t::mctsTreeNode_t( mctsTreeNode_t* parentNode, gameState_t const& gameState, inputMove_t const& inputToReachGameState )
+{
+	m_parentNode = parentNode;
+	m_currentGameState = gameState;
+	m_inputToReachGameState = inputToReachGameState;
 
 	if( m_parentNode )
 	{
@@ -185,12 +271,60 @@ int mctsTreeNode_t::GetNumberOfWins()
 	return m_nodeMetaData.m_numberOfWinsAtNode;
 }
 
+int mctsTreeNode_t::GetDepth()
+{
+	int currentDepth = 0;
+
+	mctsTreeNode_t* currentNode = m_parentNode;
+	while( currentNode )
+	{
+		currentDepth++;
+		currentNode = currentNode->m_parentNode;
+	}
+
+	return currentDepth;
+}
+
+int mctsTreeNode_t::GetMinimumDepthFromCurrentGameState()
+{
+	bool isGameStateWon = g_theGame->IsGameStateWon( m_currentGameState );
+
+	if( isGameStateWon )
+	{
+		return GetDepth();
+	}
+	else
+	{
+		int bestChildDepth = 99999;
+		for( size_t childIndex = 0; childIndex < m_childNodes.size(); childIndex++ )
+		{
+			int currentChildDepth = m_childNodes[childIndex]->GetMinimumDepthFromCurrentGameState();
+
+			if( currentChildDepth < bestChildDepth )
+			{
+				bestChildDepth = currentChildDepth;
+			}
+		}
+
+		return bestChildDepth;
+	}
+}
+
 float mctsTreeNode_t::GetUCBValueAtNode( float explorationParameter /*= SQRT_2 */ )
 {
+	if( GetDepth() > g_maxDepth )
+	{
+		return -1;
+	}
+
 	float numberOfSimulations = (float)GetNumberOfSimulations();
 	float numberOfSimulationsAtParent = (float)GetNumberOfSimulationsAtParent();
 	float numberOfWins = (float)GetNumberOfWins();
 
+	if( numberOfSimulations == 0 )
+	{
+		return 0;
+	}
 
 	float ucb = numberOfWins/numberOfSimulations + explorationParameter * SquareRootFloat( NaturalLog( numberOfSimulationsAtParent ) / numberOfSimulations );
 
@@ -226,14 +360,45 @@ bool mctsTreeNode_t::CanExpand()
 mctsTreeNode_t* mctsTreeNode_t::ExpandNode()
 {
 	//GetValidChildNode
+	std::vector<inputMove_t> validMoves = g_theGame->GetValidMovesAtGameState( m_currentGameState );
+	
+	for( size_t validMoveIndex = 0; validMoveIndex < validMoves.size(); validMoveIndex++ )
+	{
+		inputMove_t const& currentValidMove = validMoves[validMoveIndex];
+		bool canExpand = true;
+
+		for( size_t childIndex = 0; childIndex < m_childNodes.size(); childIndex++ )
+		{
+			inputMove_t const& childInput = m_childNodes[childIndex]->GetInputToReachNode();
+
+			if( currentValidMove == childInput )
+			{
+				canExpand = false;
+				break;
+			}
+		}
+
+
+		if( canExpand )
+		{
+			gameState_t newGameState = g_theGame->GetGameStateFromInput( currentValidMove, m_currentGameState );
+			mctsTreeNode_t* node = new mctsTreeNode_t( this, newGameState, currentValidMove );
+
+			m_childNodes.push_back( node );
+			return node;
+		}
+
+	}
+
 
 	return nullptr;
 }
 
 mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect()
 {
-	float currentBestUCBValue = GetUCBValueAtNode();
-	mctsTreeNode_t* currentBestNode = this;
+	
+	float currentBestUCBValue = -1;
+	mctsTreeNode_t* currentBestNode = nullptr;
 
 
 	for( size_t childNodeIndex = 0; childNodeIndex < m_childNodes.size(); childNodeIndex++ )
@@ -248,5 +413,84 @@ mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect()
 		}
 	}
 
+	if( g_theGame->GetNumberOfValidMovesAtGameState( m_currentGameState ) != (int)m_childNodes.size() )
+	{
+		float ucbAtNode = GetUCBValueAtNode();
+		ucbAtNode = Max( ucbAtNode, 0.000001f );
+
+		if( ucbAtNode > currentBestUCBValue )
+		{
+			currentBestUCBValue = ucbAtNode;
+			currentBestNode = this;
+		}
+	}
+
+	if( currentBestUCBValue == -1 )
+	{
+		currentBestNode = this;
+	}
 	return currentBestNode;
+}
+
+mctsTreeNode_t* mctsTreeNode_t::GetOrCreateChildFromInput( inputMove_t const& input )
+{
+	for( size_t childIndex = 0; childIndex < m_childNodes.size(); childIndex++ )
+	{
+		inputMove_t const& childInput = m_childNodes[childIndex]->m_inputToReachGameState;
+		if( input == childInput )
+		{
+			return m_childNodes[childIndex];
+		}
+	}
+	gameState_t newChildGameState = g_theGame->GetGameStateFromInput( input, m_currentGameState );
+	bool isMoveValid = g_theGame->IsMoveValidForGameState( input, newChildGameState );
+	
+	GUARANTEE_OR_DIE( isMoveValid, "Input is invalid to create this game state" );
+	
+	mctsTreeNode_t* newChildNode = new mctsTreeNode_t( this, newChildGameState, input );
+	m_childNodes.push_back( newChildNode );
+	return newChildNode;
+}
+
+inputMove_t const& mctsTreeNode_t::GetBestInput()
+{
+	int currentMinimumDepth = 999999;
+	size_t currentBestIndex = 0;
+
+	for( size_t childIndex = 0; childIndex < m_childNodes.size(); childIndex++ )
+	{
+		int childMinimumDepth = m_childNodes[childIndex]->GetMinimumDepthFromCurrentGameState();
+		if( childMinimumDepth < currentMinimumDepth )
+		{
+			currentMinimumDepth = childMinimumDepth;
+			currentBestIndex = childIndex;
+		}
+	}
+
+	return m_childNodes[currentBestIndex]->GetInputToReachNode();
+}
+
+bool inputMove_t::operator==( inputMove_t const& compare ) const
+{
+	if( compare.m_columnToPop == m_columnToPop &&
+		compare.m_columnToPush == m_columnToPush )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+inputMove_t::inputMove_t( inputMove_t const& copyFrom )
+{
+	m_columnToPop = copyFrom.m_columnToPop;
+	m_columnToPush = copyFrom.m_columnToPush;
+}
+
+void inputMove_t::operator=( inputMove_t const& copyFrom )
+{
+	m_columnToPop = copyFrom.m_columnToPop;
+	m_columnToPush = copyFrom.m_columnToPush;
 }

@@ -404,9 +404,9 @@ void Game::InitializeGameState()
 	m_currentGameState.columns[1].clear();
 	m_currentGameState.columns[2].clear();
 
-	m_currentGameState.columns[0].push_back( 5 );
-	m_currentGameState.columns[0].push_back( 4 );
-	m_currentGameState.columns[0].push_back( 3 );
+// 	m_currentGameState.columns[0].push_back( 5 );
+// 	m_currentGameState.columns[0].push_back( 4 );
+// 	m_currentGameState.columns[0].push_back( 3 );
 	m_currentGameState.columns[0].push_back( 2 );
 	m_currentGameState.columns[0].push_back( 1 );
 
@@ -548,6 +548,25 @@ bool Game::IsMoveValidForGameState( inputMove_t const& inputMove, gameState_t co
 	}
 
 	return true;
+}
+
+gameState_t Game::GetGameStateFromInput( inputMove_t const& inputMove, gameState_t const& currentGameState )
+{
+	if( IsMoveValidForGameState( inputMove, currentGameState ) )
+	{
+
+		gameState_t newGameState = currentGameState;
+		int valueToPop = newGameState.columns[inputMove.m_columnToPop].back();
+		newGameState.columns[inputMove.m_columnToPop].pop_back();
+
+		newGameState.columns[inputMove.m_columnToPush].push_back( valueToPop );
+
+
+		return newGameState;
+		//m_mcAI.SetGameState( m_currentGameState );
+	}
+
+	ERROR_AND_DIE( "Invalid Move" );
 }
 
 void Game::IncrementShader()
@@ -953,11 +972,13 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		if( IsMoveValidForGameState( m_currentInputMove, m_currentGameState ) )
 		{
 			UpdateGameStateIfValid( m_currentInputMove );
+			m_mcAI.UpdateHeadNode( m_currentInputMove );
+			
 			m_currentInputMove.m_columnToPop = 0;
 			m_currentInputMove.m_columnToPush = 0;
 			m_isInputPop = true;
 
-			m_mcAI.SetGameState( m_currentGameState );
+			//m_mcAI.SetGameState( m_currentGameState );
 		}
 	}
 
@@ -1003,16 +1024,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num4Key.WasJustPressed() )
 	{
 		//run sims
-		m_mcAI.RunSimulations( 10000 );
+		m_mcAI.RunSimulations( 1000 );
 		m_mcAI.UpdateBestMove();
-		UpdateGameStateIfValid( m_mcAI.GetBestMove() );
+		inputMove_t const& bestInput = m_mcAI.GetBestMove();
+		UpdateGameStateIfValid( bestInput );
 
-		m_mcAI.SetGameState( m_currentGameState );
+		m_mcAI.UpdateHeadNode( bestInput );
+		//m_mcAI.SetGameState( m_currentGameState );
 	}
 	if( rKey.WasJustPressed() )
 	{
 		InitializeGameState();
-		m_mcAI.SetGameState( m_currentGameState );
+		//m_mcAI.SetGameState( m_currentGameState );
 		m_mcAI.SetMaxDepth( 50 );
 	}
 }

@@ -103,7 +103,7 @@ public:
 	void UpdateGameStateIfValid( inputMove_t const& inputMove );
 	void UpdateGameStateIfValid( inputMove_t const& inputMove, gameState_t& gameState );
 	bool IsMoveValidForGameState( inputMove_t const& inputMove, gameState_t const& gameState );
-
+	gameState_t GetGameStateFromInput( inputMove_t const& inputMove, gameState_t const& currentGameState );
 private:
 	void InitializeGameState();
 
