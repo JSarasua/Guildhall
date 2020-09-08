@@ -63,7 +63,6 @@ public:
 	std::vector<mctsTreeNode_t*> m_childNodes;
 
 	bool m_isCurrentHead = true;
-	int m_depth = -1;
 };
 
 

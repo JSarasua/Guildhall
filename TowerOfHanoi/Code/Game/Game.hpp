@@ -90,13 +90,6 @@ public:
 	void Update();
 	void Render();
 
-	static bool SetAmbientColor(const EventArgs* args);
-	static bool SetAttenuation(const EventArgs* args);
-	static bool SetLightColor(const EventArgs* args);
-
-	bool TestEventSystem( EventArgs const& args );
-	bool TestEventSystem2( EventArgs const& args );
-
 	std::vector<inputMove_t> GetValidMovesAtGameState( gameState_t const& gameState );
 	int GetNumberOfValidMovesAtGameState( gameState_t const& gameState );
 	bool IsGameStateWon( gameState_t const& gameState );
@@ -107,23 +100,9 @@ public:
 private:
 	void InitializeGameState();
 
-	void IncrementShader();
-	void DecrementShader();
-	void IncrementRenderTexture();
-	void DecrementRenderTexture();
-	void IncrementNormalTexture();
-	void DecrementNormalTexture();
-	void IncrementCurrentLight();
-	void DecrementCurrentLight();
+
 
 	void AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList );
-
-	void ToggleAttenuation();
-	void ToggleBloom();
-	void SetAttenuation( Vec3 const& newAttenuation );
-
-	void UpdateLightPosition( float deltaSeconds );
-	void EnableLights();
 
 	void CheckCollisions();
 	void UpdateEntities( float deltaSeconds );
@@ -132,13 +111,9 @@ private:
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
 	IntVec2 GetCurrentMapBounds() const;
-	void SetLightPosition( Vec3 const& pos );
+
 
 private:
-	Mat44 m_frontCubeModelMatrix;
-	Mat44 m_leftCubeModelMatrix;
-	Mat44 m_frontleftCubeModelMatrix;
-
 	Clock* m_gameClock = nullptr;
 
 	Camera m_UICamera;
@@ -151,49 +126,12 @@ private:
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
 
-	GPUMesh* m_cubeMesh = nullptr;
 	Texture* m_screenTexture = nullptr;
 
-	Shader* m_invertShader = nullptr;
-
-	std::vector<Shader*> m_shaders;
-	std::vector<Texture*> m_renderTextures;
-	std::vector<Texture*> m_normalTextures;
-
-	size_t m_currentShaderIndex = 0;
-	size_t m_currentRenderTextureIndex = 0;
-	size_t m_currentNormalTextureIndex = 0;
-
-
-	bool m_isLightFollowingCamera = false;
-	bool m_isLightAnimated = false;
-
-	float m_lightAnimatedTheta = 0.f;
-	float m_lightAnimatedPhi = 0.f;
-	Vec3 m_lightAnimatedPosition;
 
 	float m_numTilesInViewVertically = 0.f;
 	float m_numTilesInViewHorizontally = 0.f;
-
-	float m_dissolveAmount = 0.f;
-	float m_greyscaleAmount = 0.f;
-	float m_tintAmount = 0.f;
-
-	float m_fogDistance = 20.f;
-	float m_fogRange = 10.f;
-	Rgba8 m_fogRed = Rgba8( 50, 0, 0 );
-	Rgba8 m_fogBlue = Rgba8( 0, 0, 50 );
-	float m_fogColorLerp = 0.5f;
-
-	ShaderState* m_testShaderState = nullptr;
-	Material* m_testMaterial = nullptr;
-
-	bool m_isBloomActive = false;
-
 public:
-	//static light_t m_pointLight;
-	static std::vector<light_t> m_lights;
-	static uint m_currentLightIndex;
 	
 	Rgba8 m_clearColor = Rgba8::BLACK;
 	float m_currentTime = 0.f;

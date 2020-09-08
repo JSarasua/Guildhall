@@ -30,10 +30,6 @@ extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 
 
-//light_t Game::m_pointLight;
-std::vector<light_t> Game::m_lights;
-uint Game::m_currentLightIndex = 0;
-
 Game::Game()
 {
 	//m_world = new World(this);
@@ -50,81 +46,6 @@ void Game::Startup()
 	m_camera.SetOutputSize( Vec2( 16.f, 9.f ) );
 	m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
 	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
-	//m_camera.SetProjectionOrthographic( m_camera.m_outputSize, -0.1f, -100.f );
-	
-	XmlDocument shaderStateDoc;
-	XmlElement const& element = GetRootElement( shaderStateDoc, "Data/ShaderStates/BasicLit.xml" );
-	m_testShaderState = new ShaderState(g_theRenderer, element );
-	g_theRenderer->AcquireShaderState( m_testShaderState );
-	m_testMaterial = new Material( g_theRenderer, "Data/Materials/TestMaterial.xml" );
-
-	dissolve_t dissolveData;
-	dissolveData.amount = m_dissolveAmount;
-	dissolveData.edgeFarColor = Vec3( 0.5f, 0.f, 0.f );
-	dissolveData.edgeNearColor = Vec3( 1.f, 1.f, 0.f );
-	dissolveData.edgeWidth = 0.1f;
-	
-	m_testMaterial->SetData( dissolveData );
-	//m_testMaterial->SetShaderByName( dissolveShader );
-	
-// 	m_testMaterial->m_texturePerSlot.push_back( noiseTexture );
-// 	m_testMaterial->m_samplersPerSlot.push_back( new Sampler( g_theRenderer, SAMPLER_POINT, SAMPLER_WRAP ) );
-
-	//g_theRenderer->SetMaterialData( &dissolveData, sizeof( dissolveData ) );
-
-	m_invertShader = g_theRenderer->GetOrCreateShader("Data/Shaders/InvertColor.hlsl");
-	Shader* litShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Phong.hlsl" );
-	Shader* normalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Normals.hlsl" );
-	Shader* tangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Tangents.hlsl" );
-	Shader* bitangentShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/Bitangents.hlsl" );
-	Shader* surfaceNormalShader = g_theRenderer->GetOrCreateShader( "Data/Shaders/SurfaceNormals.hlsl" );
-	m_shaders.push_back( litShader );
-	m_shaders.push_back( normalShader );
-	m_shaders.push_back( tangentShader );
-	m_shaders.push_back( bitangentShader );
-	m_shaders.push_back( surfaceNormalShader );
-
-
-	Texture* couchTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/example_colour.png" );
-	Texture* stoneTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/stone_diffuse.png" );
-	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test.png" );
-	Texture* chiTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/chi.png" );
-	Texture* tileDiffuseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_diffuse.png" );
-	Texture* tileGlossTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_gloss.png" );
-	Texture* woodCrateTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/woodcrate.png" );
-	m_renderTextures.push_back( nullptr );
-	m_renderTextures.push_back( couchTexture );
-	m_renderTextures.push_back( stoneTexture );
-	m_renderTextures.push_back( testTexture );
-	m_renderTextures.push_back( chiTexture );
-	m_renderTextures.push_back( tileDiffuseTexture );
-	m_renderTextures.push_back( tileGlossTexture );
-	m_renderTextures.push_back( woodCrateTexture );
-
-	Texture* normalCouchTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/example_normal.png" );
-	Texture* normalStoneTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/stone_normal.png" );
-	Texture* normalTileTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/tile_normal.png" );
-	Texture* normalTestSphereTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/test_normal.png" );
-	m_normalTextures.push_back( nullptr );
-	m_normalTextures.push_back( normalCouchTexture );
-	m_normalTextures.push_back( normalStoneTexture );
-	m_normalTextures.push_back( testTexture );
-	m_normalTextures.push_back( chiTexture );
-	m_normalTextures.push_back( normalTileTexture );
-	m_normalTextures.push_back( normalTestSphereTexture );
-
-	m_frontCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 0.5f, 0.5f ) );
-	m_leftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 0.5f, 2.5f, 0.5f ) );
-	m_frontleftCubeModelMatrix = Mat44::CreateTranslation3D( Vec3( 2.5f, 2.5f, 0.5f ) );
-
-	m_cubeMesh = new GPUMesh( g_theRenderer );
-	std::vector<Vertex_PCUTBN> cubeVerts;
-	std::vector<uint> cubeIndices;
-	//Vertex_PCUTBN::AppendIndexedVertsCube( cubeVerts, cubeIndices, 0.5f );
-	AppendIndexedVertsTestCube( cubeVerts, cubeIndices );
-
-	m_cubeMesh->UpdateVertices( cubeVerts );
-	m_cubeMesh->UpdateIndices( cubeIndices );
 
 
 	m_gameClock = new Clock();
@@ -136,31 +57,6 @@ void Game::Startup()
 
 
 
-	Vec3 cameraDirection = m_camera.GetDirection();
-	for( uint lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
-	{
-		light_t lightData;
-		lightData.color = Vec3( 1.f, 1.f, 1.f );
-		lightData.intensity = 0.f;
-		lightData.position = m_camera.GetPosition();
-		lightData.cosInnerAngle = -0.98f;
-		lightData.cosOuterAngle = -1.f;
-		lightData.direction = cameraDirection;
-		m_lights.push_back( lightData );
-	}
-	m_lights[0].intensity = 0.5f;
-	m_lights[0].position.z -= 2.f;
-	m_lights[0].color = Vec3( 1.f, 1.f, 1.f );
-
-
-
-	g_theRenderer->SetSpecularFactorAndPower( 0.5f, 2.f );
-
-	g_theRenderer->SetAmbientLight( Rgba8::WHITE, 0.f );
-
-	g_theEventSystem->SubscribeToEvent( "light_set_ambient_color", CONSOLECOMMAND, SetAmbientColor );
-	g_theEventSystem->SubscribeToEvent( "light_set_attenuation", CONSOLECOMMAND, SetAttenuation );
-	g_theEventSystem->SubscribeToEvent( "light_set_color", CONSOLECOMMAND, SetLightColor );
 
 	InitializeGameState();
 
@@ -168,11 +64,7 @@ void Game::Startup()
 
 void Game::Shutdown()
 {
-	delete m_cubeMesh;
-	m_cubeMesh = nullptr;
 
-	delete m_testMaterial;
-	m_testMaterial = nullptr;
 }
 
 void Game::RunFrame(){}
@@ -198,44 +90,6 @@ void Game::Update()
 	{
 		CheckButtonPresses( dt );
 	}
-
-	DebugAddWorldBasis( Mat44(), 0.f, DEBUG_RENDER_ALWAYS );
-	Mat44 cameraModelMatrix = Mat44();
-	cameraModelMatrix.ScaleUniform3D( 0.01f );
-	Vec3 compassPosition = m_camera.GetPosition();
-	compassPosition += m_camera.GetDirection() * 0.1f;
-
-// 	cameraModelMatrix.SetTranslation3D( compassPosition );
-// 	DebugAddWorldBasis( cameraModelMatrix, 0.f, DEBUG_RENDER_ALWAYS );
-	//DebugAddScreenBasis( m_camera.GetModelRotationMatrix(), Rgba8::WHITE, Rgba8::WHITE, 0.f );
-
-	//GREY: Playing (UI)
-	//YELLOW: Camera Yaw=X.X	Pitch=X.X	Roll=X.X	xyz=(X.XX, Y.YY, Z.ZZ)
-	//RED: iBasis (forward,	+x world-east when identity): (X.XX, Y.YY, Z.ZZ)
-	//GREEN: jBasis (left,	+y world-north when identity):	(X.XX, Y.YY, Z.ZZ)
-	//BLUE: kBasis (up, +z world-up when identity):		(X.XX, Y.YY, Z.ZZ)
-
-// 	Vec3 cameraPitchRollYaw = m_camera.GetRotation();
-// 	Vec3 cameraPosition = m_camera.GetPosition();
-// 	float yaw = cameraPitchRollYaw.z;
-// 	float pitch = cameraPitchRollYaw.x;
-// 	float roll = cameraPitchRollYaw.y;
-// 	Mat44 cameraBases = m_camera.GetCameraScreenRotationMatrix();
-// 	Vec3 cameraIBasis = cameraBases.GetIBasis3D();
-// 	Vec3 cameraJBasis = cameraBases.GetJBasis3D();
-// 	Vec3 cameraKBasis = cameraBases.GetKBasis3D();
-// 
-//  	std::string playingUIStr = Stringf( "Playing (UI)");
-// 	std::string cameraRotationTranslationStr = Stringf( "Camera Yaw = %.1f	Pitch=%.1f	Roll=%.1f	xyz=(%.2f, %.2f, %.2f)", yaw, pitch, roll, cameraPosition.x, cameraPosition.y, cameraPosition.z );;
-// 	std::string cameraIBasisStr = Stringf( "iBasis (forward, +x world-east when identity): (%.2f, %.2f, %.2f)", cameraIBasis.x, cameraIBasis.y, cameraIBasis.z );
-// 	std::string cameraJBasisStr = Stringf( "jBasis (left,	+y world-north when identity):	(%.2f, %.2f, %.2f)", cameraJBasis.x, cameraJBasis.y, cameraJBasis.z );
-// 	std::string cameraKBasisStr = Stringf( "kBasis (up, +z world-up when identity):		(%.2f, %.2f, %.2f)", cameraKBasis.x, cameraKBasis.y, cameraKBasis.z );
-// 
-//  	DebugAddScreenText( Vec4( 0.01f, 0.95f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, playingUIStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.93f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::YELLOW, Rgba8::YELLOW, 0.f, cameraRotationTranslationStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.91f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::RED, Rgba8::RED, 0.f, cameraIBasisStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.89f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, cameraJBasisStr.c_str() );
-// 	DebugAddScreenText( Vec4( 0.01f, 0.87f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, cameraKBasisStr.c_str() );
 
 	float baseHeight = 0.7f;
 	float baseHeightIncr = 0.02f;
@@ -285,38 +139,16 @@ void Game::Render()
 {
 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* bloomTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* albedoTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* normalTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	Texture* tangentTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
 	
 	m_camera.SetColorTarget( 0, colorTarget );
-	m_camera.SetColorTarget( 1, bloomTarget );
-	m_camera.SetColorTarget( 2, normalTarget );
-	m_camera.SetColorTarget( 3, albedoTarget );
-	m_camera.SetColorTarget( 4, tangentTarget );
 
 	g_theRenderer->BeginCamera(m_camera);
 
 	g_theRenderer->DisableLight( 0 );
-	//EnableLights();
 
 	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
 	g_theRenderer->BindTexture( testTexture );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetModelMatrix( m_frontCubeModelMatrix );
-
-// 	Shader* shader = g_theRenderer->GetOrCreateShader(  "Data/Shaders/WorldOpaque.hlsl" );
-// 	g_theRenderer->BindShader( shader );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-// 
-// 	g_theRenderer->SetModelMatrix( m_leftCubeModelMatrix );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-// 
-// 	g_theRenderer->SetModelMatrix( m_frontleftCubeModelMatrix );
-// 	g_theRenderer->DrawMesh( m_cubeMesh );
-
-	//RenderProjection();
 
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->EndCamera(m_camera);
@@ -330,72 +162,12 @@ void Game::Render()
 
 	m_camera.SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-	g_theRenderer->ReleaseRenderTarget( bloomTarget );
-	g_theRenderer->ReleaseRenderTarget( albedoTarget );
-	g_theRenderer->ReleaseRenderTarget( normalTarget );
-	g_theRenderer->ReleaseRenderTarget( tangentTarget );
 
 
 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
-}
-
-
-
-
-bool Game::SetAmbientColor( const EventArgs* args )
-{
-	Rgba8 ambientColor = args->GetValue( "color", Rgba8::WHITE );
-	g_theRenderer->SetAmbientColor( ambientColor );
-
-	return true;
-}
-
-bool Game::SetAttenuation( const EventArgs* args )
-{
-	Vec3 attenuation = args->GetValue( "attenuation", Vec3( 0.f, 1.f, 0.f ) );
-	g_theGame->SetAttenuation( attenuation );
-
-	return true;
-}
-
-void Game::SetAttenuation( Vec3 const& newAttenuation )
-{
-	Vec3& attenuation = m_lights[m_currentLightIndex].attenuation;
-	attenuation = newAttenuation;
-}
-
-bool Game::SetLightColor( const EventArgs* args )
-{
-	Rgba8 lightColor = args->GetValue( "color", Rgba8::WHITE );
-	uint lightIndex = args->GetValue( "index", 0 );
-
-	float lightColorAsFloats[4];
-	lightColor.ToFloatArray( lightColorAsFloats );
-
-	Vec3 lightColorAsVec3 = Vec3( lightColorAsFloats[0], lightColorAsFloats[1], lightColorAsFloats[2]);
-	lightColorAsVec3 /= 255.f;
-	Game::m_lights[lightIndex].color = lightColorAsVec3;
-
-	return true;
-}
-
-bool Game::TestEventSystem( EventArgs const& args )
-{
-	UNUSED( args );
-	DebugAddScreenTextf( Vec4( 0.5f, 0.5f, 0.f, 0.f), Vec2(), 10.f, Rgba8::GREEN, Rgba8::GREEN, 5.f, "Test Event System" );
-
-	return true;
-}
-
-bool Game::TestEventSystem2( EventArgs const& args )
-{
-	UNUSED( args );
-	DebugAddScreenTextf( Vec4( 0.5f, 0.3f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::GREEN, Rgba8::GREEN, 5.f, "Test Event System 2" );
-
-	return true;
 }
 
 void Game::InitializeGameState()
@@ -585,101 +357,6 @@ gameState_t Game::GetGameStateFromInput( inputMove_t const& inputMove, gameState
 	ERROR_AND_DIE( "Invalid Move" );
 }
 
-void Game::IncrementShader()
-{
-	m_currentShaderIndex++;
-	if( m_currentShaderIndex >= m_shaders.size() )
-	{
-		m_currentShaderIndex = 0;
-	}
-}
-
-void Game::DecrementShader()
-{
-	if( m_currentShaderIndex == 0 )
-	{
-		if( !m_shaders.empty() )
-		{
-			m_currentShaderIndex = m_shaders.size() - 1;
-		}
-	}
-	else
-	{
-		m_currentShaderIndex--;
-	}
-}
-
-void Game::IncrementRenderTexture()
-{
-	m_currentRenderTextureIndex++;
-	if( m_currentRenderTextureIndex >= m_renderTextures.size() )
-	{
-		m_currentRenderTextureIndex = 0;
-	}
-}
-
-void Game::DecrementRenderTexture()
-{
-	if( m_currentRenderTextureIndex == 0 )
-	{
-		if( !m_renderTextures.empty() )
-		{
-			m_currentRenderTextureIndex = m_renderTextures.size() - 1;
-		}
-	}
-	else
-	{
-		m_currentRenderTextureIndex--;
-	}
-}
-
-void Game::IncrementNormalTexture()
-{
-	m_currentNormalTextureIndex++;
-	if( m_currentNormalTextureIndex >= m_normalTextures.size() )
-	{
-		m_currentNormalTextureIndex = 0;
-	}
-}
-
-void Game::DecrementNormalTexture()
-{
-	if( m_currentNormalTextureIndex == 0 )
-	{
-		if( !m_normalTextures.empty() )
-		{
-			m_currentNormalTextureIndex = m_normalTextures.size() - 1;
-		}
-	}
-	else
-	{
-		m_currentNormalTextureIndex--;
-	}
-}
-
-void Game::IncrementCurrentLight()
-{
-	m_currentLightIndex++;
-	if( m_currentLightIndex >= MAX_LIGHTS )
-	{
-		m_currentLightIndex = 0;
-	}
-}
-
-void Game::DecrementCurrentLight()
-{
-	if( m_currentLightIndex == 0 )
-	{
-		m_currentLightIndex = MAX_LIGHTS - 1;
-
-	}
-	else
-	{
-		m_currentLightIndex--;
-	}
-}
-
-
 void Game::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexList, std::vector<uint>& masterIndexList )
 {
 	Vec3 nonUniformScale = Vec3( 1.f, 1.f, 1.f );
@@ -828,75 +505,6 @@ void Game::AppendIndexedVertsTestCube( std::vector<Vertex_PCUTBN>& masterVertexL
 	for( int indicesIndex = 0; indicesIndex < 36; indicesIndex++ )
 	{
 		masterIndexList.push_back( cubeIndices[indicesIndex] );
-	}
-}
-
-void Game::ToggleAttenuation()
-{
-	Vec3& attenuation = m_lights[m_currentLightIndex].attenuation;
-	if( attenuation.x == 1.f )
-	{
-		attenuation.x = 0.f;
-		attenuation.y = 1.f;
-		attenuation.z = 0.f;
-	}
-	else if( attenuation.y == 1.f )
-	{
-		attenuation.x = 0.f;
-		attenuation.y = 0.f;
-		attenuation.z = 1.f;
-	}
-	else if( attenuation.z == 1.f )
-	{
-		attenuation.x = 1.f;
-		attenuation.y = 0.f;
-		attenuation.z = 0.f;
-	}
-	else
-	{
-		attenuation.x = 1.f;
-		attenuation.y = 0.f;
-		attenuation.z = 0.f;
-	}
-}
-
-void Game::ToggleBloom()
-{
-	m_isBloomActive = !m_isBloomActive;
-}
-
-
-
-void Game::UpdateLightPosition( float deltaSeconds )
-{
-	m_lightAnimatedTheta += deltaSeconds * 45.f;
-	m_lightAnimatedPhi += deltaSeconds * 90.f;
-
-	Vec2 xzLightPath = Vec2::MakeFromPolarDegrees( m_lightAnimatedTheta, 6.f );
-	float yLight = SinDegrees( m_lightAnimatedPhi );
-
-	m_lightAnimatedPosition = Vec3( xzLightPath.x, yLight, xzLightPath.y );
-	m_lightAnimatedPosition.z *= 0.5f;
-	m_lightAnimatedPosition.z += -10.f;
-	m_lightAnimatedPosition.x *= 2.f;
-
-
-	if( m_isLightFollowingCamera )
-	{
-		m_lights[m_currentLightIndex].position = m_camera.GetPosition();
-		m_lights[m_currentLightIndex].direction = m_camera.GetDirection();
-	}
-	else if( m_isLightAnimated )
-	{
-		m_lights[m_currentLightIndex].position = m_lightAnimatedPosition;
-	}
-}
-
-void Game::EnableLights()
-{
-	for( size_t lightIndex = 0; lightIndex < MAX_LIGHTS; lightIndex++ )
-	{
-		g_theRenderer->EnableLight( (uint)lightIndex, m_lights[lightIndex] );
 	}
 }
 
@@ -1064,11 +672,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 IntVec2 Game::GetCurrentMapBounds() const
 {
 	return m_world->getCurrentMapBounds();
-}
-
-void Game::SetLightPosition( Vec3 const& pos )
-{
-	m_lights[m_currentLightIndex].position = pos;
 }
 
 void Game::RenderDevConsole()
