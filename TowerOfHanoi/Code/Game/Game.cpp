@@ -404,9 +404,9 @@ void Game::InitializeGameState()
 	m_currentGameState.columns[1].clear();
 	m_currentGameState.columns[2].clear();
 
-// 	m_currentGameState.columns[0].push_back( 5 );
-// 	m_currentGameState.columns[0].push_back( 4 );
-// 	m_currentGameState.columns[0].push_back( 3 );
+ 	m_currentGameState.columns[0].push_back( 5 );
+ 	m_currentGameState.columns[0].push_back( 4 );
+ 	m_currentGameState.columns[0].push_back( 3 );
 	m_currentGameState.columns[0].push_back( 2 );
 	m_currentGameState.columns[0].push_back( 1 );
 
@@ -498,19 +498,35 @@ int Game::GetNumberOfValidMovesAtGameState( gameState_t const& gameState )
 
 bool Game::IsGameStateWon( gameState_t const& gameState )
 {
+	std::deque<int> const& col0 = gameState.columns[0];
+	std::deque<int> const& col1 = gameState.columns[1];
 	std::deque<int> const& col2 = gameState.columns[2];
 
-	if( col2.size() != 5 )
+	if( col0.size() != 0 || col1.size() != 0 )
 	{
 		return false;
 	}
 
-	if( col2[0] == 5 && col2[1] == 4 && col2[2] == 3 && col2[3] == 2 && col2[4] == 1 )
+// 	if( col2[0] == 5 && col2[1] == 4 && col2[2] == 3 && col2[3] == 2 && col2[4] == 1 )
+// 	{
+// 		return true;
+// 	}
+
+	int maxVal = 999999;
+	for( size_t col2Index = 0; col2Index < col2.size(); col2Index++ )
 	{
-		return true;
+		int currentValue = col2[col2Index];
+		if( currentValue < maxVal )
+		{
+			maxVal = currentValue;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 void Game::UpdateGameStateIfValid( inputMove_t const& inputMove )
@@ -1024,13 +1040,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( num4Key.WasJustPressed() )
 	{
 		//run sims
-		m_mcAI.RunSimulations( 1000 );
-		m_mcAI.UpdateBestMove();
-		inputMove_t const& bestInput = m_mcAI.GetBestMove();
-		UpdateGameStateIfValid( bestInput );
+		if( !IsGameStateWon( m_currentGameState ) )
+		{
+			m_mcAI.RunSimulations( 1000 );
 
-		m_mcAI.UpdateHeadNode( bestInput );
-		//m_mcAI.SetGameState( m_currentGameState );
+			m_mcAI.UpdateBestMove();
+			inputMove_t const& bestInput = m_mcAI.GetBestMove();
+			UpdateGameStateIfValid( bestInput );
+
+			m_mcAI.UpdateHeadNode( bestInput );
+			
+		}
+
 	}
 	if( rKey.WasJustPressed() )
 	{

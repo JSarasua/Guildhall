@@ -47,7 +47,12 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 // 		//sim
 
 		//Select Node
-		mctsTreeNode_t* selectedNode = m_currentHeadNode->GetBestNodeToSelect();
+		mctsTreeNode_t* selectedNode = m_currentHeadNode->GetBestNodeToSelect( g_maxDepth );
+
+		if( nullptr == selectedNode )
+		{
+			break; //There are no more nodes to check
+		}
 		//Expand Node
 		mctsTreeNode_t* expandedNode = selectedNode->ExpandNode();
 		//Simulate
@@ -394,16 +399,35 @@ mctsTreeNode_t* mctsTreeNode_t::ExpandNode()
 	return nullptr;
 }
 
-mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect()
+mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect( int depthToReach )
 {
-	
+	if( GetDepth() >= depthToReach )
+	{
+		return nullptr;
+	}
+	if( g_theGame->IsGameStateWon( m_currentGameState ) )
+	{
+		return nullptr;
+	}
+
 	float currentBestUCBValue = -1;
 	mctsTreeNode_t* currentBestNode = nullptr;
 
 
 	for( size_t childNodeIndex = 0; childNodeIndex < m_childNodes.size(); childNodeIndex++ )
 	{
-		mctsTreeNode_t* childNodeBestUCB = m_childNodes[childNodeIndex]->GetBestNodeToSelect();
+		mctsTreeNode_t* childNodeBestUCB = m_childNodes[childNodeIndex]->GetBestNodeToSelect( depthToReach );
+
+		if( nullptr == childNodeBestUCB )
+		{
+			continue;
+		}
+
+		if( !childNodeBestUCB->CanExpand() )
+		{
+			continue;
+		}
+
 		float childNodeUCBValue = childNodeBestUCB->GetUCBValueAtNode();
 
 		if( childNodeUCBValue > currentBestUCBValue )
@@ -413,7 +437,7 @@ mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect()
 		}
 	}
 
-	if( g_theGame->GetNumberOfValidMovesAtGameState( m_currentGameState ) != (int)m_childNodes.size() )
+	if( CanExpand() )
 	{
 		float ucbAtNode = GetUCBValueAtNode();
 		ucbAtNode = Max( ucbAtNode, 0.000001f );
@@ -442,10 +466,8 @@ mctsTreeNode_t* mctsTreeNode_t::GetOrCreateChildFromInput( inputMove_t const& in
 			return m_childNodes[childIndex];
 		}
 	}
-	gameState_t newChildGameState = g_theGame->GetGameStateFromInput( input, m_currentGameState );
-	bool isMoveValid = g_theGame->IsMoveValidForGameState( input, newChildGameState );
 	
-	GUARANTEE_OR_DIE( isMoveValid, "Input is invalid to create this game state" );
+	gameState_t newChildGameState = g_theGame->GetGameStateFromInput( input, m_currentGameState );
 	
 	mctsTreeNode_t* newChildNode = new mctsTreeNode_t( this, newChildGameState, input );
 	m_childNodes.push_back( newChildNode );

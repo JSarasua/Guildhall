@@ -48,7 +48,7 @@ public:
 	void BackPropagateResult( bool didWin );
 	bool CanExpand();
 	mctsTreeNode_t* ExpandNode();
-	mctsTreeNode_t* GetBestNodeToSelect();
+	mctsTreeNode_t* GetBestNodeToSelect( int depthToReach );
 	mctsTreeNode_t* GetOrCreateChildFromInput( inputMove_t const& input );
 	inputMove_t const& GetInputToReachNode() { return m_inputToReachGameState; }
 	gameState_t GetGameState() { return m_currentGameState; }
@@ -63,6 +63,7 @@ public:
 	std::vector<mctsTreeNode_t*> m_childNodes;
 
 	bool m_isCurrentHead = true;
+	int m_depth = -1;
 };
 
 
