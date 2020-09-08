@@ -196,6 +196,7 @@
     <ClCompile Include="Math\vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="Network\NetworkSystem.cpp" />
     <ClCompile Include="Physics2D\Collider2D.cpp" />
     <ClCompile Include="Physics2D\Collision2D.cpp" />
     <ClCompile Include="Physics2D\DiscCollider2D.cpp" />
@@ -281,6 +282,7 @@
     <ClInclude Include="Math\vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Network\NetworkSystem.hpp" />
     <ClInclude Include="Physics2D\Collider2D.hpp" />
     <ClInclude Include="Physics2D\Collision2D.hpp" />
     <ClInclude Include="Physics2D\DiscCollider2D.hpp" />

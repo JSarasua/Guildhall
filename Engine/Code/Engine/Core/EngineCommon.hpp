@@ -3,10 +3,12 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
+
 /*#include "Engine/Input/InputSystem.hpp"*/
 
 class InputSystem;
 class JobSystem;
+class NetworkSystem;
 
 #define UNUSED(x) (void)(x);
 typedef unsigned int uint;
@@ -27,6 +29,7 @@ extern NamedStrings* g_gameConfigBlackboard;
 extern EventSystem* g_theEventSystem;
 extern InputSystem* g_theInput;
 extern JobSystem* g_theJobSystem;
+extern NetworkSystem* g_theNetwork;
 
 
 enum class eYawPitchRollRotationOrder

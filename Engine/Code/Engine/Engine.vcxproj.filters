@@ -41,6 +41,9 @@
     <Filter Include="ThirdParty\MikkT">
       <UniqueIdentifier>{810b3044-56d8-4a5f-863c-19fb234e30a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{420a76d0-7bd6-4265-8f83-383ca4418c3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -261,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="Core\JobSystem.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Network\NetworkSystem.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -515,6 +521,9 @@
     </ClInclude>
     <ClInclude Include="Core\JobSystem.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Network\NetworkSystem.hpp">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

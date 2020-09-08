@@ -7,6 +7,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/GameCommon.hpp"
+#include "Engine/Network/NetworkSystem.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 AudioSystem* g_theAudio = nullptr;
@@ -24,6 +25,7 @@ App::App()
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
 	g_theJobSystem = new JobSystem();
+	g_theNetwork = new NetworkSystem();
 }
 
 App::~App() {}
@@ -56,6 +58,7 @@ void App::Startup()
 	
 	g_theGame->Startup();
 	g_theConsole->Startup();
+	g_theNetwork->Startup();
 
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget( g_theRenderer->GetBackBuffer() );
@@ -71,6 +74,8 @@ void App::Startup()
 
 void App::Shutdown()
 {
+	g_theNetwork->Shutdown();
+	delete g_theNetwork;
 	g_theJobSystem->Shutdown();
 	delete g_theJobSystem;
 	
