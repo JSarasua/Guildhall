@@ -3,7 +3,7 @@
 #include "Game/Game.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
-int constexpr g_maxDepth = 15;
+int g_maxDepth = 30;
 
 void MonteCarlo::SetGameState( gameState_t const& gameState )
 {
@@ -27,6 +27,7 @@ void MonteCarlo::SetGameState( gameState_t const& gameState )
 void MonteCarlo::SetMaxDepth( int maxDepth )
 {
 	m_maxDepth = maxDepth;
+	g_maxDepth = m_maxDepth;
 }
 
 void MonteCarlo::RunSimulations( int numberOfSimulations )
@@ -107,11 +108,12 @@ void MonteCarlo::RunSimulationOnMove( int moveIndex )
 
 bool MonteCarlo::RunSimulationOnNode( mctsTreeNode_t* node )
 {
-
+	gameState_t currentGameState = node->GetGameState();
 	int currentDepth = node->GetDepth();
+	
 	while( currentDepth < m_maxDepth )
 	{
-		gameState_t currentGameState = node->GetGameState();
+
 		std::vector<inputMove_t> potentialMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
 		int maxMoves = (int)potentialMoves.size() - 1;
 		int moveIndexChoice = g_theGame->m_rand.RollRandomIntInRange( 0, maxMoves );
@@ -207,6 +209,16 @@ void MonteCarlo::UpdateHeadNode( inputMove_t const& input )
 	}
 
 
+}
+
+int MonteCarlo::GetNumberOfWinsAtHead()
+{
+	return m_currentHeadNode->GetNumberOfWins();
+}
+
+int MonteCarlo::GetNumberOfSimulationsAtHead()
+{
+	return m_currentHeadNode->GetNumberOfSimulations();
 }
 
 mctsTreeNode_t::mctsTreeNode_t()
@@ -401,11 +413,12 @@ mctsTreeNode_t* mctsTreeNode_t::ExpandNode()
 
 mctsTreeNode_t* mctsTreeNode_t::GetBestNodeToSelect( int depthToReach )
 {
-	if( GetDepth() >= depthToReach )
+	if( g_theGame->IsGameStateWon( m_currentGameState ) )
 	{
 		return nullptr;
 	}
-	if( g_theGame->IsGameStateWon( m_currentGameState ) )
+
+	if( GetDepth() >= depthToReach - 1 )
 	{
 		return nullptr;
 	}

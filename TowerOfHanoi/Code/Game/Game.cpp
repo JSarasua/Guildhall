@@ -30,6 +30,8 @@ extern InputSystem* g_theInput;
 extern AudioSystem* g_theAudio;
 
 
+int constexpr maxDepth = 15;
+
 Game::Game()
 {
 	//m_world = new World(this);
@@ -113,18 +115,26 @@ void Game::Update()
 		DebugAddScreenText( Vec4( col1X, currentCol1Height, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, Stringf("%i", rowValue).c_str() );
 	}
 
+	Rgba8 cyan( 0, 168, 255 );
 	for( int rowIndex = 0; rowIndex < m_currentGameState.columns[2].size(); rowIndex++ )
 	{
 		int rowValue = m_currentGameState.columns[2][rowIndex];
 
 		currentCol2Height = baseHeight + baseHeightIncr * (float)rowIndex;
-		DebugAddScreenText( Vec4( col2X, currentCol2Height, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::BLUE, Rgba8::BLUE, 0.f, Stringf("%i", rowValue).c_str() );
+		DebugAddScreenText( Vec4( col2X, currentCol2Height, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, cyan, cyan, 0.f, Stringf("%i", rowValue).c_str() );
 	}
 
 	if( IsGameStateWon( m_currentGameState ) )
 	{
 		DebugAddScreenText( Vec4( col0X, victoryHeight, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, "YOU WON!" );
 	}
+	else
+	{
+		DebugAddScreenText( Vec4( col0X, victoryHeight, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, Stringf( "Col to pop: %i, Col to push: %i", m_currentInputMove.m_columnToPop+1, m_currentInputMove.m_columnToPush+1 ).c_str() );
+		DebugAddScreenText( Vec4( col0X, 0.85f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, Stringf( "Number Of Simulations at Head: %i", m_mcAI.GetNumberOfSimulationsAtHead() ).c_str() );
+		DebugAddScreenText( Vec4( col0X, 0.8f, 0.f, 0.f ), Vec2( 0.f, 0.f ), 20.f, Rgba8::GREEN, Rgba8::GREEN, 0.f, Stringf( "Number Of Wins at Head: %i", m_mcAI.GetNumberOfWinsAtHead() ).c_str() );
+	}
+
 
 
 
@@ -171,14 +181,14 @@ void Game::InitializeGameState()
 	m_currentGameState.columns[1].clear();
 	m_currentGameState.columns[2].clear();
 
- 	m_currentGameState.columns[0].push_back( 5 );
- 	m_currentGameState.columns[0].push_back( 4 );
- 	m_currentGameState.columns[0].push_back( 3 );
+//  	m_currentGameState.columns[0].push_back( 5 );
+//  	m_currentGameState.columns[0].push_back( 4 );
+  	m_currentGameState.columns[0].push_back( 3 );
 	m_currentGameState.columns[0].push_back( 2 );
 	m_currentGameState.columns[0].push_back( 1 );
 
 	m_mcAI.SetGameState( m_currentGameState );
-	m_mcAI.SetMaxDepth( 15 );
+	m_mcAI.SetMaxDepth( maxDepth );
 }
 
 std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& gameState )
@@ -186,6 +196,23 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 	bool isCol0NotEmpty = !gameState.columns[0].empty();
 	bool isCol1NotEmpty = !gameState.columns[1].empty();
 	bool isCol2NotEmpty = !gameState.columns[2].empty();
+
+	int topValueCol0 = 9999999;
+	int topValueCol1 = 9999999;
+	int topValueCol2 = 9999999;
+
+	if( isCol0NotEmpty )
+	{
+		topValueCol0 = gameState.columns[0].back();
+	}
+	if( isCol1NotEmpty )
+	{
+		topValueCol1 = gameState.columns[1].back();
+	}
+	if( isCol2NotEmpty )
+	{
+		topValueCol2 = gameState.columns[2].back();
+	}
 
 	std::vector<inputMove_t> moves;
 
@@ -200,8 +227,15 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move1.m_columnToPush = 1;
 		move2.m_columnToPush = 2;
 		
-		moves.push_back( move1 );
-		moves.push_back( move2 );
+		if( topValueCol0 < topValueCol1 )
+		{
+			moves.push_back( move1 );
+		}
+
+		if( topValueCol0 < topValueCol2 )
+		{
+			moves.push_back( move2 );
+		}
 	}
 
 	if( isCol1NotEmpty )
@@ -215,8 +249,15 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move1.m_columnToPush = 0;
 		move2.m_columnToPush = 2;
 		
-		moves.push_back( move1 );
-		moves.push_back( move2 );
+		if( topValueCol1 < topValueCol0 )
+		{
+			moves.push_back( move1 );
+		}
+
+		if( topValueCol1 < topValueCol2 )
+		{
+			moves.push_back( move2 );
+		}
 	}
 
 	if( isCol2NotEmpty )
@@ -230,8 +271,15 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gameState_t const& game
 		move1.m_columnToPush = 0;
 		move2.m_columnToPush = 1;
 		
-		moves.push_back( move1 );
-		moves.push_back( move2 );
+		if( topValueCol2 < topValueCol0 )
+		{
+			moves.push_back( move1 );
+		}
+
+		if( topValueCol2 < topValueCol1 )
+		{
+			moves.push_back( move2 );
+		}
 	}
 
 	return moves;
@@ -243,21 +291,63 @@ int Game::GetNumberOfValidMovesAtGameState( gameState_t const& gameState )
 	bool isCol1NotEmpty = !gameState.columns[1].empty();
 	bool isCol2NotEmpty = !gameState.columns[2].empty();
 
+	int topValueCol0 = 9999999;
+	int topValueCol1 = 9999999;
+	int topValueCol2 = 9999999;
+
+	if( isCol0NotEmpty )
+	{
+		topValueCol0 = gameState.columns[0].back();
+	}
+	if( isCol1NotEmpty )
+	{
+		topValueCol1 = gameState.columns[1].back();
+	}
+	if( isCol2NotEmpty )
+	{
+		topValueCol2 = gameState.columns[2].back();
+	}
+
+
 	int numberOfValidMoves = 0;
 
 	if( isCol0NotEmpty )
 	{
-		numberOfValidMoves += 2;
+		if( topValueCol0 < topValueCol1 )
+		{
+			numberOfValidMoves++;
+		}
+
+		if( topValueCol0 < topValueCol2 )
+		{
+			numberOfValidMoves++;
+		}
 	}
 
 	if( isCol1NotEmpty )
 	{
-		numberOfValidMoves += 2;
+		if( topValueCol1 < topValueCol0 )
+		{
+			numberOfValidMoves++;
+		}
+
+		if( topValueCol1 < topValueCol2 )
+		{
+			numberOfValidMoves++;
+		}
 	}
 
 	if( isCol2NotEmpty )
 	{
-		numberOfValidMoves += 2;
+		if( topValueCol2 < topValueCol0 )
+		{
+			numberOfValidMoves++;
+		}
+
+		if( topValueCol2 < topValueCol1 )
+		{
+			numberOfValidMoves++;
+		}
 	}
 
 	return numberOfValidMoves;
@@ -273,11 +363,6 @@ bool Game::IsGameStateWon( gameState_t const& gameState )
 	{
 		return false;
 	}
-
-// 	if( col2[0] == 5 && col2[1] == 4 && col2[2] == 3 && col2[3] == 2 && col2[4] == 1 )
-// 	{
-// 		return true;
-// 	}
 
 	int maxVal = 999999;
 	for( size_t col2Index = 0; col2Index < col2.size(); col2Index++ )
@@ -325,12 +410,30 @@ void Game::UpdateGameStateIfValid( inputMove_t const& inputMove, gameState_t& ga
 bool Game::IsMoveValidForGameState( inputMove_t const& inputMove, gameState_t const& gameState )
 {
 	int columnToPop = inputMove.m_columnToPop;
+	int columnToPush = inputMove.m_columnToPush;
+
 	if( gameState.columns[columnToPop].empty() )
 	{
 		return false;
 	}
+	
+	int topValueFromColumnToPop = gameState.columns[columnToPop].back();
+	int topValueFromColumnToPush = 999999; //if empty, make it a high value
+	
+	if( !gameState.columns[columnToPush].empty() )
+	{
+		topValueFromColumnToPush = gameState.columns[columnToPush].back();
+	}
 
-	return true;
+	//Can only push onto a column that has a larger value than the column you are popping
+	if( topValueFromColumnToPop < topValueFromColumnToPush )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 gameState_t Game::GetGameStateFromInput( inputMove_t const& inputMove, gameState_t const& currentGameState )
@@ -440,13 +543,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			UpdateGameStateIfValid( m_currentInputMove );
 			m_mcAI.UpdateHeadNode( m_currentInputMove );
-			
-			m_currentInputMove.m_columnToPop = 0;
-			m_currentInputMove.m_columnToPush = 0;
-			m_isInputPop = true;
 
-			//m_mcAI.SetGameState( m_currentGameState );
 		}
+
+		m_currentInputMove.m_columnToPop = 0;
+		m_currentInputMove.m_columnToPush = 0;
+		m_isInputPop = true;
 	}
 
 	if( num1Key.WasJustPressed() )
@@ -493,7 +595,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		//run sims
 		if( !IsGameStateWon( m_currentGameState ) )
 		{
-			m_mcAI.RunSimulations( 1000 );
+			m_mcAI.RunSimulations( 2000 );
 
 			m_mcAI.UpdateBestMove();
 			inputMove_t const& bestInput = m_mcAI.GetBestMove();
@@ -508,7 +610,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		InitializeGameState();
 		//m_mcAI.SetGameState( m_currentGameState );
-		m_mcAI.SetMaxDepth( 50 );
+		m_mcAI.SetMaxDepth( maxDepth );
 	}
 }
 

@@ -90,6 +90,8 @@ public:
 	inputMove_t GetBestMove();
 	int GetMoveToSimIndex();
 	void UpdateHeadNode( inputMove_t const& input );
+	int GetNumberOfWinsAtHead();
+	int GetNumberOfSimulationsAtHead();
 
 
 public:
