@@ -86,8 +86,9 @@ void NetworkSystem::Shutdown()
 
 bool NetworkSystem::StartTCPServer( EventArgs const& args )
 {
+	UNUSED( args );
 	//start listening to data from the client
-	int port = args.GetValue( "port", 48000 );
+	//int port = args.GetValue( "port", 48000 );
 	return true;
 }
 
