@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Material
+  tint="255,255,255,255"
+  specularFactor="1.0"
+  specularPower="64.0"
+  diffuseTexturePath="Data/Images/SF_Fighter-Albedo.jpg"
+  normalTexturePath="Data/Images/SF_Fighter-Normal.jpg"
+  >
+
+  <Textures>
+    <Texture
+      textureFilePath="Data/Images/noise.png"
+      />
+    <Texture
+      textureFilePath="Data/Images/stone_normal.png"
+      />
+    <Texture
+      textureFilePath="Data/Images/stone_spec.png"
+      />
+  </Textures>
+
+  <Samplers>
+    <Sampler
+      SamplerType="SAMPLER_BILINEAR"
+      SamplerEdgeMode="SAMPLER_WRAP"
+    />
+    <Sampler
+      SamplerType="SAMPLER_BILINEAR"
+      SamplerEdgeMode="SAMPLER_CLAMP"
+    />
+  </Samplers>
+    
+  <ShaderState
+    ShaderFilePath="Data/Shaders/Phong.hlsl"
+    BlendMode="SOLID"
+    DepthCompareMode="COMPARE_LESS_THAN_OR_EQUAL"
+    WindingOrder="WIND_COUNTERCLOCKWISE"
+    CullMode="CULL_BACK"
+    FillMode="FILL_SOLID"
+    WriteDepth="true"
+  />
+</Material>
