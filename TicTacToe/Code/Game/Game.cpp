@@ -89,16 +89,16 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-	float baseHeight = 0.7f;
-	float baseHeightIncr = 0.02f;
-	float col0X = 0.01f;
-	float col1X = 0.1f;
-	float col2X = 0.3f;
-	float victoryHeight = 0.9f;
-
-	float currentCol0Height = baseHeight;
-	float currentCol1Height = baseHeight;
-	float currentCol2Height = baseHeight;
+// 	float baseHeight = 0.7f;
+// 	float baseHeightIncr = 0.02f;
+// 	float col0X = 0.01f;
+// 	float col1X = 0.1f;
+// 	float col2X = 0.3f;
+// 	float victoryHeight = 0.9f;
+// 
+// 	float currentCol0Height = baseHeight;
+// 	float currentCol1Height = baseHeight;
+// 	float currentCol2Height = baseHeight;
 
 
 	AABB2 gameBoard = DebugGetScreenBounds();
@@ -136,28 +136,57 @@ void Game::Update()
 	DebugAddScreenAABB2( gameBottomRight,	Rgba8( 0, 170, 255 ) );
 
 	//CenterOfTiles
-
-	Vec4 topLeft( Vec2(),		gameTopLeft.GetCenter() );
-	Vec4 topMiddle( Vec2(),		gameTopMiddle.GetCenter() );
-	Vec4 topRight( Vec2(),		gameTopRight.GetCenter() );
-	Vec4 middleLeft( Vec2(),	gameMiddleLeft.GetCenter() );
-	Vec4 middleMiddle( Vec2(),	gameMiddleMiddle.GetCenter() );
-	Vec4 middleRight( Vec2(),	gameMiddleRight.GetCenter() );
-	Vec4 bottomLeft( Vec2(),	gameBottomLeft.GetCenter() );
-	Vec4 bottomMiddle( Vec2(),	gameBottomMiddle.GetCenter() );
-	Vec4 bottomRight( Vec2(),	gameBottomRight.GetCenter() );
-
+	Vec4 positionArr[] = {
+	Vec4( Vec2(),		gameTopLeft.GetCenter() ),
+	Vec4( Vec2(),		gameTopMiddle.GetCenter() ),
+	Vec4( Vec2(),		gameTopRight.GetCenter() ),
+	Vec4( Vec2(),	gameMiddleLeft.GetCenter() ),
+	Vec4( Vec2(),	gameMiddleMiddle.GetCenter() ),
+	Vec4( Vec2(),	gameMiddleRight.GetCenter() ),
+	Vec4( Vec2(),	gameBottomLeft.GetCenter() ),
+	Vec4( Vec2(),	gameBottomMiddle.GetCenter() ),
+	Vec4( Vec2(),	gameBottomRight.GetCenter() )
+};
 	float fontSize = 100.f;
 
-	DebugAddScreenText( topLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( topMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
-	DebugAddScreenText( topRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( middleLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
-	DebugAddScreenText( middleMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( middleRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( bottomLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( bottomMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-	DebugAddScreenText( bottomRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+	int positionIndex = 0;
+	int const* gameArray = m_currentGameState.gameArray;
+	while( positionIndex < 9 )
+	{
+		Vec4 const& position = positionArr[positionIndex];
+		if( gameArray[positionIndex] == CIRCLEPLAYER )
+		{
+			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
+		}
+		else if( gameArray[positionIndex] == XPLAYER )
+		{
+			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+		}
+
+		positionIndex++;
+	}
+
+
+	if( IsGameStateWon() == CIRCLEPLAYER )
+	{
+		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: O won!" ).c_str() );
+
+	}
+	else if( IsGameStateWon() == XPLAYER )
+	{
+		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: X won!" ).c_str() );
+
+	}
+
+// 	DebugAddScreenText( topLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( topMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
+// 	DebugAddScreenText( topRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( middleLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
+// 	DebugAddScreenText( middleMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( middleRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( bottomLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( bottomMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 	DebugAddScreenText( bottomRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
 
 
 
@@ -201,6 +230,7 @@ void Game::Render()
 void Game::InitializeGameState()
 {
 	//Setup gamestate
+	memset( m_currentGameState.gameArray, 0, 9 );
 }
 
 void Game::CheckCollisions()
@@ -293,20 +323,39 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.WasJustPressed() )
 	{
-
+		PlayMoveIfValid( TOPLEFT );
 	}
 	if( num2Key.WasJustPressed() )
 	{
-
+		PlayMoveIfValid( TOPMIDDLE );
 	}
 	if( num3Key.WasJustPressed() )
 	{
-
+		PlayMoveIfValid( TOPRIGHT );
 	}
 	if( num4Key.WasJustPressed() )
 	{
-
-
+		PlayMoveIfValid( MIDDLELEFT );
+	}
+	if( num5Key.WasJustPressed() )
+	{
+		PlayMoveIfValid( MIDDLEMIDDLE );
+	}
+	if( num6Key.WasJustPressed() )
+	{
+		PlayMoveIfValid( MIDDLERIGHT );
+	}
+	if( num7Key.WasJustPressed() )
+	{		
+		PlayMoveIfValid( BOTTOMLEFT );
+	}
+	if( num8Key.WasJustPressed() )
+	{
+		PlayMoveIfValid( BOTTOMMIDDLE );
+	}
+	if( num9Key.WasJustPressed() )
+	{
+		PlayMoveIfValid( BOTTOMRIGHT );
 	}
 	if( rKey.WasJustPressed() )
 	{
@@ -316,6 +365,83 @@ void Game::CheckButtonPresses(float deltaSeconds)
 }
 
 
+
+void Game::PlayMoveIfValid( int moveToPlay )
+{
+	if( IsGameStateWon() )
+	{
+		return;
+	}
+	if( IsMoveValid( moveToPlay ) )
+	{
+		if( m_isCirclesTurn )
+		{
+			m_currentGameState.gameArray[moveToPlay] = CIRCLEPLAYER;
+		}
+		else
+		{
+			m_currentGameState.gameArray[moveToPlay] = XPLAYER;
+		}
+
+		m_isCirclesTurn = !m_isCirclesTurn;
+
+	}
+}
+
+bool Game::IsMoveValid( int moveToPlay )
+{
+	return IsMoveValidForGameState( moveToPlay, m_currentGameState );
+}
+
+bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState )
+{
+	if( moveToPlay > -1 && moveToPlay < 9 )
+	{
+		int gamespot = gameState.gameArray[moveToPlay];
+
+		if( gamespot == 0 )
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+int Game::IsGameStateWon( gamestate_t const& gameState )
+{
+	int const* gameArray = gameState.gameArray;
+	if( (gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+		(gameArray[3] == CIRCLEPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+		(gameArray[1] == CIRCLEPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[6]) || //middle column
+		(gameArray[2] == CIRCLEPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+	{
+		return CIRCLEPLAYER;
+	}
+
+	if( (gameArray[0] == XPLAYER && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+		(gameArray[3] == XPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+		(gameArray[1] == XPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[6]) || //middle column
+		(gameArray[2] == XPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+	{
+		return XPLAYER;
+	}
+
+	return 0;
+}
+
+int Game::IsGameStateWon()
+{
+	return IsGameStateWon( m_currentGameState );
+}
 
 void Game::RenderDevConsole()
 {
