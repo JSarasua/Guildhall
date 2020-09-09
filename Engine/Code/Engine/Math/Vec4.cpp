@@ -22,6 +22,14 @@ Vec4::Vec4( float initialX, float initialY, float initialZ, float initialW )
 }
 
 
+Vec4::Vec4( Vec2 const& XY, Vec2 const& ZW )
+{
+	x = XY.x;
+	y = XY.y;
+	z = ZW.x;
+	w = ZW.y;
+}
+
 const bool Vec4::operator==( Vec4 const& b )
 {
 	if( x == b.x && y == b.y && z == b.z && w == b.w )

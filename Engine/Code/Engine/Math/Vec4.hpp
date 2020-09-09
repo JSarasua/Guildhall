@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Math/vec2.hpp"
 
 struct Vec4
 {
@@ -13,6 +14,7 @@ public:
 	Vec4() {}
 	Vec4( const Vec4& copyFrom );
 	explicit Vec4( float initialX, float initialY, float initialZ, float initialW );
+	explicit Vec4( Vec2 const& XY, Vec2 const& ZW );
 
 	const bool	operator==( Vec4 const& b );
 	const bool	operator!=( Vec4 const& b );
