@@ -36,11 +36,33 @@ int constexpr CIRCLEPLAYER = 1;
 int constexpr XPLAYER = 2;
 
 
+struct inputMove_t
+{
+	int m_move = -1;
+};
+
+struct metaData_t
+{
+	int m_numberOfWins = 0;
+	int m_numberOfSimulations = 0;
+};
+
+
 struct gamestate_t
 {
 public:
 	int gameArray[9]{};
+	bool m_isCirclesMove = true;
 };
+
+struct data_t
+{
+	metaData_t m_metaData;
+
+	inputMove_t m_moveToReachNode;
+	gamestate_t m_currentGamestate;
+};
+
 
 
 class Game
@@ -70,6 +92,9 @@ private:
 	bool IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState );
 	int IsGameStateWon( gamestate_t const& gameState );
 	int IsGameStateWon();
+
+	std::vector<int> GetValidMovesAtGameState( gamestate_t const& gameState );
+	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 
 
 

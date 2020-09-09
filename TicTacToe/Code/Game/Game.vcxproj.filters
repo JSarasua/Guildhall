@@ -46,6 +46,12 @@
     <ClCompile Include="Player.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="TreeNode.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MonteCarlor.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -76,6 +82,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeNode.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MonteCarlo.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

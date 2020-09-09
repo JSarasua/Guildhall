@@ -57,7 +57,6 @@ void Game::Startup()
 	g_theRenderer->Setup( m_gameClock );
 
 	InitializeGameState();
-
 }
 
 void Game::Shutdown()
@@ -441,6 +440,42 @@ int Game::IsGameStateWon( gamestate_t const& gameState )
 int Game::IsGameStateWon()
 {
 	return IsGameStateWon( m_currentGameState );
+}
+
+std::vector<int> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
+{
+	std::vector<int> validMoves;
+
+	int const* gameArray = gameState.gameArray;
+	int stateIndex = 0;
+	while ( stateIndex < 9 )
+	{
+		if( gameArray[stateIndex] == 0 )
+		{
+			validMoves.push_back( stateIndex );
+		}
+		stateIndex++;
+	}
+
+	return validMoves;
+}
+
+int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
+{
+	int numberOfValidMoves = 0;
+
+	int const* gameArray = gameState.gameArray;
+	int stateIndex = 0;
+	while( stateIndex < 9 )
+	{
+		if( gameArray[stateIndex] == 0 )
+		{
+			numberOfValidMoves++;
+		}
+		stateIndex++;
+	}
+
+	return numberOfValidMoves;
 }
 
 void Game::RenderDevConsole()
