@@ -202,8 +202,8 @@ void Game::Render()
 
 	g_theRenderer->DisableLight( 0 );
 
-	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
-	g_theRenderer->BindTexture( testTexture );
+// 	Texture* testTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Test_StbiFlippedAndOpenGL.png" );
+// 	g_theRenderer->BindTexture( testTexture );
 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
 
 	g_theRenderer->BindTexture( nullptr );
