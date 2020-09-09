@@ -109,6 +109,11 @@ void MonteCarlo::RunSimulationOnMove( int moveIndex )
 bool MonteCarlo::RunSimulationOnNode( mctsTreeNode_t* node )
 {
 	gameState_t currentGameState = node->GetGameState();
+	if( g_theGame->IsGameStateWon( currentGameState ) )
+	{
+		return true;
+	}
+
 	int currentDepth = node->GetDepth();
 	
 	while( currentDepth < m_maxDepth )
