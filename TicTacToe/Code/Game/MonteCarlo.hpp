@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/TreeNode.hpp"
+#include "Game/Game.hpp"
 
 constexpr float SQRT_2 = 1.41421356237f;
 
@@ -20,7 +21,7 @@ public:
 	bool RunSimulationOnNode( TreeNode* node ); //Returns result of simulation
 	ucbResult_t GetBestNodeToSelect( TreeNode* currentNode ); //Returns null if all nodes have been explored
 	TreeNode* ExpandNode( TreeNode* nodeToExpand ); //Returns null if can't expand
-	void BackPropagateResult( bool didWin );
+	void BackPropagateResult( bool didWin, TreeNode* node );
 	
 	//Helper Methods
 	float GetUCBValueAtNode( TreeNode* node, float explorationParameter = SQRT_2 );
@@ -30,5 +31,5 @@ public:
 public:
 	TreeNode* m_headNode = nullptr;
 	TreeNode* m_currentHeadNode = nullptr;
-	bool m_doIStart = false;
+	int m_player = CIRCLEPLAYER;
 };

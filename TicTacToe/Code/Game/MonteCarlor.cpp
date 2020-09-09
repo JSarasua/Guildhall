@@ -1,5 +1,5 @@
 #include "Game/MonteCarlo.hpp"
-#include "Game/Game.hpp"
+//#include "Game/Game.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/GameCommon.hpp"
 
@@ -29,16 +29,47 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			break;
 		}
 		bool didWin = RunSimulationOnNode( expandedNode );
-		BackPropagateResult( didWin );
+		BackPropagateResult( didWin, expandedNode );
 	}
 }
 
 bool MonteCarlo::RunSimulationOnNode( TreeNode* node )
 {
-	//TODO
+	gamestate_t currentGameState = node->m_data->m_currentGamestate;
+	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
+	if( isGameOver != 0 )
+	{
+		if( isGameOver == m_player )
+		{
+			return true; //You won
+		}
+		else
+		{
+			return false; //You lost
+		}
+	}
 
+	inputMove_t move; 
 
-	return false;
+	while( isGameOver == 0 )
+	{
+		move = g_theGame->GetRandomMoveAtGameState( currentGameState );
+		currentGameState = g_theGame->GetGameStateAfterMove( currentGameState, move );
+		isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
+	}
+
+	if( isGameOver == m_player )
+	{
+		return true; //You won
+	}
+	else if( isGameOver == TIE )
+	{
+		return false; //You tied, should it be false???
+	}
+	else
+	{
+		return false; //You lost
+	}
 }
 
 ucbResult_t MonteCarlo::GetBestNodeToSelect( TreeNode* currentNode )
@@ -77,15 +108,54 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 	{
 		return nullptr;
 	}
+	TreeNode* newChildNode = nullptr;
 
-	//TODO
+	gamestate_t const& currentGameState = nodeToExpand->m_data->m_currentGamestate;
+	std::vector<int> validMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
+	std::vector<TreeNode*> const& childNodes = nodeToExpand->m_childNodes;
+	for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+	{
+		int currentMove = validMoves[moveIndex];
+		bool canExpand = true;
+		for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
+		{
+			int moveAtChild = childNodes[childIndex]->m_data->m_moveToReachNode.m_move;
+
+			if( currentMove == moveAtChild )
+			{
+				canExpand = false;
+				break;
+			}
+		}
+
+		if( canExpand )
+		{
+			newChildNode = new TreeNode();
+			newChildNode->m_parentNode = nodeToExpand;
+			inputMove_t newMove = inputMove_t( currentMove );
+			gamestate_t childGameState = g_theGame->GetGameStateAfterMove( currentGameState, newMove );
+			data_t* childData = new data_t( metaData_t(), newMove, childGameState );
+			newChildNode->m_data = childData;
+
+			return newChildNode;
+		}
+
+	}
 
 	return nullptr;
 }
 
-void MonteCarlo::BackPropagateResult( bool didWin )
+void MonteCarlo::BackPropagateResult( bool didWin, TreeNode* node )
 {
-	//TODO
+	metaData_t& metaData = node->m_data->m_metaData;
+	metaData.m_numberOfWins += (int)didWin;
+	metaData.m_numberOfSimulations++;
+
+	TreeNode* parentNode = node->m_parentNode;
+	if( parentNode )
+	{
+		BackPropagateResult( didWin, parentNode );
+	}
 }
 
 float MonteCarlo::GetUCBValueAtNode( TreeNode* node, float explorationParameter )
@@ -115,8 +185,17 @@ float MonteCarlo::GetUCBValueAtNode( TreeNode* node, float explorationParameter 
 
 bool MonteCarlo::CanExpand( TreeNode const* node )
 {
-	//TODO
+	gamestate_t const& currentGameState = node->m_data->m_currentGamestate;
 
+	int numMoves = g_theGame->GetNumberOfValidMovesAtGameState( currentGameState );
+	int numChildren = (int)node->m_childNodes.size();
 
-	return false;
+	if( numMoves > numChildren )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

@@ -166,15 +166,17 @@ void Game::Update()
 	}
 
 
-	if( IsGameStateWon() == CIRCLEPLAYER )
+	if( IsGameOver() == CIRCLEPLAYER )
 	{
 		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: O won!" ).c_str() );
-
 	}
-	else if( IsGameStateWon() == XPLAYER )
+	else if( IsGameOver() == XPLAYER )
 	{
 		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: X won!" ).c_str() );
-
+	}
+	else if( IsGameOver() == TIE )
+	{
+		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
 	}
 
 // 	DebugAddScreenText( topLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
@@ -367,7 +369,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 void Game::PlayMoveIfValid( int moveToPlay )
 {
-	if( IsGameStateWon() )
+	if( IsGameOver() != 0 )
 	{
 		return;
 	}
@@ -407,7 +409,7 @@ bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState
 	return false;
 }
 
-int Game::IsGameStateWon( gamestate_t const& gameState )
+int Game::IsGameOverForGameState( gamestate_t const& gameState )
 {
 	int const* gameArray = gameState.gameArray;
 	if( (gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
@@ -434,13 +436,20 @@ int Game::IsGameStateWon( gamestate_t const& gameState )
 		return XPLAYER;
 	}
 
+	if( GetValidMovesAtGameState( gameState ).size() == 0 )
+	{
+		return TIE;
+	}
+
 	return 0;
 }
 
-int Game::IsGameStateWon()
+int Game::IsGameOver()
 {
-	return IsGameStateWon( m_currentGameState );
+	return IsGameOverForGameState( m_currentGameState );
 }
+
+
 
 std::vector<int> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
 {
@@ -476,6 +485,40 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 	}
 
 	return numberOfValidMoves;
+}
+
+gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move )
+{
+	gamestate_t newGameState = currentGameState;
+	bool isCirclesTurn = newGameState.m_isCirclesMove;
+	int moveToMake = move.m_move;
+	if( IsMoveValidForGameState( move.m_move, newGameState ) )
+	{
+		if( isCirclesTurn )
+		{
+			newGameState.gameArray[moveToMake] = CIRCLEPLAYER;
+		}
+		else
+		{
+			newGameState.gameArray[moveToMake] = XPLAYER;
+		}
+
+		newGameState.m_isCirclesMove = !isCirclesTurn;
+
+	}
+
+	return newGameState;
+}
+
+inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState )
+{
+	std::vector<int> validMoves = GetValidMovesAtGameState( currentGameState );
+
+	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() );
+	int randMove = validMoves[randIndex];
+	inputMove_t randMoveStruct = inputMove_t(randMove);
+
+	return randMoveStruct;
 }
 
 void Game::RenderDevConsole()

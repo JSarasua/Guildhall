@@ -32,12 +32,17 @@ int constexpr BOTTOMLEFT	= 6;
 int constexpr BOTTOMMIDDLE	= 7;
 int constexpr BOTTOMRIGHT	= 8;
 
-int constexpr CIRCLEPLAYER = 1;
-int constexpr XPLAYER = 2;
+int constexpr CIRCLEPLAYER	= 1;
+int constexpr XPLAYER		= 2;
+int constexpr TIE			= 3;
 
 
 struct inputMove_t
 {
+public:
+	inputMove_t() = default;
+	inputMove_t( int move ) { m_move = move; }
+
 	int m_move = -1;
 };
 
@@ -51,12 +56,23 @@ struct metaData_t
 struct gamestate_t
 {
 public:
+	gamestate_t() = default;
+	gamestate_t( int* gameArrayToCopy, bool isCirclesMove ) { memcpy(gameArray, gameArrayToCopy, 9); m_isCirclesMove = isCirclesMove; }
+public:
 	int gameArray[9]{};
 	bool m_isCirclesMove = true;
 };
 
 struct data_t
 {
+	data_t() = default;
+	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t const& gameState )
+	{
+		m_metaData = metaData;
+		m_moveToReachNode = move;
+		m_currentGamestate = gameState;
+	}
+
 	metaData_t m_metaData;
 
 	inputMove_t m_moveToReachNode;
@@ -77,6 +93,18 @@ public:
 	void Update();
 	void Render();
 
+	void PlayMoveIfValid( int moveToPlay );
+	bool IsMoveValid( int moveToPlay );
+	bool IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState );
+	int IsGameOverForGameState( gamestate_t const& gameState );
+	int IsGameOver();
+
+
+	std::vector<int> GetValidMovesAtGameState( gamestate_t const& gameState );
+	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
+	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
+	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
+
 private:
 	void InitializeGameState();
 
@@ -86,16 +114,6 @@ private:
 	void RenderGame();
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
-
-	void PlayMoveIfValid( int moveToPlay );
-	bool IsMoveValid( int moveToPlay );
-	bool IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState );
-	int IsGameStateWon( gamestate_t const& gameState );
-	int IsGameStateWon();
-
-	std::vector<int> GetValidMovesAtGameState( gamestate_t const& gameState );
-	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
-
 
 
 private:
