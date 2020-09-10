@@ -102,6 +102,9 @@ void Game::Update()
 // 	float currentCol0Height = baseHeight;
 // 	float currentCol1Height = baseHeight;
 // 	float currentCol2Height = baseHeight;
+	Vec2 winOffset = Vec2(0.0f, -0.02f );
+	Vec2 simOffset = Vec2(0.0f, -0.03f );
+	Vec2 winPercentOffset = Vec2( 0.0f, -0.04f );
 
 
 	AABB2 gameBoard = DebugGetScreenBounds();
@@ -151,6 +154,7 @@ void Game::Update()
 	Vec4( Vec2(),	gameBottomRight.GetCenter() )
 };
 	float fontSize = 100.f;
+	float metaFontSize = 10.f;
 
 	int positionIndex = 0;
 	int const* gameArray = m_currentGameState.gameArray;
@@ -167,6 +171,37 @@ void Game::Update()
 		}
 
 		positionIndex++;
+	}
+
+	TreeNode const* headNode = m_mcts->GetCurrentHeadNode();
+	for( size_t childIndex = 0; childIndex < headNode->m_childNodes.size(); childIndex++ )
+	{
+		data_t const* data = headNode->m_childNodes[childIndex]->m_data;
+		if( nullptr == data )
+		{
+			continue;
+		}
+		int move = data->m_moveToReachNode.m_move;
+		float wins = data->m_metaData.m_numberOfWins;
+		int sims = data->m_metaData.m_numberOfSimulations;
+		float winPercent = wins / (float)sims;
+		Vec4 position = positionArr[move];
+		Vec4 winPosition = position;
+		Vec4 simPosition = position;
+		Vec4 winPercentPosition = position;
+
+		winPosition.x += winOffset.x;
+		winPosition.y += winOffset.y;
+		simPosition.x += simOffset.x;
+		simPosition.y += simOffset.y;
+		winPercentPosition.x += winPercentOffset.x;
+		winPercentPosition.y += winPercentOffset.y;
+
+		DebugAddScreenText( winPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Wins: %.1f", wins ).c_str() );
+		DebugAddScreenText( simPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Sims: %i", sims ).c_str() );
+		DebugAddScreenText( winPercentPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Win Rate: %.1f", winPercent ).c_str() );
+
+
 	}
 
 

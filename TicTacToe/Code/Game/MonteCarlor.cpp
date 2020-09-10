@@ -71,7 +71,7 @@ int MonteCarlo::RunSimulationOnNode( TreeNode* node )
 
 ucbResult_t MonteCarlo::GetBestNodeToSelect( TreeNode* currentNode )
 {
-	float highestUCBValue = 0.f;
+	float highestUCBValue = -10000.f;
 	TreeNode* bestTreeNode = nullptr;
 
 	//Return itself if it can be expanded
@@ -158,6 +158,10 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeNode* node )
 	{
 		metaData.m_numberOfWins += 0.5f;
 	}
+	else
+	{
+		metaData.m_numberOfWins -= 100.f;
+	}
 
 	metaData.m_numberOfSimulations++;
 
@@ -212,7 +216,7 @@ bool MonteCarlo::CanExpand( TreeNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	float bestWinRate = -1.f;
+	float bestWinRate = -10000.f;
 	inputMove_t bestMove;
 
 	std::vector<TreeNode*> const& childNodes = m_currentHeadNode->m_childNodes;
@@ -255,3 +259,9 @@ void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& n
 	m_currentHeadNode->m_childNodes.push_back( newTreeNode );
 	m_currentHeadNode = newTreeNode;
 }
+
+TreeNode const* MonteCarlo::GetCurrentHeadNode()
+{
+	return m_currentHeadNode;
+}
+

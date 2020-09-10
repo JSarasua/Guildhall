@@ -33,7 +33,7 @@ public:
 	bool CanExpand( TreeNode const* node );
 	inputMove_t GetBestMove();
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
-
+	TreeNode const* GetCurrentHeadNode();
 public:
 	TreeNode* m_headNode = nullptr;
 	TreeNode* m_currentHeadNode = nullptr;
