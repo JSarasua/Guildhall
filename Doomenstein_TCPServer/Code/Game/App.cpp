@@ -150,6 +150,7 @@ bool App::IsNoClipping()
 void App::BeginFrame()
 {
 	Clock::BeginFrame();
+	g_theNetwork->BeginFrame();
 	g_theAudio->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
@@ -180,6 +181,7 @@ void App::Render()
 }
 void App::EndFrame()
 {
+	g_theNetwork->EndFrame();
 	g_theAudio->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theConsole->EndFrame();
