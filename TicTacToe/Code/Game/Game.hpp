@@ -18,6 +18,7 @@ class Player;
 class Shader;
 class ShaderState;
 class World;
+class MonteCarlo;
 
 struct light_t;
 struct Vertex_PCUTBN;
@@ -57,10 +58,22 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( int* gameArrayToCopy, bool isCirclesMove ) { memcpy(gameArray, gameArrayToCopy, 9); m_isCirclesMove = isCirclesMove; }
+	gamestate_t( int* gameArrayToCopy, int whoseMoveNow ) { memcpy(gameArray, gameArrayToCopy, 9); whoseMoveIsIt = whoseMoveNow; }
+
+	int WhoJustMoved() 
+	{
+		if( whoseMoveIsIt == CIRCLEPLAYER )
+		{
+			return XPLAYER;
+		}
+		else
+		{
+			return CIRCLEPLAYER;
+		}
+	}
 public:
 	int gameArray[9]{};
-	bool m_isCirclesMove = true;
+	int whoseMoveIsIt = CIRCLEPLAYER;
 };
 
 struct data_t
@@ -129,9 +142,9 @@ public:
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
 
-
-	bool m_isCirclesTurn = true;
 	gamestate_t m_currentGameState;
+
+	MonteCarlo* m_mcts = nullptr;
 
 private:
 	void RenderDevConsole();

@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/Game.hpp"
+#include "Game/MonteCarlo.hpp"
 #include "Engine/Math/AABB2.hpp"
 #include "App.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
@@ -32,6 +33,7 @@ extern AudioSystem* g_theAudio;
 
 
 int constexpr maxDepth = 15;
+int constexpr g_WhoStarts = XPLAYER;
 
 Game::Game()
 {
@@ -56,12 +58,14 @@ void Game::Startup()
 
 	g_theRenderer->Setup( m_gameClock );
 
+	m_mcts = new MonteCarlo();
+	//m_mcts->Startup( CIRCLEPLAYER );
 	InitializeGameState();
 }
 
 void Game::Shutdown()
 {
-
+	m_mcts->Shutdown();
 }
 
 void Game::RunFrame(){}
@@ -231,7 +235,12 @@ void Game::Render()
 void Game::InitializeGameState()
 {
 	//Setup gamestate
-	memset( m_currentGameState.gameArray, 0, 9 );
+	memset( m_currentGameState.gameArray, 0, 9 * sizeof(int) );
+	m_currentGameState.whoseMoveIsIt = g_WhoStarts;
+
+	m_mcts->Shutdown();
+	m_mcts->Startup( g_WhoStarts );
+
 }
 
 void Game::CheckCollisions()
@@ -317,6 +326,13 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 	const KeyButtonState& enterKey = g_theInput->GetKeyStates( ENTER_KEY );
 
+	if( f1Key.WasJustPressed() )
+	{
+		m_mcts->RunSimulations( 10000 );
+		inputMove_t move = m_mcts->GetBestMove();
+
+		PlayMoveIfValid( move.m_move );
+	}
 	if( enterKey.WasJustPressed() )
 	{
 
@@ -375,18 +391,20 @@ void Game::PlayMoveIfValid( int moveToPlay )
 	}
 	if( IsMoveValid( moveToPlay ) )
 	{
-		if( m_isCirclesTurn )
+		int whoseMoveIsIt = m_currentGameState.whoseMoveIsIt;
+		m_currentGameState.gameArray[moveToPlay] = whoseMoveIsIt;
+		if( whoseMoveIsIt == CIRCLEPLAYER )
 		{
-			m_currentGameState.gameArray[moveToPlay] = CIRCLEPLAYER;
+			m_currentGameState.whoseMoveIsIt = XPLAYER;
 		}
 		else
 		{
-			m_currentGameState.gameArray[moveToPlay] = XPLAYER;
+			m_currentGameState.whoseMoveIsIt = CIRCLEPLAYER;
 		}
-
-		m_isCirclesTurn = !m_isCirclesTurn;
-
 	}
+	inputMove_t move = inputMove_t(moveToPlay);
+
+	m_mcts->UpdateGame( move, m_currentGameState );
 }
 
 bool Game::IsMoveValid( int moveToPlay )
@@ -416,7 +434,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 		(gameArray[3] == CIRCLEPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
 		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
 		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == CIRCLEPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[6]) || //middle column
+		(gameArray[1] == CIRCLEPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
 		(gameArray[2] == CIRCLEPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
 		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
 		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
@@ -428,7 +446,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 		(gameArray[3] == XPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
 		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
 		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == XPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[6]) || //middle column
+		(gameArray[1] == XPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
 		(gameArray[2] == XPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
 		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
 		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
@@ -490,21 +508,20 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move )
 {
 	gamestate_t newGameState = currentGameState;
-	bool isCirclesTurn = newGameState.m_isCirclesMove;
+	int whoseMoveIsIt = newGameState.whoseMoveIsIt;
 	int moveToMake = move.m_move;
 	if( IsMoveValidForGameState( move.m_move, newGameState ) )
 	{
-		if( isCirclesTurn )
+		newGameState.gameArray[moveToMake] = whoseMoveIsIt;
+
+		if( whoseMoveIsIt == CIRCLEPLAYER )
 		{
-			newGameState.gameArray[moveToMake] = CIRCLEPLAYER;
+			newGameState.whoseMoveIsIt = XPLAYER;
 		}
 		else
 		{
-			newGameState.gameArray[moveToMake] = XPLAYER;
+			newGameState.whoseMoveIsIt = CIRCLEPLAYER;
 		}
-
-		newGameState.m_isCirclesMove = !isCirclesTurn;
-
 	}
 
 	return newGameState;
@@ -514,7 +531,7 @@ inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState 
 {
 	std::vector<int> validMoves = GetValidMovesAtGameState( currentGameState );
 
-	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() );
+	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
 	int randMove = validMoves[randIndex];
 	inputMove_t randMoveStruct = inputMove_t(randMove);
 

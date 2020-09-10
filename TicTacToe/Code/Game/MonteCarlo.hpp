@@ -6,6 +6,8 @@ constexpr float SQRT_2 = 1.41421356237f;
 
 struct ucbResult_t
 {
+	ucbResult_t() = default;
+	ucbResult_t( float ucb, TreeNode* newNode ) { ucbValue = ucb; node = newNode; }
 	float ucbValue = 0.f;
 	TreeNode* node = nullptr;
 };
@@ -16,20 +18,24 @@ public:
 	MonteCarlo() = default;
 	~MonteCarlo();
 
+	void Startup( int whoseMoveIsIt );
+	void Shutdown();
+
 	//Base MCTS methods
 	void RunSimulations( int numberOfSimulations );
-	bool RunSimulationOnNode( TreeNode* node ); //Returns result of simulation
+	int RunSimulationOnNode( TreeNode* node ); //Returns result of simulation
 	ucbResult_t GetBestNodeToSelect( TreeNode* currentNode ); //Returns null if all nodes have been explored
 	TreeNode* ExpandNode( TreeNode* nodeToExpand ); //Returns null if can't expand
-	void BackPropagateResult( bool didWin, TreeNode* node );
+	void BackPropagateResult( int whoWon, TreeNode* node );
 	
 	//Helper Methods
 	float GetUCBValueAtNode( TreeNode* node, float explorationParameter = SQRT_2 );
 	bool CanExpand( TreeNode const* node );
-
+	inputMove_t GetBestMove();
+	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 
 public:
 	TreeNode* m_headNode = nullptr;
 	TreeNode* m_currentHeadNode = nullptr;
-	int m_player = CIRCLEPLAYER;
+	//int m_player = CIRCLEPLAYER;
 };

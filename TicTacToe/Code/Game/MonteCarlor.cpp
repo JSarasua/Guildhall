@@ -13,6 +13,21 @@ MonteCarlo::~MonteCarlo()
 	m_currentHeadNode = nullptr;
 }
 
+void MonteCarlo::Startup( int whoseMoveIsIt )
+{
+	m_headNode = new TreeNode();
+	m_headNode->m_data = new data_t();
+	m_headNode->m_data->m_currentGamestate.whoseMoveIsIt = whoseMoveIsIt;
+
+	m_currentHeadNode = m_headNode;
+}
+
+void MonteCarlo::Shutdown()
+{
+	delete m_headNode;
+	m_currentHeadNode = nullptr;
+}
+
 void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
@@ -28,25 +43,18 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 		{
 			break;
 		}
-		bool didWin = RunSimulationOnNode( expandedNode );
-		BackPropagateResult( didWin, expandedNode );
+		int whoWon = RunSimulationOnNode( expandedNode );
+		BackPropagateResult( whoWon, expandedNode );
 	}
 }
 
-bool MonteCarlo::RunSimulationOnNode( TreeNode* node )
+int MonteCarlo::RunSimulationOnNode( TreeNode* node )
 {
 	gamestate_t currentGameState = node->m_data->m_currentGamestate;
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	if( isGameOver != 0 )
 	{
-		if( isGameOver == m_player )
-		{
-			return true; //You won
-		}
-		else
-		{
-			return false; //You lost
-		}
+		return isGameOver;
 	}
 
 	inputMove_t move; 
@@ -58,18 +66,7 @@ bool MonteCarlo::RunSimulationOnNode( TreeNode* node )
 		isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	}
 
-	if( isGameOver == m_player )
-	{
-		return true; //You won
-	}
-	else if( isGameOver == TIE )
-	{
-		return false; //You tied, should it be false???
-	}
-	else
-	{
-		return false; //You lost
-	}
+	return isGameOver;
 }
 
 ucbResult_t MonteCarlo::GetBestNodeToSelect( TreeNode* currentNode )
@@ -77,10 +74,12 @@ ucbResult_t MonteCarlo::GetBestNodeToSelect( TreeNode* currentNode )
 	float highestUCBValue = 0.f;
 	TreeNode* bestTreeNode = nullptr;
 
+	//Return itself if it can be expanded
 	if( CanExpand( currentNode ) )
 	{
 		highestUCBValue = GetUCBValueAtNode( currentNode );
 		bestTreeNode = currentNode;
+		return ucbResult_t( highestUCBValue, bestTreeNode );
 	}
 
 	std::vector<TreeNode*>& childNodes = currentNode->m_childNodes;
@@ -137,6 +136,8 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 			data_t* childData = new data_t( metaData_t(), newMove, childGameState );
 			newChildNode->m_data = childData;
 
+			nodeToExpand->m_childNodes.push_back( newChildNode );
+
 			return newChildNode;
 		}
 
@@ -145,16 +146,21 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 	return nullptr;
 }
 
-void MonteCarlo::BackPropagateResult( bool didWin, TreeNode* node )
+void MonteCarlo::BackPropagateResult( int whoWon, TreeNode* node )
 {
+	int whoJustMoved = node->m_data->m_currentGamestate.WhoJustMoved();
 	metaData_t& metaData = node->m_data->m_metaData;
-	metaData.m_numberOfWins += (int)didWin;
+	if( whoJustMoved == whoWon )
+	{
+		metaData.m_numberOfWins++;
+	}
+
 	metaData.m_numberOfSimulations++;
 
 	TreeNode* parentNode = node->m_parentNode;
 	if( parentNode )
 	{
-		BackPropagateResult( didWin, parentNode );
+		BackPropagateResult( whoWon, parentNode );
 	}
 }
 
@@ -198,4 +204,50 @@ bool MonteCarlo::CanExpand( TreeNode const* node )
 	{
 		return false;
 	}
+}
+
+inputMove_t MonteCarlo::GetBestMove()
+{
+	float bestWinRate = -1.f;
+	inputMove_t bestMove;
+
+	std::vector<TreeNode*> const& childNodes = m_currentHeadNode->m_childNodes;
+
+	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
+	{
+		metaData_t const& metaData = childNodes[childIndex]->m_data->m_metaData;
+		float wins = (float)metaData.m_numberOfWins;
+		float sims = (float)metaData.m_numberOfSimulations;
+
+		float childWinRate = wins/sims;
+		if( childWinRate > bestWinRate )
+		{
+			bestWinRate = childWinRate;
+			bestMove = childNodes[childIndex]->m_data->m_moveToReachNode;
+		}
+	}
+
+	return bestMove;
+}
+
+void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState )
+{
+	std::vector<TreeNode*> const& childNodes = m_currentHeadNode->m_childNodes;
+	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
+	{
+		inputMove_t const& childMove = childNodes[childIndex]->m_data->m_moveToReachNode;
+
+		if( movePlayed.m_move == childMove.m_move )
+		{
+			m_currentHeadNode = childNodes[childIndex];
+			return;
+		}
+	}
+
+	TreeNode* newTreeNode = new TreeNode();
+	newTreeNode->m_parentNode = m_currentHeadNode;
+	newTreeNode->m_data = new data_t( metaData_t(), movePlayed, newGameState );
+	
+	m_currentHeadNode->m_childNodes.push_back( newTreeNode );
+	m_currentHeadNode = newTreeNode;
 }
