@@ -91,7 +91,7 @@ ucbResult_t MonteCarlo::GetBestNodeToSelect( TreeNode* currentNode )
 		if( result.ucbValue > highestUCBValue )
 		{
 			highestUCBValue = result.ucbValue;
-			bestTreeNode = childNodes[childIndex];
+			bestTreeNode = result.node;
 		}
 	}
 
@@ -153,6 +153,10 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeNode* node )
 	if( whoJustMoved == whoWon )
 	{
 		metaData.m_numberOfWins++;
+	}
+	else if( whoWon == TIE )
+	{
+		metaData.m_numberOfWins += 0.5f;
 	}
 
 	metaData.m_numberOfSimulations++;
