@@ -29,6 +29,13 @@ NetworkSystem::~NetworkSystem()
 void NetworkSystem::Startup()
 {
 	g_theEventSystem->SubscribeMethodToEvent( "StartTCPServer", CONSOLECOMMAND, this, &NetworkSystem::StartTCPServer  );
+	
+// 	g_theEventSystem->SubscribeMethodToEvent( "SendMessage", CONSOLECOMMAND, this, &NetworkSystem::StartTCPServer );
+// 	g_theEventSystem->SubscribeMethodToEvent( "StopServer", CONSOLECOMMAND, this, &NetworkSystem::StartTCPServer );
+// 	g_theEventSystem->SubscribeMethodToEvent( "Connect", CONSOLECOMMAND, this, &NetworkSystem::ConnectToTCPServer );
+// 	g_theEventSystem->SubscribeMethodToEvent( "Disconnect", CONSOLECOMMAND, this, &NetworkSystem::DisconnectToTCPServer );
+// 	g_theEventSystem->SubscribeToEvent()
+
 
 	WSADATA wsaData;
 	WORD wVersion MAKEWORD(2, 2);
@@ -53,6 +60,7 @@ void NetworkSystem::BeginFrame()
 			addrHintsIn.ai_flags	= AI_PASSIVE;
 
 			std::string serverPort( "48000" );
+			//NULL should be changed to hostname.c_str()
 			int iResult = getaddrinfo( NULL, serverPort.c_str(), &addrHintsIn, &pAddrOut ); //NULL because we'ring binding to local host
 
 																						   //Doesn't call WSAGetLastError
@@ -89,7 +97,6 @@ void NetworkSystem::BeginFrame()
 				m_clientSocket = accept( m_listenSocket, NULL, NULL );
 				g_theConsole->GuaranteeOrError( m_clientSocket != INVALID_SOCKET, Stringf( "Call to accept failed %i", WSAGetLastError() ) );
 				g_theConsole->PrintString( Rgba8::WHITE, Stringf("Client connected from %s", GetAddress().c_str() ) );
-
 			}
 		}
 		else

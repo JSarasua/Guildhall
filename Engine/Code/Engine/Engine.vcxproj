@@ -196,7 +196,11 @@
     <ClCompile Include="Math\vec2.cpp" />
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
+    <ClCompile Include="Network\NetworkSys.cpp" />
     <ClCompile Include="Network\NetworkSystem.cpp" />
+    <ClCompile Include="Network\TCPClient.cpp" />
+    <ClCompile Include="Network\TCPServer.cpp" />
+    <ClCompile Include="Network\TCPSocket.cpp" />
     <ClCompile Include="Physics2D\Collider2D.cpp" />
     <ClCompile Include="Physics2D\Collision2D.cpp" />
     <ClCompile Include="Physics2D\DiscCollider2D.cpp" />
@@ -282,7 +286,11 @@
     <ClInclude Include="Math\vec2.hpp" />
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
+    <ClInclude Include="Network\NetworkSys.hpp" />
     <ClInclude Include="Network\NetworkSystem.hpp" />
+    <ClInclude Include="Network\TCPClient.hpp" />
+    <ClInclude Include="Network\TCPServer.hpp" />
+    <ClInclude Include="Network\TCPSocket.hpp" />
     <ClInclude Include="Physics2D\Collider2D.hpp" />
     <ClInclude Include="Physics2D\Collision2D.hpp" />
     <ClInclude Include="Physics2D\DiscCollider2D.hpp" />
