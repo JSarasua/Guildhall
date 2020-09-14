@@ -216,7 +216,8 @@ bool MonteCarlo::CanExpand( TreeNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	float bestWinRate = -10000.f;
+	//float bestWinRate = -10000.f;
+	float highestSims = 0.f;
 	inputMove_t bestMove;
 
 	std::vector<TreeNode*> const& childNodes = m_currentHeadNode->m_childNodes;
@@ -224,13 +225,13 @@ inputMove_t MonteCarlo::GetBestMove()
 	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
 	{
 		metaData_t const& metaData = childNodes[childIndex]->m_data->m_metaData;
-		float wins = (float)metaData.m_numberOfWins;
+		//float wins = (float)metaData.m_numberOfWins;
 		float sims = (float)metaData.m_numberOfSimulations;
 
-		float childWinRate = wins/sims;
-		if( childWinRate > bestWinRate )
+		//float childWinRate = wins/sims;
+		if( sims > highestSims )
 		{
-			bestWinRate = childWinRate;
+			highestSims = sims;
 			bestMove = childNodes[childIndex]->m_data->m_moveToReachNode;
 		}
 	}
