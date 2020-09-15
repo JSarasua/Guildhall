@@ -5,12 +5,24 @@
 #define  _WINSOCK_DEPRECATED_NO_WARNINGS
 #endif // !_WINSOCK_DEPRECATED_NO_WARNINGS
 
-
-
 #include <string>
 #include <array>
 #include <winsock2.h>
 #include <WS2tcpip.h>
+
+
+
+struct MessageHeader
+{
+	uint16_t m_id = 0;
+	uint16_t m_size = 0;
+};
+
+struct ServerListeningMessage
+{
+	MessageHeader m_header;
+	std::string m_gameName;
+};
 
 class NetworkSystem
 {

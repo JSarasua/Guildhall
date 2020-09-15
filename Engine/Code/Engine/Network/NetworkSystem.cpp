@@ -114,7 +114,15 @@ void NetworkSystem::BeginFrame()
 				}
 				else
 				{
+					
+					MessageHeader* headerPtr = reinterpret_cast<MessageHeader*>(&buffer[0]);
+					
+					ServerListeningMessage svrListenMsg;
+					svrListenMsg.m_header = *headerPtr;
+					
 					buffer[iResult] = NULL;
+					svrListenMsg.m_gameName = std::string( &buffer[4] );
+
 					g_theConsole->PrintString( Rgba8::WHITE, Stringf( "Client messageg: %s", &buffer[0] ) );
 				
 					std::string msg("Hello client");
