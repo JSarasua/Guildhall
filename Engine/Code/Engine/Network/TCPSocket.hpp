@@ -34,6 +34,7 @@ public:
 	bool IsDataAvailable();
 	void Shutdown();
 	void Close();
+	bool IsSocketValid() { return m_socket != INVALID_SOCKET; }
 
 private:
 	//Mode m_mode;
