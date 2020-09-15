@@ -9,6 +9,7 @@
 class InputSystem;
 class JobSystem;
 class NetworkSystem;
+class NetworkSys;
 
 #define UNUSED(x) (void)(x);
 typedef unsigned int uint;
@@ -30,6 +31,7 @@ extern EventSystem* g_theEventSystem;
 extern InputSystem* g_theInput;
 extern JobSystem* g_theJobSystem;
 extern NetworkSystem* g_theNetwork;
+extern NetworkSys* g_theNetworkSys;
 
 
 enum class eYawPitchRollRotationOrder

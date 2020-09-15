@@ -17,6 +17,7 @@ public:
 
 private:
 	//Mode m_mode; //may need for blocking/nonblocking
+	// int m_listnPort = 48000;
 	FD_SET m_listenSet;
 	SOCKET m_listenSocket;
 	timeval m_timeval;

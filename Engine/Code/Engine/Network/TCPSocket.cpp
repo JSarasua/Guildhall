@@ -40,7 +40,7 @@ TCPSocket::TCPSocket( TCPSocket const& src )
 
 TCPSocket::~TCPSocket()
 {
-	delete m_bufferPtr;
+
 }
 
 void TCPSocket::operator=( TCPSocket const& src )
@@ -97,8 +97,8 @@ void TCPSocket::Send( std::string dataToSend, size_t length )
 
 TCPData TCPSocket::Receive()
 {
-	std::array<char, 256> buffer;
-	int iResult = ::recv( m_socket, &buffer[0], (int)buffer.size() - 1, 0 );
+	//std::array<char, 256> buffer;
+	int iResult = ::recv( m_socket, m_bufferPtr, (int)m_bufferSize, 0 );
 	g_theConsole->GuaranteeOrError( iResult != SOCKET_ERROR, Stringf( "Call to recv failed %i", WSAGetLastError() ) );
 
 	if( iResult == 0 )
@@ -106,7 +106,7 @@ TCPData TCPSocket::Receive()
 		g_theConsole->ErrorString( Stringf( "Call to recv return 0" ) );
 	}
 
-	TCPData data = TCPData( (int)buffer.size(), &buffer[0] );
+	TCPData data = TCPData( iResult, m_bufferPtr );
 	return data;
 }
 
@@ -117,7 +117,8 @@ bool TCPSocket::IsDataAvailable()
 	int iResult = select( 0, &m_fdSet, NULL, NULL, &m_timeval );
 	g_theConsole->GuaranteeOrError( iResult != SOCKET_ERROR, Stringf( "Select on socket in non-blocking mode failed, error = %i", WSAGetLastError() ) );
 
-	return FD_ISSET( m_socket, &m_fdSet );
+	bool isDataAvailable = FD_ISSET( m_socket, &m_fdSet );
+	return isDataAvailable;
 }
 
 void TCPSocket::Shutdown()

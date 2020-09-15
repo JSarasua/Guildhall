@@ -1,4 +1,11 @@
 #include "Engine/Network/TCPClient.hpp"
+#include <array>
+
+struct MessageHeader
+{
+	uint16_t m_id = 0;
+	uint16_t m_size = 0;
+};
 
 
 TCPSocket TCPClient::Connect( std::string const& host, int port )

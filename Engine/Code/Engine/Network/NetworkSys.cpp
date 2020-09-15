@@ -65,6 +65,8 @@ void NetworkSys::Startup()
 
 	g_theConsole->GuaranteeOrError( iResult == 0, Stringf( "Call to WSAStartup failed %i", WSAGetLastError() ) );
 
+	m_TCPServer = new TCPServer();
+	m_TCPClient = new TCPClient();
 	m_TCPClientToServerSocket = new TCPSocket();
 	m_TCPServerToClientSocket = new TCPSocket();
 }
@@ -84,7 +86,7 @@ void NetworkSys::BeginFrame()
 			if( m_TCPServerToClientSocket->IsDataAvailable() )
 			{
 				TCPData data = m_TCPServerToClientSocket->Receive();
-				std::string dataStr = data.GetData();
+				std::string dataStr = std::string( data.GetData(), data.GetLength() );
 				g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
 				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
 			}
@@ -93,7 +95,7 @@ void NetworkSys::BeginFrame()
 
 	if( nullptr != m_TCPClientToServerSocket )
 	{
-		if( m_TCPClientToServerSocket->IsDataAvailable() )
+		if( m_TCPClientToServerSocket->IsSocketValid() && m_TCPClientToServerSocket->IsDataAvailable() )
 		{
 			TCPData data = m_TCPClientToServerSocket->Receive();
 			std::string dataStr = data.GetData();
@@ -114,8 +116,8 @@ void NetworkSys::Shutdown()
 
 bool NetworkSys::StartTCPServer( EventArgs const& args )
 {
-	int port = args.GetValue( "port", 48000 );
-	m_TCPServer = new TCPServer();
+	//int port = args.GetValue( "port", 48000 );
+	int port = 48000;
 
 	m_TCPServer->Bind( port );
 	m_TCPServer->Listen();
