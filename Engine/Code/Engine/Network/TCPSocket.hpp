@@ -25,7 +25,7 @@ public:
 	TCPSocket( SOCKET socket, size_t bufferSize = 256 );
 	TCPSocket( TCPSocket const& src );
 	~TCPSocket();
-	TCPSocket& operator=( TCPSocket const& src );
+	void operator=( TCPSocket const& src );
 
 	std::string GetAddress();
 
