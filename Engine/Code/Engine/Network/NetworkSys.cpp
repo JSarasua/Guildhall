@@ -38,13 +38,13 @@ NetworkSys::~NetworkSys()
 	{
 		delete m_TCPClient;
 	}
-	if( m_TCPServerSocket )
+	if( m_TCPServerToClientSocket )
 	{
-		delete m_TCPServerSocket;
+		delete m_TCPServerToClientSocket;
 	}
-	if( m_TCPClientSocket )
+	if( m_TCPClientToServerSocket )
 	{
-		delete m_TCPClientSocket;
+		delete m_TCPClientToServerSocket;
 	}
 }
 
@@ -65,6 +65,42 @@ void NetworkSys::Startup()
 
 	g_theConsole->GuaranteeOrError( iResult == 0, Stringf( "Call to WSAStartup failed %i", WSAGetLastError() ) );
 
+	m_TCPClientToServerSocket = new TCPSocket();
+	m_TCPServerToClientSocket = new TCPSocket();
+}
+
+void NetworkSys::BeginFrame()
+{
+	//check socket
+	if( nullptr != m_TCPServerToClientSocket )
+	{
+		if( m_TCPServer->m_listenSocket != INVALID_SOCKET &&
+			!m_TCPServerToClientSocket->IsSocketValid() )
+		{
+			*m_TCPServerToClientSocket = m_TCPServer->Accept();
+		}
+		else if( m_TCPServerToClientSocket->IsSocketValid() )
+		{
+			if( m_TCPServerToClientSocket->IsDataAvailable() )
+			{
+				TCPData data = m_TCPServerToClientSocket->Receive();
+				std::string dataStr = data.GetData();
+				g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
+				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+			}
+		}
+	}
+
+	if( nullptr != m_TCPClientToServerSocket )
+	{
+		if( m_TCPClientToServerSocket->IsDataAvailable() )
+		{
+			TCPData data = m_TCPClientToServerSocket->Receive();
+			std::string dataStr = data.GetData();
+			g_theConsole->PrintString( Rgba8::GREEN, "Message received from server" );
+			g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+		}
+	}
 }
 
 void NetworkSys::Shutdown()
@@ -83,7 +119,6 @@ bool NetworkSys::StartTCPServer( EventArgs const& args )
 
 	m_TCPServer->Bind( port );
 	m_TCPServer->Listen();
-
 	//FINISH
 
 	return true;
@@ -91,31 +126,55 @@ bool NetworkSys::StartTCPServer( EventArgs const& args )
 
 bool NetworkSys::SendMessageToClient( EventArgs const& args )
 {
-	//REMEMBER TCPSOCKET ISNT FINISHED
-	if( m_TCPServerSocket )
+	if( m_TCPServerToClientSocket->IsSocketValid() )
 	{
-
+		std::string message = args.GetValue( "msg", "Invalid message" );
+		m_TCPServerToClientSocket->Send( message, message.size() );
+	}
+	else
+	{
+		g_theConsole->ErrorString( "Can't call send message to client when not connected to client" );
 	}
 	return true;
 }
 
 bool NetworkSys::StopTCPServer( EventArgs const& args )
 {
+	UNUSED( args );
+
+	m_TCPServer->StopListen();
+	m_TCPServerToClientSocket->Close();
 	return true;
 }
 
 bool NetworkSys::TCPClientConnect( EventArgs const& args )
 {
+	std::string host = args.GetValue("host", "" );
+	int port = args.GetValue("port", 48000 );
+	m_TCPClient->Connect( host, port );
+
 	return true;
 }
 
 bool NetworkSys::SendMessageToServer( EventArgs const& args )
 {
+	if( m_TCPClientToServerSocket->IsSocketValid() )
+	{
+		std::string message = args.GetValue( "msg", "Invalid message" );
+		m_TCPClientToServerSocket->Send( message, message.size() );
+	}
+	else
+	{
+		g_theConsole->ErrorString( "Can't call send message to server when not connected to server" );
+	}
 	return true;
 }
 
 bool NetworkSys::DisconnectClient( EventArgs const& args )
 {
+	UNUSED( args );
+
+	m_TCPClientToServerSocket->Close();
 	return true;
 }
 

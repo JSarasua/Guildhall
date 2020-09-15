@@ -47,6 +47,6 @@ private:
 
 	TCPServer* m_TCPServer = nullptr;
 	TCPClient* m_TCPClient = nullptr;
-	TCPSocket* m_TCPServerSocket = nullptr;
-	TCPSocket* m_TCPClientSocket = nullptr;
+	TCPSocket* m_TCPServerToClientSocket = nullptr;
+	TCPSocket* m_TCPClientToServerSocket = nullptr;
 };
