@@ -531,6 +531,9 @@ void DevConsole::ExecuteString( std::string const& commandToExecute )
 	
 	//size_t currentPos = 0;
 	size_t spacePos = fullString.find(' ');
+	size_t startQuotePos = 0;
+	size_t endQuotePos = 0;
+
 	if( spacePos == std::string::npos )
 	{
 		g_theEventSystem->FireEvent( fullString, CONSOLECOMMAND, nullptr );
@@ -552,9 +555,23 @@ void DevConsole::ExecuteString( std::string const& commandToExecute )
 				size_t argCharCount = equalPos - spacePos;
 				std::string argName = fullString.substr( spacePos + 1, argCharCount - 1 );
 
+				startQuotePos = fullString.find('"', equalPos );
 				spacePos = fullString.find(' ', equalPos);
-				std::string argValue = fullString.substr( equalPos + 1, spacePos - equalPos - 1 );
-				args.SetValue( argName, argValue );
+				if( startQuotePos < spacePos )
+				{
+					if( startQuotePos != std::string::npos )
+					{
+						endQuotePos = fullString.find('"', startQuotePos + 1 );
+						std::string argValue = fullString.substr( startQuotePos + 1, endQuotePos - startQuotePos - 1 );
+						args.SetValue( argName, argValue );
+					}
+				}
+				else
+				{
+					std::string argValue = fullString.substr( equalPos + 1, spacePos - equalPos - 1 );
+					args.SetValue( argName, argValue );
+				}
+
 			}
 		}
 		g_theEventSystem->FireEvent( executeString, CONSOLECOMMAND, &args );
