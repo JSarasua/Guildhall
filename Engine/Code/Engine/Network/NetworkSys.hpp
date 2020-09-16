@@ -46,10 +46,10 @@ struct TextMessage
 public:
 	std::string ToString()
 	{
-		std::string testMessageStr;
-		testMessageStr.append( (char*)&m_header, 4 );
-		testMessageStr.append( m_data );
-		return testMessageStr;
+		std::string textMessageStr;
+		textMessageStr.append( (char*)&m_header, 4 );
+		textMessageStr.append( m_data );
+		return textMessageStr;
 	}
 };
 
