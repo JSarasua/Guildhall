@@ -160,7 +160,7 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeNode* node )
 	}
 	else
 	{
-		metaData.m_numberOfWins -= 100.f;
+		//metaData.m_numberOfWins -= 100.f;
 	}
 
 	metaData.m_numberOfSimulations++;
@@ -201,6 +201,12 @@ bool MonteCarlo::CanExpand( TreeNode const* node )
 {
 	gamestate_t const& currentGameState = node->m_data->m_currentGamestate;
 
+	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
+	if( isGameOver != 0 )
+	{
+		return false;
+	}
+
 	int numMoves = g_theGame->GetNumberOfValidMovesAtGameState( currentGameState );
 	int numChildren = (int)node->m_childNodes.size();
 
@@ -216,27 +222,73 @@ bool MonteCarlo::CanExpand( TreeNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	//float bestWinRate = -10000.f;
-	float highestSims = 0.f;
+	float bestWinRate = -10000.f;
+	float lowestOpponentWinRate = 10000.f;
 	inputMove_t bestMove;
+	bestNode_t worstOpponentNode;
+	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
+
 
 	std::vector<TreeNode*> const& childNodes = m_currentHeadNode->m_childNodes;
 
 	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
 	{
 		metaData_t const& metaData = childNodes[childIndex]->m_data->m_metaData;
-		//float wins = (float)metaData.m_numberOfWins;
+		float wins = (float)metaData.m_numberOfWins;
 		float sims = (float)metaData.m_numberOfSimulations;
 
-		//float childWinRate = wins/sims;
-		if( sims > highestSims )
+		float childWinRate = wins/sims;
+		if( childWinRate > 0.999f ) //A winnning move
 		{
-			highestSims = sims;
+			bestWinRate = childWinRate;
 			bestMove = childNodes[childIndex]->m_data->m_moveToReachNode;
+			return bestMove;
+		}
+		else if( bestWinRate < childWinRate )
+		{
+			bestWinRate = childWinRate;
+			bestMove = childNodes[childIndex]->m_data->m_moveToReachNode;
+		}
+
+		bestNode_t bestOpponentNode = GetHighestWinRateChildNode( childNodes[childIndex] );
+		if( bestOpponentNode.nodeWinRate < worstOpponentNode.nodeWinRate &&
+			bestOpponentNode.node )
+		{
+			worstOpponentNode = bestOpponentNode;
 		}
 	}
 
+	if( worstOpponentNode.node )
+	{
+		bestMove = worstOpponentNode.node->m_parentNode->m_data->m_moveToReachNode;
+		//bestMove = worstOpponentNode.node->m_data->m_moveToReachNode;
+	}
+
 	return bestMove;
+}
+
+bestNode_t MonteCarlo::GetHighestWinRateChildNode( TreeNode const* node )
+{
+	bestNode_t bestNode;
+	bestNode.nodeWinRate = -10000.f;
+
+	std::vector<TreeNode*> const& childNodes = node->m_childNodes;
+
+	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
+	{
+		metaData_t const& metaData = childNodes[childIndex]->m_data->m_metaData;
+		float wins = (float)metaData.m_numberOfWins;
+		float sims = (float)metaData.m_numberOfSimulations;
+
+		float childWinRate = wins/sims;
+		if( childWinRate > bestNode.nodeWinRate )
+		{
+			bestNode.nodeWinRate = childWinRate;
+			bestNode.node = childNodes[childIndex];
+		}
+	}
+
+	return bestNode;
 }
 
 void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState )

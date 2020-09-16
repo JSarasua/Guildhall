@@ -12,6 +12,12 @@ struct ucbResult_t
 	TreeNode* node = nullptr;
 };
 
+struct bestNode_t
+{
+	float nodeWinRate = 0.f;
+	TreeNode const* node = nullptr;
+};
+
 class MonteCarlo
 {
 public:
@@ -32,6 +38,8 @@ public:
 	float GetUCBValueAtNode( TreeNode* node, float explorationParameter = SQRT_2 );
 	bool CanExpand( TreeNode const* node );
 	inputMove_t GetBestMove();
+	bestNode_t GetHighestWinRateChildNode( TreeNode const* node );
+
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 	TreeNode const* GetCurrentHeadNode();
 public:
