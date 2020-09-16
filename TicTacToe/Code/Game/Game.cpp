@@ -320,6 +320,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& shiftKey = g_theInput->GetKeyStates( SHIFT_KEY );
  	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
 	const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
+	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
 // 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
 // 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 // 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
@@ -364,7 +365,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( f1Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 10000 );
+		m_mcts->RunSimulations( 1000 );
 
 	}
 	if( f2Key.WasJustPressed() )
@@ -372,6 +373,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move = m_mcts->GetBestMove();
 
 		PlayMoveIfValid( move.m_move );
+	}
+	if( f3Key.WasJustPressed() )
+	{
+		m_mcts->RunSimulations( 1 );
 	}
 	if( enterKey.WasJustPressed() )
 	{
