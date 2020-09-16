@@ -80,6 +80,15 @@ void NetworkSys::BeginFrame()
 			!m_TCPServerToClientSocket->IsSocketValid() )
 		{
 			*m_TCPServerToClientSocket = m_TCPServer->Accept();
+			if( m_TCPServerToClientSocket->IsSocketValid() )
+			{
+				ServerListeningMessage listeningMessage;
+				listeningMessage.m_gameName= "Doomenstein";
+				std::string listeningMessageStr = listeningMessage.ToString();
+
+				m_TCPServerToClientSocket->Send( listeningMessageStr, listeningMessageStr.size() );
+
+			}
 		}
 		else if( m_TCPServerToClientSocket->IsSocketValid() )
 		{
@@ -88,7 +97,9 @@ void NetworkSys::BeginFrame()
 				TCPData data = m_TCPServerToClientSocket->Receive();
 				if( data.GetLength() != 0 )
 				{
-					std::string dataStr = std::string( data.GetData(), data.GetLength() );
+					const char* dataArray = data.GetData();
+					std::string dataStr = dataArray + 4;
+					//std::string dataStr = std::string( data.GetData(), data.GetLength() );
 					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
 					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
 				}
@@ -101,7 +112,9 @@ void NetworkSys::BeginFrame()
 		if( m_TCPClientToServerSocket->IsSocketValid() && m_TCPClientToServerSocket->IsDataAvailable() )
 		{
 			TCPData data = m_TCPClientToServerSocket->Receive();
-			std::string dataStr = data.GetData();
+			const char* dataArray = data.GetData();
+
+			std::string dataStr = dataArray + 4;
 			g_theConsole->PrintString( Rgba8::GREEN, "Message received from server" );
 			g_theConsole->PrintString( Rgba8::WHITE, dataStr );
 		}
@@ -134,7 +147,10 @@ bool NetworkSys::SendMessageToClient( EventArgs const& args )
 	if( m_TCPServerToClientSocket->IsSocketValid() )
 	{
 		std::string message = args.GetValue( "msg", "Invalid message" );
-		m_TCPServerToClientSocket->Send( message, message.size() );
+		TextMessage textMessage;
+		textMessage.m_data = message;
+		std::string testMessageStr = textMessage.ToString();
+		m_TCPServerToClientSocket->Send( testMessageStr, testMessageStr.size() );
 	}
 	else
 	{
@@ -166,7 +182,10 @@ bool NetworkSys::SendMessageToServer( EventArgs const& args )
 	if( m_TCPClientToServerSocket->IsSocketValid() )
 	{
 		std::string message = args.GetValue( "msg", "Invalid message" );
-		m_TCPClientToServerSocket->Send( message, message.size() );
+		TextMessage textMessage;
+		textMessage.m_data = message;
+		std::string testMessageStr = textMessage.ToString();
+		m_TCPClientToServerSocket->Send( testMessageStr, testMessageStr.size() );
 	}
 	else
 	{
@@ -178,7 +197,9 @@ bool NetworkSys::SendMessageToServer( EventArgs const& args )
 bool NetworkSys::DisconnectClient( EventArgs const& args )
 {
 	UNUSED( args );
-
+	ClientDisconnecting clientDisconnecting;
+	std::string disconnectStr = clientDisconnecting.ToString();
+	m_TCPClientToServerSocket->Send( disconnectStr, disconnectStr.size() );
 	m_TCPClientToServerSocket->Close();
 	return true;
 }

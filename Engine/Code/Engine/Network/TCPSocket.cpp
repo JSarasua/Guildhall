@@ -1,11 +1,5 @@
 #include "Engine/Network/TCPSocket.hpp"
 
-struct MessageHeader
-{
-	uint16_t m_id = 0;
-	uint16_t m_size = 0;
-};
-
 
 TCPSocket::TCPSocket()
 {

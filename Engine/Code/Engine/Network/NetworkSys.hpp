@@ -17,6 +17,57 @@ class TCPServer;
 class TCPClient;
 class TCPSocket;
 
+struct MessageHeader
+{
+	uint16_t m_id = 0;
+	uint16_t m_size = 0;
+};
+
+struct ServerListeningMessage
+{
+	MessageHeader m_header = MessageHeader{ 1, 0};
+	std::string m_gameName;
+
+public:
+	std::string ToString()
+	{
+		std::string listeningMessageStr;
+		listeningMessageStr.append( (char*)&m_header, 4 );
+		listeningMessageStr.append( m_gameName );
+		return listeningMessageStr;
+	}
+};
+
+struct TextMessage
+{
+	MessageHeader m_header = MessageHeader{ 2, 0 };
+	std::string m_data;
+
+public:
+	std::string ToString()
+	{
+		std::string testMessageStr;
+		testMessageStr.append( (char*)&m_header, 4 );
+		testMessageStr.append( m_data );
+		return testMessageStr;
+	}
+};
+
+struct ClientDisconnecting
+{
+	MessageHeader m_header = MessageHeader{ 3, 0 };
+
+public:
+	std::string ToString()
+	{
+		std::string clientDisconnecting;
+		clientDisconnecting.append( (char*)&m_header, 4 );
+		return clientDisconnecting;
+	}
+};
+
+
+
 class NetworkSys
 {
 public:
