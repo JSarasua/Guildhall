@@ -7,7 +7,8 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Game/GameCommon.hpp"
-#include "Engine/Network/NetworkSystem.hpp"
+//#include "Engine/Network/NetworkSystem.hpp"
+#include "Engine/Network/NetworkSys.hpp"
 
 RenderContext* g_theRenderer = nullptr;
 AudioSystem* g_theAudio = nullptr;
@@ -25,7 +26,8 @@ App::App()
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
 	g_theJobSystem = new JobSystem();
-	g_theNetwork = new NetworkSystem();
+	//g_theNetwork = new NetworkSystem();
+	g_theNetworkSys = new NetworkSys();
 }
 
 App::~App() {}
@@ -58,7 +60,8 @@ void App::Startup()
 	
 	g_theGame->Startup();
 	g_theConsole->Startup();
-	g_theNetwork->Startup();
+	//g_theNetwork->Startup();
+	g_theNetworkSys->Startup();
 
 	m_devConsoleCamera = new Camera();
 	m_devConsoleCamera->SetColorTarget( g_theRenderer->GetBackBuffer() );
@@ -74,8 +77,10 @@ void App::Startup()
 
 void App::Shutdown()
 {
-	g_theNetwork->Shutdown();
-	delete g_theNetwork;
+	g_theNetworkSys->Shutdown();
+	delete g_theNetworkSys;
+// 	g_theNetwork->Shutdown();
+// 	delete g_theNetwork;
 	g_theJobSystem->Shutdown();
 	delete g_theJobSystem;
 	
@@ -150,7 +155,8 @@ bool App::IsNoClipping()
 void App::BeginFrame()
 {
 	Clock::BeginFrame();
-	g_theNetwork->BeginFrame();
+	//g_theNetwork->BeginFrame();
+	g_theNetworkSys->BeginFrame();
 	g_theAudio->BeginFrame();
 	g_theWindow->BeginFrame();
 	g_theRenderer->BeginFrame();
@@ -181,7 +187,8 @@ void App::Render()
 }
 void App::EndFrame()
 {
-	g_theNetwork->EndFrame();
+	//g_theNetworkSys->EndFrame();
+	//g_theNetwork->EndFrame();
 	g_theAudio->EndFrame();
 	g_theRenderer->EndFrame();
 	g_theConsole->EndFrame();

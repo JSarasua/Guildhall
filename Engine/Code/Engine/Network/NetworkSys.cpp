@@ -86,9 +86,12 @@ void NetworkSys::BeginFrame()
 			if( m_TCPServerToClientSocket->IsDataAvailable() )
 			{
 				TCPData data = m_TCPServerToClientSocket->Receive();
-				std::string dataStr = std::string( data.GetData(), data.GetLength() );
-				g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
-				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+				if( data.GetLength() != 0 )
+				{
+					std::string dataStr = std::string( data.GetData(), data.GetLength() );
+					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
+					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+				}
 			}
 		}
 	}
@@ -153,7 +156,7 @@ bool NetworkSys::TCPClientConnect( EventArgs const& args )
 {
 	std::string host = args.GetValue("host", "" );
 	int port = args.GetValue("port", 48000 );
-	m_TCPClient->Connect( host, port );
+	*m_TCPClientToServerSocket = m_TCPClient->Connect( host, port );
 
 	return true;
 }
