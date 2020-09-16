@@ -122,6 +122,10 @@ public:
 private:
 	TypedPropertyBase* FindInMap( std::string const& key ) const
 	{
+		if( nullptr == &m_keyValuePairs )
+		{
+			return nullptr;
+		}
 		auto iter = m_keyValuePairs.find( key );
 		if( iter != m_keyValuePairs.end() )
 		{
