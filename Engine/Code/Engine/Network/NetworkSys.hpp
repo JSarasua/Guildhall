@@ -17,6 +17,10 @@ class TCPServer;
 class TCPClient;
 class TCPSocket;
 
+constexpr uint16_t SERVERLISTENING = 1;
+constexpr uint16_t TEXTMESSAGE = 2;
+constexpr uint16_t CLIENTDISCONNECT = 3;
+
 struct MessageHeader
 {
 	uint16_t m_id = 0;
@@ -25,7 +29,7 @@ struct MessageHeader
 
 struct ServerListeningMessage
 {
-	MessageHeader m_header = MessageHeader{ 1, 0};
+	MessageHeader m_header = MessageHeader{ SERVERLISTENING, 0};
 	std::string m_gameName;
 
 public:
@@ -40,7 +44,7 @@ public:
 
 struct TextMessage
 {
-	MessageHeader m_header = MessageHeader{ 2, 0 };
+	MessageHeader m_header = MessageHeader{ TEXTMESSAGE, 0 };
 	std::string m_data;
 
 public:
@@ -55,7 +59,7 @@ public:
 
 struct ClientDisconnecting
 {
-	MessageHeader m_header = MessageHeader{ 3, 0 };
+	MessageHeader m_header = MessageHeader{ CLIENTDISCONNECT, 0 };
 
 public:
 	std::string ToString()

@@ -84,6 +84,7 @@ void NetworkSys::BeginFrame()
 			{
 				ServerListeningMessage listeningMessage;
 				listeningMessage.m_gameName= "Doomenstein";
+				listeningMessage.m_header.m_size = (uint16_t)listeningMessage.m_gameName.size();
 				std::string listeningMessageStr = listeningMessage.ToString();
 
 				m_TCPServerToClientSocket->Send( listeningMessageStr, listeningMessageStr.size() );
@@ -95,14 +96,24 @@ void NetworkSys::BeginFrame()
 			if( m_TCPServerToClientSocket->IsDataAvailable() )
 			{
 				TCPData data = m_TCPServerToClientSocket->Receive();
-				if( data.GetLength() != 0 )
-				{
+// 				if( data.GetLength() != 0 )
+// 				{
 					const char* dataArray = data.GetData();
-					std::string dataStr = dataArray + 4;
-					//std::string dataStr = std::string( data.GetData(), data.GetLength() );
-					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
-					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
-				}
+					MessageHeader* messageHeader = (MessageHeader*)dataArray;
+					if( messageHeader->m_id == CLIENTDISCONNECT )
+					{
+						g_theConsole->PrintString( Rgba8::GREEN, "Client is disconnecting" );
+						m_TCPServerToClientSocket->Close();
+					}
+					else if( messageHeader->m_id == TEXTMESSAGE )
+					{
+						std::string dataStr = dataArray + 4;
+						//std::string dataStr = std::string( data.GetData(), data.GetLength() );
+						g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
+						g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+					}
+
+				//}
 			}
 		}
 	}
@@ -114,9 +125,21 @@ void NetworkSys::BeginFrame()
 			TCPData data = m_TCPClientToServerSocket->Receive();
 			const char* dataArray = data.GetData();
 
-			std::string dataStr = dataArray + 4;
-			g_theConsole->PrintString( Rgba8::GREEN, "Message received from server" );
-			g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+			MessageHeader* messageHeader = (MessageHeader*)dataArray;
+			if( messageHeader->m_id == SERVERLISTENING )
+			{
+				g_theConsole->PrintString( Rgba8::GREEN, "Server is listening for game:" );
+				std::string dataStr = dataArray + 4;
+				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+			}
+			else
+			{
+				std::string dataStr = dataArray + 4;
+				g_theConsole->PrintString( Rgba8::GREEN, "Message received from server" );
+				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+			}
+
+
 		}
 	}
 }
@@ -132,13 +155,12 @@ void NetworkSys::Shutdown()
 
 bool NetworkSys::StartTCPServer( EventArgs const& args )
 {
-	//int port = args.GetValue( "port", 48000 );
-	int port = 48000;
+	int port = args.GetValue( "port", 48000 );
 
 	m_TCPServer->Bind( port );
 	m_TCPServer->Listen();
-	//FINISH
 
+	g_theConsole->PrintString( Rgba8::WHITE, Stringf( "Server listening on port: %i", port ) );
 	return true;
 }
 
@@ -149,8 +171,9 @@ bool NetworkSys::SendMessageToClient( EventArgs const& args )
 		std::string message = args.GetValue( "msg", "Invalid message" );
 		TextMessage textMessage;
 		textMessage.m_data = message;
-		std::string testMessageStr = textMessage.ToString();
-		m_TCPServerToClientSocket->Send( testMessageStr, testMessageStr.size() );
+		textMessage.m_header.m_size = (uint16_t)message.size();
+		std::string textMessageStr = textMessage.ToString();
+		m_TCPServerToClientSocket->Send( textMessageStr, textMessageStr.size() );
 	}
 	else
 	{
@@ -164,7 +187,10 @@ bool NetworkSys::StopTCPServer( EventArgs const& args )
 	UNUSED( args );
 
 	m_TCPServer->StopListen();
-	m_TCPServerToClientSocket->Close();
+	if( m_TCPServerToClientSocket->IsSocketValid() )
+	{
+		m_TCPServerToClientSocket->Close();
+	}
 	return true;
 }
 
@@ -184,6 +210,7 @@ bool NetworkSys::SendMessageToServer( EventArgs const& args )
 		std::string message = args.GetValue( "msg", "Invalid message" );
 		TextMessage textMessage;
 		textMessage.m_data = message;
+		textMessage.m_header.m_size = (uint16_t)message.size();
 		std::string testMessageStr = textMessage.ToString();
 		m_TCPClientToServerSocket->Send( testMessageStr, testMessageStr.size() );
 	}
