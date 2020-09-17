@@ -1,18 +1,16 @@
 Jonathan Sarasua
-SDST-A4
-Due: 7/17/2020
+SD3-A1
+Due: 9/17/2020
 
-W = Move Forward
-S = Move Backward
-A = Move Left
-D = Move Right
-C = Move Up
-Space = Move Down
-Mouse = Rotate camera
-F1 = Toggle Debug Draw
-F3 = Possess
-1 = Start Work 1000 pieces of work (Sine and Cosine math in a double for loop)
-2 = Claim work
+Console Commands:
+~: Toggle Console
 
-Problems:
-No problems this assignment. I did not do any extras and I don't auto possess an entity on startup
+Server Commands
+	StartTCPServer: starts server
+	StopTCPServer: Stops listening server
+	SendMessageToClient msg="MESSAGE"
+
+Client Commands
+	TCPClientConnect host=HOSTNAME port=PORT | host defaults to "", port defaults to 48000
+	DisconnectClient
+	SendMessageToServer msg="MESSAGE"
