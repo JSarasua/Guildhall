@@ -13,6 +13,7 @@ public:
 	float	RollRandomFloatZeroToAlmostOne();
 	bool	RollPercentChance( float probabilityOfReturningTrue );
 	Vec2	RollRandomDirection2D();
+	unsigned int	RollRandomUInt();
 
 	void Reset( unsigned int seed = 0 );
 

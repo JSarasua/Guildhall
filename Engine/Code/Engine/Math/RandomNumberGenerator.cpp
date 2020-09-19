@@ -65,6 +65,12 @@ Vec2 RandomNumberGenerator::RollRandomDirection2D()
 	return Vec2::MakeFromPolarDegrees(RollRandomFloatInRange(0.f,360.f));
 }
 
+unsigned int RandomNumberGenerator::RollRandomUInt()
+{
+	unsigned int randomNumber = Get1dNoiseUint(m_position++, m_seed);
+	return randomNumber;
+}
+
 void RandomNumberGenerator::Reset( unsigned int seed /*= 0 */ )
 {
 	m_seed = seed;
