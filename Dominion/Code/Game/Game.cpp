@@ -33,7 +33,7 @@ extern AudioSystem* g_theAudio;
 
 
 int constexpr maxDepth = 15;
-int constexpr g_WhoStarts = XPLAYER;
+int constexpr g_WhoStarts = PLAYER_2;
 
 Game::Game()
 {
@@ -161,11 +161,11 @@ void Game::Update()
 	while( positionIndex < 9 )
 	{
 		Vec4 const& position = positionArr[positionIndex];
-		if( gameArray[positionIndex] == CIRCLEPLAYER )
+		if( gameArray[positionIndex] == PLAYER_1 )
 		{
 			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
 		}
-		else if( gameArray[positionIndex] == XPLAYER )
+		else if( gameArray[positionIndex] == PLAYER_2 )
 		{
 			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
 		}
@@ -205,11 +205,11 @@ void Game::Update()
 	}
 
 
-	if( IsGameOver() == CIRCLEPLAYER )
+	if( IsGameOver() == PLAYER_1 )
 	{
 		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: O won!" ).c_str() );
 	}
-	else if( IsGameOver() == XPLAYER )
+	else if( IsGameOver() == PLAYER_2 )
 	{
 		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: X won!" ).c_str() );
 	}
@@ -385,39 +385,39 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( TOPLEFT );
+		//PlayMoveIfValid( TOPLEFT );
 	}
 	if( num2Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( TOPMIDDLE );
+		//PlayMoveIfValid( TOPMIDDLE );
 	}
 	if( num3Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( TOPRIGHT );
+		//PlayMoveIfValid( TOPRIGHT );
 	}
 	if( num4Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( MIDDLELEFT );
+		//PlayMoveIfValid( MIDDLELEFT );
 	}
 	if( num5Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( MIDDLEMIDDLE );
+		//PlayMoveIfValid( MIDDLEMIDDLE );
 	}
 	if( num6Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( MIDDLERIGHT );
+		//PlayMoveIfValid( MIDDLERIGHT );
 	}
 	if( num7Key.WasJustPressed() )
 	{		
-		PlayMoveIfValid( BOTTOMLEFT );
+		//PlayMoveIfValid( BOTTOMLEFT );
 	}
 	if( num8Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( BOTTOMMIDDLE );
+		//PlayMoveIfValid( BOTTOMMIDDLE );
 	}
 	if( num9Key.WasJustPressed() )
 	{
-		PlayMoveIfValid( BOTTOMRIGHT );
+		//PlayMoveIfValid( BOTTOMRIGHT );
 	}
 	if( rKey.WasJustPressed() )
 	{
@@ -438,13 +438,13 @@ void Game::PlayMoveIfValid( int moveToPlay )
 	{
 		int whoseMoveIsIt = m_currentGameState.whoseMoveIsIt;
 		m_currentGameState.gameArray[moveToPlay] = whoseMoveIsIt;
-		if( whoseMoveIsIt == CIRCLEPLAYER )
+		if( whoseMoveIsIt == PLAYER_1 )
 		{
-			m_currentGameState.whoseMoveIsIt = XPLAYER;
+			m_currentGameState.whoseMoveIsIt = PLAYER_2;
 		}
 		else
 		{
-			m_currentGameState.whoseMoveIsIt = CIRCLEPLAYER;
+			m_currentGameState.whoseMoveIsIt = PLAYER_1;
 		}
 	}
 	inputMove_t move = inputMove_t(moveToPlay);
@@ -475,28 +475,28 @@ bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState
 int Game::IsGameOverForGameState( gamestate_t const& gameState )
 {
 	int const* gameArray = gameState.gameArray;
-	if( (gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-		(gameArray[3] == CIRCLEPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == CIRCLEPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-		(gameArray[2] == CIRCLEPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-		(gameArray[0] == CIRCLEPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-		(gameArray[6] == CIRCLEPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+	if( (gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+		(gameArray[3] == PLAYER_1 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+		(gameArray[1] == PLAYER_1 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
+		(gameArray[2] == PLAYER_1 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
 	{
-		return CIRCLEPLAYER;
+		return PLAYER_1;
 	}
 
-	if( (gameArray[0] == XPLAYER && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-		(gameArray[3] == XPLAYER && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == XPLAYER && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-		(gameArray[2] == XPLAYER && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-		(gameArray[0] == XPLAYER && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-		(gameArray[6] == XPLAYER && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+	if( (gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+		(gameArray[3] == PLAYER_2 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+		(gameArray[1] == PLAYER_2 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
+		(gameArray[2] == PLAYER_2 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
 	{
-		return XPLAYER;
+		return PLAYER_2;
 	}
 
 	if( GetValidMovesAtGameState( gameState ).size() == 0 )
@@ -559,13 +559,13 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 	{
 		newGameState.gameArray[moveToMake] = whoseMoveIsIt;
 
-		if( whoseMoveIsIt == CIRCLEPLAYER )
+		if( whoseMoveIsIt == PLAYER_1 )
 		{
-			newGameState.whoseMoveIsIt = XPLAYER;
+			newGameState.whoseMoveIsIt = PLAYER_2;
 		}
 		else
 		{
-			newGameState.whoseMoveIsIt = CIRCLEPLAYER;
+			newGameState.whoseMoveIsIt = PLAYER_1;
 		}
 	}
 

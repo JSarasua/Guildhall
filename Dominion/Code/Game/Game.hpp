@@ -23,19 +23,12 @@ class MonteCarlo;
 struct light_t;
 struct Vertex_PCUTBN;
 
-int constexpr TOPLEFT		= 0;
-int constexpr TOPMIDDLE		= 1;
-int constexpr TOPRIGHT		= 2;
-int constexpr MIDDLELEFT	= 3;
-int constexpr MIDDLEMIDDLE	= 4;
-int constexpr MIDDLERIGHT	= 5;
-int constexpr BOTTOMLEFT	= 6;
-int constexpr BOTTOMMIDDLE	= 7;
-int constexpr BOTTOMRIGHT	= 8;
 
-int constexpr CIRCLEPLAYER	= 1;
-int constexpr XPLAYER		= 2;
+int constexpr PLAYER_1		= 1;
+int constexpr PLAYER_2		= 2;
 int constexpr TIE			= 3;
+
+
 
 
 struct inputMove_t
@@ -62,18 +55,18 @@ public:
 
 	int WhoJustMoved() 
 	{
-		if( whoseMoveIsIt == CIRCLEPLAYER )
+		if( whoseMoveIsIt == PLAYER_1 )
 		{
-			return XPLAYER;
+			return PLAYER_2;
 		}
 		else
 		{
-			return CIRCLEPLAYER;
+			return PLAYER_1;
 		}
 	}
 public:
 	int gameArray[9]{};
-	int whoseMoveIsIt = CIRCLEPLAYER;
+	int whoseMoveIsIt = PLAYER_1;
 };
 
 struct data_t
