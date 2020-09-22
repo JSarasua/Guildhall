@@ -6,6 +6,8 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Game/Deck.hpp"
+#include "Game/CardDefinition.hpp"
 #include <vector>
 #include <deque>
 #include <queue>
@@ -28,16 +30,43 @@ int constexpr PLAYER_1		= 1;
 int constexpr PLAYER_2		= 2;
 int constexpr TIE			= 3;
 
+// enum ePlayers
+// {
+// 	INVALID_PLAYER = -1,
+// 	PLAYER_1,
+// 	PLAYER_2,
+// 	PLAYER_TIE
+// };
 
+enum eGamePhase
+{
+	ACTION_PHASE,
+	BUY_PHASE,
+	CLEANUP_PHASE
+	
+};
 
+enum eMoveType
+{
+	INVALID_MOVE,
+	BUY_MOVE,
+	PLAY_CARD,
+	END_PHASE
+};
 
 struct inputMove_t
 {
 public:
 	inputMove_t() = default;
-	inputMove_t( int move ) { m_move = move; }
+	inputMove_t( eMoveType const& moveType, int cardIndexToBuy = -1, int cardHandIndexToPlay = -1 ) :
+	m_moveType( moveType ),
+	m_cardIndexToBuy( cardIndexToBuy ),
+	m_cardHandIndexToPlay( cardHandIndexToPlay )
+	{}
 
-	int m_move = -1;
+	eMoveType m_moveType = INVALID_MOVE;
+	int m_cardIndexToBuy = -1;
+	int m_cardHandIndexToPlay = -1;
 };
 
 struct metaData_t
@@ -46,38 +75,63 @@ struct metaData_t
 	int m_numberOfSimulations = 0;
 };
 
+struct pileData_t
+{
+	int m_pileSize = -1;
+	CardDefinition const* m_card = nullptr;
+};
 
 struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( int* gameArrayToCopy, int whoseMoveNow ) { memcpy(gameArray, gameArrayToCopy, 9); whoseMoveIsIt = whoseMoveNow; }
-
-	int WhoJustMoved() 
+	gamestate_t( pileData_t gamePiles[16], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
+		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase ), m_numberOfActionsAvailable( actionsAvailable ), m_numberOfBuysAvailable( buysAvailable )
 	{
-		if( whoseMoveIsIt == PLAYER_1 )
+		memcpy( m_cardPiles, gamePiles, 16 * sizeof(pileData_t) );
+	}
+
+
+	int WhoJustMoved()
+	{
+		if( m_currentPhase == ACTION_PHASE )
 		{
-			return PLAYER_2;
+			if( m_whoseMoveIsIt == PLAYER_1 )
+			{
+				return PLAYER_2;
+			}
+			else
+			{
+				return PLAYER_1;
+			}
 		}
 		else
 		{
-			return PLAYER_1;
+			return m_whoseMoveIsIt;
 		}
+
 	}
-public:
-	int gameArray[9]{};
-	int whoseMoveIsIt = PLAYER_1;
+
+private:
+	//Card Piles depicting what cards are in the game and how many are in that pile
+	pileData_t m_cardPiles[16] {};
+
+	Deck m_player1Deck;
+	Deck m_player2Deck;
+	int m_whoseMoveIsIt = PLAYER_1;
+	eGamePhase m_currentPhase = CLEANUP_PHASE;
+	int m_numberOfActionsAvailable = 1;
+	int m_numberOfBuysAvailable = 1;
 };
 
 struct data_t
 {
 	data_t() = default;
-	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t const& gameState )
-	{
-		m_metaData = metaData;
-		m_moveToReachNode = move;
-		m_currentGamestate = gameState;
-	}
+	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t const& gameState ) :
+		m_metaData( metaData ),
+		m_moveToReachNode( move ),
+		m_currentGamestate( gameState )
+	{}
 
 	metaData_t m_metaData;
 

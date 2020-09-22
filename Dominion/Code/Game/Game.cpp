@@ -58,14 +58,14 @@ void Game::Startup()
 
 	g_theRenderer->Setup( m_gameClock );
 
-	m_mcts = new MonteCarlo();
+	//m_mcts = new MonteCarlo();
 	//m_mcts->Startup( CIRCLEPLAYER );
 	InitializeGameState();
 }
 
 void Game::Shutdown()
 {
-	m_mcts->Shutdown();
+	//m_mcts->Shutdown();
 }
 
 void Game::RunFrame(){}
@@ -92,117 +92,107 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-// 	float baseHeight = 0.7f;
-// 	float baseHeightIncr = 0.02f;
-// 	float col0X = 0.01f;
-// 	float col1X = 0.1f;
-// 	float col2X = 0.3f;
-// 	float victoryHeight = 0.9f;
+// 	Vec2 winOffset = Vec2(0.0f, -0.02f );
+// 	Vec2 simOffset = Vec2(0.0f, -0.03f );
+// 	Vec2 winPercentOffset = Vec2( 0.0f, -0.04f );
 // 
-// 	float currentCol0Height = baseHeight;
-// 	float currentCol1Height = baseHeight;
-// 	float currentCol2Height = baseHeight;
-	Vec2 winOffset = Vec2(0.0f, -0.02f );
-	Vec2 simOffset = Vec2(0.0f, -0.03f );
-	Vec2 winPercentOffset = Vec2( 0.0f, -0.04f );
-
-
-	AABB2 gameBoard = DebugGetScreenBounds();
-	Vec2 gameDims = gameBoard.GetDimensions();
-	gameDims.y = gameDims.x;
-	gameDims *= 0.5f;
-	gameBoard.SetDimensions( gameDims );
-
-	AABB2 carvingBoard = gameBoard;
-
-	AABB2 gameTopThird = carvingBoard.CarveBoxOffTop( 0.333f );
-	AABB2 gameTopLeft = gameTopThird.CarveBoxOffLeft( 0.333f );
-	AABB2 gameTopMiddle = gameTopThird.CarveBoxOffLeft( 0.5f );
-	AABB2 gameTopRight = gameTopThird;
-
-	AABB2 gameMiddleThird = carvingBoard.CarveBoxOffTop( 0.5f );
-	AABB2 gameMiddleLeft = gameMiddleThird.CarveBoxOffLeft( 0.333f );
-	AABB2 gameMiddleMiddle = gameMiddleThird.CarveBoxOffLeft( 0.5f );
-	AABB2 gameMiddleRight = gameMiddleThird;
-
-	AABB2 gameBottomThird = carvingBoard;
-	AABB2 gameBottomLeft = gameBottomThird.CarveBoxOffLeft( 0.333f );
-	AABB2 gameBottomMiddle = gameBottomThird.CarveBoxOffLeft( 0.5f );
-	AABB2 gameBottomRight = gameBottomThird;
-
-
-	DebugAddScreenAABB2( gameTopLeft,		Rgba8( 0, 170, 255 ) );
-	DebugAddScreenAABB2( gameTopMiddle,		Rgba8( 50, 205, 50 ) );
-	DebugAddScreenAABB2( gameTopRight,		Rgba8( 0, 170, 255 ) );
-	DebugAddScreenAABB2( gameMiddleLeft,	Rgba8( 50, 205, 50 ) );
-	DebugAddScreenAABB2( gameMiddleMiddle,	Rgba8( 0, 170, 255 ) );
-	DebugAddScreenAABB2( gameMiddleRight,	Rgba8( 50, 205, 50 ) );
-	DebugAddScreenAABB2( gameBottomLeft,	Rgba8( 0, 170, 255 ) );
-	DebugAddScreenAABB2( gameBottomMiddle,	Rgba8( 50, 205, 50 ) );
-	DebugAddScreenAABB2( gameBottomRight,	Rgba8( 0, 170, 255 ) );
-
-	//CenterOfTiles
-	Vec4 positionArr[] = {
-	Vec4( Vec2(),		gameTopLeft.GetCenter() ),
-	Vec4( Vec2(),		gameTopMiddle.GetCenter() ),
-	Vec4( Vec2(),		gameTopRight.GetCenter() ),
-	Vec4( Vec2(),	gameMiddleLeft.GetCenter() ),
-	Vec4( Vec2(),	gameMiddleMiddle.GetCenter() ),
-	Vec4( Vec2(),	gameMiddleRight.GetCenter() ),
-	Vec4( Vec2(),	gameBottomLeft.GetCenter() ),
-	Vec4( Vec2(),	gameBottomMiddle.GetCenter() ),
-	Vec4( Vec2(),	gameBottomRight.GetCenter() )
-};
-	float fontSize = 100.f;
-	float metaFontSize = 10.f;
-
-	int positionIndex = 0;
-	int const* gameArray = m_currentGameState.gameArray;
-	while( positionIndex < 9 )
-	{
-		Vec4 const& position = positionArr[positionIndex];
-		if( gameArray[positionIndex] == PLAYER_1 )
-		{
-			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
-		}
-		else if( gameArray[positionIndex] == PLAYER_2 )
-		{
-			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-		}
-
-		positionIndex++;
-	}
-
-	TreeNode const* headNode = m_mcts->GetCurrentHeadNode();
-	for( size_t childIndex = 0; childIndex < headNode->m_childNodes.size(); childIndex++ )
-	{
-		data_t const* data = headNode->m_childNodes[childIndex]->m_data;
-		if( nullptr == data )
-		{
-			continue;
-		}
-		int move = data->m_moveToReachNode.m_move;
-		float wins = data->m_metaData.m_numberOfWins;
-		int sims = data->m_metaData.m_numberOfSimulations;
-		float winPercent = wins / (float)sims;
-		Vec4 position = positionArr[move];
-		Vec4 winPosition = position;
-		Vec4 simPosition = position;
-		Vec4 winPercentPosition = position;
-
-		winPosition.x += winOffset.x;
-		winPosition.y += winOffset.y;
-		simPosition.x += simOffset.x;
-		simPosition.y += simOffset.y;
-		winPercentPosition.x += winPercentOffset.x;
-		winPercentPosition.y += winPercentOffset.y;
-
-		DebugAddScreenText( winPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Wins: %.1f", wins ).c_str() );
-		DebugAddScreenText( simPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Sims: %i", sims ).c_str() );
-		DebugAddScreenText( winPercentPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Win Rate: %.1f", winPercent ).c_str() );
-
-
-	}
+// 
+// 	AABB2 gameBoard = DebugGetScreenBounds();
+// 	Vec2 gameDims = gameBoard.GetDimensions();
+// 	gameDims.y = gameDims.x;
+// 	gameDims *= 0.5f;
+// 	gameBoard.SetDimensions( gameDims );
+// 
+// 	AABB2 carvingBoard = gameBoard;
+// 
+// 	AABB2 gameTopThird = carvingBoard.CarveBoxOffTop( 0.333f );
+// 	AABB2 gameTopLeft = gameTopThird.CarveBoxOffLeft( 0.333f );
+// 	AABB2 gameTopMiddle = gameTopThird.CarveBoxOffLeft( 0.5f );
+// 	AABB2 gameTopRight = gameTopThird;
+// 
+// 	AABB2 gameMiddleThird = carvingBoard.CarveBoxOffTop( 0.5f );
+// 	AABB2 gameMiddleLeft = gameMiddleThird.CarveBoxOffLeft( 0.333f );
+// 	AABB2 gameMiddleMiddle = gameMiddleThird.CarveBoxOffLeft( 0.5f );
+// 	AABB2 gameMiddleRight = gameMiddleThird;
+// 
+// 	AABB2 gameBottomThird = carvingBoard;
+// 	AABB2 gameBottomLeft = gameBottomThird.CarveBoxOffLeft( 0.333f );
+// 	AABB2 gameBottomMiddle = gameBottomThird.CarveBoxOffLeft( 0.5f );
+// 	AABB2 gameBottomRight = gameBottomThird;
+// 
+// 
+// 	DebugAddScreenAABB2( gameTopLeft,		Rgba8( 0, 170, 255 ) );
+// 	DebugAddScreenAABB2( gameTopMiddle,		Rgba8( 50, 205, 50 ) );
+// 	DebugAddScreenAABB2( gameTopRight,		Rgba8( 0, 170, 255 ) );
+// 	DebugAddScreenAABB2( gameMiddleLeft,	Rgba8( 50, 205, 50 ) );
+// 	DebugAddScreenAABB2( gameMiddleMiddle,	Rgba8( 0, 170, 255 ) );
+// 	DebugAddScreenAABB2( gameMiddleRight,	Rgba8( 50, 205, 50 ) );
+// 	DebugAddScreenAABB2( gameBottomLeft,	Rgba8( 0, 170, 255 ) );
+// 	DebugAddScreenAABB2( gameBottomMiddle,	Rgba8( 50, 205, 50 ) );
+// 	DebugAddScreenAABB2( gameBottomRight,	Rgba8( 0, 170, 255 ) );
+// 
+// 	//CenterOfTiles
+// 	Vec4 positionArr[] = {
+// 	Vec4( Vec2(),		gameTopLeft.GetCenter() ),
+// 	Vec4( Vec2(),		gameTopMiddle.GetCenter() ),
+// 	Vec4( Vec2(),		gameTopRight.GetCenter() ),
+// 	Vec4( Vec2(),	gameMiddleLeft.GetCenter() ),
+// 	Vec4( Vec2(),	gameMiddleMiddle.GetCenter() ),
+// 	Vec4( Vec2(),	gameMiddleRight.GetCenter() ),
+// 	Vec4( Vec2(),	gameBottomLeft.GetCenter() ),
+// 	Vec4( Vec2(),	gameBottomMiddle.GetCenter() ),
+// 	Vec4( Vec2(),	gameBottomRight.GetCenter() )
+// };
+// 	float fontSize = 100.f;
+// 	float metaFontSize = 10.f;
+// 
+// 	int positionIndex = 0;
+// 	int const* gameArray = m_currentGameState.gameArray;
+// 	while( positionIndex < 9 )
+// 	{
+// 		Vec4 const& position = positionArr[positionIndex];
+// 		if( gameArray[positionIndex] == PLAYER_1 )
+// 		{
+// 			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
+// 		}
+// 		else if( gameArray[positionIndex] == PLAYER_2 )
+// 		{
+// 			DebugAddScreenText( position, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
+// 		}
+// 
+// 		positionIndex++;
+// 	}
+// 
+// 	TreeNode const* headNode = m_mcts->GetCurrentHeadNode();
+// 	for( size_t childIndex = 0; childIndex < headNode->m_childNodes.size(); childIndex++ )
+// 	{
+// 		data_t const* data = headNode->m_childNodes[childIndex]->m_data;
+// 		if( nullptr == data )
+// 		{
+// 			continue;
+// 		}
+// 		int move = data->m_moveToReachNode.m_move;
+// 		float wins = data->m_metaData.m_numberOfWins;
+// 		int sims = data->m_metaData.m_numberOfSimulations;
+// 		float winPercent = wins / (float)sims;
+// 		Vec4 position = positionArr[move];
+// 		Vec4 winPosition = position;
+// 		Vec4 simPosition = position;
+// 		Vec4 winPercentPosition = position;
+// 
+// 		winPosition.x += winOffset.x;
+// 		winPosition.y += winOffset.y;
+// 		simPosition.x += simOffset.x;
+// 		simPosition.y += simOffset.y;
+// 		winPercentPosition.x += winPercentOffset.x;
+// 		winPercentPosition.y += winPercentOffset.y;
+// 
+// 		DebugAddScreenText( winPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Wins: %.1f", wins ).c_str() );
+// 		DebugAddScreenText( simPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Sims: %i", sims ).c_str() );
+// 		DebugAddScreenText( winPercentPosition, Vec2( 0.f, 0.f ), metaFontSize, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Win Rate: %.1f", winPercent ).c_str() );
+// 
+// 
+// 	}
 
 
 	if( IsGameOver() == PLAYER_1 )
@@ -217,16 +207,6 @@ void Game::Update()
 	{
 		DebugAddScreenText( Vec4( 0.f, 0.8f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
 	}
-
-// 	DebugAddScreenText( topLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( topMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
-// 	DebugAddScreenText( topRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( middleLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "O" );
-// 	DebugAddScreenText( middleMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( middleRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( bottomLeft, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( bottomMiddle, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
-// 	DebugAddScreenText( bottomRight, Vec2( 0.5f, 0.5f ), fontSize, Rgba8::RED, Rgba8::RED, 0.f, "X" );
 
 
 
@@ -269,12 +249,13 @@ void Game::Render()
 
 void Game::InitializeGameState()
 {
+	UNIMPLEMENTED();
 	//Setup gamestate
-	memset( m_currentGameState.gameArray, 0, 9 * sizeof(int) );
-	m_currentGameState.whoseMoveIsIt = g_WhoStarts;
+// 	memset( m_currentGameState.gameArray, 0, 9 * sizeof(int) );
+// 	m_currentGameState.m_whoseMoveIsIt = g_WhoStarts;
 
-	m_mcts->Shutdown();
-	m_mcts->Startup( g_WhoStarts );
+// 	m_mcts->Shutdown();
+// 	m_mcts->Startup( g_WhoStarts );
 
 }
 
@@ -365,18 +346,18 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( f1Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 1000 );
+/*		m_mcts->RunSimulations( 1000 );*/
 
 	}
 	if( f2Key.WasJustPressed() )
 	{
-		inputMove_t move = m_mcts->GetBestMove();
+		//inputMove_t move = m_mcts->GetBestMove();
 
-		PlayMoveIfValid( move.m_move );
+/*		PlayMoveIfValid( move.m_move );*/
 	}
 	if( f3Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 1 );
+		/*m_mcts->RunSimulations( 1 );*/
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -430,26 +411,27 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 void Game::PlayMoveIfValid( int moveToPlay )
 {
-	if( IsGameOver() != 0 )
-	{
-		return;
-	}
-	if( IsMoveValid( moveToPlay ) )
-	{
-		int whoseMoveIsIt = m_currentGameState.whoseMoveIsIt;
-		m_currentGameState.gameArray[moveToPlay] = whoseMoveIsIt;
-		if( whoseMoveIsIt == PLAYER_1 )
-		{
-			m_currentGameState.whoseMoveIsIt = PLAYER_2;
-		}
-		else
-		{
-			m_currentGameState.whoseMoveIsIt = PLAYER_1;
-		}
-	}
-	inputMove_t move = inputMove_t(moveToPlay);
-
-	m_mcts->UpdateGame( move, m_currentGameState );
+	UNIMPLEMENTED();
+// 	if( IsGameOver() != 0 )
+// 	{
+// 		return;
+// 	}
+// 	if( IsMoveValid( moveToPlay ) )
+// 	{
+// 		int whoseMoveIsIt = m_currentGameState.m_whoseMoveIsIt;
+// 		m_currentGameState.gameArray[moveToPlay] = whoseMoveIsIt;
+// 		if( whoseMoveIsIt == PLAYER_1 )
+// 		{
+// 			m_currentGameState.m_whoseMoveIsIt = PLAYER_2;
+// 		}
+// 		else
+// 		{
+// 			m_currentGameState.m_whoseMoveIsIt = PLAYER_1;
+// 		}
+// 	}
+// 	inputMove_t move = inputMove_t(moveToPlay);
+// 
+// 	m_mcts->UpdateGame( move, m_currentGameState );
 }
 
 bool Game::IsMoveValid( int moveToPlay )
@@ -459,50 +441,52 @@ bool Game::IsMoveValid( int moveToPlay )
 
 bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState )
 {
-	if( moveToPlay > -1 && moveToPlay < 9 )
-	{
-		int gamespot = gameState.gameArray[moveToPlay];
-
-		if( gamespot == 0 )
-		{
-			return true;
-		}
-	}
+	UNIMPLEMENTED();
+// 	if( moveToPlay > -1 && moveToPlay < 9 )
+// 	{
+// 		int gamespot = gameState.gameArray[moveToPlay];
+// 
+// 		if( gamespot == 0 )
+// 		{
+// 			return true;
+// 		}
+// 	}
 
 	return false;
 }
 
 int Game::IsGameOverForGameState( gamestate_t const& gameState )
 {
-	int const* gameArray = gameState.gameArray;
-	if( (gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-		(gameArray[3] == PLAYER_1 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == PLAYER_1 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-		(gameArray[2] == PLAYER_1 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
-	{
-		return PLAYER_1;
-	}
-
-	if( (gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-		(gameArray[3] == PLAYER_2 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-		(gameArray[1] == PLAYER_2 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-		(gameArray[2] == PLAYER_2 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
-	{
-		return PLAYER_2;
-	}
-
-	if( GetValidMovesAtGameState( gameState ).size() == 0 )
-	{
-		return TIE;
-	}
+	UNIMPLEMENTED();
+// 	int const* gameArray = gameState.gameArray;
+// 	if( (gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+// 		(gameArray[3] == PLAYER_1 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+// 		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+// 		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+// 		(gameArray[1] == PLAYER_1 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
+// 		(gameArray[2] == PLAYER_1 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+// 		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+// 		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+// 	{
+// 		return PLAYER_1;
+// 	}
+// 
+// 	if( (gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
+// 		(gameArray[3] == PLAYER_2 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
+// 		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
+// 		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
+// 		(gameArray[1] == PLAYER_2 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
+// 		(gameArray[2] == PLAYER_2 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
+// 		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
+// 		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
+// 	{
+// 		return PLAYER_2;
+// 	}
+// 
+// 	if( GetValidMovesAtGameState( gameState ).size() == 0 )
+// 	{
+// 		return TIE;
+// 	}
 
 	return 0;
 }
@@ -516,71 +500,77 @@ int Game::IsGameOver()
 
 std::vector<int> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
 {
+	UNIMPLEMENTED();
 	std::vector<int> validMoves;
-
-	int const* gameArray = gameState.gameArray;
-	int stateIndex = 0;
-	while ( stateIndex < 9 )
-	{
-		if( gameArray[stateIndex] == 0 )
-		{
-			validMoves.push_back( stateIndex );
-		}
-		stateIndex++;
-	}
+// 
+// 	int const* gameArray = gameState.gameArray;
+// 	int stateIndex = 0;
+// 	while ( stateIndex < 9 )
+// 	{
+// 		if( gameArray[stateIndex] == 0 )
+// 		{
+// 			validMoves.push_back( stateIndex );
+// 		}
+// 		stateIndex++;
+// 	}
 
 	return validMoves;
 }
 
 int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 {
+	UNIMPLEMENTED();
 	int numberOfValidMoves = 0;
-
-	int const* gameArray = gameState.gameArray;
-	int stateIndex = 0;
-	while( stateIndex < 9 )
-	{
-		if( gameArray[stateIndex] == 0 )
-		{
-			numberOfValidMoves++;
-		}
-		stateIndex++;
-	}
+// 
+// 	int const* gameArray = gameState.gameArray;
+// 	int stateIndex = 0;
+// 	while( stateIndex < 9 )
+// 	{
+// 		if( gameArray[stateIndex] == 0 )
+// 		{
+// 			numberOfValidMoves++;
+// 		}
+// 		stateIndex++;
+// 	}
 
 	return numberOfValidMoves;
 }
 
 gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move )
 {
+	UNIMPLEMENTED();
 	gamestate_t newGameState = currentGameState;
-	int whoseMoveIsIt = newGameState.whoseMoveIsIt;
-	int moveToMake = move.m_move;
-	if( IsMoveValidForGameState( move.m_move, newGameState ) )
-	{
-		newGameState.gameArray[moveToMake] = whoseMoveIsIt;
-
-		if( whoseMoveIsIt == PLAYER_1 )
-		{
-			newGameState.whoseMoveIsIt = PLAYER_2;
-		}
-		else
-		{
-			newGameState.whoseMoveIsIt = PLAYER_1;
-		}
-	}
+// 	int whoseMoveIsIt = newGameState.m_whoseMoveIsIt;
+// 	int moveToMake = move.m_move;
+// 	if( IsMoveValidForGameState( move.m_move, newGameState ) )
+// 	{
+// 		newGameState.gameArray[moveToMake] = whoseMoveIsIt;
+// 
+// 		if( whoseMoveIsIt == PLAYER_1 )
+// 		{
+// 			newGameState.m_whoseMoveIsIt = PLAYER_2;
+// 		}
+// 		else
+// 		{
+// 			newGameState.m_whoseMoveIsIt = PLAYER_1;
+// 		}
+// 	}
 
 	return newGameState;
 }
 
 inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState )
 {
-	std::vector<int> validMoves = GetValidMovesAtGameState( currentGameState );
+	UNIMPLEMENTED();
 
-	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
-	int randMove = validMoves[randIndex];
-	inputMove_t randMoveStruct = inputMove_t(randMove);
-
-	return randMoveStruct;
+// 	std::vector<int> validMoves = GetValidMovesAtGameState( currentGameState );
+// 
+// 	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
+// 	int randMove = validMoves[randIndex];
+// 	inputMove_t randMoveStruct = inputMove_t(randMove);
+// 
+// 	return randMoveStruct;
+	return inputMove_t();
 }
 
 void Game::RenderDevConsole()
