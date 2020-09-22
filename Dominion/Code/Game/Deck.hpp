@@ -3,6 +3,8 @@
 #include <vector>
 #include "Engine/Math/RandomNumberGenerator.hpp"
 
+class CardDefinition;
+
 class Deck
 {
 public:
@@ -10,12 +12,14 @@ public:
 	Deck( RandomNumberGenerator* rand);
 	~Deck() = default;
 
-	void InitializeDeck( std::vector<int>& deck );
+	void InitializeDeck( std::vector<CardDefinition const*>& deck );
 	void InitializeRand( RandomNumberGenerator* rand );
-	void AddCardToDiscardPile( int cardToAdd );
+	void AddCardToDiscardPile( CardDefinition const* cardToAdd );
 
-	std::vector<int>& GetHand();
-	int TakeCardFromHand( size_t cardIndex );
+	std::vector<CardDefinition const*>& GetHand();
+	CardDefinition const* TakeCardFromHand( size_t cardIndex );
+
+	int GetCurrentVictoryPoints() const;
 
 	void ShuffleDeck();
 	void AddDiscardPileToDeck();
@@ -25,11 +29,11 @@ public:
 	void Draw5();
 
 public:
-	std::vector<int> m_hand;
-	std::vector<int> m_discardPile;
-	std::vector<int> m_playArea;
+	std::vector<CardDefinition const*> m_hand;
+	std::vector<CardDefinition const*> m_discardPile;
+	std::vector<CardDefinition const*> m_playArea;
 private:
-	std::vector<int> m_deck;
+	std::vector<CardDefinition const*> m_deck;
 	RandomNumberGenerator* m_rand = nullptr;
 
 };

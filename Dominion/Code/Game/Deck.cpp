@@ -1,4 +1,5 @@
 #include "Game/Deck.hpp"
+#include "Game/CardDefinition.hpp"
 
 Deck::Deck( RandomNumberGenerator* rand )
 {
@@ -17,7 +18,7 @@ Deck::Deck()
 	m_deck.reserve( 30 );
 }
 
-void Deck::InitializeDeck( std::vector<int>& deck )
+void Deck::InitializeDeck( std::vector<CardDefinition const*>& deck )
 {
 	m_deck.swap( deck );
 }
@@ -27,19 +28,19 @@ void Deck::InitializeRand( RandomNumberGenerator* rand )
 	m_rand = rand;
 }
 
-void Deck::AddCardToDiscardPile( int cardToAdd )
+void Deck::AddCardToDiscardPile( CardDefinition const* cardToAdd )
 {
 	m_discardPile.push_back( cardToAdd );
 }
 
-std::vector<int>& Deck::GetHand()
+std::vector<CardDefinition const*>& Deck::GetHand()
 {
 	return m_hand;
 }
 
-int Deck::TakeCardFromHand( size_t cardIndex )
+CardDefinition const* Deck::TakeCardFromHand( size_t cardIndex )
 {
-	int cardToTake = -1;
+	CardDefinition const* cardToTake = nullptr;
 	if( !m_hand.empty() )
 	{
 		cardToTake = m_hand[cardIndex]; //Save off the card
@@ -48,6 +49,38 @@ int Deck::TakeCardFromHand( size_t cardIndex )
 	}
 
 	return cardToTake;
+}
+
+int Deck::GetCurrentVictoryPoints() const
+{
+	int currentVPCount = 0;
+
+	size_t handSize = m_hand.size();
+	for( size_t handIndex = 0; handIndex < handSize; handIndex++ )
+	{
+		int cardVPs = m_hand[handIndex]->GetCardVPs();
+		currentVPCount += cardVPs;
+	}
+	size_t discardSize = m_discardPile.size();
+	for( size_t discardIndex = 0; discardIndex < discardSize; discardIndex++ )
+	{
+		int cardVPs = m_discardPile[discardIndex]->GetCardVPs();
+		currentVPCount += cardVPs;
+	}
+	size_t playerAreaSize = m_playArea.size();
+	for( size_t playerAreaIndex = 0; playerAreaIndex < playerAreaSize; playerAreaIndex++ )
+	{
+		int cardVPs = m_playArea[playerAreaIndex]->GetCardVPs();
+		currentVPCount += cardVPs;
+	}
+	size_t deckSize = m_deck.size();
+	for( size_t deckIndex = 0; deckIndex < deckSize; deckIndex++ )
+	{
+		int cardVPs = m_deck[deckIndex]->GetCardVPs();
+		currentVPCount += cardVPs;
+	}
+
+	return currentVPCount;
 }
 
 void Deck::ShuffleDeck()
@@ -61,8 +94,8 @@ void Deck::ShuffleDeck()
 	for( int deckIndex = 0; deckIndex < deckSize; deckIndex++ )
 	{
 		int indexToSwapWith = m_rand->RollRandomIntInRange( deckIndex, deckSize - 1 );
-		int firstCard = m_deck[deckIndex];
-		int secondCard = m_deck[indexToSwapWith];
+		CardDefinition const* firstCard = m_deck[deckIndex];
+		CardDefinition const* secondCard = m_deck[indexToSwapWith];
 
 		m_deck[deckIndex] = secondCard;
 		m_deck[indexToSwapWith] = firstCard;
@@ -96,7 +129,7 @@ void Deck::Draw()
 
 	if( !m_deck.empty() )
 	{
-		int cardToDraw = m_deck.back();
+		CardDefinition const* cardToDraw = m_deck.back();
 		m_deck.pop_back();
 		m_hand.push_back( cardToDraw );
 	}
