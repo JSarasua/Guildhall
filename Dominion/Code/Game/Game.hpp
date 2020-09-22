@@ -30,6 +30,11 @@ int constexpr PLAYER_1		= 1;
 int constexpr PLAYER_2		= 2;
 int constexpr TIE			= 3;
 
+int constexpr MONEPILESIZE = 100;
+int constexpr VPPileSize = 8;
+int constexpr CURSEPILESIZE = 10;
+//int constexpr ACTIONPILESIZE = 10;
+
 // enum ePlayers
 // {
 // 	INVALID_PLAYER = -1,
@@ -85,10 +90,10 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( pileData_t gamePiles[16], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
+	gamestate_t( pileData_t gamePiles[17], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
 		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase ), m_numberOfActionsAvailable( actionsAvailable ), m_numberOfBuysAvailable( buysAvailable )
 	{
-		memcpy( m_cardPiles, gamePiles, 16 * sizeof(pileData_t) );
+		memcpy( m_cardPiles, gamePiles, 17 * sizeof(pileData_t) );
 	}
 
 
@@ -112,9 +117,9 @@ public:
 
 	}
 
-private:
+public:
 	//Card Piles depicting what cards are in the game and how many are in that pile
-	pileData_t m_cardPiles[16] {};
+	pileData_t m_cardPiles[17] {};
 
 	Deck m_player1Deck;
 	Deck m_player2Deck;
@@ -189,7 +194,7 @@ public:
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;
 
-	gamestate_t m_currentGameState;
+	gamestate_t* m_currentGameState = nullptr;
 
 	MonteCarlo* m_mcts = nullptr;
 

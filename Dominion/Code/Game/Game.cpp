@@ -60,6 +60,7 @@ void Game::Startup()
 
 	//m_mcts = new MonteCarlo();
 	//m_mcts->Startup( CIRCLEPLAYER );
+	CardDefinition::InitializeCards();
 	InitializeGameState();
 }
 
@@ -249,14 +250,62 @@ void Game::Render()
 
 void Game::InitializeGameState()
 {
-	UNIMPLEMENTED();
-	//Setup gamestate
-// 	memset( m_currentGameState.gameArray, 0, 9 * sizeof(int) );
-// 	m_currentGameState.m_whoseMoveIsIt = g_WhoStarts;
+	if( m_currentGameState )
+	{
+		delete m_currentGameState;
+		m_currentGameState = nullptr;
+	}
+
+
+	Deck starterDeck = Deck( &m_rand );
+	std::vector<CardDefinition const*> starterCards;
+	starterCards.reserve( 10 );
+	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
+	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
+	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
+	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
+	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
+	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
+	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
+	
+
+	//7 copper
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	//3 estate
+	starterCards.push_back( estate );
+	starterCards.push_back( estate );
+	starterCards.push_back( estate );
+	starterDeck.InitializeDeck( starterCards );
+
+	m_currentGameState = new gamestate_t();
+	m_currentGameState->m_player1Deck = starterDeck;
+	m_currentGameState->m_player2Deck = starterDeck;
+
+	pileData_t* cardPiles = m_currentGameState->m_cardPiles;
+	cardPiles[(int)eCards::COPPER].m_card = copper;
+	cardPiles[(int)eCards::COPPER].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::SILVER].m_card = silver;
+	cardPiles[(int)eCards::SILVER].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::GOLD].m_card = gold;
+	cardPiles[(int)eCards::GOLD].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::ESTATE].m_card = estate;
+	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::DUCHY].m_card = duchy;
+	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::PROVINCE].m_card = province;
+	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::CURSE].m_card = curse;
+	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
+
 
 // 	m_mcts->Shutdown();
 // 	m_mcts->Startup( g_WhoStarts );
-
 }
 
 void Game::CheckCollisions()
@@ -436,7 +485,7 @@ void Game::PlayMoveIfValid( int moveToPlay )
 
 bool Game::IsMoveValid( int moveToPlay )
 {
-	return IsMoveValidForGameState( moveToPlay, m_currentGameState );
+	return IsMoveValidForGameState( moveToPlay, *m_currentGameState );
 }
 
 bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState )
@@ -457,43 +506,60 @@ bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState
 
 int Game::IsGameOverForGameState( gamestate_t const& gameState )
 {
-	UNIMPLEMENTED();
-// 	int const* gameArray = gameState.gameArray;
-// 	if( (gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-// 		(gameArray[3] == PLAYER_1 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-// 		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-// 		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-// 		(gameArray[1] == PLAYER_1 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-// 		(gameArray[2] == PLAYER_1 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-// 		(gameArray[0] == PLAYER_1 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-// 		(gameArray[6] == PLAYER_1 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
-// 	{
-// 		return PLAYER_1;
-// 	}
-// 
-// 	if( (gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[1] && gameArray[1] == gameArray[2]) || //top row
-// 		(gameArray[3] == PLAYER_2 && gameArray[3] == gameArray[4] && gameArray[4] == gameArray[5]) || //middle row
-// 		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[7] && gameArray[7] == gameArray[8]) || //bottom row
-// 		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[3] && gameArray[3] == gameArray[6]) || //left column
-// 		(gameArray[1] == PLAYER_2 && gameArray[1] == gameArray[4] && gameArray[4] == gameArray[7]) || //middle column
-// 		(gameArray[2] == PLAYER_2 && gameArray[2] == gameArray[5] && gameArray[5] == gameArray[8]) || //right column
-// 		(gameArray[0] == PLAYER_2 && gameArray[0] == gameArray[4] && gameArray[4] == gameArray[8]) || //topleft Cross
-// 		(gameArray[6] == PLAYER_2 && gameArray[6] == gameArray[4] && gameArray[4] == gameArray[2]) )  //bottomLeft Cross
-// 	{
-// 		return PLAYER_2;
-// 	}
-// 
-// 	if( GetValidMovesAtGameState( gameState ).size() == 0 )
-// 	{
-// 		return TIE;
-// 	}
+	bool isGameOver = false;
+	pileData_t const& provinceData = gameState.m_cardPiles[(int)eCards::PROVINCE];
+	if( provinceData.m_pileSize == 0 )
+	{
+		isGameOver = true;
+	}
+	else
+	{
+		int emptyPileCount = 0;
+		for( size_t pileIndex = 0; pileIndex < 17; pileIndex++ )
+		{
+			pileData_t const& pileData = gameState.m_cardPiles[pileIndex];
+			if( pileData.m_card && pileData.m_pileSize == 0 )
+			{
+				emptyPileCount++;
+			}
+		}
+		if( emptyPileCount >= 3 )
+		{
+			isGameOver = true;
+		}
+	}
 
+	if( isGameOver )
+	{
+		//Victory goes to highest score. In case of tie, it goes to who has played fewer turns. If still a tie, then its a tie.
+		int player1Score = gameState.m_player1Deck.GetCurrentVictoryPoints();
+		int player2Score = gameState.m_player2Deck.GetCurrentVictoryPoints();
+		int whoseTurnIsIt = gameState.m_whoseMoveIsIt;
+		if( player1Score > player2Score )
+		{
+			return PLAYER_1;
+		}
+		else if( player2Score > player1Score )
+		{
+			return PLAYER_2;
+		}
+		else if( whoseTurnIsIt == PLAYER_1 )
+		{
+			return PLAYER_2;
+		}
+		else
+		{
+			return TIE;
+		}
+	}
+
+	//Game is not over
 	return 0;
 }
 
 int Game::IsGameOver()
 {
-	return IsGameOverForGameState( m_currentGameState );
+	return IsGameOverForGameState( *m_currentGameState );
 }
 
 
