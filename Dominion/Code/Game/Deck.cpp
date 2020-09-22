@@ -9,9 +9,22 @@ Deck::Deck( RandomNumberGenerator* rand )
 	m_deck.reserve( 30 );
 }
 
+Deck::Deck()
+{
+	m_hand.reserve( 10 );
+	m_discardPile.reserve( 10 );
+	m_playArea.reserve( 10 );
+	m_deck.reserve( 30 );
+}
+
 void Deck::InitializeDeck( std::vector<int>& deck )
 {
 	m_deck.swap( deck );
+}
+
+void Deck::InitializeRand( RandomNumberGenerator* rand )
+{
+	m_rand = rand;
 }
 
 void Deck::AddCardToDiscardPile( int cardToAdd )

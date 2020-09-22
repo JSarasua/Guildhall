@@ -6,10 +6,12 @@
 class Deck
 {
 public:
+	Deck();
 	Deck( RandomNumberGenerator* rand);
 	~Deck() = default;
 
 	void InitializeDeck( std::vector<int>& deck );
+	void InitializeRand( RandomNumberGenerator* rand );
 	void AddCardToDiscardPile( int cardToAdd );
 
 	std::vector<int>& GetHand();
