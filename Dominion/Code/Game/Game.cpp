@@ -289,6 +289,27 @@ void Game::Update()
 		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
 	}
 
+	inputMove_t currentBestMove = m_mc->GetBestMove();
+	if( currentBestMove.m_moveType != INVALID_MOVE )
+	{
+		std::string moveStr;
+		
+		if( currentBestMove.m_moveType == BUY_MOVE )
+		{
+			CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+			moveStr = Stringf(" Best Move: buy %s", card->GetCardName().c_str() );
+		}
+		else if( currentBestMove.m_moveType == PLAY_CARD )
+		{
+			moveStr = Stringf( "How did you get here?" );
+		}
+		else if( currentBestMove.m_moveType == END_PHASE )
+		{
+			moveStr = Stringf("Best move: End turn");
+		}
+		DebugAddScreenText( Vec4( 0.5f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, moveStr.c_str() );
+	}
+
 
 
 }
@@ -486,7 +507,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( f1Key.WasJustPressed() )
 	{
-		m_mc->RunSimulations( 1000 );
+		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+		m_mc->RunSimulations( 400 );
 /*		m_mcts->RunSimulations( 1000 );*/
 
 	}
@@ -500,7 +522,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f3Key.WasJustPressed() )
 	{
-		/*m_mcts->RunSimulations( 1 );*/
+		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+		PlayMoveIfValid( bigMoneyAI );
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -999,6 +1022,59 @@ inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState 
 	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
 	inputMove_t randMove = validMoves[randIndex];
 	return randMove;
+
+}
+
+inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) )
+	{
+		return newMove;
+	}
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		newMove.m_moveType = END_PHASE;
+		return newMove;
+	}
+	else
+	{
+
+		Deck const* currentDeck = &currentGameState.m_player1Deck;
+		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
+		{
+			currentDeck = &currentGameState.m_player2Deck;
+		}
+
+		int currentMoney = currentDeck->GetCurrentMoney();
+		newMove.m_moveType = BUY_MOVE;
+		if( currentGameState.m_numberOfBuysAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else if( currentMoney >= 8 )
+		{
+			newMove.m_cardIndexToBuy = (int)PROVINCE;
+		}
+		else if( currentMoney >= 6 )
+		{
+			newMove.m_cardIndexToBuy = (int)GOLD;
+		}
+		else if( currentMoney >= 3 )
+		{
+			newMove.m_cardIndexToBuy = (int)SILVER;
+		}
+		else
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+
+		return newMove;
+	}
 
 }
 

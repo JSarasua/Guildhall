@@ -174,6 +174,7 @@ public:
 	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
 
 private:
 	void InitializeGameState();
