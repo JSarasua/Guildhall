@@ -697,7 +697,6 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 			}
 		}
 
-
 		return false;
 	}
 	else if( moveType == PLAY_CARD )
@@ -795,77 +794,201 @@ int Game::IsGameOver()
 
 std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
 {
-	UNIMPLEMENTED();
 	std::vector<inputMove_t> validMoves;
-// 
-// 	int const* gameArray = gameState.gameArray;
-// 	int stateIndex = 0;
-// 	while ( stateIndex < 9 )
-// 	{
-// 		if( gameArray[stateIndex] == 0 )
-// 		{
-// 			validMoves.push_back( stateIndex );
-// 		}
-// 		stateIndex++;
-// 	}
+
+	if( IsGameOverForGameState( gameState ) )
+	{
+		return validMoves;
+	}
+
+	int whoseMove = gameState.m_whoseMoveIsIt;
+	eGamePhase currentPhase = gameState.m_currentPhase;
+	
+	//You can always end the phase
+	inputMove_t move;
+	move.m_whoseMoveIsIt = whoseMove;
+	move.m_moveType = END_PHASE;
+	validMoves.push_back( move );
+
+	if( currentPhase == ACTION_PHASE )
+	{
+		//Add more later
+	}
+	else if( currentPhase == BUY_PHASE )
+	{
+		int numberOfBuys = gameState.m_numberOfBuysAvailable;
+		if( numberOfBuys > 0 )
+		{
+			Deck const* playerDeck = nullptr;
+			pileData_t const* piles = gameState.m_cardPiles;
+			if( whoseMove == PLAYER_1 )
+			{
+				playerDeck = &gameState.m_player1Deck;
+			}
+			else
+			{
+				playerDeck = &gameState.m_player2Deck;
+			}
+
+			int currentMoney = playerDeck->GetCurrentMoney();
+
+			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
+			{
+				CardDefinition const* card = piles[pileIndex].m_card;
+				int pileSize = piles[pileIndex].m_pileSize;
+				int cardCost = card->GetCardCost();
+
+				if( pileSize > 0 && currentMoney > cardCost )
+				{
+					inputMove_t newMove = move;
+					newMove.m_moveType = BUY_MOVE;
+					newMove.m_cardIndexToBuy = (int)pileIndex;
+					validMoves.push_back( newMove );
+				}
+			}
+		}
+	}
 
 	return validMoves;
 }
 
 int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 {
-	UNIMPLEMENTED();
 	int numberOfValidMoves = 0;
-// 
-// 	int const* gameArray = gameState.gameArray;
-// 	int stateIndex = 0;
-// 	while( stateIndex < 9 )
-// 	{
-// 		if( gameArray[stateIndex] == 0 )
-// 		{
-// 			numberOfValidMoves++;
-// 		}
-// 		stateIndex++;
-// 	}
+
+
+	if( IsGameOverForGameState( gameState ) )
+	{
+		return 0;
+	}
+
+	//You can always end the phase as a move
+	numberOfValidMoves++;
+
+	eGamePhase currentPhase = gameState.m_currentPhase;
+	int whoseMove = gameState.m_whoseMoveIsIt;
+	
+	if( currentPhase == ACTION_PHASE )
+	{
+		//Add more later
+	}
+	else if( currentPhase == BUY_PHASE )
+	{
+		int numberOfBuys = gameState.m_numberOfBuysAvailable;
+		if( numberOfBuys > 0 )
+		{
+			Deck const* playerDeck = nullptr;
+			pileData_t const* piles = gameState.m_cardPiles;
+			if( whoseMove == PLAYER_1 )
+			{
+				playerDeck = &gameState.m_player1Deck;
+			}
+			else
+			{
+				playerDeck = &gameState.m_player2Deck;
+			}
+
+			int currentMoney = playerDeck->GetCurrentMoney();
+
+			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
+			{
+				CardDefinition const* card = piles[pileIndex].m_card;
+				int pileSize = piles[pileIndex].m_pileSize;
+				int cardCost = card->GetCardCost();
+
+				if( pileSize > 0 && currentMoney > cardCost )
+				{
+					numberOfValidMoves++;
+				}
+			}
+		}
+	}
 
 	return numberOfValidMoves;
 }
 
 gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move )
 {
-	UNIMPLEMENTED();
 	gamestate_t newGameState = currentGameState;
-// 	int whoseMoveIsIt = newGameState.m_whoseMoveIsIt;
-// 	int moveToMake = move.m_move;
-// 	if( IsMoveValidForGameState( move.m_move, newGameState ) )
-// 	{
-// 		newGameState.gameArray[moveToMake] = whoseMoveIsIt;
-// 
-// 		if( whoseMoveIsIt == PLAYER_1 )
-// 		{
-// 			newGameState.m_whoseMoveIsIt = PLAYER_2;
-// 		}
-// 		else
-// 		{
-// 			newGameState.m_whoseMoveIsIt = PLAYER_1;
-// 		}
-// 	}
+
+	if( IsGameOver() != 0 )
+	{
+		return newGameState;
+	}
+	if( IsMoveValidForGameState( move, newGameState ) )
+	{
+		Deck* playerDeck = nullptr;
+		int nextPlayersTurn = 0;
+		if( move.m_whoseMoveIsIt == PLAYER_1 )
+		{
+			playerDeck = &newGameState.m_player1Deck;
+			nextPlayersTurn = PLAYER_2;
+		}
+		else
+		{
+			playerDeck = &newGameState.m_player2Deck;
+			nextPlayersTurn = PLAYER_1;
+		}
+
+
+		if( move.m_moveType == PLAY_CARD )
+		{
+			//IMPLEMENT LATER
+			newGameState.m_numberOfActionsAvailable--;
+			return newGameState;
+		}
+		else if( move.m_moveType == BUY_MOVE )
+		{
+			int pileIndex = move.m_cardIndexToBuy;
+			pileData_t& pileData = newGameState.m_cardPiles[pileIndex];
+			pileData.m_pileSize -= 1;
+			int cardCost = pileData.m_card->GetCardCost();
+			//Decrement coins
+			//Put card in discard pile
+			playerDeck->DecrementCoins( cardCost );
+			playerDeck->AddCardToDiscardPile( pileData.m_card );
+			newGameState.m_numberOfBuysAvailable--;
+		}
+		else if( move.m_moveType == END_PHASE )
+		{
+			if( newGameState.m_currentPhase == ACTION_PHASE )
+			{
+				//PLAY ALL TREASURE CARDS
+				playerDeck->PlayTreasureCards();
+				newGameState.m_currentPhase = BUY_PHASE;
+			}
+			else if( newGameState.m_currentPhase == BUY_PHASE )
+			{
+				//DISCARD ALL CARDS, DRAW NEW HAND, AND PASS TURN
+				playerDeck->DiscardHand();
+				playerDeck->DiscardPlayArea();
+				playerDeck->Draw5();
+
+				newGameState.m_currentPhase = ACTION_PHASE;
+				newGameState.m_whoseMoveIsIt = nextPlayersTurn;
+				newGameState.m_numberOfActionsAvailable = 1;
+				newGameState.m_numberOfBuysAvailable = 1;
+				playerDeck->m_currentCoins = 0;
+			}
+		}
+		else
+		{
+			ERROR_AND_DIE( "INVALID PHASE" );
+		}
+
+	}
 
 	return newGameState;
 }
 
 inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState )
 {
-	UNIMPLEMENTED();
+	std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
 
-// 	std::vector<int> validMoves = GetValidMovesAtGameState( currentGameState );
-// 
-// 	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
-// 	int randMove = validMoves[randIndex];
-// 	inputMove_t randMoveStruct = inputMove_t(randMove);
-// 
-// 	return randMoveStruct;
-	return inputMove_t();
+	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
+	inputMove_t randMove = validMoves[randIndex];
+	return randMove;
+
 }
 
 void Game::RenderDevConsole()
