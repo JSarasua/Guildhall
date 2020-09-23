@@ -33,6 +33,8 @@ int constexpr TIE			= 3;
 int constexpr MONEPILESIZE = 100;
 int constexpr VPPileSize = 8;
 int constexpr CURSEPILESIZE = 10;
+
+int constexpr NUMBEROFPILES = 7;
 //int constexpr ACTIONPILESIZE = 10;
 
 // enum ePlayers
@@ -45,15 +47,15 @@ int constexpr CURSEPILESIZE = 10;
 
 enum eGamePhase
 {
-	ACTION_PHASE,
+	INVALID_PHASE = -1,
 	BUY_PHASE,
+	ACTION_PHASE,
 	CLEANUP_PHASE
-	
 };
 
 enum eMoveType
 {
-	INVALID_MOVE,
+	INVALID_MOVE = -1,
 	BUY_MOVE,
 	PLAY_CARD,
 	END_PHASE
@@ -63,8 +65,9 @@ struct inputMove_t
 {
 public:
 	inputMove_t() = default;
-	inputMove_t( eMoveType const& moveType, int cardIndexToBuy = -1, int cardHandIndexToPlay = -1 ) :
+	inputMove_t( eMoveType const& moveType, int whoseMove, int cardIndexToBuy = -1, int cardHandIndexToPlay = -1 ) :
 	m_moveType( moveType ),
+	m_whoseMoveIsIt( whoseMove ),
 	m_cardIndexToBuy( cardIndexToBuy ),
 	m_cardHandIndexToPlay( cardHandIndexToPlay )
 	{}
@@ -72,6 +75,7 @@ public:
 	eMoveType m_moveType = INVALID_MOVE;
 	int m_cardIndexToBuy = -1;
 	int m_cardHandIndexToPlay = -1;
+	int m_whoseMoveIsIt = -1;
 };
 
 struct metaData_t
@@ -90,10 +94,10 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( pileData_t gamePiles[17], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
+	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
 		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase ), m_numberOfActionsAvailable( actionsAvailable ), m_numberOfBuysAvailable( buysAvailable )
 	{
-		memcpy( m_cardPiles, gamePiles, 17 * sizeof(pileData_t) );
+		memcpy( m_cardPiles, gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
 	}
 
 
@@ -119,7 +123,7 @@ public:
 
 public:
 	//Card Piles depicting what cards are in the game and how many are in that pile
-	pileData_t m_cardPiles[17] {};
+	pileData_t m_cardPiles[NUMBEROFPILES] {};
 
 	Deck m_player1Deck;
 	Deck m_player2Deck;
@@ -158,14 +162,14 @@ public:
 	void Update();
 	void Render();
 
-	void PlayMoveIfValid( int moveToPlay );
-	bool IsMoveValid( int moveToPlay );
-	bool IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState );
+	void PlayMoveIfValid( inputMove_t const& moveToPlay );
+	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
+	bool IsMoveValidForGameState( inputMove_t const&, gamestate_t const& gameState ) const;
 	int IsGameOverForGameState( gamestate_t const& gameState );
 	int IsGameOver();
 
 
-	std::vector<int> GetValidMovesAtGameState( gamestate_t const& gameState );
+	std::vector<inputMove_t> GetValidMovesAtGameState( gamestate_t const& gameState );
 	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );

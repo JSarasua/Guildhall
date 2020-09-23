@@ -93,6 +93,107 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
+	//Render Player 2s hand at top of screen
+
+	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_player1Deck.GetHand();
+	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_player2Deck.GetHand();
+
+	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_player1Deck.GetPlayArea();
+	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_player2Deck.GetPlayArea();
+
+	pileData_t const* piles = m_currentGameState->m_cardPiles;
+
+	AABB2 gameBoard = DebugGetScreenBounds();
+	Vec2 gameDims = gameBoard.GetDimensions();
+	//gameDims.y = gameDims.x;
+	gameDims *= 0.75f;
+	gameBoard.SetDimensions( gameDims );
+	
+	AABB2 carvingBoard = gameBoard;
+
+	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( 1.f / 5.f );
+	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( 1.f / 4.f );
+	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( 1.f / 3.f );
+	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( 1.f / 2.f );
+	AABB2 player1HandAABB = carvingBoard;
+
+	AABB2 carvingPlayer2Hand = player2HandAABB;
+	DebugAddScreenAABB2( player2HandAABB, Rgba8::GREEN, 0.f );
+	DebugAddScreenAABB2( player2PlayAreaAABB, Rgba8::RED, 0.f );
+	DebugAddScreenAABB2( pilesArea, Rgba8::CYAN, 0.f );
+	DebugAddScreenAABB2( player1PlayAreaAABB, Rgba8::RED, 0.f );
+	DebugAddScreenAABB2(player1HandAABB, Rgba8::GREEN, 0.f );
+
+	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
+	//DebugAddScreenText( debugCenter, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, "Hello" );
+	for( size_t player2HandIndex = 0; player2HandIndex < player2Hand.size(); player2HandIndex++ )
+	{
+		float player2HandSize = (float)player2Hand.size();
+		float carvingNumber = player2HandSize - (float)player2HandIndex;
+		AABB2 cardArea = carvingPlayer2Hand.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player2Hand[player2HandIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+	}
+
+	for( size_t player2PlayAreaIndex = 0; player2PlayAreaIndex < player2PlayArea.size(); player2PlayAreaIndex++ )
+	{
+		float player2PlayAreaSize = (float)player2PlayArea.size();
+		float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
+		AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player2PlayArea[player2PlayAreaIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+	}
+
+	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
+	{
+		float pileSize = (float)NUMBEROFPILES;
+		float carvingNumber = pileSize - (float)pilesIndex;
+		AABB2 cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = piles[pilesIndex].m_card;
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
+		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
+		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
+		std::string cardName = card->GetCardName();
+		std::string cardCost = Stringf("Cost: %i", card->GetCardCost() );
+		std::string cardCoins = Stringf("Coins: %i", card->GetCoins() );
+		std::string cardVPs = Stringf("VPs: %i", card->GetCardVPs() );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardCost.c_str() );
+		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardCoins.c_str() );
+		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardVPs.c_str() );
+	}
+
+	for( size_t player1PlayAreaIndex = 0; player1PlayAreaIndex < player1PlayArea.size(); player1PlayAreaIndex++ )
+	{
+		float player1PlayAreaSize = (float)player1PlayArea.size();
+		float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
+		AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player1PlayArea[player1PlayAreaIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+	}
+
+	for( size_t player1HandIndex = 0; player1HandIndex < player1Hand.size(); player1HandIndex++ )
+	{
+		float player1HandSize = (float)player1Hand.size();
+		float carvingNumber = player1HandSize - (float)player1HandIndex;
+		AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player1Hand[player1HandIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+	}
+
+	//Render Player 1s hand at bottom of screen
+	//Render piles in the middle
+	//Render play area below player 1
+
 // 	Vec2 winOffset = Vec2(0.0f, -0.02f );
 // 	Vec2 simOffset = Vec2(0.0f, -0.03f );
 // 	Vec2 winPercentOffset = Vec2( 0.0f, -0.04f );
@@ -286,6 +387,11 @@ void Game::InitializeGameState()
 	m_currentGameState = new gamestate_t();
 	m_currentGameState->m_player1Deck = starterDeck;
 	m_currentGameState->m_player2Deck = starterDeck;
+	
+	m_currentGameState->m_player1Deck.Draw5();
+	m_currentGameState->m_player2Deck.Draw5();
+
+	m_currentGameState->m_currentPhase = ACTION_PHASE;
 
 	pileData_t* cardPiles = m_currentGameState->m_cardPiles;
 	cardPiles[(int)eCards::COPPER].m_card = copper;
@@ -302,6 +408,8 @@ void Game::InitializeGameState()
 	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
 	cardPiles[(int)eCards::CURSE].m_card = curse;
 	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
+
+	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
 
 // 	m_mcts->Shutdown();
@@ -458,50 +566,155 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 
 
-void Game::PlayMoveIfValid( int moveToPlay )
+void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 {
-	UNIMPLEMENTED();
-// 	if( IsGameOver() != 0 )
-// 	{
-// 		return;
-// 	}
-// 	if( IsMoveValid( moveToPlay ) )
-// 	{
-// 		int whoseMoveIsIt = m_currentGameState.m_whoseMoveIsIt;
-// 		m_currentGameState.gameArray[moveToPlay] = whoseMoveIsIt;
-// 		if( whoseMoveIsIt == PLAYER_1 )
-// 		{
-// 			m_currentGameState.m_whoseMoveIsIt = PLAYER_2;
-// 		}
-// 		else
-// 		{
-// 			m_currentGameState.m_whoseMoveIsIt = PLAYER_1;
-// 		}
-// 	}
-// 	inputMove_t move = inputMove_t(moveToPlay);
+	if( IsGameOver() != 0 )
+	{
+		return;
+	}
+	if( IsMoveValid( moveToPlay ) )
+	{
+		Deck* playerDeck = nullptr;
+		int nextPlayersTurn = 0;
+		if( moveToPlay.m_whoseMoveIsIt == PLAYER_1 )
+		{
+			playerDeck = &m_currentGameState->m_player1Deck;
+			nextPlayersTurn = PLAYER_2;
+		}
+		else
+		{
+			playerDeck = &m_currentGameState->m_player2Deck;
+			nextPlayersTurn = PLAYER_1;
+		}
+
+
+		if( moveToPlay.m_moveType == PLAY_CARD )
+		{
+			//IMPLEMENT LATER
+			return;
+		}
+		else if( moveToPlay.m_moveType == BUY_MOVE )
+		{
+			int pileIndex = moveToPlay.m_cardIndexToBuy;
+			pileData_t& pileData = m_currentGameState->m_cardPiles[pileIndex];
+			pileData.m_pileSize -= 1;
+			int cardCost = pileData.m_card->GetCardCost();
+			//Decrement coins
+			//Put card in discard pile
+			playerDeck->DecrementCoins( cardCost );
+			playerDeck->AddCardToDiscardPile( pileData.m_card );
+		}
+		else if( moveToPlay.m_moveType == END_PHASE )
+		{
+			if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+			{
+				//PLAY ALL TREASURE CARDS
+				playerDeck->PlayTreasureCards();
+				m_currentGameState->m_currentPhase = BUY_PHASE;
+			}
+			else if( m_currentGameState->m_currentPhase == BUY_PHASE )
+			{
+				//DISCARD ALL CARDS, DRAW NEW HAND, AND PASS TURN
+				playerDeck->DiscardHand();
+				playerDeck->DiscardPlayArea();
+				playerDeck->Draw5();
+
+				m_currentGameState->m_currentPhase = ACTION_PHASE;
+				m_currentGameState->m_whoseMoveIsIt = nextPlayersTurn;
+			}
+		}
+		else
+		{
+			ERROR_AND_DIE( "INVALID PHASE" );
+			return;
+		}
+
+	}
 // 
 // 	m_mcts->UpdateGame( move, m_currentGameState );
 }
 
-bool Game::IsMoveValid( int moveToPlay )
+bool Game::IsMoveValid( inputMove_t const& moveToPlay ) const
 {
 	return IsMoveValidForGameState( moveToPlay, *m_currentGameState );
 }
 
-bool Game::IsMoveValidForGameState( int moveToPlay, gamestate_t const& gameState )
+bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t const& gameState ) const
 {
-	UNIMPLEMENTED();
-// 	if( moveToPlay > -1 && moveToPlay < 9 )
-// 	{
-// 		int gamespot = gameState.gameArray[moveToPlay];
-// 
-// 		if( gamespot == 0 )
-// 		{
-// 			return true;
-// 		}
-// 	}
+	eGamePhase const& gamePhase = gameState.m_currentPhase;
+	eMoveType const& moveType = moveToPlay.m_moveType;
+	int whoseMove = moveToPlay.m_whoseMoveIsIt;
 
-	return false;
+	if( whoseMove != gameState.m_whoseMoveIsIt )
+	{
+		return false;
+	}
+
+	if( gamePhase != moveType )
+	{
+		return false;
+	}
+
+	Deck const* playerDeck = nullptr;
+	if( whoseMove == PLAYER_1 )
+	{
+		playerDeck = &gameState.m_player1Deck;
+	}
+	else
+	{
+		playerDeck = &gameState.m_player2Deck;
+	}
+
+	if( moveType == BUY_MOVE )
+	{
+		int cardIndex = moveToPlay.m_cardIndexToBuy;
+		if( cardIndex >= 0 && cardIndex < NUMBEROFPILES )
+		{
+			pileData_t const& pileData = gameState.m_cardPiles[cardIndex];
+			if( pileData.m_pileSize > 0 )
+			{
+				if( pileData.m_card->GetCardCost() <= playerDeck->GetCurrentMoney() )
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	else if( moveType == PLAY_CARD )
+	{
+
+
+		std::vector<CardDefinition const*> hand = playerDeck->m_hand;
+
+		if( gameState.m_numberOfActionsAvailable > 0 )
+		{
+			if( hand.size() > 0 )
+			{
+				int cardIndex = moveToPlay.m_cardHandIndexToPlay;
+				if( cardIndex >= 0 && cardIndex < hand.size() )
+				{
+					if( hand[cardIndex]->GetCardType() == ACTION_TYPE )
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+	else if( moveType == END_PHASE )
+	{
+		return true;
+	}
+	else
+	{
+		ERROR_AND_DIE( "INVALID PHASE" );
+		//return false;
+	}
+
 }
 
 int Game::IsGameOverForGameState( gamestate_t const& gameState )
@@ -515,7 +728,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 	else
 	{
 		int emptyPileCount = 0;
-		for( size_t pileIndex = 0; pileIndex < 17; pileIndex++ )
+		for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
 		{
 			pileData_t const& pileData = gameState.m_cardPiles[pileIndex];
 			if( pileData.m_card && pileData.m_pileSize == 0 )
@@ -564,10 +777,10 @@ int Game::IsGameOver()
 
 
 
-std::vector<int> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
+std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
 {
 	UNIMPLEMENTED();
-	std::vector<int> validMoves;
+	std::vector<inputMove_t> validMoves;
 // 
 // 	int const* gameArray = gameState.gameArray;
 // 	int stateIndex = 0;
