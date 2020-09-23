@@ -121,23 +121,29 @@ void Deck::DiscardHand()
 
 void Deck::DiscardPlayArea()
 {
-	m_discardPile.insert( m_discardPile.end(), m_playArea.begin(), m_hand.end() );
+	m_discardPile.insert( m_discardPile.end(), m_playArea.begin(), m_playArea.end() );
 	m_playArea.clear();
 }
 
 void Deck::PlayTreasureCards()
 {
-	for( size_t handIndex = 0; handIndex < m_hand.size(); handIndex++ )
+	size_t handIndex = 0;
+	while( handIndex < m_hand.size() )
 	{
 		CardDefinition const* card = m_hand[handIndex];
 		if( nullptr == card )
 		{
-			ERROR_AND_DIE("Card returned null.");
+			ERROR_AND_DIE( "Card returned null." );
 		}
+
 		if( card->GetCardType() == TREASURE_TYPE )
 		{
 			m_currentCoins += card->GetCoins();
 			PlayCard( handIndex );
+		}
+		else
+		{
+			handIndex++;
 		}
 	}
 }
