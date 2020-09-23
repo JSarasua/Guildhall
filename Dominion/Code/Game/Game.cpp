@@ -521,7 +521,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( enterKey.WasJustPressed() )
 	{
-		
+		inputMove_t move;
+		move.m_moveType = END_PHASE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		PlayMoveIfValid( move );
 	}
 
 	if( num1Key.WasJustPressed() )
@@ -653,7 +656,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 		return false;
 	}
 
-	if( gamePhase != moveType )
+	if( gamePhase != moveType && moveType != END_PHASE )
 	{
 		return false;
 	}
