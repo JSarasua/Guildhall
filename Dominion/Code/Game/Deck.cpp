@@ -1,5 +1,6 @@
 #include "Game/Deck.hpp"
 #include "Game/CardDefinition.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 Deck::Deck( RandomNumberGenerator* rand )
 {
@@ -36,6 +37,11 @@ void Deck::AddCardToDiscardPile( CardDefinition const* cardToAdd )
 std::vector<CardDefinition const*>& Deck::GetHand()
 {
 	return m_hand;
+}
+
+std::vector<CardDefinition const*>& Deck::GetPlayArea()
+{
+	return m_playArea;
 }
 
 CardDefinition const* Deck::TakeCardFromHand( size_t cardIndex )
@@ -119,6 +125,23 @@ void Deck::DiscardPlayArea()
 	m_playArea.clear();
 }
 
+void Deck::PlayTreasureCards()
+{
+	for( size_t handIndex = 0; handIndex < m_hand.size(); handIndex++ )
+	{
+		CardDefinition const* card = m_hand[handIndex];
+		if( nullptr == card )
+		{
+			ERROR_AND_DIE("Card returned null.");
+		}
+		if( card->GetCardType() == TREASURE_TYPE )
+		{
+			m_currentCoins += card->GetCoins();
+			PlayCard( handIndex );
+		}
+	}
+}
+
 void Deck::Draw()
 {
 	if( m_deck.empty() )
@@ -144,5 +167,11 @@ void Deck::Draw5()
 	Draw();
 	Draw();
 	Draw();
+}
+
+void Deck::PlayCard( size_t handIndex )
+{
+	CardDefinition const* cardToPlay = TakeCardFromHand( handIndex );
+	m_playArea.push_back( cardToPlay );
 }
 

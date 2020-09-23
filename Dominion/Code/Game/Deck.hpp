@@ -17,21 +17,27 @@ public:
 	void AddCardToDiscardPile( CardDefinition const* cardToAdd );
 
 	std::vector<CardDefinition const*>& GetHand();
+	std::vector<CardDefinition const*>& GetPlayArea();
 	CardDefinition const* TakeCardFromHand( size_t cardIndex );
 
+	int GetCurrentMoney() const { return m_currentCoins; }
 	int GetCurrentVictoryPoints() const;
-
+	void DecrementCoins( int cost ) { m_currentCoins -= cost; }
+	void ResetCurrentCoins() { m_currentCoins = 0; }
 	void ShuffleDeck();
 	void AddDiscardPileToDeck();
 	void DiscardHand();
 	void DiscardPlayArea();
+	void PlayTreasureCards();
 	void Draw();
 	void Draw5();
+	void PlayCard( size_t handIndex );
 
 public:
 	std::vector<CardDefinition const*> m_hand;
 	std::vector<CardDefinition const*> m_discardPile;
 	std::vector<CardDefinition const*> m_playArea;
+	int m_currentCoins = 0;
 private:
 	std::vector<CardDefinition const*> m_deck;
 	RandomNumberGenerator* m_rand = nullptr;
