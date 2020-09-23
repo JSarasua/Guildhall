@@ -388,6 +388,9 @@ void Game::InitializeGameState()
 	m_currentGameState->m_player1Deck = starterDeck;
 	m_currentGameState->m_player2Deck = starterDeck;
 	
+	m_currentGameState->m_player1Deck.ShuffleDeck();
+	m_currentGameState->m_player2Deck.ShuffleDeck();
+
 	m_currentGameState->m_player1Deck.Draw5();
 	m_currentGameState->m_player2Deck.Draw5();
 
