@@ -111,6 +111,7 @@ void Deck::ShuffleDeck()
 void Deck::AddDiscardPileToDeck()
 {
 	m_deck.insert( m_deck.end(), m_discardPile.begin(), m_discardPile.end() );
+	m_discardPile.clear();
 }
 
 void Deck::DiscardHand()

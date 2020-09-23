@@ -33,6 +33,9 @@ public:
 	void Draw5();
 	void PlayCard( size_t handIndex );
 
+	size_t GetDeckSize() { return m_deck.size(); }
+	size_t GetDiscardSize() { return m_discardPile.size(); }
+
 public:
 	std::vector<CardDefinition const*> m_hand;
 	std::vector<CardDefinition const*> m_discardPile;
