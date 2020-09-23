@@ -1,6 +1,8 @@
 #pragma once
 #include "Game/Game.hpp"
-#include "Game/MonteCarlo.hpp"
+//#include "Game/MonteCarlo.hpp"
+#include "Game//MonteCarloNoTree.hpp"
+
 #include "Engine/Math/AABB2.hpp"
 #include "App.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
@@ -60,6 +62,7 @@ void Game::Startup()
 
 	//m_mcts = new MonteCarlo();
 	//m_mcts->Startup( CIRCLEPLAYER );
+	m_mc = new MonteCarloNoTree();
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 }
@@ -67,6 +70,7 @@ void Game::Startup()
 void Game::Shutdown()
 {
 	//m_mcts->Shutdown();
+	delete m_mc;
 }
 
 void Game::RunFrame(){}
@@ -389,7 +393,8 @@ void Game::InitializeGameState()
 
 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
-
+	m_mc->SetCurrentGameState( *m_currentGameState );
+	m_mc->ResetPossibleMoves();
 // 	m_mcts->Shutdown();
 // 	m_mcts->Startup( g_WhoStarts );
 }
@@ -481,11 +486,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( f1Key.WasJustPressed() )
 	{
+		m_mc->RunSimulations( 1000 );
 /*		m_mcts->RunSimulations( 1000 );*/
 
 	}
 	if( f2Key.WasJustPressed() )
 	{
+		inputMove_t move = m_mc->GetBestMove();
+		PlayMoveIfValid( move );
 		//inputMove_t move = m_mcts->GetBestMove();
 
 /*		PlayMoveIfValid( move.m_move );*/
@@ -644,7 +652,10 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 		}
 
 	}
-// 
+
+	m_mc->SetCurrentGameState( *m_currentGameState );
+	m_mc->ResetPossibleMoves();
+
 // 	m_mcts->UpdateGame( move, m_currentGameState );
 }
 

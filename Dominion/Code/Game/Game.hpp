@@ -20,7 +20,8 @@ class Player;
 class Shader;
 class ShaderState;
 class World;
-class MonteCarlo;
+//class MonteCarlo;
+class MonteCarloNoTree;
 
 struct light_t;
 struct Vertex_PCUTBN;
@@ -200,7 +201,8 @@ public:
 
 	gamestate_t* m_currentGameState = nullptr;
 
-	MonteCarlo* m_mcts = nullptr;
+	//MonteCarlo* m_mcts = nullptr;
+	MonteCarloNoTree* m_mc = nullptr;
 
 private:
 	void RenderDevConsole();

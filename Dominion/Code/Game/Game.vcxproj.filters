@@ -58,6 +58,9 @@
     <ClCompile Include="CardDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="MonteCarloNoTree.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -100,6 +103,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="CardDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MonteCarloNoTree.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
