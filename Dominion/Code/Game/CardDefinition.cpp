@@ -4,7 +4,7 @@
 
 std::map< eCards, CardDefinition* > CardDefinition::s_definitions;
 
-CardDefinition::CardDefinition( int cardIndex, int type, std::string cardName, int cost, int coins, int vp, int plusActions, int plusDraw ) :
+CardDefinition::CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost, int coins, int vp, int plusActions, int plusDraw ) :
 	m_cardIndex( cardIndex ), 
 	m_cost( cost ),
 	m_coins( coins ),

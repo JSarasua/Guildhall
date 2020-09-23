@@ -39,7 +39,7 @@ class CardDefinition
 {
 public:
 	CardDefinition() = delete;
-	CardDefinition( int cardIndex, int type, std::string cardName, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0 );
+	CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0 );
 	~CardDefinition() {}
 
 	static void InitializeCards();
@@ -47,14 +47,15 @@ public:
 	static std::map< eCards, CardDefinition* > s_definitions;
 
 	int GetCardCost() const { return m_cost; }
-	int GetCardType() const { return m_type; }
+	int GetCoins() const { return m_coins; }
+	eCardType GetCardType() const { return m_type; }
 	int GetCardVPs() const	{ return m_victoryPointValue; }
 	std::string const& GetCardName() const { return m_cardName; }
 
 public:
 	int m_cardIndex = -1;
 	int m_cost = -1;
-	int m_type = -1;
+	eCardType m_type = InvalidType;
 	int m_coins = -1;
 	std::string m_cardName;
 	int m_victoryPointValue = 0;
