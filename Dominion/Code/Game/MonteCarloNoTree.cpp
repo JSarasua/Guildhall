@@ -89,11 +89,23 @@ int MonteCarloNoTree::RunSimulationOnMove( inputMove_t const& move )
 	gamestate_t currentGameState = g_theGame->GetGameStateAfterMove( m_currentGameState, move );
 
 	int gameResultAfterMove = g_theGame->IsGameOverForGameState( currentGameState );
+	int whoseMove = m_currentGameState.m_whoseMoveIsIt;
 
 
 	while( gameResultAfterMove == 0 )
 	{
-		inputMove_t currentMove = g_theGame->GetRandomMoveAtGameState( currentGameState );
+		inputMove_t currentMove;
+		if( currentGameState.m_whoseMoveIsIt == whoseMove )
+		{
+			//You play random
+			currentMove = g_theGame->GetMoveUsingBigMoney( currentGameState );
+		}
+		else
+		{
+			//They play big money
+			currentMove = g_theGame->GetMoveUsingBigMoney( currentGameState );
+		}
+
 		currentGameState = g_theGame->GetGameStateAfterMove( currentGameState, currentMove );
 
 		gameResultAfterMove = g_theGame->IsGameOverForGameState( currentGameState );
@@ -133,5 +145,21 @@ float MonteCarloNoTree::GetUCBValueFromMoveData( moveMetaData_t const& moveData,
 	float ucb = numberOfWins/numberOfSimulations + explorationParameter * SquareRootFloat( NaturalLog( m_totalNumberOfSimulations ) / numberOfSimulations );
 
 	return ucb;
+}
+
+std::vector<int> MonteCarloNoTree::GetCurrentBuyIndexes()
+{
+	std::vector<int> buyIndexes;
+
+	for( size_t moveIndex = 0; moveIndex < m_currentPossibleMoves.size(); moveIndex++ )
+	{
+		inputMove_t move = m_currentPossibleMoves[moveIndex].m_move;
+		if( move.m_moveType == BUY_MOVE )
+		{
+			buyIndexes.push_back( move.m_cardIndexToBuy );
+		}
+	}
+
+	return buyIndexes;
 }
 

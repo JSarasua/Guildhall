@@ -29,6 +29,7 @@ public:
 	//Helper Methods
 	float GetUCBValueFromMoveData( moveMetaData_t const& moveData, float explorationParameter = SQRT_2 );
 	inputMove_t GetBestMove() { return m_currentBestMove; }
+	std::vector<int> GetCurrentBuyIndexes();
 
 public:
 	gamestate_t m_currentGameState;

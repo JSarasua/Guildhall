@@ -228,11 +228,23 @@ void Game::Update()
 		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
 	}
 
+	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
 	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
 	{
 		float pileSize = (float)NUMBEROFPILES;
 		float carvingNumber = pileSize - (float)pilesIndex;
 		AABB2 cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+
+		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
+		{
+			int aiPileIndex = aiValidMoves[aiValidIndexes];
+			if( pilesIndex == aiPileIndex )
+			{
+				DebugAddScreenAABB2( cardArea, Rgba8::BLUE, 0.f );
+				break;
+			}
+		}
+
 		CardDefinition const* card = piles[pilesIndex].m_card;
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
@@ -872,7 +884,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 				int pileSize = piles[pileIndex].m_pileSize;
 				int cardCost = card->GetCardCost();
 
-				if( pileSize > 0 && currentMoney > cardCost )
+				if( pileSize > 0 && currentMoney >= cardCost )
 				{
 					inputMove_t newMove = move;
 					newMove.m_moveType = BUY_MOVE;
