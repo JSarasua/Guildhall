@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Protogame2D", "Code\Game\Game.vcxproj", "{08E45489-4F88-49F1-B726-946BFC9C2AEC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Doomenstein_TCPServer", "Code\Game\Game.vcxproj", "{08E45489-4F88-49F1-B726-946BFC9C2AEC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "..\Engine\Code\Engine\Engine.vcxproj", "{D2C8C721-DAAE-43AD-A8B9-08C0AC80CF4B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{D2C8C721-DAAE-43AD-A8B9-08C0AC80CF4B}.Release|x64.Build.0 = Release|x64
 		{D2C8C721-DAAE-43AD-A8B9-08C0AC80CF4B}.Release|x86.ActiveCfg = Release|Win32
 		{D2C8C721-DAAE-43AD-A8B9-08C0AC80CF4B}.Release|x86.Build.0 = Release|Win32
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Debug|x64.ActiveCfg = Debug|x64
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Debug|x64.Build.0 = Debug|x64
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Debug|x86.ActiveCfg = Debug|Win32
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Debug|x86.Build.0 = Debug|Win32
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Release|x64.ActiveCfg = Release|x64
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Release|x64.Build.0 = Release|x64
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Release|x86.ActiveCfg = Release|Win32
+		{E038D8F3-55BD-41FD-9E60-FEFB5E4FA07B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

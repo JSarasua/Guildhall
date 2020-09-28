@@ -201,6 +201,7 @@
     <ClCompile Include="Network\TCPClient.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\TCPSocket.cpp" />
+    <ClCompile Include="Network\UDPSocket.cpp" />
     <ClCompile Include="Physics2D\Collider2D.cpp" />
     <ClCompile Include="Physics2D\Collision2D.cpp" />
     <ClCompile Include="Physics2D\DiscCollider2D.cpp" />
@@ -291,6 +292,7 @@
     <ClInclude Include="Network\TCPClient.hpp" />
     <ClInclude Include="Network\TCPServer.hpp" />
     <ClInclude Include="Network\TCPSocket.hpp" />
+    <ClInclude Include="Network\UDPSocket.hpp" />
     <ClInclude Include="Physics2D\Collider2D.hpp" />
     <ClInclude Include="Physics2D\Collision2D.hpp" />
     <ClInclude Include="Physics2D\DiscCollider2D.hpp" />
