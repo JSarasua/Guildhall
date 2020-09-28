@@ -29,7 +29,16 @@ enum eCards
 
 	//Curse
 	CURSE,
+	
 	//Action
+	Village,
+	Smithy,
+	//CouncilRoom,
+	Festival,
+	Laboratory,
+	Market,
+	//Witch,
+
 
 	NUM_CARDS
 
@@ -39,7 +48,7 @@ class CardDefinition
 {
 public:
 	CardDefinition() = delete;
-	CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0 );
+	CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0, int plusBuys = 0 );
 	~CardDefinition() {}
 
 	static void InitializeCards();
@@ -61,6 +70,7 @@ public:
 	int m_victoryPointValue = 0;
 	int m_actionsGained = 0;
 	int m_cardDraw = 0;
+	int m_buysGained = 0;
 
 
 };

@@ -381,6 +381,13 @@ void Game::InitializeGameState()
 	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
 	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
 	
+	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
+	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
+	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
+	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
+	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
+
+
 
 	//7 copper
 	starterCards.push_back( copper );
@@ -423,6 +430,17 @@ void Game::InitializeGameState()
 	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
 	cardPiles[(int)eCards::CURSE].m_card = curse;
 	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
+	cardPiles[(int)eCards::Village].m_card = village;
+	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Smithy].m_card = smithy;
+	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Festival].m_card = festival;
+	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
+	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Market].m_card = market;
+	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
+
 
 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
@@ -489,22 +507,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& num7Key = g_theInput->GetKeyStates( '7' );
  	const KeyButtonState& num8Key = g_theInput->GetKeyStates( '8' );
 	const KeyButtonState& num9Key = g_theInput->GetKeyStates( '9' );
+ 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
+ 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+ 	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
+ 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+ 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
+ 	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+ 	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
 // 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
 // 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
 // 	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
- 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
 // 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 // 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 // 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
 // 	const KeyButtonState& hKey = g_theInput->GetKeyStates( 'H' );
 // 	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
-// 	const KeyButtonState& qKey = g_theInput->GetKeyStates( 'Q' );
 // 	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
 // 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
 // 	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
 // 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
 // 	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
-// 	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
 // 	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
 // 	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
 // 	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
@@ -547,69 +569,219 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( num1Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 0;
-		PlayMoveIfValid( move );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 0;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 0;
+			PlayMoveIfValid( move );
+		}
+
 	}
 	if( num2Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 1;
-		PlayMoveIfValid( move );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 1;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 1;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num3Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 2;
-		PlayMoveIfValid( move );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 2;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 2;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num4Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 3;
-		PlayMoveIfValid( move );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 3;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 3;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num5Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 4;
-		PlayMoveIfValid( move );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 4;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 4;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num6Key.WasJustPressed() )
 	{
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 5;
-		PlayMoveIfValid( move );
+
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 5;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 5;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num7Key.WasJustPressed() )
 	{		
-		inputMove_t move;
-		move.m_moveType = BUY_MOVE;
-		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 6;
-		PlayMoveIfValid( move );
+
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 6;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 6;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num8Key.WasJustPressed() )
 	{
-		//PlayMoveIfValid( BOTTOMMIDDLE );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 7;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 7;
+			PlayMoveIfValid( move );
+		}
 	}
 	if( num9Key.WasJustPressed() )
 	{
-		//PlayMoveIfValid( BOTTOMRIGHT );
+		if( m_currentGameState->m_currentPhase == BUY_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = BUY_MOVE;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardIndexToBuy = 8;
+			PlayMoveIfValid( move );
+		}
+		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
+		{
+			inputMove_t move;
+			move.m_moveType = PLAY_CARD;
+			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+			move.m_cardHandIndexToPlay = 8;
+			PlayMoveIfValid( move );
+		}
+	}
+	if( qKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 7;
+		PlayMoveIfValid( move );
+	}
+	if( wKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 8;
+		PlayMoveIfValid( move );
+	}
+	if( eKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 9;
+		PlayMoveIfValid( move );
 	}
 	if( rKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 10;
+		PlayMoveIfValid( move );
+	}
+	if( tKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 11;
+		PlayMoveIfValid( move );
+	}
+	if( iKey.WasJustPressed() )
 	{
 		InitializeGameState();
 		//reset ai
@@ -642,8 +814,13 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 		if( moveToPlay.m_moveType == PLAY_CARD )
 		{
-			//IMPLEMENT LATER
-			m_currentGameState->m_numberOfActionsAvailable--;
+			if( m_currentGameState->m_numberOfActionsAvailable > 0 )
+			{
+				m_currentGameState->m_numberOfActionsAvailable--;
+				int handIndex = moveToPlay.m_cardHandIndexToPlay;
+				playerDeck->PlayCard( handIndex, m_currentGameState );
+			}
+
 			return;
 		}
 		else if( moveToPlay.m_moveType == BUY_MOVE )
@@ -856,25 +1033,37 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 	move.m_moveType = END_PHASE;
 	validMoves.push_back( move );
 
+	Deck const* playerDeck = nullptr;
+	pileData_t const* piles = gameState.m_cardPiles;
+	if( whoseMove == PLAYER_1 )
+	{
+		playerDeck = &gameState.m_player1Deck;
+	}
+	else
+	{
+		playerDeck = &gameState.m_player2Deck;
+	}
+
 	if( currentPhase == ACTION_PHASE )
 	{
-		//Add more later
+		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
+		for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+		{
+			CardDefinition const* card = hand[handIndex];
+			if( card->GetCardType() == ACTION_TYPE )
+			{
+				inputMove_t newMove = move;
+				newMove.m_moveType = PLAY_CARD;
+				newMove.m_cardHandIndexToPlay = (int)handIndex;
+				validMoves.push_back( newMove );
+			}
+		}
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
 		int numberOfBuys = gameState.m_numberOfBuysAvailable;
 		if( numberOfBuys > 0 )
 		{
-			Deck const* playerDeck = nullptr;
-			pileData_t const* piles = gameState.m_cardPiles;
-			if( whoseMove == PLAYER_1 )
-			{
-				playerDeck = &gameState.m_player1Deck;
-			}
-			else
-			{
-				playerDeck = &gameState.m_player2Deck;
-			}
 
 			int currentMoney = playerDeck->GetCurrentMoney();
 
@@ -902,7 +1091,6 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 {
 	int numberOfValidMoves = 0;
 
-
 	if( IsGameOverForGameState( gameState ) )
 	{
 		return 0;
@@ -914,26 +1102,34 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 	eGamePhase currentPhase = gameState.m_currentPhase;
 	int whoseMove = gameState.m_whoseMoveIsIt;
 	
+	Deck const* playerDeck = nullptr;
+	if( whoseMove == PLAYER_1 )
+	{
+		playerDeck = &gameState.m_player1Deck;
+	}
+	else
+	{
+		playerDeck = &gameState.m_player2Deck;
+	}
+
 	if( currentPhase == ACTION_PHASE )
 	{
-		//Add more later
+		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
+		for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+		{
+			CardDefinition const* card = hand[handIndex];
+			if( card->GetCardType() == ACTION_TYPE )
+			{
+				numberOfValidMoves++;
+			}
+		}
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
 		int numberOfBuys = gameState.m_numberOfBuysAvailable;
 		if( numberOfBuys > 0 )
 		{
-			Deck const* playerDeck = nullptr;
 			pileData_t const* piles = gameState.m_cardPiles;
-			if( whoseMove == PLAYER_1 )
-			{
-				playerDeck = &gameState.m_player1Deck;
-			}
-			else
-			{
-				playerDeck = &gameState.m_player2Deck;
-			}
-
 			int currentMoney = playerDeck->GetCurrentMoney();
 
 			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
@@ -979,8 +1175,12 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 
 		if( move.m_moveType == PLAY_CARD )
 		{
-			//IMPLEMENT LATER
-			newGameState.m_numberOfActionsAvailable--;
+			if( m_currentGameState->m_numberOfActionsAvailable > 0 )
+			{
+				newGameState.m_numberOfActionsAvailable--;
+				int handIndex = move.m_cardHandIndexToPlay;
+				playerDeck->PlayCard( handIndex, &newGameState );
+			}
 			return newGameState;
 		}
 		else if( move.m_moveType == BUY_MOVE )

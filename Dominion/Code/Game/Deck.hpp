@@ -5,6 +5,8 @@
 
 class CardDefinition;
 
+struct gamestate_t;
+
 class Deck
 {
 public:
@@ -16,7 +18,7 @@ public:
 	void InitializeRand( RandomNumberGenerator* rand );
 	void AddCardToDiscardPile( CardDefinition const* cardToAdd );
 
-	std::vector<CardDefinition const*>& GetHand();
+	std::vector<CardDefinition const*> const& GetHand() const;
 	std::vector<CardDefinition const*>& GetPlayArea();
 	CardDefinition const* TakeCardFromHand( size_t cardIndex );
 
@@ -29,9 +31,9 @@ public:
 	void DiscardHand();
 	void DiscardPlayArea();
 	void PlayTreasureCards();
-	void Draw();
+	void Draw( int numberToDraw = 1 );
 	void Draw5();
-	void PlayCard( size_t handIndex );
+	void PlayCard( size_t handIndex, gamestate_t* gameState );
 
 	size_t GetDeckSize() { return m_deck.size(); }
 	size_t GetDiscardSize() { return m_discardPile.size(); }

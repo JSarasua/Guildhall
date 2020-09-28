@@ -1,6 +1,7 @@
 #include "Game/Deck.hpp"
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/Game.hpp"
 
 Deck::Deck( RandomNumberGenerator* rand )
 {
@@ -34,7 +35,7 @@ void Deck::AddCardToDiscardPile( CardDefinition const* cardToAdd )
 	m_discardPile.push_back( cardToAdd );
 }
 
-std::vector<CardDefinition const*>& Deck::GetHand()
+std::vector<CardDefinition const*> const& Deck::GetHand() const
 {
 	return m_hand;
 }
@@ -140,7 +141,7 @@ void Deck::PlayTreasureCards()
 		if( card->GetCardType() == TREASURE_TYPE )
 		{
 			m_currentCoins += card->GetCoins();
-			PlayCard( handIndex );
+			PlayCard( handIndex, nullptr );
 		}
 		else
 		{
@@ -149,36 +150,56 @@ void Deck::PlayTreasureCards()
 	}
 }
 
-void Deck::Draw()
+void Deck::Draw( int numberToDraw )
 {
-	if( m_deck.empty() )
+	for( int drawIndex = 0; drawIndex < numberToDraw; drawIndex++ )
 	{
-		AddDiscardPileToDeck();
-		ShuffleDeck();
+		if( m_deck.empty() )
+		{
+			AddDiscardPileToDeck();
+			ShuffleDeck();
+		}
+
+		if( !m_deck.empty() )
+		{
+			CardDefinition const* cardToDraw = m_deck.back();
+			m_deck.pop_back();
+			m_hand.push_back( cardToDraw );
+		}
 	}
 
-	if( !m_deck.empty() )
-	{
-		CardDefinition const* cardToDraw = m_deck.back();
-		m_deck.pop_back();
-		m_hand.push_back( cardToDraw );
-	}
 
 }
 
 void Deck::Draw5()
 {
 	//Think about optimizing this;
-	Draw();
-	Draw();
-	Draw();
-	Draw();
-	Draw();
+	Draw( 5 );
+
 }
 
-void Deck::PlayCard( size_t handIndex )
+void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
 {
 	CardDefinition const* cardToPlay = TakeCardFromHand( handIndex );
 	m_playArea.push_back( cardToPlay );
+
+	if( cardToPlay->GetCardType() == ACTION_TYPE )
+	{
+		if( gameState )
+		{
+			int actionsToGain = cardToPlay->m_actionsGained;
+			int cardDraw = cardToPlay->m_cardDraw;
+			int buysToGain = cardToPlay->m_buysGained;
+
+			gameState->m_numberOfActionsAvailable += actionsToGain;
+			gameState->m_numberOfBuysAvailable += buysToGain;
+			Draw( cardDraw );
+		}
+		else
+		{
+			ERROR_AND_DIE("Gamestate is required for a action card to be played");
+		}
+	}
+
 }
 

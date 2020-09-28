@@ -34,8 +34,9 @@ int constexpr TIE			= 3;
 int constexpr MONEPILESIZE = 100;
 int constexpr VPPileSize = 8;
 int constexpr CURSEPILESIZE = 10;
+int constexpr ACTIONPILESIZE = 10;
 
-int constexpr NUMBEROFPILES = 7;
+int constexpr NUMBEROFPILES = 12;
 //int constexpr ACTIONPILESIZE = 10;
 
 // enum ePlayers
