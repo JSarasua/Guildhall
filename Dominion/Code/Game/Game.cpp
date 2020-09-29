@@ -99,304 +99,13 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-	//Render Player 2s hand at top of screen
+	DebugDrawGame();
+	
 
-	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_player1Deck.GetHand();
-	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_player2Deck.GetHand();
-
-	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_player1Deck.GetPlayArea();
-	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_player2Deck.GetPlayArea();
-
-	pileData_t const* piles = m_currentGameState->m_cardPiles;
-
-
-	Rgba8 textColor = Rgba8::BLACK;
-	Rgba8 borderColor = Rgba8::BLACK;
-	AABB2 gameBoard = DebugGetScreenBounds();
-	DebugAddScreenAABB2( gameBoard, Rgba8::TuscanTan, 0.f );
-	Vec2 gameDims = gameBoard.GetDimensions();
-	//gameDims.y = gameDims.x;
-	AABB2 gameDataArea = gameBoard;
-	AABB2 deckDataArea = gameBoard;
-	gameDims.x *= 0.8f;
-	gameDims.y *= 0.9f;
-	gameBoard.SetDimensions( gameDims );
-
-	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
-	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
-	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
-	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
-	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
-
-	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 9.f );
-	Vec2 player2DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.8f ) );
-	Vec2 player2DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.7f ) );
-	Vec2 player2VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
-	Vec2 player1DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.3f ) );
-	Vec2 player1DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
-	Vec2 player1VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.1f ) );
-
-	Deck const* playerDeck = nullptr;
-	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	if( m_isAutoPlayEnabled )
 	{
-		playerDeck = &m_currentGameState->m_player1Deck;
+		AutoPlayGame();
 	}
-	else
-	{
-		playerDeck = &m_currentGameState->m_player2Deck;
-	}
-
-	int currentCoins = playerDeck->m_currentCoins;
-	int buysAmount = m_currentGameState->m_numberOfBuysAvailable;
-	int actionsAmount = m_currentGameState->m_numberOfActionsAvailable;
-
-	std::string coinStr = Stringf( "Coins: %i", currentCoins );
-	std::string buysStr = Stringf( "Buys: %i", buysAmount );
-	std::string actionsStr = Stringf( "Actions: %i", actionsAmount );
-	eGamePhase phase = m_currentGameState->m_currentPhase;
-	std::string phaseStr;
-
-	if( phase == ACTION_PHASE )
-	{
-		phaseStr = "Phase: Action";
-	}
-	else if( phase == BUY_PHASE )
-	{
-		phaseStr = "Phase: Buy";
-	}
-	else if( phase == CLEANUP_PHASE )
-	{
-		phaseStr = "Phase: Cleanup";
-	}
-
-
-	int player1DeckSize = (int)m_currentGameState->m_player1Deck.GetDeckSize();
-	int player1DiscardSize = (int)m_currentGameState->m_player1Deck.GetDiscardSize();
-	int player1VPCount = m_currentGameState->m_player1Deck.GetCurrentVictoryPoints();
-	int player2DeckSize = (int)m_currentGameState->m_player2Deck.GetDeckSize();
-	int player2DiscardSize = (int)m_currentGameState->m_player2Deck.GetDiscardSize();
-	int player2VPCount = m_currentGameState->m_player2Deck.GetCurrentVictoryPoints();
-	std::string player2DeckStr = Stringf( "Deck Size: %i", player2DeckSize );
-	std::string player2DiscardStr = Stringf( "Discard Size: %i", player2DiscardSize );
-	std::string player1DeckStr = Stringf( "Deck Size: %i", player1DeckSize );
-	std::string player1DiscardStr = Stringf( "Discard Size: %i", player1DiscardSize );
-
-	std::string player1VPStr = Stringf( "VP: %i", player1VPCount );
-	std::string player2VPStr = Stringf( "VP: %i", player2VPCount );
-
-	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DiscardStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DiscardStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
-
-	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
-
-	AABB2 carvingBoard = gameBoard;
-
-
-	float handHeightFraction = 0.15f;
-	float playAreaHeightFraction = 0.15f;
-	float pileAreaHeightFraction = 0.4f;
-
-	float currentProportionalFractionSize = 1.f;
-	float currentProportionalSize = 1.f;
-	float currentFraction = handHeightFraction;
-	float fractionToCarve = currentFraction;
-
-
-	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-	currentFraction = playAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-	currentFraction = pileAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-	currentFraction = playAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-// 	currentFraction = playAreaHeightFraction;
-// 	currentProportionalFractionSize = 1.f - fractionToCarve;
-// 	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-// 	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player1HandAABB = carvingBoard;
-
-	AABB2 carvingPlayer2Hand = player2HandAABB;
-
-	Rgba8 handColor = Rgba8::WindsorTan;
-	Rgba8 playAreaColor = Rgba8::Tan;
-	Rgba8 pileAreaColor = Rgba8::SandyTan;
-
-	DebugAddScreenAABB2( player2HandAABB, handColor, 0.f );
-	DebugAddScreenAABB2( player2PlayAreaAABB, playAreaColor, 0.f );
-	DebugAddScreenAABB2( pilesArea, pileAreaColor, 0.f );
-	DebugAddScreenAABB2( player1PlayAreaAABB, playAreaColor, 0.f );
-	DebugAddScreenAABB2(player1HandAABB, handColor, 0.f );
-
-	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
-
-	for( size_t player2HandIndex = 0; player2HandIndex < player2Hand.size(); player2HandIndex++ )
-	{
-		float player2HandSize = (float)player2Hand.size();
-		float carvingNumber = player2HandSize - (float)player2HandIndex;
-		AABB2 cardArea = carvingPlayer2Hand.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player2Hand[player2HandIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-	}
-
-	for( size_t player2PlayAreaIndex = 0; player2PlayAreaIndex < player2PlayArea.size(); player2PlayAreaIndex++ )
-	{
-		float player2PlayAreaSize = (float)player2PlayArea.size();
-		float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
-		AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player2PlayArea[player2PlayAreaIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-	}
-
-	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
-	AABB2 bottomPilesArea;
-	bool isTwoRows = false;
-	int cardsPerRow = 8;
-	float cardsPerRowFloat = (float)cardsPerRow;
-	if( NUMBEROFPILES > cardsPerRow )
-	{
-		isTwoRows = true;
-		bottomPilesArea = pilesArea.CarveBoxOffBottom( 0.5f );
-	}
-	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
-	{
-		//float pileSize = 8.f;
-		float carvingNumber = 0.f;
-		
-		AABB2 cardArea;
-		if( isTwoRows )
-		{
-			if( pilesIndex < (size_t)cardsPerRow )
-			{
-				carvingNumber = cardsPerRowFloat - (float)pilesIndex;
-				cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-			}
-			else
-			{
-				carvingNumber = (2.f*cardsPerRowFloat) - (float)pilesIndex; 
-				cardArea = bottomPilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-			}
-		}
-		else
-		{
-			carvingNumber = cardsPerRowFloat - (float)pilesIndex;
-			cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-		}
-
-		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
-		{
-			int aiPileIndex = aiValidMoves[aiValidIndexes];
-			if( pilesIndex == aiPileIndex )
-			{
-				DebugAddScreenAABB2( cardArea, Rgba8::RedBrown, 0.f );
-				break;
-			}
-		}
-
-		CardDefinition const* card = piles[pilesIndex].m_card;
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
-		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
-		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
-		Vec4 pileSizePos = Vec4( Vec2(), Vec2( cardArea.mins.x, cardArea.maxs.y ) );
-		std::string cardName = card->GetCardName();
-		std::string cardCost = Stringf("Cost:%i", card->GetCardCost() );
-		std::string cardCoins = Stringf("Coins:%i", card->GetCoins() );
-		std::string cardVPs = Stringf("VPs:%i", card->GetCardVPs() );
-		std::string pileCount = Stringf("Count:%i", piles[pilesIndex].m_pileSize );
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 15.f, textColor, textColor, 0.f, cardName.c_str() );
-		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.5f ), 12.f, textColor, textColor, 0.f, cardCost.c_str() );
-		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardCoins.c_str() );
-		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardVPs.c_str() );
-		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.5f ), 12.f, textColor, textColor, 0.f, pileCount.c_str() );
-		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
-	}
-
-	for( size_t player1PlayAreaIndex = 0; player1PlayAreaIndex < player1PlayArea.size(); player1PlayAreaIndex++ )
-	{
-		float player1PlayAreaSize = (float)player1PlayArea.size();
-		float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
-		AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player1PlayArea[player1PlayAreaIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-	}
-
-	for( size_t player1HandIndex = 0; player1HandIndex < player1Hand.size(); player1HandIndex++ )
-	{
-		float player1HandSize = (float)player1Hand.size();
-		float carvingNumber = player1HandSize - (float)player1HandIndex;
-		AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player1Hand[player1HandIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-	}
-
-
-
-
-	if( IsGameOver() == PLAYER_1 )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 1 won!" ).c_str() );
-	}
-	else if( IsGameOver() == PLAYER_2 )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 2 won!" ).c_str() );
-	}
-	else if( IsGameOver() == TIE )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
-	}
-
-	inputMove_t currentBestMove = m_mc->GetBestMove();
-	if( currentBestMove.m_moveType != INVALID_MOVE )
-	{
-		std::string moveStr;
-		
-		if( currentBestMove.m_moveType == BUY_MOVE )
-		{
-			CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
-			moveStr = Stringf(" Best Move: buy %s", card->GetCardName().c_str() );
-		}
-		else if( currentBestMove.m_moveType == PLAY_CARD )
-		{
-			moveStr = Stringf( "How did you get here?" );
-		}
-		else if( currentBestMove.m_moveType == END_PHASE )
-		{
-			moveStr = Stringf("Best move: End turn");
-		}
-		DebugAddScreenText( Vec4( 0.5f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, moveStr.c_str() );
-	}
-
 
 
 }
@@ -568,8 +277,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
 	const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
 	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
-// 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
-// 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
+ 	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
+ 	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
 // 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
 // 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
 // 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
@@ -633,6 +342,33 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
 		PlayMoveIfValid( bigMoneyAI );
+	}
+	if( f5Key.WasJustPressed() )
+	{
+		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+		{
+			inputMove_t move = m_mc->GetBestMove();
+			if( move.m_moveType == INVALID_MOVE )
+			{
+
+			}
+			else
+			{
+				PlayMoveIfValid( move );
+			}
+
+			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+			m_mc->RunSimulations( 400 );
+		}
+		else
+		{
+			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+			PlayMoveIfValid( bigMoneyAI );
+		}
+	}
+	if( f6Key.WasJustPressed() )
+	{
+		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -865,6 +601,357 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 
 
+void Game::DebugDrawGame()
+{
+	//Render Player 2s hand at top of screen
+
+	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_player1Deck.GetHand();
+	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_player2Deck.GetHand();
+
+	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_player1Deck.GetPlayArea();
+	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_player2Deck.GetPlayArea();
+
+	pileData_t const* piles = m_currentGameState->m_cardPiles;
+
+
+	Rgba8 textColor = Rgba8::BLACK;
+	Rgba8 borderColor = Rgba8::BLACK;
+	AABB2 gameBoard = DebugGetScreenBounds();
+	DebugAddScreenAABB2( gameBoard, Rgba8::TuscanTan, 0.f );
+	Vec2 gameDims = gameBoard.GetDimensions();
+	//gameDims.y = gameDims.x;
+	AABB2 gameDataArea = gameBoard;
+	AABB2 deckDataArea = gameBoard;
+	gameDims.x *= 0.8f;
+	gameDims.y *= 0.9f;
+	gameBoard.SetDimensions( gameDims );
+
+	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
+	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
+	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
+	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
+	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
+
+	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 9.f );
+	Vec2 player2DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.8f ) );
+	Vec2 player2DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.7f ) );
+	Vec2 player2VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
+	Vec2 player1DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.3f ) );
+	Vec2 player1DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
+	Vec2 player1VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.1f ) );
+
+	Deck const* playerDeck = nullptr;
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		playerDeck = &m_currentGameState->m_player1Deck;
+	}
+	else
+	{
+		playerDeck = &m_currentGameState->m_player2Deck;
+	}
+
+	int currentCoins = playerDeck->m_currentCoins;
+	int buysAmount = playerDeck->m_numberOfBuysAvailable;
+	int actionsAmount = playerDeck->m_numberOfActionsAvailable;
+
+	std::string coinStr = Stringf( "Coins: %i", currentCoins );
+	std::string buysStr = Stringf( "Buys: %i", buysAmount );
+	std::string actionsStr = Stringf( "Actions: %i", actionsAmount );
+	eGamePhase phase = m_currentGameState->m_currentPhase;
+	std::string phaseStr;
+
+	if( phase == ACTION_PHASE )
+	{
+		phaseStr = "Phase: Action";
+	}
+	else if( phase == BUY_PHASE )
+	{
+		phaseStr = "Phase: Buy";
+	}
+	else if( phase == CLEANUP_PHASE )
+	{
+		phaseStr = "Phase: Cleanup";
+	}
+
+
+	int player1DeckSize = (int)m_currentGameState->m_player1Deck.GetDeckSize();
+	int player1DiscardSize = (int)m_currentGameState->m_player1Deck.GetDiscardSize();
+	int player1VPCount = m_currentGameState->m_player1Deck.GetCurrentVictoryPoints();
+	int player2DeckSize = (int)m_currentGameState->m_player2Deck.GetDeckSize();
+	int player2DiscardSize = (int)m_currentGameState->m_player2Deck.GetDiscardSize();
+	int player2VPCount = m_currentGameState->m_player2Deck.GetCurrentVictoryPoints();
+	std::string player2DeckStr = Stringf( "Deck Size: %i", player2DeckSize );
+	std::string player2DiscardStr = Stringf( "Discard Size: %i", player2DiscardSize );
+	std::string player1DeckStr = Stringf( "Deck Size: %i", player1DeckSize );
+	std::string player1DiscardStr = Stringf( "Discard Size: %i", player1DiscardSize );
+
+	std::string player1VPStr = Stringf( "VP: %i", player1VPCount );
+	std::string player2VPStr = Stringf( "VP: %i", player2VPCount );
+
+	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
+
+	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
+
+	AABB2 carvingBoard = gameBoard;
+
+
+	float handHeightFraction = 0.15f;
+	float playAreaHeightFraction = 0.15f;
+	float pileAreaHeightFraction = 0.4f;
+
+	float currentProportionalFractionSize = 1.f;
+	float currentProportionalSize = 1.f;
+	float currentFraction = handHeightFraction;
+	float fractionToCarve = currentFraction;
+
+
+	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+	currentFraction = pileAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	// 	currentFraction = playAreaHeightFraction;
+	// 	currentProportionalFractionSize = 1.f - fractionToCarve;
+	// 	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	// 	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player1HandAABB = carvingBoard;
+
+	AABB2 carvingPlayer2Hand = player2HandAABB;
+
+	Rgba8 handColor = Rgba8::WindsorTan;
+	Rgba8 playAreaColor = Rgba8::Tan;
+	Rgba8 pileAreaColor = Rgba8::SandyTan;
+
+	DebugAddScreenAABB2( player2HandAABB, handColor, 0.f );
+	DebugAddScreenAABB2( player2PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2( pilesArea, pileAreaColor, 0.f );
+	DebugAddScreenAABB2( player1PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2( player1HandAABB, handColor, 0.f );
+
+	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
+
+	for( size_t player2HandIndex = 0; player2HandIndex < player2Hand.size(); player2HandIndex++ )
+	{
+		float player2HandSize = (float)player2Hand.size();
+		float carvingNumber = player2HandSize - (float)player2HandIndex;
+		AABB2 cardArea = carvingPlayer2Hand.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player2Hand[player2HandIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+	}
+
+	for( size_t player2PlayAreaIndex = 0; player2PlayAreaIndex < player2PlayArea.size(); player2PlayAreaIndex++ )
+	{
+		float player2PlayAreaSize = (float)player2PlayArea.size();
+		float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
+		AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player2PlayArea[player2PlayAreaIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+	}
+
+	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
+	AABB2 bottomPilesArea;
+	bool isTwoRows = false;
+	int cardsPerRow = 8;
+	float cardsPerRowFloat = (float)cardsPerRow;
+	if( NUMBEROFPILES > cardsPerRow )
+	{
+		isTwoRows = true;
+		bottomPilesArea = pilesArea.CarveBoxOffBottom( 0.5f );
+	}
+	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
+	{
+		//float pileSize = 8.f;
+		float carvingNumber = 0.f;
+
+		AABB2 cardArea;
+		if( isTwoRows )
+		{
+			if( pilesIndex < (size_t)cardsPerRow )
+			{
+				carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+				cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+			else
+			{
+				carvingNumber = (2.f*cardsPerRowFloat) - (float)pilesIndex;
+				cardArea = bottomPilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+		}
+		else
+		{
+			carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+			cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+		}
+
+		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
+		{
+			int aiPileIndex = aiValidMoves[aiValidIndexes];
+			if( pilesIndex == aiPileIndex )
+			{
+				DebugAddScreenAABB2( cardArea, Rgba8::RedBrown, 0.f );
+				break;
+			}
+		}
+
+		CardDefinition const* card = piles[pilesIndex].m_card;
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
+		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
+		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
+		Vec4 pileSizePos = Vec4( Vec2(), Vec2( cardArea.mins.x, cardArea.maxs.y ) );
+		std::string cardName = card->GetCardName();
+		std::string cardCost = Stringf( "Cost:%i", card->GetCardCost() );
+		std::string cardCoins = Stringf( "Coins:%i", card->GetCoins() );
+		std::string cardVPs = Stringf( "VPs:%i", card->GetCardVPs() );
+		std::string pileCount = Stringf( "Count:%i", piles[pilesIndex].m_pileSize );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 15.f, textColor, textColor, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.5f ), 12.f, textColor, textColor, 0.f, cardCost.c_str() );
+		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardCoins.c_str() );
+		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardVPs.c_str() );
+		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.5f ), 12.f, textColor, textColor, 0.f, pileCount.c_str() );
+		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
+	}
+
+	for( size_t player1PlayAreaIndex = 0; player1PlayAreaIndex < player1PlayArea.size(); player1PlayAreaIndex++ )
+	{
+		float player1PlayAreaSize = (float)player1PlayArea.size();
+		float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
+		AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player1PlayArea[player1PlayAreaIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+	}
+
+	for( size_t player1HandIndex = 0; player1HandIndex < player1Hand.size(); player1HandIndex++ )
+	{
+		float player1HandSize = (float)player1Hand.size();
+		float carvingNumber = player1HandSize - (float)player1HandIndex;
+		AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+		CardDefinition const* card = player1Hand[player1HandIndex];
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		std::string cardName = card->GetCardName();
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+	}
+
+
+
+
+	if( IsGameOver() == PLAYER_1 )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 1 won!" ).c_str() );
+	}
+	else if( IsGameOver() == PLAYER_2 )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 2 won!" ).c_str() );
+	}
+	else if( IsGameOver() == TIE )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
+	}
+
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		inputMove_t currentBestMove = m_mc->GetBestMove();
+		if( currentBestMove.m_moveType != INVALID_MOVE )
+		{
+			std::string moveStr;
+
+			if( currentBestMove.m_moveType == BUY_MOVE )
+			{
+				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+				moveStr = Stringf( " Best Move: Buy %s", card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == PLAY_CARD )
+			{
+				CardDefinition const* card = playerDeck->GetHand()[currentBestMove.m_cardHandIndexToPlay];
+				moveStr = Stringf( "Best Move: Play %s", card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == END_PHASE )
+			{
+				moveStr = Stringf( "Best move: End Phase" );
+			}
+			DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, moveStr.c_str() );
+		}
+	}
+	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
+	{
+		inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
+		std::string bigMoneyStr;
+		if( bigMoneyMove.m_moveType == BUY_MOVE )
+		{
+			CardDefinition const* card = m_currentGameState->m_cardPiles[bigMoneyMove.m_cardIndexToBuy].m_card;
+			bigMoneyStr = Stringf( "Big Money Best Move: Buy %s", card->GetCardName().c_str() );
+		}
+		else if( bigMoneyMove.m_moveType == PLAY_CARD )
+		{
+			CardDefinition const* card = playerDeck->GetHand()[bigMoneyMove.m_cardHandIndexToPlay];
+			bigMoneyStr = Stringf( "Big Money Best Move: Play %s", card->GetCardName().c_str() );
+		}
+		else if( bigMoneyMove.m_moveType == END_PHASE )
+		{
+			bigMoneyStr = Stringf( "Big Money Best move: End Phase" );
+		}
+		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
+
+	}
+
+}
+
+void Game::AutoPlayGame()
+{
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		inputMove_t move = m_mc->GetBestMove();
+		if( move.m_moveType == INVALID_MOVE )
+		{
+
+		}
+		else
+		{
+			PlayMoveIfValid( move );
+		}
+
+		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+		m_mc->RunSimulations( 400 );
+	}
+	else
+	{
+		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+		PlayMoveIfValid( bigMoneyAI );
+	}
+}
+
 void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 {
 	if( IsGameOver() != 0 )
@@ -889,14 +976,12 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 		if( moveToPlay.m_moveType == PLAY_CARD )
 		{
-			if( m_currentGameState->m_numberOfActionsAvailable > 0 )
+			if( playerDeck->m_numberOfActionsAvailable > 0 )
 			{
-				m_currentGameState->m_numberOfActionsAvailable--;
+				playerDeck->m_numberOfActionsAvailable--;
 				int handIndex = moveToPlay.m_cardHandIndexToPlay;
 				playerDeck->PlayCard( handIndex, m_currentGameState );
 			}
-
-			return;
 		}
 		else if( moveToPlay.m_moveType == BUY_MOVE )
 		{
@@ -908,7 +993,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
 			playerDeck->AddCardToDiscardPile( pileData.m_card );
-			m_currentGameState->m_numberOfBuysAvailable--;
+			playerDeck->m_numberOfBuysAvailable--;
 		}
 		else if( moveToPlay.m_moveType == END_PHASE )
 		{
@@ -927,8 +1012,8 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 				m_currentGameState->m_currentPhase = ACTION_PHASE;
 				m_currentGameState->m_whoseMoveIsIt = nextPlayersTurn;
-				m_currentGameState->m_numberOfActionsAvailable = 1;
-				m_currentGameState->m_numberOfBuysAvailable = 1;
+				playerDeck->m_numberOfActionsAvailable = 1;
+				playerDeck->m_numberOfBuysAvailable = 1;
 				playerDeck->m_currentCoins = 0;
 			}
 		}
@@ -979,7 +1064,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 
 	if( moveType == BUY_MOVE )
 	{
-		if( gameState.m_numberOfBuysAvailable > 0 )
+		if( playerDeck->m_numberOfBuysAvailable > 0 )
 		{
 			int cardIndex = moveToPlay.m_cardIndexToBuy;
 			if( cardIndex >= 0 && cardIndex < NUMBEROFPILES )
@@ -1001,7 +1086,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 	{
 		std::vector<CardDefinition const*> hand = playerDeck->m_hand;
 
-		if( gameState.m_numberOfActionsAvailable > 0 )
+		if( playerDeck->m_numberOfActionsAvailable > 0 )
 		{
 			if( hand.size() > 0 )
 			{
@@ -1121,22 +1206,26 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 
 	if( currentPhase == ACTION_PHASE )
 	{
-		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
-		for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+		int numberOfActions = playerDeck->m_numberOfActionsAvailable;
+		if( numberOfActions > 0 )
 		{
-			CardDefinition const* card = hand[handIndex];
-			if( card->GetCardType() == ACTION_TYPE )
+			std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
+			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
 			{
-				inputMove_t newMove = move;
-				newMove.m_moveType = PLAY_CARD;
-				newMove.m_cardHandIndexToPlay = (int)handIndex;
-				validMoves.push_back( newMove );
+				CardDefinition const* card = hand[handIndex];
+				if( card->GetCardType() == ACTION_TYPE )
+				{
+					inputMove_t newMove = move;
+					newMove.m_moveType = PLAY_CARD;
+					newMove.m_cardHandIndexToPlay = (int)handIndex;
+					validMoves.push_back( newMove );
+				}
 			}
 		}
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
-		int numberOfBuys = gameState.m_numberOfBuysAvailable;
+		int numberOfBuys = playerDeck->m_numberOfBuysAvailable;
 		if( numberOfBuys > 0 )
 		{
 
@@ -1201,7 +1290,7 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
-		int numberOfBuys = gameState.m_numberOfBuysAvailable;
+		int numberOfBuys = playerDeck->m_numberOfBuysAvailable;
 		if( numberOfBuys > 0 )
 		{
 			pileData_t const* piles = gameState.m_cardPiles;
@@ -1250,9 +1339,9 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 
 		if( move.m_moveType == PLAY_CARD )
 		{
-			if( m_currentGameState->m_numberOfActionsAvailable > 0 )
+			if( playerDeck->m_numberOfActionsAvailable > 0 )
 			{
-				newGameState.m_numberOfActionsAvailable--;
+				playerDeck->m_numberOfActionsAvailable--;
 				int handIndex = move.m_cardHandIndexToPlay;
 				playerDeck->PlayCard( handIndex, &newGameState );
 			}
@@ -1268,7 +1357,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
 			playerDeck->AddCardToDiscardPile( pileData.m_card );
-			newGameState.m_numberOfBuysAvailable--;
+			playerDeck->m_numberOfBuysAvailable--;
 		}
 		else if( move.m_moveType == END_PHASE )
 		{
@@ -1287,8 +1376,8 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 
 				newGameState.m_currentPhase = ACTION_PHASE;
 				newGameState.m_whoseMoveIsIt = nextPlayersTurn;
-				newGameState.m_numberOfActionsAvailable = 1;
-				newGameState.m_numberOfBuysAvailable = 1;
+				playerDeck->m_numberOfActionsAvailable = 1;
+				playerDeck->m_numberOfBuysAvailable = 1;
 				playerDeck->m_currentCoins = 0;
 			}
 		}
@@ -1325,21 +1414,38 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 
 	if( currentGameState.m_currentPhase == ACTION_PHASE )
 	{
-		newMove.m_moveType = END_PHASE;
-		return newMove;
+		std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+		if( validMoves.size() == 1 )
+		{
+			return validMoves[0];
+		}
+		else
+		{
+			for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+			{
+				if( validMoves[moveIndex].m_moveType != END_PHASE )
+				{
+					return validMoves[moveIndex];
+				}
+			}
+			
+			newMove.m_moveType = END_PHASE;
+			return newMove;
+		}
+
 	}
 	else
 	{
 
-		Deck const* currentDeck = &currentGameState.m_player1Deck;
+		Deck const* playerDeck = &currentGameState.m_player1Deck;
 		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
 		{
-			currentDeck = &currentGameState.m_player2Deck;
+			playerDeck = &currentGameState.m_player2Deck;
 		}
 
-		int currentMoney = currentDeck->GetCurrentMoney();
+		int currentMoney = playerDeck->GetCurrentMoney();
 		newMove.m_moveType = BUY_MOVE;
-		if( currentGameState.m_numberOfBuysAvailable == 0 )
+		if( playerDeck->m_numberOfBuysAvailable == 0 )
 		{
 			newMove.m_moveType = END_PHASE;
 		}

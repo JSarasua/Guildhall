@@ -96,8 +96,8 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase, int actionsAvailable, int buysAvailable ) :
-		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase ), m_numberOfActionsAvailable( actionsAvailable ), m_numberOfBuysAvailable( buysAvailable )
+	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase ) :
+		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase )
 	{
 		memcpy( m_cardPiles, gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
 	}
@@ -131,8 +131,7 @@ public:
 	Deck m_player2Deck;
 	int m_whoseMoveIsIt = PLAYER_1;
 	eGamePhase m_currentPhase = CLEANUP_PHASE;
-	int m_numberOfActionsAvailable = 1;
-	int m_numberOfBuysAvailable = 1;
+
 };
 
 struct data_t
@@ -187,6 +186,8 @@ private:
 	void RenderUI();
 	void CheckButtonPresses(float deltaSeconds);
 
+	void DebugDrawGame();
+	void AutoPlayGame();
 
 private:
 	Clock* m_gameClock = nullptr;
@@ -205,6 +206,7 @@ public:
 
 	//MonteCarlo* m_mcts = nullptr;
 	MonteCarloNoTree* m_mc = nullptr;
+	bool m_isAutoPlayEnabled = false;
 
 private:
 	void RenderDevConsole();

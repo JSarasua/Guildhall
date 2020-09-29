@@ -43,6 +43,8 @@ public:
 	std::vector<CardDefinition const*> m_discardPile;
 	std::vector<CardDefinition const*> m_playArea;
 	int m_currentCoins = 0;
+	int m_numberOfActionsAvailable = 1;
+	int m_numberOfBuysAvailable = 1;
 private:
 	std::vector<CardDefinition const*> m_deck;
 	RandomNumberGenerator* m_rand = nullptr;

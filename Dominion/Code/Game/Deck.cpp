@@ -191,8 +191,8 @@ void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
 			int cardDraw = cardToPlay->m_cardDraw;
 			int buysToGain = cardToPlay->m_buysGained;
 
-			gameState->m_numberOfActionsAvailable += actionsToGain;
-			gameState->m_numberOfBuysAvailable += buysToGain;
+			m_numberOfActionsAvailable += actionsToGain;
+			m_numberOfBuysAvailable += buysToGain;
 			Draw( cardDraw );
 		}
 		else

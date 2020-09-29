@@ -15,6 +15,8 @@ void MonteCarloNoTree::ResetPossibleMoves()
 
 		m_currentPossibleMoves.push_back( metaData );
 	}
+
+	m_currentBestMove .m_moveType = INVALID_MOVE;
 }
 
 void MonteCarloNoTree::UpdateBestMove()
