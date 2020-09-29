@@ -47,4 +47,12 @@ public:
 	static const Rgba8 YELLOW;
 	static const Rgba8 CYAN;
 
+
+	static const Rgba8 WindsorTan;
+	static const Rgba8 TuscanTan;
+	static const Rgba8 Tan;
+	static const Rgba8 SandyTan;
+
+	static const Rgba8 RedBrown;
+
 };

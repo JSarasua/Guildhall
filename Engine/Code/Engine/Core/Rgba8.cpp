@@ -14,6 +14,13 @@ const Rgba8 Rgba8::GREY		=	Rgba8(128,128,128,255);
 const Rgba8 Rgba8::YELLOW	=	Rgba8(255,255,0,255);
 const Rgba8 Rgba8::CYAN		=	Rgba8(0,255,255,255);
 
+const Rgba8 Rgba8::SandyTan		=	Rgba8( 253, 217, 181, 255 );
+const Rgba8 Rgba8::Tan			=	Rgba8( 250, 167, 108, 255 );
+const Rgba8 Rgba8::WindsorTan	=	Rgba8( 167, 85, 2, 255 );
+const Rgba8 Rgba8::TuscanTan	=	Rgba8( 166, 123, 91, 255 );
+
+const Rgba8 Rgba8::RedBrown		=	Rgba8( 165, 42, 42 );
+
 Rgba8::Rgba8 (const Rgba8& copy)
 	: r( copy.r )
 	, g( copy.g )
@@ -232,7 +239,7 @@ void Rgba8::HSLToRGB( float const* hsl, Rgba8& rgba )
 
 	if( s == 0.f )
 	{
-		r = g = b = 1.f;
+		r = g = b = l;
 	}
 	else
 	{
