@@ -86,6 +86,24 @@ void Vertex_PCU::AppendVertsAABB2D( std::vector<Vertex_PCU>& masterVertexList, c
 }
 
 
+
+void Vertex_PCU::AppendVertsAABB2DBorder( std::vector<Vertex_PCU>& masterVertexList, AABB2 const& aabb, float thickness, Rgba8 const& color )
+{
+	Vec2 bLeft = aabb.mins;
+	Vec2 bRight = Vec2( aabb.maxs.x, aabb.mins.y );
+	Vec2 tLeft = Vec2( aabb.mins.x, aabb.maxs.y );
+	Vec2 tRight = aabb.maxs;
+	LineSegment2 bottomLine( bLeft, bRight );
+	LineSegment2 topLine( tLeft, tRight );
+	LineSegment2 leftLine( bLeft, tLeft );
+	LineSegment2 rightLine( bRight, tRight );
+
+	AppendVertsLine2D( masterVertexList, bottomLine, thickness, color );
+	AppendVertsLine2D( masterVertexList, topLine, thickness, color );
+	AppendVertsLine2D( masterVertexList, leftLine, thickness, color );
+	AppendVertsLine2D( masterVertexList, rightLine, thickness, color );
+}
+
 void Vertex_PCU::AppendVertsOBB2D( std::vector<Vertex_PCU>& masterVertexList, const OBB2& obb, const Rgba8& color, const AABB2& uvs /*= AABB2() */ )
 {
 	Vec2* obbCornerPositions = new Vec2[4];

@@ -1230,6 +1230,33 @@ void DebugAddScreenAABB2( AABB2 const& bounds, Rgba8 const& color, float duratio
 	DebugAddScreenAABB2( bounds, color, color, duration );
 }
 
+void DebugAddScreenAABB2Border( AABB2 const& bounds, Rgba8 const& startColor, Rgba8 const& endColor, float thickness, float duration )
+{
+	DebugRenderObject* debugObject = new DebugRenderObject;
+	debugObject->m_startColor = startColor;
+	debugObject->m_endColor = endColor;
+	debugObject->m_duration = duration;
+	debugObject->m_timer.SetSeconds( s_DebugRenderSystem->m_context->m_gameClock, (double)duration );
+	debugObject->m_modelMatrix = Mat44(); //Identity
+	debugObject->m_renderTo = DEBUG_RENDER_TO_SCREEN;
+	debugObject->m_mode = DEBUG_RENDER_ALWAYS;
+	debugObject->m_isBillBoarded = false;
+	Vertex_PCU::AppendVertsAABB2DBorder( debugObject->m_vertices, bounds, thickness, startColor );
+
+	for( size_t vertIndex = 0; vertIndex < debugObject->m_vertices.size(); vertIndex++ )
+	{
+		debugObject->m_indices.push_back( (uint)vertIndex );
+	}
+
+	s_DebugRenderSystem->AddObjectToList( debugObject, s_DebugRenderSystem->m_renderObjects );
+
+}
+
+void DebugAddScreenAABB2Border( AABB2 const& bounds, Rgba8 const& color, float thickness, float duration /*= 0.f */ )
+{
+	DebugAddScreenAABB2Border( bounds, color, color, thickness, duration );
+}
+
 void DebugAddScreenTexturedQuad( AABB2 const& bounds, Texture* tex, AABB2 const& uvs, Rgba8 const& startTint, Rgba8 const& endTint, float duration /*= 0.f */ )
 {
 	DebugRenderObject* debugObject = new DebugRenderObject;
