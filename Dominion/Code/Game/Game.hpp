@@ -31,7 +31,7 @@ int constexpr PLAYER_1		= 1;
 int constexpr PLAYER_2		= 2;
 int constexpr TIE			= 3;
 
-int constexpr MONEPILESIZE = 100;
+int constexpr MONEYPILESIZE = 50;
 int constexpr VPPileSize = 8;
 int constexpr CURSEPILESIZE = 10;
 int constexpr ACTIONPILESIZE = 10;

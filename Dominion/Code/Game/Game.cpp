@@ -54,6 +54,8 @@ void Game::Startup()
 	m_camera.SetProjectionPerspective( 60.f, -0.09f, -100.f );
 	m_camera.Translate( Vec3( -2.f, 0.f, 1.5f ) );
 
+// 	Sampler* testSampler = new Sampler( g_theRenderer, SAMPLER_BILINEAR );
+// 	g_theRenderer->BindSampler( testSampler );
 
 	m_gameClock = new Clock();
 	m_gameClock->SetParent( Clock::GetMaster() );
@@ -107,21 +109,26 @@ void Game::Update()
 
 	pileData_t const* piles = m_currentGameState->m_cardPiles;
 
+
+	Rgba8 textColor = Rgba8::BLACK;
+	Rgba8 borderColor = Rgba8::BLACK;
 	AABB2 gameBoard = DebugGetScreenBounds();
+	DebugAddScreenAABB2( gameBoard, Rgba8::TuscanTan, 0.f );
 	Vec2 gameDims = gameBoard.GetDimensions();
 	//gameDims.y = gameDims.x;
 	AABB2 gameDataArea = gameBoard;
 	AABB2 deckDataArea = gameBoard;
-	gameDims *= 0.75f;
+	gameDims.x *= 0.8f;
+	gameDims.y *= 0.9f;
 	gameBoard.SetDimensions( gameDims );
 
-	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 7.f );
-	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.5f, 0.9f ) );
-	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.5f, 0.5f ) );
-	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.5f, 0.4f ) );
-	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.5f, 0.3f ) );
+	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
+	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
+	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
+	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
+	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
 
-	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 7.f );
+	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 9.f );
 	Vec2 player2DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.8f ) );
 	Vec2 player2DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.7f ) );
 	Vec2 player2VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
@@ -177,35 +184,74 @@ void Game::Update()
 	std::string player1VPStr = Stringf( "VP: %i", player1VPCount );
 	std::string player2VPStr = Stringf( "VP: %i", player2VPCount );
 
-	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player2DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player2DiscardStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player1DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player1DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
 
-	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, phaseStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, coinStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, buysStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, actionsStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player1VPStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, player2VPStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
 
 	AABB2 carvingBoard = gameBoard;
 
-	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( 1.f / 5.f );
-	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( 1.f / 4.f );
-	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( 1.f / 3.f );
-	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( 1.f / 2.f );
+
+	float handHeightFraction = 0.15f;
+	float playAreaHeightFraction = 0.15f;
+	float pileAreaHeightFraction = 0.4f;
+
+	float currentProportionalFractionSize = 1.f;
+	float currentProportionalSize = 1.f;
+	float currentFraction = handHeightFraction;
+	float fractionToCarve = currentFraction;
+
+
+	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+	currentFraction = pileAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+// 	currentFraction = playAreaHeightFraction;
+// 	currentProportionalFractionSize = 1.f - fractionToCarve;
+// 	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+// 	fractionToCarve = currentFraction * currentProportionalSize;
+
 	AABB2 player1HandAABB = carvingBoard;
 
 	AABB2 carvingPlayer2Hand = player2HandAABB;
-	DebugAddScreenAABB2( player2HandAABB, Rgba8::GREEN, 0.f );
-	DebugAddScreenAABB2( player2PlayAreaAABB, Rgba8::RED, 0.f );
-	DebugAddScreenAABB2( pilesArea, Rgba8::CYAN, 0.f );
-	DebugAddScreenAABB2( player1PlayAreaAABB, Rgba8::RED, 0.f );
-	DebugAddScreenAABB2(player1HandAABB, Rgba8::GREEN, 0.f );
+
+	Rgba8 handColor = Rgba8::WindsorTan;
+	Rgba8 playAreaColor = Rgba8::Tan;
+	Rgba8 pileAreaColor = Rgba8::SandyTan;
+
+	DebugAddScreenAABB2( player2HandAABB, handColor, 0.f );
+	DebugAddScreenAABB2( player2PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2( pilesArea, pileAreaColor, 0.f );
+	DebugAddScreenAABB2( player1PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2(player1HandAABB, handColor, 0.f );
 
 	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
-	//DebugAddScreenText( debugCenter, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, "Hello" );
+
 	for( size_t player2HandIndex = 0; player2HandIndex < player2Hand.size(); player2HandIndex++ )
 	{
 		float player2HandSize = (float)player2Hand.size();
@@ -214,7 +260,7 @@ void Game::Update()
 		CardDefinition const* card = player2Hand[player2HandIndex];
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
 	}
 
 	for( size_t player2PlayAreaIndex = 0; player2PlayAreaIndex < player2PlayArea.size(); player2PlayAreaIndex++ )
@@ -225,22 +271,50 @@ void Game::Update()
 		CardDefinition const* card = player2PlayArea[player2PlayAreaIndex];
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
 	}
 
 	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
+	AABB2 bottomPilesArea;
+	bool isTwoRows = false;
+	int cardsPerRow = 8;
+	float cardsPerRowFloat = (float)cardsPerRow;
+	if( NUMBEROFPILES > cardsPerRow )
+	{
+		isTwoRows = true;
+		bottomPilesArea = pilesArea.CarveBoxOffBottom( 0.5f );
+	}
 	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
 	{
-		float pileSize = (float)NUMBEROFPILES;
-		float carvingNumber = pileSize - (float)pilesIndex;
-		AABB2 cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+		//float pileSize = 8.f;
+		float carvingNumber = 0.f;
+		
+		AABB2 cardArea;
+		if( isTwoRows )
+		{
+			if( pilesIndex < (size_t)cardsPerRow )
+			{
+				carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+				cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+			else
+			{
+				carvingNumber = (2.f*cardsPerRowFloat) - (float)pilesIndex; 
+				cardArea = bottomPilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+		}
+		else
+		{
+			carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+			cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+		}
 
 		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
 		{
 			int aiPileIndex = aiValidMoves[aiValidIndexes];
 			if( pilesIndex == aiPileIndex )
 			{
-				DebugAddScreenAABB2( cardArea, Rgba8::BLUE, 0.f );
+				DebugAddScreenAABB2( cardArea, Rgba8::RedBrown, 0.f );
 				break;
 			}
 		}
@@ -252,15 +326,16 @@ void Game::Update()
 		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
 		Vec4 pileSizePos = Vec4( Vec2(), Vec2( cardArea.mins.x, cardArea.maxs.y ) );
 		std::string cardName = card->GetCardName();
-		std::string cardCost = Stringf("Cost: %i", card->GetCardCost() );
-		std::string cardCoins = Stringf("Coins: %i", card->GetCoins() );
-		std::string cardVPs = Stringf("VPs: %i", card->GetCardVPs() );
-		std::string pileCount = Stringf("Count: %i", piles[pilesIndex].m_pileSize );
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
-		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardCost.c_str() );
-		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardCoins.c_str() );
-		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardVPs.c_str() );
-		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.1f ), 10.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, pileCount.c_str() );
+		std::string cardCost = Stringf("Cost:%i", card->GetCardCost() );
+		std::string cardCoins = Stringf("Coins:%i", card->GetCoins() );
+		std::string cardVPs = Stringf("VPs:%i", card->GetCardVPs() );
+		std::string pileCount = Stringf("Count:%i", piles[pilesIndex].m_pileSize );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 15.f, textColor, textColor, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.5f ), 12.f, textColor, textColor, 0.f, cardCost.c_str() );
+		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardCoins.c_str() );
+		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardVPs.c_str() );
+		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.5f ), 12.f, textColor, textColor, 0.f, pileCount.c_str() );
+		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
 	}
 
 	for( size_t player1PlayAreaIndex = 0; player1PlayAreaIndex < player1PlayArea.size(); player1PlayAreaIndex++ )
@@ -271,7 +346,7 @@ void Game::Update()
 		CardDefinition const* card = player1PlayArea[player1PlayAreaIndex];
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
 	}
 
 	for( size_t player1HandIndex = 0; player1HandIndex < player1Hand.size(); player1HandIndex++ )
@@ -282,7 +357,7 @@ void Game::Update()
 		CardDefinition const* card = player1Hand[player1HandIndex];
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, Rgba8::WHITE, Rgba8::WHITE, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
 	}
 
 
@@ -417,11 +492,11 @@ void Game::InitializeGameState()
 
 	pileData_t* cardPiles = m_currentGameState->m_cardPiles;
 	cardPiles[(int)eCards::COPPER].m_card = copper;
-	cardPiles[(int)eCards::COPPER].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
 	cardPiles[(int)eCards::SILVER].m_card = silver;
-	cardPiles[(int)eCards::SILVER].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
 	cardPiles[(int)eCards::GOLD].m_card = gold;
-	cardPiles[(int)eCards::GOLD].m_pileSize = MONEPILESIZE;
+	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
 	cardPiles[(int)eCards::ESTATE].m_card = estate;
 	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
 	cardPiles[(int)eCards::DUCHY].m_card = duchy;
