@@ -27,8 +27,8 @@ struct light_t;
 struct Vertex_PCUTBN;
 
 int constexpr GAMENOTOVER	= -1;
-int constexpr PLAYER_1		= 1;
-int constexpr PLAYER_2		= 2;
+int constexpr PLAYER_1		= 0;
+int constexpr PLAYER_2		= 1;
 int constexpr TIE			= 3;
 
 int constexpr MONEYPILESIZE = 50;
@@ -127,11 +127,11 @@ public:
 
 	PlayerBoard& GetEditableCurrentPlayerBoard()
 	{
-
+		return m_playerBoards[m_whoseMoveIsIt];
 	}
 	PlayerBoard const& GetCurrentPlayerBoard()
 	{
-
+		return m_playerBoards[m_whoseMoveIsIt];
 	}
 
 public:

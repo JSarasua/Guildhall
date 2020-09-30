@@ -28,7 +28,7 @@ void CardDefinition::InitializeCards()
 
 	CardDefinition* villageCard		= new CardDefinition( eCards::Village,		eCardType::ACTION_TYPE, "Village",		3,			0,		 0,		 2,		 1,		0 );
 	CardDefinition* smithyCard		= new CardDefinition( eCards::Smithy,		eCardType::ACTION_TYPE, "Smithy",		4,			0,		 0,		 0,		 3,		0 );
-	CardDefinition* councilRoomCard	= new CardDefinition( eCards::CouncilRoom,	eCardType::ACTION_TYPE, "Council Room", 5,			0,		-1,		 0,		 4,		1 );
+	CardDefinition* councilRoomCard	= new CardDefinition( eCards::CouncilRoom,	eCardType::ACTION_TYPE, "Council Room", 5,			0,		 0,		 0,		 4,		1 );
 	CardDefinition* festivalCard	= new CardDefinition( eCards::Festival,		eCardType::ACTION_TYPE, "Festival",		5,			2,		 0,		 2,		 0,		1 );
 	CardDefinition* laboraryCard	= new CardDefinition( eCards::Laboratory,	eCardType::ACTION_TYPE, "Laboratory",	5,			0,		 0,		 1,		 2,		0 );
 	CardDefinition* marketCard		= new CardDefinition( eCards::Market,		eCardType::ACTION_TYPE, "Market",		5,			1,		 0,		 1,		 1,		1 );

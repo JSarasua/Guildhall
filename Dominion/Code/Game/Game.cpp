@@ -286,7 +286,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
  	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
  	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
-// 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
+ 	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
 // 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
 // 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
@@ -303,7 +303,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
  	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
  	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
- 	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+ 	const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
+ 	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
  	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
 // 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
 // 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
@@ -317,7 +318,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
 // 	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
 // 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
-// 	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
 // 	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
 // 	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
 // 	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
@@ -376,6 +376,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( f6Key.WasJustPressed() )
 	{
 		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
+	}
+	if( f7Key.WasJustPressed() )
+	{
+		InitializeGameState();
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -564,7 +568,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 7;
+		move.m_cardIndexToBuy = 8;
 		PlayMoveIfValid( move );
 	}
 	if( wKey.WasJustPressed() )
@@ -572,7 +576,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 8;
+		move.m_cardIndexToBuy = 9;
 		PlayMoveIfValid( move );
 	}
 	if( eKey.WasJustPressed() )
@@ -580,7 +584,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 9;
+		move.m_cardIndexToBuy = 10;
 		PlayMoveIfValid( move );
 	}
 	if( rKey.WasJustPressed() )
@@ -588,7 +592,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 10;
+		move.m_cardIndexToBuy = 11;
 		PlayMoveIfValid( move );
 	}
 	if( tKey.WasJustPressed() )
@@ -596,13 +600,24 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 11;
+		move.m_cardIndexToBuy = 12;
+		PlayMoveIfValid( move );
+	}
+	if( yKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 13;
 		PlayMoveIfValid( move );
 	}
 	if( iKey.WasJustPressed() )
 	{
-		InitializeGameState();
-		//reset ai
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 14;
+		PlayMoveIfValid( move );
 	}
 }
 
