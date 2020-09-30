@@ -46,7 +46,7 @@ void MonteCarloNoTree::UpdateBestMove()
 
 void MonteCarloNoTree::RunSimulations( int numberOfSimulations )
 {
-	if( g_theGame->IsGameOverForGameState( m_currentGameState ) )
+	if( g_theGame->IsGameOverForGameState( m_currentGameState ) != GAMENOTOVER )
 	{
 		return;
 	}
@@ -94,7 +94,7 @@ int MonteCarloNoTree::RunSimulationOnMove( inputMove_t const& move )
 	int whoseMove = m_currentGameState.m_whoseMoveIsIt;
 
 
-	while( gameResultAfterMove == 0 )
+	while( gameResultAfterMove == GAMENOTOVER )
 	{
 		inputMove_t currentMove;
 		if( currentGameState.m_whoseMoveIsIt == whoseMove )

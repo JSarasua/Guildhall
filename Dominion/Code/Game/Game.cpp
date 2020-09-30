@@ -961,7 +961,7 @@ void Game::AutoPlayGame()
 
 void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 {
-	if( IsGameOver() != 0 )
+	if( IsGameOver() != GAMENOTOVER )
 	{
 		return;
 	}
@@ -1034,7 +1034,6 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 	m_mc->SetCurrentGameState( *m_currentGameState );
 	m_mc->ResetPossibleMoves();
-
 // 	m_mcts->UpdateGame( move, m_currentGameState );
 }
 
@@ -1172,7 +1171,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 	}
 
 	//Game is not over
-	return 0;
+	return GAMENOTOVER;
 }
 
 int Game::IsGameOver()
@@ -1186,7 +1185,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 {
 	std::vector<inputMove_t> validMoves;
 
-	if( IsGameOverForGameState( gameState ) )
+	if( IsGameOverForGameState( gameState ) != GAMENOTOVER )
 	{
 		return validMoves;
 	}
@@ -1262,9 +1261,9 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 {
 	int numberOfValidMoves = 0;
 
-	if( IsGameOverForGameState( gameState ) )
+	if( IsGameOverForGameState( gameState ) != GAMENOTOVER )
 	{
-		return 0;
+		return numberOfValidMoves;
 	}
 
 	//You can always end the phase as a move
@@ -1324,7 +1323,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 {
 	gamestate_t newGameState = currentGameState;
 
-	if( IsGameOver() != 0 )
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
 	{
 		return newGameState;
 	}
@@ -1411,7 +1410,7 @@ inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState 
 inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 {
 	inputMove_t newMove;
-	if( IsGameOverForGameState( currentGameState ) )
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
 	{
 		return newMove;
 	}
