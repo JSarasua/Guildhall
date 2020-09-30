@@ -154,7 +154,7 @@ void Game::InitializeGameState()
 	}
 
 
-	Deck starterDeck = Deck( &m_rand );
+	PlayerBoard starterDeck = PlayerBoard( &m_rand );
 	std::vector<CardDefinition const*> starterCards;
 	starterCards.reserve( 10 );
 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
@@ -191,14 +191,14 @@ void Game::InitializeGameState()
 	starterDeck.InitializeDeck( starterCards );
 
 	m_currentGameState = new gamestate_t();
-	m_currentGameState->m_player1Deck = starterDeck;
-	m_currentGameState->m_player2Deck = starterDeck;
+	m_currentGameState->m_playerBoards[0] = starterDeck;
+	m_currentGameState->m_playerBoards[1] = starterDeck;
 	
-	m_currentGameState->m_player1Deck.ShuffleDeck();
-	m_currentGameState->m_player2Deck.ShuffleDeck();
+	m_currentGameState->m_playerBoards[0].ShuffleDeck();
+	m_currentGameState->m_playerBoards[1].ShuffleDeck();
 
-	m_currentGameState->m_player1Deck.Draw5();
-	m_currentGameState->m_player2Deck.Draw5();
+	m_currentGameState->m_playerBoards[0].Draw5();
+	m_currentGameState->m_playerBoards[1].Draw5();
 
 	m_currentGameState->m_currentPhase = ACTION_PHASE;
 
@@ -612,11 +612,11 @@ void Game::DebugDrawGame()
 {
 	//Render Player 2s hand at top of screen
 
-	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_player1Deck.GetHand();
-	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_player2Deck.GetHand();
+	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_playerBoards[0].GetHand();
+	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_playerBoards[1].GetHand();
 
-	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_player1Deck.GetPlayArea();
-	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_player2Deck.GetPlayArea();
+	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
+	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
 
 	pileData_t const* piles = m_currentGameState->m_cardPiles;
 
@@ -647,14 +647,14 @@ void Game::DebugDrawGame()
 	Vec2 player1DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
 	Vec2 player1VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.1f ) );
 
-	Deck const* playerDeck = nullptr;
+	PlayerBoard const* playerDeck = nullptr;
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
-		playerDeck = &m_currentGameState->m_player1Deck;
+		playerDeck = &m_currentGameState->m_playerBoards[0];
 	}
 	else
 	{
-		playerDeck = &m_currentGameState->m_player2Deck;
+		playerDeck = &m_currentGameState->m_playerBoards[1];
 	}
 
 	int currentCoins = playerDeck->m_currentCoins;
@@ -681,12 +681,12 @@ void Game::DebugDrawGame()
 	}
 
 
-	int player1DeckSize = (int)m_currentGameState->m_player1Deck.GetDeckSize();
-	int player1DiscardSize = (int)m_currentGameState->m_player1Deck.GetDiscardSize();
-	int player1VPCount = m_currentGameState->m_player1Deck.GetCurrentVictoryPoints();
-	int player2DeckSize = (int)m_currentGameState->m_player2Deck.GetDeckSize();
-	int player2DiscardSize = (int)m_currentGameState->m_player2Deck.GetDiscardSize();
-	int player2VPCount = m_currentGameState->m_player2Deck.GetCurrentVictoryPoints();
+	int player1DeckSize = (int)m_currentGameState->m_playerBoards[0].GetDeckSize();
+	int player1DiscardSize = (int)m_currentGameState->m_playerBoards[0].GetDiscardSize();
+	int player1VPCount = m_currentGameState->m_playerBoards[0].GetCurrentVictoryPoints();
+	int player2DeckSize = (int)m_currentGameState->m_playerBoards[1].GetDeckSize();
+	int player2DiscardSize = (int)m_currentGameState->m_playerBoards[1].GetDiscardSize();
+	int player2VPCount = m_currentGameState->m_playerBoards[1].GetCurrentVictoryPoints();
 	std::string player2DeckStr = Stringf( "Deck Size: %i", player2DeckSize );
 	std::string player2DiscardStr = Stringf( "Discard Size: %i", player2DiscardSize );
 	std::string player1DeckStr = Stringf( "Deck Size: %i", player1DeckSize );
@@ -967,16 +967,16 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 	}
 	if( IsMoveValid( moveToPlay ) )
 	{
-		Deck* playerDeck = nullptr;
+		PlayerBoard* playerDeck = nullptr;
 		int nextPlayersTurn = 0;
 		if( moveToPlay.m_whoseMoveIsIt == PLAYER_1 )
 		{
-			playerDeck = &m_currentGameState->m_player1Deck;
+			playerDeck = &m_currentGameState->m_playerBoards[0];
 			nextPlayersTurn = PLAYER_2;
 		}
 		else
 		{
-			playerDeck = &m_currentGameState->m_player2Deck;
+			playerDeck = &m_currentGameState->m_playerBoards[1];
 			nextPlayersTurn = PLAYER_1;
 		}
 
@@ -1059,14 +1059,14 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 		return false;
 	}
 
-	Deck const* playerDeck = nullptr;
+	PlayerBoard const* playerDeck = nullptr;
 	if( whoseMove == PLAYER_1 )
 	{
-		playerDeck = &gameState.m_player1Deck;
+		playerDeck = &gameState.m_playerBoards[0];
 	}
 	else
 	{
-		playerDeck = &gameState.m_player2Deck;
+		playerDeck = &gameState.m_playerBoards[1];
 	}
 
 	if( moveType == BUY_MOVE )
@@ -1150,8 +1150,8 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 	if( isGameOver )
 	{
 		//Victory goes to highest score. In case of tie, it goes to who has played fewer turns. If still a tie, then its a tie.
-		int player1Score = gameState.m_player1Deck.GetCurrentVictoryPoints();
-		int player2Score = gameState.m_player2Deck.GetCurrentVictoryPoints();
+		int player1Score = gameState.m_playerBoards[0].GetCurrentVictoryPoints();
+		int player2Score = gameState.m_playerBoards[1].GetCurrentVictoryPoints();
 		int whoseTurnIsIt = gameState.m_whoseMoveIsIt;
 		if( player1Score > player2Score )
 		{
@@ -1200,15 +1200,15 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 	move.m_moveType = END_PHASE;
 	validMoves.push_back( move );
 
-	Deck const* playerDeck = nullptr;
+	PlayerBoard const* playerDeck = nullptr;
 	pileData_t const* piles = gameState.m_cardPiles;
 	if( whoseMove == PLAYER_1 )
 	{
-		playerDeck = &gameState.m_player1Deck;
+		playerDeck = &gameState.m_playerBoards[0];
 	}
 	else
 	{
-		playerDeck = &gameState.m_player2Deck;
+		playerDeck = &gameState.m_playerBoards[1];
 	}
 
 	if( currentPhase == ACTION_PHASE )
@@ -1273,14 +1273,14 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 	eGamePhase currentPhase = gameState.m_currentPhase;
 	int whoseMove = gameState.m_whoseMoveIsIt;
 	
-	Deck const* playerDeck = nullptr;
+	PlayerBoard const* playerDeck = nullptr;
 	if( whoseMove == PLAYER_1 )
 	{
-		playerDeck = &gameState.m_player1Deck;
+		playerDeck = &gameState.m_playerBoards[0];
 	}
 	else
 	{
-		playerDeck = &gameState.m_player2Deck;
+		playerDeck = &gameState.m_playerBoards[1];
 	}
 
 	if( currentPhase == ACTION_PHASE )
@@ -1330,16 +1330,16 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 	}
 	if( IsMoveValidForGameState( move, newGameState ) )
 	{
-		Deck* playerDeck = nullptr;
+		PlayerBoard* playerDeck = nullptr;
 		int nextPlayersTurn = 0;
 		if( move.m_whoseMoveIsIt == PLAYER_1 )
 		{
-			playerDeck = &newGameState.m_player1Deck;
+			playerDeck = &newGameState.m_playerBoards[0];
 			nextPlayersTurn = PLAYER_2;
 		}
 		else
 		{
-			playerDeck = &newGameState.m_player2Deck;
+			playerDeck = &newGameState.m_playerBoards[1];
 			nextPlayersTurn = PLAYER_1;
 		}
 
@@ -1444,10 +1444,10 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 	else
 	{
 
-		Deck const* playerDeck = &currentGameState.m_player1Deck;
+		PlayerBoard const* playerDeck = &currentGameState.m_playerBoards[0];
 		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
 		{
-			playerDeck = &currentGameState.m_player2Deck;
+			playerDeck = &currentGameState.m_playerBoards[1];
 		}
 
 		int currentMoney = playerDeck->GetCurrentMoney();

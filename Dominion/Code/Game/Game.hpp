@@ -6,7 +6,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
-#include "Game/Deck.hpp"
+#include "Game/PlayerBoard.hpp"
 #include "Game/CardDefinition.hpp"
 #include <vector>
 #include <deque>
@@ -26,7 +26,7 @@ class MonteCarloNoTree;
 struct light_t;
 struct Vertex_PCUTBN;
 
-
+int constexpr GAMENOTOVER	= -1;
 int constexpr PLAYER_1		= 1;
 int constexpr PLAYER_2		= 2;
 int constexpr TIE			= 3;
@@ -96,9 +96,11 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
-	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], Deck const& player1Deck, Deck const& player2Deck, int whoseMove, eGamePhase const& currentPhase ) :
-		m_player1Deck( player1Deck ), m_player2Deck( player2Deck ), m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase )
+	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], PlayerBoard const& player1Deck, PlayerBoard const& player2Deck, int whoseMove, eGamePhase const& currentPhase ) :
+		m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase )
 	{
+		m_playerBoards[0] = player1Deck;
+		m_playerBoards[1] = player2Deck;
 		memcpy( m_cardPiles, gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
 	}
 
@@ -123,12 +125,22 @@ public:
 
 	}
 
+	PlayerBoard& GetEditableCurrentPlayerBoard()
+	{
+
+	}
+	PlayerBoard const& GetCurrentPlayerBoard()
+	{
+
+	}
+
 public:
 	//Card Piles depicting what cards are in the game and how many are in that pile
 	pileData_t m_cardPiles[NUMBEROFPILES] {};
 
-	Deck m_player1Deck;
-	Deck m_player2Deck;
+	PlayerBoard m_playerBoards[2];
+	//PlayerBoard m_player1Deck;
+	//PlayerBoard m_player2Deck;
 	int m_whoseMoveIsIt = PLAYER_1;
 	eGamePhase m_currentPhase = CLEANUP_PHASE;
 

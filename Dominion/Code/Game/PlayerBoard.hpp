@@ -7,12 +7,12 @@ class CardDefinition;
 
 struct gamestate_t;
 
-class Deck
+class PlayerBoard
 {
 public:
-	Deck();
-	Deck( RandomNumberGenerator* rand);
-	~Deck() = default;
+	PlayerBoard();
+	PlayerBoard( RandomNumberGenerator* rand);
+	~PlayerBoard() = default;
 
 	void InitializeDeck( std::vector<CardDefinition const*>& deck );
 	void InitializeRand( RandomNumberGenerator* rand );

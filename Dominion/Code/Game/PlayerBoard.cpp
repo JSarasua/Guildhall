@@ -1,9 +1,9 @@
-#include "Game/Deck.hpp"
+#include "Game/PlayerBoard.hpp"
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/Game.hpp"
 
-Deck::Deck( RandomNumberGenerator* rand )
+PlayerBoard::PlayerBoard( RandomNumberGenerator* rand )
 {
 	m_rand = rand;
 	m_hand.reserve( 10 );
@@ -12,7 +12,7 @@ Deck::Deck( RandomNumberGenerator* rand )
 	m_deck.reserve( 30 );
 }
 
-Deck::Deck()
+PlayerBoard::PlayerBoard()
 {
 	m_hand.reserve( 10 );
 	m_discardPile.reserve( 10 );
@@ -20,32 +20,32 @@ Deck::Deck()
 	m_deck.reserve( 30 );
 }
 
-void Deck::InitializeDeck( std::vector<CardDefinition const*>& deck )
+void PlayerBoard::InitializeDeck( std::vector<CardDefinition const*>& deck )
 {
 	m_deck.swap( deck );
 }
 
-void Deck::InitializeRand( RandomNumberGenerator* rand )
+void PlayerBoard::InitializeRand( RandomNumberGenerator* rand )
 {
 	m_rand = rand;
 }
 
-void Deck::AddCardToDiscardPile( CardDefinition const* cardToAdd )
+void PlayerBoard::AddCardToDiscardPile( CardDefinition const* cardToAdd )
 {
 	m_discardPile.push_back( cardToAdd );
 }
 
-std::vector<CardDefinition const*> const& Deck::GetHand() const
+std::vector<CardDefinition const*> const& PlayerBoard::GetHand() const
 {
 	return m_hand;
 }
 
-std::vector<CardDefinition const*>& Deck::GetPlayArea()
+std::vector<CardDefinition const*>& PlayerBoard::GetPlayArea()
 {
 	return m_playArea;
 }
 
-CardDefinition const* Deck::TakeCardFromHand( size_t cardIndex )
+CardDefinition const* PlayerBoard::TakeCardFromHand( size_t cardIndex )
 {
 	CardDefinition const* cardToTake = nullptr;
 	if( !m_hand.empty() )
@@ -58,7 +58,7 @@ CardDefinition const* Deck::TakeCardFromHand( size_t cardIndex )
 	return cardToTake;
 }
 
-int Deck::GetCurrentVictoryPoints() const
+int PlayerBoard::GetCurrentVictoryPoints() const
 {
 	int currentVPCount = 0;
 
@@ -90,7 +90,7 @@ int Deck::GetCurrentVictoryPoints() const
 	return currentVPCount;
 }
 
-void Deck::ShuffleDeck()
+void PlayerBoard::ShuffleDeck()
 {
 	if( m_deck.empty() )
 	{
@@ -109,25 +109,25 @@ void Deck::ShuffleDeck()
 	}
 }
 
-void Deck::AddDiscardPileToDeck()
+void PlayerBoard::AddDiscardPileToDeck()
 {
 	m_deck.insert( m_deck.end(), m_discardPile.begin(), m_discardPile.end() );
 	m_discardPile.clear();
 }
 
-void Deck::DiscardHand()
+void PlayerBoard::DiscardHand()
 {
 	m_discardPile.insert( m_discardPile.end(), m_hand.begin(), m_hand.end() );
 	m_hand.clear();
 }
 
-void Deck::DiscardPlayArea()
+void PlayerBoard::DiscardPlayArea()
 {
 	m_discardPile.insert( m_discardPile.end(), m_playArea.begin(), m_playArea.end() );
 	m_playArea.clear();
 }
 
-void Deck::PlayTreasureCards()
+void PlayerBoard::PlayTreasureCards()
 {
 	size_t handIndex = 0;
 	while( handIndex < m_hand.size() )
@@ -150,7 +150,7 @@ void Deck::PlayTreasureCards()
 	}
 }
 
-void Deck::Draw( int numberToDraw )
+void PlayerBoard::Draw( int numberToDraw )
 {
 	for( int drawIndex = 0; drawIndex < numberToDraw; drawIndex++ )
 	{
@@ -171,14 +171,14 @@ void Deck::Draw( int numberToDraw )
 
 }
 
-void Deck::Draw5()
+void PlayerBoard::Draw5()
 {
 	//Think about optimizing this;
 	Draw( 5 );
 
 }
 
-void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
+void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 {
 	CardDefinition const* cardToPlay = TakeCardFromHand( handIndex );
 	m_playArea.push_back( cardToPlay );
@@ -197,8 +197,8 @@ void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
 
 			if( cardToPlay->m_OpponentsDrawCard )
 			{
-				Deck* player1Deck = &gameState->m_player1Deck;
-				Deck* player2Deck = &gameState->m_player2Deck;
+				PlayerBoard* player1Deck = &gameState->m_playerBoards[0];
+				PlayerBoard* player2Deck = &gameState->m_playerBoards[1];
 
 				if( player1Deck != this )
 				{
@@ -212,8 +212,8 @@ void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
 
 			if( cardToPlay->m_OpponentsGetCurse )
 			{
-				Deck* player1Deck = &gameState->m_player1Deck;
-				Deck* player2Deck = &gameState->m_player2Deck;
+				PlayerBoard* player1Deck = &gameState->m_playerBoards[0];
+				PlayerBoard* player2Deck = &gameState->m_playerBoards[1];
 
 				if( player1Deck != this )
 				{
