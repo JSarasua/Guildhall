@@ -170,6 +170,9 @@ void Game::InitializeGameState()
 	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
 	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
 	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
+	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
+	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
+
 
 
 
@@ -224,6 +227,10 @@ void Game::InitializeGameState()
 	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
 	cardPiles[(int)eCards::Market].m_card = market;
 	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
+	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Witch].m_card = witch;
+	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
 
 
 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;

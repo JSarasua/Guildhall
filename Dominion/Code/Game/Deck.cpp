@@ -194,6 +194,46 @@ void Deck::PlayCard( size_t handIndex, gamestate_t* gameState  )
 			m_numberOfActionsAvailable += actionsToGain;
 			m_numberOfBuysAvailable += buysToGain;
 			Draw( cardDraw );
+
+			if( cardToPlay->m_OpponentsDrawCard )
+			{
+				Deck* player1Deck = &gameState->m_player1Deck;
+				Deck* player2Deck = &gameState->m_player2Deck;
+
+				if( player1Deck != this )
+				{
+					player1Deck->Draw();
+				}
+				if( player2Deck != this )
+				{
+					player2Deck->Draw();
+				}
+			}
+
+			if( cardToPlay->m_OpponentsGetCurse )
+			{
+				Deck* player1Deck = &gameState->m_player1Deck;
+				Deck* player2Deck = &gameState->m_player2Deck;
+
+				if( player1Deck != this )
+				{
+					pileData_t& pileData = gameState->m_cardPiles[(int)CURSE];
+					if( pileData.m_pileSize > 0 )
+					{
+						pileData.m_pileSize -= 1;
+						player1Deck->AddCardToDiscardPile( pileData.m_card );
+					}
+				}
+				if( player2Deck != this )
+				{
+					pileData_t& pileData = gameState->m_cardPiles[(int)CURSE];
+					if( pileData.m_pileSize > 0 )
+					{
+						pileData.m_pileSize -= 1;
+						player2Deck->AddCardToDiscardPile( pileData.m_card );
+					}
+				}
+			}
 		}
 		else
 		{

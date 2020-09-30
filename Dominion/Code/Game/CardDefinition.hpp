@@ -33,15 +33,13 @@ enum eCards
 	//Action
 	Village,
 	Smithy,
-	//CouncilRoom,
+	CouncilRoom,
 	Festival,
 	Laboratory,
 	Market,
-	//Witch,
-
+	Witch,
 
 	NUM_CARDS
-
 };
 
 class CardDefinition
@@ -72,5 +70,8 @@ public:
 	int m_cardDraw = 0;
 	int m_buysGained = 0;
 
+
+	bool m_OpponentsGetCurse = false;
+	bool m_OpponentsDrawCard = false;
 
 };

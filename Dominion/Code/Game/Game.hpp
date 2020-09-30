@@ -36,7 +36,7 @@ int constexpr VPPileSize = 8;
 int constexpr CURSEPILESIZE = 10;
 int constexpr ACTIONPILESIZE = 10;
 
-int constexpr NUMBEROFPILES = 12;
+int constexpr NUMBEROFPILES = (int)NUM_CARDS;
 //int constexpr ACTIONPILESIZE = 10;
 
 // enum ePlayers
