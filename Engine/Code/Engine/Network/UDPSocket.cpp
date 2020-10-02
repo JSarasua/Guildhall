@@ -2,6 +2,13 @@
 
 #include <iostream>
 
+
+#ifdef TEST_MODE
+#define LOG_ERROR(...) printf(Stringf(__VA_ARGS__) + std::string("\n"))
+#else
+#define LOG_ERROR(...) g_theConsole->ErrorString(Stringf(__VA_ARGS__))
+#endif
+
 UDPSocket::UDPSocket( std::string const& host, int port ) : m_socket( INVALID_SOCKET )
 {
 	m_toAddress.sin_family = AF_INET;
@@ -22,18 +29,39 @@ UDPSocket::~UDPSocket()
 
 void UDPSocket::Bind( int port )
 {
-	sockaddr_in bindAddr;
-	bindAddr.sin_family = AF_INET;
-	bindAddr.sin_port = htons( (u_short)port );
-	bindAddr.sin_addr.s_addr = htonl( INADDR_ANY );
+	m_bindAddress.sin_family = AF_INET;
+	m_bindAddress.sin_port = htons( (u_short)port );
+	m_bindAddress.sin_addr.s_addr = htonl( INADDR_ANY );
 
-	int iResult = ::bind( m_socket, (SOCKADDR*)& bindAddr, sizeof( bindAddr ) );
+	int iResult = ::bind( m_socket, (SOCKADDR*)& m_bindAddress, sizeof( m_bindAddress ) );
 
 	if( iResult != 0 )
 	{
 		std::cout << "Socket instantiate failed, error = " << WSAGetLastError() << std::endl;
 
 	}
+}
+
+int UDPSocket::Send( int length )
+{
+	int iResult = ::sendto( m_socket, &m_sendBuffer[0], (int)length, 0, reinterpret_cast<SOCKADDR*>(&m_toAddress), sizeof(m_toAddress) );
+	if( iResult == SOCKET_ERROR )
+	{
+		LOG_ERROR("Socket bind failed, error = %i",WSAGetLastError() );
+	}
+	return iResult;
+}
+
+int UDPSocket::Receive()
+{
+	//int iResult = ::recv( m_socket, &m_receiveBuffer[0], BufferSize, 0 );
+	int fromLen = BufferSize;
+	int iResult = ::recvfrom( m_socket, &m_receiveBuffer[0], BufferSize, 0, reinterpret_cast<SOCKADDR*>(&m_bindAddress), &fromLen );
+	if( iResult == SOCKET_ERROR )
+	{
+		LOG_ERROR("Socket recv failed, error = %i", WSAGetLastError() );
+	}
+	return iResult;
 }
 
 void UDPSocket::Close()

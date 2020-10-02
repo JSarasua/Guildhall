@@ -16,6 +16,7 @@
 class TCPServer;
 class TCPClient;
 class TCPSocket;
+class UDPSocket;
 
 constexpr uint16_t SERVERLISTENING = 1;
 constexpr uint16_t TEXTMESSAGE = 2;
@@ -96,6 +97,11 @@ public:
 	bool SendMessageToServer( EventArgs const& args );
 	bool DisconnectClient( EventArgs const& args );
 
+	//UDP Commands
+	bool OpenUDPPort( EventArgs const& args );
+	bool SendUDPMessage( EventArgs const& args );
+	bool CloseUDPPort( EventArgs const& args );
+
 private:
 	std::vector<TCPServer*> m_TCPServers;
 	std::vector<TCPClient*> m_TCPClients;
@@ -104,4 +110,7 @@ private:
 	TCPClient* m_TCPClient = nullptr;
 	TCPSocket* m_TCPServerToClientSocket = nullptr;
 	TCPSocket* m_TCPClientToServerSocket = nullptr;
+
+	UDPSocket* m_UDPReceiverSocket = nullptr;
+	UDPSocket* m_UDPSenderSocket = nullptr;
 };

@@ -1,6 +1,7 @@
 #include "Engine/Network/NetworkSys.hpp"
 #include "Engine/Network/TCPClient.hpp"
 #include "Engine/Network/TCPServer.hpp"
+#include "Engine/Network/UDPSocket.hpp"
 #include "Engine/Core/StringUtils.hpp"
 
 #pragma  comment( lib, "Ws2_32.lib" )
@@ -229,5 +230,36 @@ bool NetworkSys::DisconnectClient( EventArgs const& args )
 	m_TCPClientToServerSocket->Send( disconnectStr, disconnectStr.size() );
 	m_TCPClientToServerSocket->Close();
 	return true;
+}
+
+bool NetworkSys::OpenUDPPort( EventArgs const& args )
+{
+	int bindPort = args.GetValue( "bindPort", 48000 );
+	int sendToPort = args.GetValue( "sendToPort", 48001 );
+
+	m_UDPReceiverSocket = new UDPSocket( "127.0.0.1", bindPort );
+	m_UDPSenderSocket = new UDPSocket( "127.0.0.1", sendToPort );
+
+	return false;
+}
+
+bool NetworkSys::SendUDPMessage( EventArgs const& args )
+{
+	if( m_UDPSenderSocket )
+	{
+		std::string message = args.GetValue("msg","Default Message" );
+		UDPSocket::Buffer& buffer = m_UDPSenderSocket->SendBuffer();
+		memcpy( &buffer[0], message.c_str(), message.size() );
+		m_UDPSenderSocket->Send( (int)message.size() );
+	}
+
+	return false;
+}
+
+bool NetworkSys::CloseUDPPort( EventArgs const& args )
+{
+	//TODO
+
+	return false;
 }
 

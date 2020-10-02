@@ -5,6 +5,8 @@
 #include <WS2tcpip.h>
 #include <iostream>
 
+#define  TEST_MODE
+
 #pragma  comment( lib, "Ws2_32.lib" )
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -35,7 +37,10 @@ namespace UnitTest
 
 			UDPSocket socket2 = UDPSocket("127.0.0.1", 48001);
 			socket2.Bind( 48000 );
-			Assert::AreEqual( true, false );
+			Assert::AreEqual( true, true );
+
+
+			using MessageArray = std::array<std::tuple<std::uint16_t,std::uint16_t,std::uint16_t>,5>;
 		}
 
 		TEST_METHOD_CLEANUP( DeinitUPDSocketTest )

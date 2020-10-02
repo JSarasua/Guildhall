@@ -9,14 +9,23 @@ public:
 	~UDPSocket();
 
 	void Bind( int port );
-	int Send();
+	int Send( int length );
 	int Receive();
-
 	void Close();
+
+	static const int BufferSize = 512;
+	using Buffer = std::array<char, BufferSize>;
+
+	Buffer& SendBuffer() { return m_sendBuffer; }
+	Buffer& ReceiveBuffer() { return m_receiveBuffer; }
 
 protected:
 
 private:
 	sockaddr_in m_toAddress;
+	sockaddr_in m_bindAddress;
 	SOCKET m_socket;
+
+	Buffer m_sendBuffer;
+	Buffer m_receiveBuffer;
 };
