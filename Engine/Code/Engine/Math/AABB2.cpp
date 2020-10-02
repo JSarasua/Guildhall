@@ -120,6 +120,20 @@ void AABB2::SetDimensions( const Vec2& newDimensions )
 	SetCenter(currentCenter);
 }
 
+void AABB2::ScaleDimensionsNonUniform( Vec2 const& newScale )
+{
+	Vec2 currentDimensions = GetDimensions();
+	Vec2 newDimensions = currentDimensions * newScale;
+	SetDimensions( newDimensions );
+}
+
+void AABB2::ScaleDimensionsUniform( float newScale )
+{
+	Vec2 currentDimensions = GetDimensions();
+	Vec2 newDimensions = currentDimensions * newScale;
+	SetDimensions( newDimensions );
+}
+
 void AABB2::MakeSquareFromBottomLeft( bool useHeight /*= false */ )
 {
 	float displacementToUse = 0.f;
@@ -222,6 +236,37 @@ AABB2 AABB2::GetBoxAtBottom( float FractionOfWidth, float additionalWidth /*= 0.
 
 
 	return newAABB;
+}
+
+std::vector<AABB2> AABB2::GetBoxAsRows( int numberOfRows )
+{
+	std::vector<AABB2> rows;
+	if( numberOfRows == 1 )
+	{
+		rows.push_back( *this );
+		return rows;
+	}
+
+	float minY = mins.y;
+	float maxY = maxs.y;
+	float heightOfRow = (maxY - minY) / (float)numberOfRows;
+	for( int rowIndex = 1; rowIndex < numberOfRows; rowIndex++ )
+	{
+		float bottomOfRowY = minY + (heightOfRow * (float)(rowIndex - 1) );
+		float topOfRowY = minY + (heightOfRow * (float)(rowIndex) );
+		AABB2 row = AABB2( mins.x, bottomOfRowY, maxs.x, topOfRowY );
+		rows.push_back( row );
+
+		if( rowIndex + 1 == numberOfRows )
+		{
+			bottomOfRowY = minY + (heightOfRow * (float)(rowIndex));
+			topOfRowY = minY + (heightOfRow * (float)(rowIndex + 1));
+			AABB2 lastRow = AABB2( mins.x, bottomOfRowY, maxs.x, topOfRowY );
+			rows.push_back( lastRow );
+		}
+	}
+
+	return rows;
 }
 
 float AABB2::GetOuterRadius() const

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Math/Vec2.hpp"
+#include <vector>
 
 
 struct AABB2
@@ -27,6 +28,8 @@ public:
 
 	void SetCenter(const Vec2& newCenter);
 	void SetDimensions(const Vec2& newDimensions);
+	void ScaleDimensionsNonUniform( Vec2 const& newScale );
+	void ScaleDimensionsUniform( float newScale );
 	void MakeSquareFromBottomLeft( bool useHeight = false );
 
 	AABB2 CarveBoxOffLeft(float FractionOfWidth, float additionalWidth = 0.f);
@@ -38,6 +41,9 @@ public:
 	AABB2 GetBoxAtRight(float FractionOfWidth, float additionalWidth = 0.f);
 	AABB2 GetBoxAtTop(float FractionOfWidth, float additionalWidth = 0.f);
 	AABB2 GetBoxAtBottom(float FractionOfWidth, float additionalWidth = 0.f);
+
+	std::vector<AABB2> GetBoxAsRows( int numberOfRows );
+
 
 	float GetOuterRadius() const;
 	float GetInnerRadius() const;
