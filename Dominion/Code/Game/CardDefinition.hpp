@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <map>
+#include <vector>
 
 enum eCardType
 {
@@ -52,6 +53,8 @@ public:
 	static void InitializeCards();
 	static CardDefinition const* GetCardDefinitionByType( eCards cardType );
 	static std::map< eCards, CardDefinition* > s_definitions;
+
+	static bool UnorderedCompare( std::vector<CardDefinition const*> const& first, std::vector<CardDefinition const*> const& second );
 
 	int GetCardCost() const { return m_cost; }
 	int GetCoins() const { return m_coins; }

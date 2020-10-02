@@ -38,6 +38,8 @@ public:
 	size_t GetDeckSize() { return m_deck.size(); }
 	size_t GetDiscardSize() { return m_discardPile.size(); }
 
+	bool UnorderedCompare( PlayerBoard const& compare ) const;
+
 public:
 	std::vector<CardDefinition const*> m_hand;
 	std::vector<CardDefinition const*> m_discardPile;

@@ -243,3 +243,23 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 
 }
 
+bool PlayerBoard::UnorderedCompare( PlayerBoard const& compare ) const
+{
+	bool isHandEqual = CardDefinition::UnorderedCompare( m_hand, compare.m_hand );
+	bool isDiscardEqual = CardDefinition::UnorderedCompare( m_discardPile, compare.m_discardPile );
+	bool isPlayAreaEqual = CardDefinition::UnorderedCompare( m_playArea, compare.m_playArea );
+	bool isDeckEqual = CardDefinition::UnorderedCompare( m_deck, compare.m_deck );
+	bool isCurrentCoinsEqual = ( m_currentCoins == compare.m_currentCoins );
+	bool isActionsEqual = ( m_numberOfActionsAvailable == compare.m_numberOfActionsAvailable );
+	bool isBuysEqual = ( m_numberOfBuysAvailable == compare.m_numberOfBuysAvailable );
+
+	if( isHandEqual && isDiscardEqual && 
+		isPlayAreaEqual && isCurrentCoinsEqual && 
+		isActionsEqual && isBuysEqual && isDeckEqual )
+	{
+		return true;
+	}
+
+	return false;
+}
+

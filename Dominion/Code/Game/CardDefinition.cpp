@@ -1,8 +1,20 @@
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include <algorithm>
 //#include "Engine/Core/StringUtils.hpp"
 
 std::map< eCards, CardDefinition* > CardDefinition::s_definitions;
+
+bool CardDefinition::UnorderedCompare( std::vector<CardDefinition const*> const& first, std::vector<CardDefinition const*> const& second )
+{
+	std::vector<CardDefinition const*> firstCopy = first;
+	std::vector<CardDefinition const*> secondCopy = second;
+
+	std::sort( firstCopy.begin(), firstCopy.end() );
+	std::sort( secondCopy.begin(), secondCopy.end() );
+
+	return firstCopy == secondCopy;
+}
 
 CardDefinition::CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost, int coins, int vp, int plusActions, int plusDraw, int plusBuys ) :
 	m_cardIndex( cardIndex ), 
