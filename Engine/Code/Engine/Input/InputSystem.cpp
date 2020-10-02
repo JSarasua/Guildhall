@@ -44,6 +44,7 @@ const unsigned char F6_KEY			= VK_F6;
 const unsigned char F7_KEY			= VK_F7;
 const unsigned char F8_KEY			= VK_F8;
 const unsigned char F11_KEY			= VK_F11;
+const unsigned char F12_KEY			= VK_F12;
 const unsigned char PLUS_KEY		= VK_OEM_PLUS;
 const unsigned char MINUS_KEY		= VK_OEM_MINUS;
 const unsigned char SEMICOLON_KEY	= VK_OEM_1;
