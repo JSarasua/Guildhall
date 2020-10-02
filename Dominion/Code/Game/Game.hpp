@@ -11,6 +11,7 @@
 #include <vector>
 #include <deque>
 #include <queue>
+#include <array>
 
 
 class Clock;
@@ -37,22 +38,17 @@ int constexpr CURSEPILESIZE = 10;
 int constexpr ACTIONPILESIZE = 10;
 
 int constexpr NUMBEROFPILES = (int)NUM_CARDS;
-//int constexpr ACTIONPILESIZE = 10;
 
-// enum ePlayers
-// {
-// 	INVALID_PLAYER = -1,
-// 	PLAYER_1,
-// 	PLAYER_2,
-// 	PLAYER_TIE
-// };
 
 enum eGamePhase
 {
 	INVALID_PHASE = -1,
 	BUY_PHASE,
 	ACTION_PHASE,
-	CLEANUP_PHASE
+	CLEANUP_PHASE, //Phase exists but not in use since it happens on ending of phase
+
+	//Non Normal phases
+	DISCARD_DOWN_TO_3_PHASE
 };
 
 enum eMoveType
@@ -60,7 +56,10 @@ enum eMoveType
 	INVALID_MOVE = -1,
 	BUY_MOVE,
 	PLAY_CARD,
-	END_PHASE
+	END_PHASE,
+
+	//Non Normal moves
+	DISCARD_DOWN_TO_3
 };
 
 struct inputMove_t
@@ -74,10 +73,22 @@ public:
 	m_cardHandIndexToPlay( cardHandIndexToPlay )
 	{}
 
+	bool operator==( inputMove_t const& compare ) const
+	{
+		return m_moveType == compare.m_moveType && 
+			m_cardIndexToBuy == compare.m_cardIndexToBuy && 
+			m_cardHandIndexToPlay == compare.m_cardHandIndexToPlay && 
+			m_whoseMoveIsIt == compare.m_whoseMoveIsIt;
+	}
+
+public:
 	eMoveType m_moveType = INVALID_MOVE;
 	int m_cardIndexToBuy = -1;
 	int m_cardHandIndexToPlay = -1;
 	int m_whoseMoveIsIt = -1;
+
+	//Non normal moves
+	//std::vector<int> m_cardHandIndexesToDiscard;
 };
 
 struct metaData_t
@@ -88,6 +99,14 @@ struct metaData_t
 
 struct pileData_t
 {
+public:
+
+	bool operator==( pileData_t const& compare ) const
+	{
+		return m_pileSize == compare.m_pileSize &&
+			m_card == compare.m_card;
+	}
+
 	int m_pileSize = -1;
 	CardDefinition const* m_card = nullptr;
 };
@@ -101,7 +120,21 @@ public:
 	{
 		m_playerBoards[0] = player1Deck;
 		m_playerBoards[1] = player2Deck;
-		memcpy( m_cardPiles, gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
+		memcpy( &m_cardPiles[0], gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
+	}
+
+	bool UnordereredEqualsOnlyCurrentPlayer( gamestate_t const& compare ) const
+	{
+		if( m_whoseMoveIsIt == compare.m_whoseMoveIsIt &&
+			m_currentPhase == compare.m_currentPhase )
+		{
+			bool playerCompare = m_playerBoards[m_whoseMoveIsIt].UnorderedCompare( compare.m_playerBoards[m_whoseMoveIsIt] );
+			bool pileCompare = (m_cardPiles == compare.m_cardPiles);
+
+			return playerCompare && pileCompare;
+		}
+
+		return false;
 	}
 
 
@@ -136,11 +169,10 @@ public:
 
 public:
 	//Card Piles depicting what cards are in the game and how many are in that pile
-	pileData_t m_cardPiles[NUMBEROFPILES] {};
+//	pileData_t m_cardPiles[NUMBEROFPILES] {};
+	std::array< pileData_t, NUMBEROFPILES > m_cardPiles {};
 
 	PlayerBoard m_playerBoards[2];
-	//PlayerBoard m_player1Deck;
-	//PlayerBoard m_player2Deck;
 	int m_whoseMoveIsIt = PLAYER_1;
 	eGamePhase m_currentPhase = CLEANUP_PHASE;
 
@@ -160,8 +192,6 @@ struct data_t
 	inputMove_t m_moveToReachNode;
 	gamestate_t m_currentGamestate;
 };
-
-
 
 class Game
 {
@@ -199,6 +229,7 @@ private:
 	void CheckButtonPresses(float deltaSeconds);
 
 	void DebugDrawGame();
+	void DebugDrawGameStateInfo();
 	void AutoPlayGame();
 
 private:
@@ -219,6 +250,7 @@ public:
 	//MonteCarlo* m_mcts = nullptr;
 	MonteCarloNoTree* m_mc = nullptr;
 	bool m_isAutoPlayEnabled = false;
+	bool m_isDebugScreenEnabled = false;
 
 private:
 	void RenderDevConsole();

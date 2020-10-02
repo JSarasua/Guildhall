@@ -202,7 +202,8 @@ void Game::InitializeGameState()
 
 	m_currentGameState->m_currentPhase = ACTION_PHASE;
 
-	pileData_t* cardPiles = m_currentGameState->m_cardPiles;
+	//std::array<pileData_t>& cardPiles = m_currentGameState->m_cardPiles;
+	pileData_t* cardPiles = &m_currentGameState->m_cardPiles[0];
 	cardPiles[(int)eCards::COPPER].m_card = copper;
 	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
 	cardPiles[(int)eCards::SILVER].m_card = silver;
@@ -288,7 +289,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
  	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
 // 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
-// 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
+ 	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
+//	const KeyButtonState& f12Key = g_theInput->GetKeyStates( F12_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
 	const KeyButtonState& num2Key = g_theInput->GetKeyStates( '2' );
 	const KeyButtonState& num3Key = g_theInput->GetKeyStates( '3' );
@@ -380,6 +382,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( f7Key.WasJustPressed() )
 	{
 		InitializeGameState();
+	}
+	if( f11Key.WasJustPressed() )
+	{
+		m_isDebugScreenEnabled = !m_isDebugScreenEnabled;
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -611,12 +617,20 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		move.m_cardIndexToBuy = 13;
 		PlayMoveIfValid( move );
 	}
-	if( iKey.WasJustPressed() )
+	if( uKey.WasJustPressed() )
 	{
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
 		move.m_cardIndexToBuy = 14;
+		PlayMoveIfValid( move );
+	}
+	if( iKey.WasJustPressed() )
+	{
+		inputMove_t move;
+		move.m_moveType = BUY_MOVE;
+		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
+		move.m_cardIndexToBuy = 15;
 		PlayMoveIfValid( move );
 	}
 }
@@ -633,7 +647,7 @@ void Game::DebugDrawGame()
 	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
 	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
 
-	pileData_t const* piles = m_currentGameState->m_cardPiles;
+	pileData_t const* piles = &m_currentGameState->m_cardPiles[0];
 
 
 	Rgba8 textColor = Rgba8::BLACK;
@@ -948,6 +962,52 @@ void Game::DebugDrawGame()
 
 	}
 
+
+	if( m_isDebugScreenEnabled )
+	{
+		DebugDrawGameStateInfo();
+	}
+
+}
+
+void Game::DebugDrawGameStateInfo()
+{
+	AABB2 debugDrawCanvas = DebugGetScreenBounds();
+	Vec2 gameDims = debugDrawCanvas.GetDimensions();
+	debugDrawCanvas.ScaleDimensionsNonUniform( Vec2( 0.5f, 0.8f ) );
+
+
+	AABB2 leftColumn = debugDrawCanvas.CarveBoxOffLeft( 1.f / 3.f );
+	AABB2 middleColumn = debugDrawCanvas.CarveBoxOffLeft( 1.f / 2.f );
+	AABB2 rightColum = debugDrawCanvas;
+
+	AABB2 validMovesBox = leftColumn.CarveBoxOffTop( 1.f / 5.f );
+	AABB2 bigMoneyBox = middleColumn.CarveBoxOffTop( 1.f / 5.f );
+	AABB2 mcBox = rightColum.CarveBoxOffTop( 1.f / 5.f );
+
+	DebugAddScreenAABB2( validMovesBox, Rgba8::TuscanTan, 0.f );
+	DebugAddScreenAABB2( bigMoneyBox, Rgba8::TuscanTan, 0.f );
+	DebugAddScreenAABB2( mcBox, Rgba8::TuscanTan, 0.f );
+	DebugAddScreenAABB2Border( validMovesBox, Rgba8::BLACK, 10.f, 0.f );
+	DebugAddScreenAABB2Border( bigMoneyBox, Rgba8::BLACK, 10.f, 0.f );
+	DebugAddScreenAABB2Border( mcBox, Rgba8::BLACK, 10.f, 0.f );
+	DebugAddScreenText( Vec4( Vec2(), validMovesBox.GetCenter() ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, "Valid Moves" );
+	DebugAddScreenText( Vec4( Vec2(), bigMoneyBox.GetCenter() ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, "Big Money" );
+	DebugAddScreenText( Vec4( Vec2(), mcBox.GetCenter() ), Vec2( 0.5f, 0.5f ), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, "MonteCarlo" );
+
+	std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( *m_currentGameState );
+	int numberOfValidMoves = (int)validMoves.size();
+	std::vector<AABB2> validMovesAABBs = leftColumn.GetBoxAsRows( numberOfValidMoves );
+
+	//FINISH
+
+	inputMove_t aiMove = m_mc->GetBestMove();
+	if( aiMove.m_moveType == INVALID_MOVE )
+	{
+
+	
+	}
+
 }
 
 void Game::AutoPlayGame()
@@ -965,7 +1025,7 @@ void Game::AutoPlayGame()
 		}
 
 		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mc->RunSimulations( 400 );
+		m_mc->RunSimulations( 1000 );
 	}
 	else
 	{
@@ -1215,7 +1275,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 	validMoves.push_back( move );
 
 	PlayerBoard const* playerDeck = nullptr;
-	pileData_t const* piles = gameState.m_cardPiles;
+	pileData_t const* piles = &gameState.m_cardPiles[0];
 	if( whoseMove == PLAYER_1 )
 	{
 		playerDeck = &gameState.m_playerBoards[0];
@@ -1314,7 +1374,7 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 		int numberOfBuys = playerDeck->m_numberOfBuysAvailable;
 		if( numberOfBuys > 0 )
 		{
-			pileData_t const* piles = gameState.m_cardPiles;
+			pileData_t const* piles = &gameState.m_cardPiles[0];
 			int currentMoney = playerDeck->GetCurrentMoney();
 
 			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
