@@ -123,6 +123,18 @@ public:
 		memcpy( &m_cardPiles[0], gamePiles, NUMBEROFPILES * sizeof(pileData_t) );
 	}
 
+	void ResetDecks()
+	{
+		m_playerBoards[0].ResetBoard();
+		m_playerBoards[1].ResetBoard();
+	}
+
+	void ShuffleDecks()
+	{
+		m_playerBoards[0].ShuffleDeck();
+		m_playerBoards[1].ShuffleDeck();
+	}
+
 	bool UnordereredEqualsOnlyCurrentPlayer( gamestate_t const& compare ) const
 	{
 		if( m_whoseMoveIsIt == compare.m_whoseMoveIsIt &&
@@ -175,22 +187,23 @@ public:
 	PlayerBoard m_playerBoards[2];
 	int m_whoseMoveIsIt = PLAYER_1;
 	eGamePhase m_currentPhase = CLEANUP_PHASE;
+	bool m_isFirstMove = true;
 
 };
 
 struct data_t
 {
 	data_t() = default;
-	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t const& gameState ) :
+	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t* gameState ) :
 		m_metaData( metaData ),
 		m_moveToReachNode( move ),
 		m_currentGamestate( gameState )
-	{}
+	{	}
 
 	metaData_t m_metaData;
 
 	inputMove_t m_moveToReachNode;
-	gamestate_t m_currentGamestate;
+	gamestate_t* m_currentGamestate = nullptr;
 };
 
 class Game

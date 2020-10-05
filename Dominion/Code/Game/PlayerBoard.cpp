@@ -25,6 +25,15 @@ void PlayerBoard::InitializeDeck( std::vector<CardDefinition const*>& deck )
 	m_deck.swap( deck );
 }
 
+void PlayerBoard::ResetBoard()
+{
+	DiscardHand();
+	DiscardPlayArea();
+	AddDiscardPileToDeck();
+	ShuffleDeck();
+	Draw5();
+}
+
 void PlayerBoard::InitializeRand( RandomNumberGenerator* rand )
 {
 	m_rand = rand;

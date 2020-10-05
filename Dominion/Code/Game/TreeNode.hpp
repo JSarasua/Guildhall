@@ -14,5 +14,7 @@ public:
 	data_t* m_data = nullptr;
 
 	TreeNode* m_parentNode = nullptr;
+
+	//Change to a map of input to vectors of childnodes
 	std::vector<TreeNode*> m_childNodes;
 };

@@ -24,7 +24,7 @@ public:
 	MonteCarlo() = default;
 	~MonteCarlo();
 
-	void Startup( int whoseMoveIsIt );
+	void Startup(  gamestate_t const& newGameState  );
 	void Shutdown();
 
 	//Base MCTS methods
@@ -41,6 +41,7 @@ public:
 	bestNode_t GetHighestWinRateChildNode( TreeNode const* node );
 
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
+	//void ResetGame();
 	TreeNode const* GetCurrentHeadNode();
 public:
 	TreeNode* m_headNode = nullptr;

@@ -15,6 +15,7 @@ public:
 	~PlayerBoard() = default;
 
 	void InitializeDeck( std::vector<CardDefinition const*>& deck );
+	void ResetBoard();
 	void InitializeRand( RandomNumberGenerator* rand );
 	void AddCardToDiscardPile( CardDefinition const* cardToAdd );
 

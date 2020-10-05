@@ -13,11 +13,11 @@ MonteCarlo::~MonteCarlo()
 	m_currentHeadNode = nullptr;
 }
 
-void MonteCarlo::Startup( int whoseMoveIsIt )
+void MonteCarlo::Startup( gamestate_t const& newGameState )
 {
 	m_headNode = new TreeNode();
 	m_headNode->m_data = new data_t();
-	m_headNode->m_data->m_currentGamestate.m_whoseMoveIsIt = whoseMoveIsIt;
+	m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
 
 	m_currentHeadNode = m_headNode;
 }
@@ -32,6 +32,19 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
 	{
+		gamestate_t currentGameState = *m_currentHeadNode->m_data->m_currentGamestate;
+		if( currentGameState.m_isFirstMove )
+		{
+			currentGameState.ResetDecks();
+		}
+
+		//if currentGameState not in childNodes
+			//TreeNode* expandedNode = new TreeNode( currentGameState );
+		//else
+			//GetNewExpandedNode
+		//Run sim on node
+
+		//m_currentHeadNode->m_data->m_currentGamestate
 		//Select
 		ucbResult_t bestResult = GetBestNodeToSelect( m_currentHeadNode );
 		TreeNode* bestNode = bestResult.node;
@@ -54,7 +67,9 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 
 int MonteCarlo::RunSimulationOnNode( TreeNode* node )
 {
-	gamestate_t currentGameState = node->m_data->m_currentGamestate;
+	gamestate_t currentGameState = *node->m_data->m_currentGamestate;
+	currentGameState.ShuffleDecks();
+
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	if( isGameOver != 0 )
 	{
@@ -113,7 +128,7 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 	}
 	TreeNode* newChildNode = nullptr;
 
-	gamestate_t const& currentGameState = nodeToExpand->m_data->m_currentGamestate;
+	gamestate_t const& currentGameState = *nodeToExpand->m_data->m_currentGamestate;
 	std::vector<inputMove_t> validMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
 	std::vector<TreeNode*> const& childNodes = nodeToExpand->m_childNodes;
 	for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
@@ -136,7 +151,7 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 			newChildNode = new TreeNode();
 			newChildNode->m_parentNode = nodeToExpand;
 			inputMove_t newMove = inputMove_t( currentMove );
-			gamestate_t childGameState = g_theGame->GetGameStateAfterMove( currentGameState, newMove );
+			gamestate_t* childGameState = new gamestate_t(g_theGame->GetGameStateAfterMove( currentGameState, newMove ) );
 			data_t* childData = new data_t( metaData_t(), newMove, childGameState );
 			newChildNode->m_data = childData;
 
@@ -152,7 +167,7 @@ TreeNode* MonteCarlo::ExpandNode( TreeNode* nodeToExpand )
 
 void MonteCarlo::BackPropagateResult( int whoWon, TreeNode* node )
 {
-	int whoJustMoved = node->m_data->m_currentGamestate.WhoJustMoved();
+	int whoJustMoved = node->m_data->m_currentGamestate->WhoJustMoved();
 	metaData_t& metaData = node->m_data->m_metaData;
 	if( whoJustMoved == whoWon )
 	{
@@ -203,7 +218,7 @@ float MonteCarlo::GetUCBValueAtNode( TreeNode* node, float explorationParameter 
 
 bool MonteCarlo::CanExpand( TreeNode const* node )
 {
-	gamestate_t const& currentGameState = node->m_data->m_currentGamestate;
+	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
 
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	if( isGameOver != 0 )
@@ -311,7 +326,8 @@ void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& n
 
 	TreeNode* newTreeNode = new TreeNode();
 	newTreeNode->m_parentNode = m_currentHeadNode;
-	newTreeNode->m_data = new data_t( metaData_t(), movePlayed, newGameState );
+	gamestate_t* gameState = new gamestate_t( newGameState );
+	newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
 	
 	m_currentHeadNode->m_childNodes.push_back( newTreeNode );
 	m_currentHeadNode = newTreeNode;
