@@ -194,9 +194,10 @@
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MonteCarloNoTree.cpp" />
-    <ClCompile Include="MonteCarlor.cpp" />
+    <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TreeMapNode.cpp" />
     <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
@@ -214,6 +215,7 @@
     <ClInclude Include="MonteCarloNoTree.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TreeMapNode.hpp" />
     <ClInclude Include="TreeNode.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>

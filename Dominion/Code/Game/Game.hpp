@@ -81,6 +81,37 @@ public:
 			m_whoseMoveIsIt == compare.m_whoseMoveIsIt;
 	}
 
+	bool operator<( inputMove_t const& compare ) const
+	{
+		if( m_moveType < compare.m_moveType )
+		{
+			return true;
+		}
+		else if( m_moveType == compare.m_moveType )
+		{
+			if( m_cardHandIndexToPlay < compare.m_cardHandIndexToPlay )
+			{
+				return true;
+			}
+			else if( m_cardHandIndexToPlay == compare.m_cardHandIndexToPlay )
+			{
+				if( m_cardIndexToBuy < compare.m_cardIndexToBuy )
+				{
+					return true;
+				}
+				else if( m_cardIndexToBuy == compare.m_cardIndexToBuy )
+				{
+					if( m_whoseMoveIsIt < compare.m_whoseMoveIsIt )
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
 public:
 	eMoveType m_moveType = INVALID_MOVE;
 	int m_cardIndexToBuy = -1;

@@ -44,6 +44,9 @@
     <Filter Include="Network">
       <UniqueIdentifier>{420a76d0-7bd6-4265-8f83-383ca4418c3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Queues">
+      <UniqueIdentifier>{b8656c45-3b7e-4121-a42e-08bdddaba36e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
