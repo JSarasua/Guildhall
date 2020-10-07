@@ -23,6 +23,7 @@ class ShaderState;
 class World;
 //class MonteCarlo;
 class MonteCarloNoTree;
+class MonteCarlo;
 
 struct light_t;
 struct Vertex_PCUTBN;
@@ -218,7 +219,7 @@ public:
 	PlayerBoard m_playerBoards[2];
 	int m_whoseMoveIsIt = PLAYER_1;
 	eGamePhase m_currentPhase = CLEANUP_PHASE;
-	bool m_isFirstMove = true;
+	bool m_isFirstMove = false;
 
 };
 
@@ -261,7 +262,7 @@ public:
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
-
+	gamestate_t GetRandomInitialGameState();
 private:
 	void InitializeGameState();
 
@@ -291,7 +292,7 @@ public:
 
 	gamestate_t* m_currentGameState = nullptr;
 
-	//MonteCarlo* m_mcts = nullptr;
+	MonteCarlo* m_mcts = nullptr;
 	MonteCarloNoTree* m_mc = nullptr;
 	bool m_isAutoPlayEnabled = false;
 	bool m_isDebugScreenEnabled = false;

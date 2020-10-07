@@ -1,16 +1,18 @@
 #pragma once
 #include "Game/Game.hpp"
-//#include "Game/MonteCarlo.hpp"
-#include "Game//MonteCarloNoTree.hpp"
+#include "Game/App.hpp"
+#include "Game/MonteCarlo.hpp"
+#include "Game/MonteCarloNoTree.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Player.hpp"
+#include "Game/World.hpp"
 
 #include "Engine/Math/AABB2.hpp"
-#include "App.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Game/GameCommon.hpp"
 #include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/LineSegment3.hpp"
@@ -18,12 +20,10 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
-#include "Game/Player.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/StringUtils.hpp"
-#include "Game/World.hpp"
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/Vec4.hpp"
@@ -65,13 +65,15 @@ void Game::Startup()
 	//m_mcts = new MonteCarlo();
 	//m_mcts->Startup( CIRCLEPLAYER );
 	m_mc = new MonteCarloNoTree();
+	m_mcts = new MonteCarlo();
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 }
 
 void Game::Shutdown()
 {
-	//m_mcts->Shutdown();
+	m_mcts->Shutdown();
+	delete m_mcts;
 	delete m_mc;
 }
 
@@ -191,6 +193,7 @@ void Game::InitializeGameState()
 	starterDeck.InitializeDeck( starterCards );
 
 	m_currentGameState = new gamestate_t();
+	m_currentGameState->m_isFirstMove = false;
 	m_currentGameState->m_playerBoards[0] = starterDeck;
 	m_currentGameState->m_playerBoards[1] = starterDeck;
 	
@@ -238,8 +241,8 @@ void Game::InitializeGameState()
 
 	m_mc->SetCurrentGameState( *m_currentGameState );
 	m_mc->ResetPossibleMoves();
-// 	m_mcts->Shutdown();
-// 	m_mcts->Startup( g_WhoStarts );
+ 	m_mcts->Shutdown();
+ 	m_mcts->Startup( *m_currentGameState );
 }
 
 void Game::CheckCollisions()
@@ -288,7 +291,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
  	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
  	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
-// 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
+ 	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
+	const KeyButtonState& f9Key = g_theInput->GetKeyStates( F9_KEY );
  	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 //	const KeyButtonState& f12Key = g_theInput->GetKeyStates( F12_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
@@ -356,7 +360,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 		{
-			inputMove_t move = m_mc->GetBestMove();
+			//inputMove_t move = m_mc->GetBestMove();
+			inputMove_t move = m_mcts->GetBestMove();
 			if( move.m_moveType == INVALID_MOVE )
 			{
 
@@ -367,7 +372,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			}
 
 			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-			m_mc->RunSimulations( 400 );
+			//m_mc->RunSimulations( 400 );
+			m_mcts->RunSimulations( 400 );
 		}
 		else
 		{
@@ -382,6 +388,15 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( f7Key.WasJustPressed() )
 	{
 		InitializeGameState();
+	}
+	if( f8Key.WasJustPressed() )
+	{
+		m_mcts->RunSimulations( 500 );
+	}
+	if( f9Key.WasJustPressed() )
+	{
+		inputMove_t move = m_mcts->GetBestMove();
+		PlayMoveIfValid( move );
 	}
 	if( f11Key.WasJustPressed() )
 	{
@@ -918,7 +933,8 @@ void Game::DebugDrawGame()
 
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
-		inputMove_t currentBestMove = m_mc->GetBestMove();
+		//inputMove_t currentBestMove = m_mc->GetBestMove();
+		inputMove_t currentBestMove = m_mcts->GetBestMove();
 		if( currentBestMove.m_moveType != INVALID_MOVE )
 		{
 			std::string moveStr;
@@ -1014,7 +1030,8 @@ void Game::AutoPlayGame()
 {
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
-		inputMove_t move = m_mc->GetBestMove();
+		//inputMove_t move = m_mc->GetBestMove();
+		inputMove_t move = m_mcts->GetBestMove();
 		if( move.m_moveType == INVALID_MOVE )
 		{
 
@@ -1025,7 +1042,8 @@ void Game::AutoPlayGame()
 		}
 
 		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mc->RunSimulations( 1000 );
+		m_mcts->RunSimulations( 1000 );
+		//m_mc->RunSimulations( 1000 );
 	}
 	else
 	{
@@ -1109,7 +1127,8 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 	m_mc->SetCurrentGameState( *m_currentGameState );
 	m_mc->ResetPossibleMoves();
-// 	m_mcts->UpdateGame( move, m_currentGameState );
+
+	m_mcts->UpdateGame( moveToPlay, *m_currentGameState );
 }
 
 bool Game::IsMoveValid( inputMove_t const& moveToPlay ) const
@@ -1200,7 +1219,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 {
 	bool isGameOver = false;
 	pileData_t const& provinceData = gameState.m_cardPiles[(int)eCards::PROVINCE];
-	if( provinceData.m_pileSize == 0 )
+	if( provinceData.m_pileSize <= 0 )
 	{
 		isGameOver = true;
 	}
@@ -1210,7 +1229,7 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 		for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
 		{
 			pileData_t const& pileData = gameState.m_cardPiles[pileIndex];
-			if( pileData.m_card && pileData.m_pileSize == 0 )
+			if( pileData.m_card && pileData.m_pileSize <= 0 )
 			{
 				emptyPileCount++;
 			}
@@ -1550,6 +1569,90 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 		return newMove;
 	}
 
+}
+
+gamestate_t Game::GetRandomInitialGameState()
+{
+	PlayerBoard starterDeck = PlayerBoard( &m_rand );
+	std::vector<CardDefinition const*> starterCards;
+	starterCards.reserve( 10 );
+	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
+	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
+	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
+	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
+	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
+	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
+	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
+
+	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
+	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
+	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
+	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
+	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
+	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
+	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
+
+	//7 copper
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	starterCards.push_back( copper );
+	//3 estate
+	starterCards.push_back( estate );
+	starterCards.push_back( estate );
+	starterCards.push_back( estate );
+	starterDeck.InitializeDeck( starterCards );
+
+	gamestate_t newGameState;
+	newGameState.m_playerBoards[0] = starterDeck;
+	newGameState.m_playerBoards[1] = starterDeck;
+
+	newGameState.m_playerBoards[0].ShuffleDeck();
+	newGameState.m_playerBoards[1].ShuffleDeck();
+
+	newGameState.m_playerBoards[0].Draw5();
+	newGameState.m_playerBoards[1].Draw5();
+
+	newGameState.m_currentPhase = ACTION_PHASE;
+
+	pileData_t* cardPiles = &newGameState.m_cardPiles[0];
+	cardPiles[(int)eCards::COPPER].m_card = copper;
+	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
+	cardPiles[(int)eCards::SILVER].m_card = silver;
+	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
+	cardPiles[(int)eCards::GOLD].m_card = gold;
+	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
+	cardPiles[(int)eCards::ESTATE].m_card = estate;
+	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::DUCHY].m_card = duchy;
+	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::PROVINCE].m_card = province;
+	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
+	cardPiles[(int)eCards::CURSE].m_card = curse;
+	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
+	cardPiles[(int)eCards::Village].m_card = village;
+	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Smithy].m_card = smithy;
+	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Festival].m_card = festival;
+	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
+	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Market].m_card = market;
+	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
+	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
+	cardPiles[(int)eCards::Witch].m_card = witch;
+	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
+
+
+	newGameState.m_whoseMoveIsIt = PLAYER_1;
+	newGameState.m_isFirstMove = false;
+
+	return newGameState;
 }
 
 void Game::RenderDevConsole()
