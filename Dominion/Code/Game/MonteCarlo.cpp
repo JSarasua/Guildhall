@@ -8,9 +8,6 @@
 
 MonteCarlo::~MonteCarlo()
 {
-	delete m_headNode;
-	m_headNode = nullptr;
-	m_currentHeadNode = nullptr;
 }
 
 void MonteCarlo::Startup( gamestate_t const& newGameState )
@@ -18,13 +15,16 @@ void MonteCarlo::Startup( gamestate_t const& newGameState )
 	m_headNode = new TreeMapNode();
 	m_headNode->m_data = new data_t();
 	m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
-
+	m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
 	m_currentHeadNode = m_headNode;
 }
 
 void MonteCarlo::Shutdown()
 {
-	delete m_headNode;
+	if( m_headNode )
+	{
+		delete m_headNode;
+	}
 	m_currentHeadNode = nullptr;
 }
 
@@ -32,8 +32,6 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
 	{
-
-
 		expand_t expandResult = GetBestNodeToSelect( m_currentHeadNode );
 
 		if( nullptr == expandResult.nodeToExpand )
@@ -59,14 +57,14 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 	currentGameState.ShuffleDecks();
 
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
-	if( isGameOver != 0 )
+	if( isGameOver != GAMENOTOVER )
 	{
 		return isGameOver;
 	}
 
 	inputMove_t move; 
 
-	while( isGameOver == 0 )
+	while( isGameOver == GAMENOTOVER )
 	{
 		move = g_theGame->GetRandomMoveAtGameState( currentGameState );
 		currentGameState = g_theGame->GetGameStateAfterMove( currentGameState, move );
@@ -178,42 +176,70 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 
 }
 
+//The best node to select follows these rules
+//1. Can the current node be expanded (input that haven't been tried)?
+//2. Has the current Gamestate never been reached before? (Previous input has created multiple cases)
 expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 {
-	gamestate_t currentGameState = *currentNode->m_data->m_currentGamestate;
+	TreeMapNode* nodeToCheck = currentNode;
+	gamestate_t currentGameState = *nodeToCheck->m_data->m_currentGamestate;
 	
-	if( currentGameState.m_isFirstMove )
+	if( currentGameState.m_isFirstMove && CanExpand( nodeToCheck ) )
 	{
-
-	}
-
-	else if( CanExpand( currentNode ) )
-	{
+		//Handle moving on to next state
+		//Get a game state from game
 		expand_t result;
-		result.nodeToExpand = currentNode;
+		result.gameState = g_theGame->GetRandomInitialGameState();
+		result.nodeToExpand = nodeToCheck;
 		return result;
 	}
-	else
+	else if( currentGameState.m_isFirstMove )
 	{
-		float highestUCBValue = -1.f;
-		inputMove_t moveToMake;
-		for( auto outcomesAfterMove : currentNode->m_possibleOutcomes )
+		//Roll a new game and check if this game state has been done before,
+		//if not, add it
+		//otherwise move on
+		currentGameState = g_theGame->GetRandomInitialGameState();
+
+		inputMove_t defaultInputMove = inputMove_t();
+		std::vector<TreeMapNode*> const& childNodesForMove = nodeToCheck->m_possibleOutcomes[defaultInputMove];
+		bool isGameStateInVector = false;
+		for( size_t childNodeIndex = 0; childNodeIndex < childNodesForMove.size(); childNodeIndex++ )
 		{
-			std::vector<TreeMapNode*> const& childNodesForMove = outcomesAfterMove.second;
-			float ucbValue = GetAverageUCBValue( childNodesForMove );
-			if( ucbValue > highestUCBValue )
+			gamestate_t const& childGameState = *childNodesForMove[childNodeIndex]->m_data->m_currentGamestate;
+			if( childGameState.UnordereredEqualsOnlyCurrentPlayer( currentGameState ) )
 			{
-				highestUCBValue = ucbValue;
-				moveToMake = outcomesAfterMove.first;
+				nodeToCheck = childNodesForMove[childNodeIndex];
+				isGameStateInVector = true;
+				break;
 			}
+		}
+
+		if( !isGameStateInVector )
+		{
+			//Add it
+			expand_t result;
+			result.nodeToExpand = nodeToCheck;
+			result.gameState = currentGameState;
+			//result.m_input = moveToMake;
+			return result;
 		}
 	}
 
-	while( !CanExpand( currentNode ) )
+	//Always choose the current Node if it can be expanded
+	if( CanExpand( nodeToCheck ) )
 	{
+		expand_t result;
+		result.nodeToExpand = nodeToCheck;
+		return result;
+	}
+
+
+	while( !CanExpand( nodeToCheck ) )
+	{
+		//Get Best move to make
 		float highestUCBValue = -1.f;
 		inputMove_t moveToMake;
-		for( auto outcomesAfterMove : currentNode->m_possibleOutcomes )
+		for( auto outcomesAfterMove : nodeToCheck->m_possibleOutcomes )
 		{
 			std::vector<TreeMapNode*> const& childNodesForMove = outcomesAfterMove.second;
 			float ucbValue = GetAverageUCBValue( childNodesForMove );
@@ -223,8 +249,11 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 				moveToMake = outcomesAfterMove.first;
 			}
 		}
+
+		//Find if the best move makes a gamestate that has existed before
+		//If not, the new gamestate is what we return
 		currentGameState = g_theGame->GetGameStateAfterMove( currentGameState, moveToMake );
-		std::vector<TreeMapNode*> const& childNodesForMove = currentNode->m_possibleOutcomes[moveToMake];
+		std::vector<TreeMapNode*> const& childNodesForMove = nodeToCheck->m_possibleOutcomes[moveToMake];
 
 		bool isGameStateInVector = false;
 		for( size_t childNodeIndex = 0; childNodeIndex < childNodesForMove.size(); childNodeIndex++ )
@@ -232,29 +261,35 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 			gamestate_t const& childGameState = *childNodesForMove[childNodeIndex]->m_data->m_currentGamestate;
 			if( childGameState.UnordereredEqualsOnlyCurrentPlayer( currentGameState ) )
 			{
-				currentNode = childNodesForMove[childNodeIndex];
+				nodeToCheck = childNodesForMove[childNodeIndex];
 				isGameStateInVector = true;
 				break;
 			}
 		}
 
-		//Returns if game state has never occurred before. An example where this occurs is if your opponent ends his turn, but the hand you draw isn't the same as the last time this node was reached
 		if( !isGameStateInVector )
 		{
 			//Add it
 			expand_t result;
-			result.nodeToExpand = currentNode;
+			result.nodeToExpand = nodeToCheck;
 			result.gameState = currentGameState;
 			result.m_input = moveToMake;
 			return result;
 		}
+
+		//We can't go any farther
+		if( g_theGame->IsGameOverForGameState( *currentNode->m_data->m_currentGamestate ) != GAMENOTOVER )
+		{
+			break;
+		}
 		//Loop again on new current game state
 	}
 
-	if( g_theGame->IsGameOverForGameState( *currentNode->m_data->m_currentGamestate ) != GAMENOTOVER )
+	//Always choose the current Node if it can be expanded
+	if( CanExpand( nodeToCheck ) )
 	{
 		expand_t result;
-		result.nodeToExpand = currentNode;
+		result.nodeToExpand = nodeToCheck;
 		return result;
 	}
 
@@ -325,6 +360,15 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 {
 	int whoJustMoved = node->m_data->m_currentGamestate->WhoJustMoved();
+	if( !node->m_parentNode )
+	{
+		whoJustMoved = PLAYER_1;
+	}
+	else if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
+	{
+		whoJustMoved = PLAYER_1;
+	}
+
 	metaData_t& metaData = node->m_data->m_metaData;
 	if( whoJustMoved == whoWon )
 	{
@@ -404,7 +448,10 @@ inputMove_t MonteCarlo::GetBestMove()
 	bestNode_t worstOpponentNode;
 	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
 
-
+	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
+	{
+		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
+	}
 	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
 	{
 		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
