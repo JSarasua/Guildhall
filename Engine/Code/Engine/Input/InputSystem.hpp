@@ -42,6 +42,7 @@ extern const unsigned char F5_KEY;
 extern const unsigned char F6_KEY;
 extern const unsigned char F7_KEY;
 extern const unsigned char F8_KEY;
+extern const unsigned char F9_KEY;
 extern const unsigned char F11_KEY;
 extern const unsigned char F12_KEY;
 extern const unsigned char PLUS_KEY;
