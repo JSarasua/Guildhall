@@ -3,7 +3,6 @@
 #include "Game/TreeMapNode.hpp"
 #include "Game/Game.hpp"
 
-constexpr float SQRT_2 = 1.41421356237f;
 
 struct ucbResult_t
 {

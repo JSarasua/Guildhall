@@ -9,6 +9,8 @@ class Game;
 extern Window* g_theWindow;
 extern Game* g_theGame;
 
+constexpr float SQRT_2 = 1.41421356237f;
+
 constexpr float CLIENT_ASPECT = 16.f/9.f;
 
 //Given Constants

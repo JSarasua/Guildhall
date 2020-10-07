@@ -1,7 +1,7 @@
 #include "Game/Game.hpp"
 #include "Game/TreeNode.hpp"
 
-constexpr float SQRT_2 = 1.41421356237f;
+
 
 struct moveMetaData_t
 {
