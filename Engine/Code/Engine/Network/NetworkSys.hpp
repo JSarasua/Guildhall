@@ -75,6 +75,12 @@ public:
 	}
 };
 
+struct ReceivedUDPMessage
+{
+	TextMessage m_Message;
+	std::string m_ReceiveAddress;
+};
+
 
 
 class NetworkSys
@@ -123,7 +129,7 @@ private:
 	UDPSocket* m_UDPSocket = nullptr;
 
 	BlockingQueue<std::string> m_writerQueue;
-	SynchronizedLockFreeQueue<std::string> m_readerQueue;
+	SynchronizedLockFreeQueue<ReceivedUDPMessage> m_readerQueue;
 
 	std::thread* m_UDPReaderThread = nullptr;
 	std::thread* m_UDPWriterThread = nullptr;

@@ -156,18 +156,18 @@ void NetworkSys::BeginFrame()
 		{
 			if( m_readerQueue.size() > 0 )
 			{
-				std::string message = m_readerQueue.pop();
-				//const char* message = m_readerQueue.pop().c_str();
-				MessageHeader* messageHeader = (MessageHeader*)&message;
+				ReceivedUDPMessage UDPMessage = m_readerQueue.pop();
+				std::string message = UDPMessage.m_Message.m_data;
+				std::string receiveAddress = UDPMessage.m_ReceiveAddress;
+				//std::string message = m_readerQueue.pop();
+
+				MessageHeader* messageHeader = &UDPMessage.m_Message.m_header;
 				if( messageHeader->m_id == TEXTMESSAGE )
 				{
-
+					g_theConsole->PrintString( Rgba8::GREEN, Stringf("UDP Message received from: %s", receiveAddress.c_str() ) );
+					g_theConsole->PrintString( Rgba8::WHITE, message.c_str() + 4 );
 				}
-				g_theConsole->PrintString( Rgba8::GREEN, "UDP Message received" );
-				g_theConsole->PrintString( Rgba8::WHITE, message );
-
 			}
-
 		}
 	}
 }
@@ -241,12 +241,12 @@ bool NetworkSys::SendMessageToServer( EventArgs const& args )
 	if( m_TCPClientToServerSocket->IsSocketValid() )
 	{
 		std::string message = args.GetValue( "msg", "Invalid message" );
-// 		TextMessage textMessage;
-// 		textMessage.m_data = message;
-// 		textMessage.m_header.m_size = (uint16_t)message.size();
-// 		std::string testMessageStr = textMessage.ToString();
-// 		m_TCPClientToServerSocket->Send( testMessageStr, testMessageStr.size() );
-		m_TCPClientToServerSocket->Send( message, message.size() );
+		TextMessage textMessage;
+		textMessage.m_data = message;
+		textMessage.m_header.m_size = (uint16_t)message.size();
+		std::string testMessageStr = textMessage.ToString();
+		m_TCPClientToServerSocket->Send( testMessageStr, testMessageStr.size() );
+		//m_TCPClientToServerSocket->Send( message, message.size() );
 	}
 	else
 	{
@@ -286,16 +286,15 @@ bool NetworkSys::SendUDPMessage( EventArgs const& args )
 	{
 		std::string message = args.GetValue("msg","Default Message" );
 
-// 		TextMessage textMessage;
-// 		textMessage.m_data = message;
-// 		textMessage.m_header.m_size = (uint16_t)message.size();
-// 		std::string textMessageStr = textMessage.ToString();
-/*		m_TCPServerToClientSocket->Send( textMessageStr, textMessageStr.size() );*/
-//		m_TCPServerToClientSocket->Send( textMessageStr, textMessageStr.size() );
+		TextMessage textMessage;
+		textMessage.m_data = message;
+		textMessage.m_header.m_size = (uint16_t)message.size();
+		std::string textMessageStr = textMessage.ToString();
+
 
 		UDPSocket::Buffer& buffer = m_UDPSocket->SendBuffer();
-		memcpy( &buffer[0], message.c_str(), message.size() );
-		m_UDPSocket->Send( (int)message.size() );
+		memcpy( &buffer[0], textMessageStr.c_str(), textMessageStr.size() );
+		m_UDPSocket->Send( (int)textMessageStr.size() );
 	}
 
 	return false;
@@ -323,7 +322,11 @@ void NetworkSys::ReaderThread()
 				UDPSocket::Buffer& buffer = m_UDPSocket->ReceiveBuffer();
 				std::string message = std::string( &buffer[0], length );
 
-				m_readerQueue.push( message );
+				ReceivedUDPMessage UDPMessage;
+				UDPMessage.m_Message.m_data = message;
+				UDPMessage.m_ReceiveAddress = m_UDPSocket->GetLastReceiveAddress();
+
+				m_readerQueue.push( UDPMessage );
 			}
 		}
 
