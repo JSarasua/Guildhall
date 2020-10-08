@@ -1407,14 +1407,19 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 	if( currentPhase == ACTION_PHASE )
 	{
 		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
-		for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+		int numberOfActionsAvailable = playerDeck->m_numberOfActionsAvailable;
+		if( numberOfActionsAvailable > 0 )
 		{
-			CardDefinition const* card = hand[handIndex];
-			if( card->GetCardType() == ACTION_TYPE )
+			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
 			{
-				numberOfValidMoves++;
+				CardDefinition const* card = hand[handIndex];
+				if( card->GetCardType() == ACTION_TYPE )
+				{
+					numberOfValidMoves++;
+				}
 			}
 		}
+
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
