@@ -20,6 +20,16 @@ UDPSocket::UDPSocket( std::string const& host, int port ) : m_socket( INVALID_SO
 	{
 		std::cout << "Socket instantiate failed, error = " << WSAGetLastError() << std::endl;
 	}
+
+// 	struct timeval timeout;
+// 	timeout.tv_sec = 10;
+// 	timeout.tv_usec = 0;
+
+// 	int iResult = setsockopt( m_socket, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof( timeout ) );
+// 	if( iResult == SOCKET_ERROR )
+// 	{
+// 		std::cout << "Socket setting timeout failed, error = " << WSAGetLastError() << std::endl;
+// 	}
 }
 
 UDPSocket::~UDPSocket()
@@ -40,6 +50,10 @@ void UDPSocket::Bind( int port )
 		std::cout << "Socket instantiate failed, error = " << WSAGetLastError() << std::endl;
 
 	}
+	else
+	{
+		m_isBound = true;
+	}
 }
 
 int UDPSocket::Send( int length )
@@ -54,12 +68,15 @@ int UDPSocket::Send( int length )
 
 int UDPSocket::Receive()
 {
-	//int iResult = ::recv( m_socket, &m_receiveBuffer[0], BufferSize, 0 );
 	int fromLen = BufferSize;
 	int iResult = ::recvfrom( m_socket, &m_receiveBuffer[0], BufferSize, 0, reinterpret_cast<SOCKADDR*>(&m_bindAddress), &fromLen );
 	if( iResult == SOCKET_ERROR )
 	{
-		LOG_ERROR("Socket recv failed, error = %i", WSAGetLastError() );
+		int error = WSAGetLastError();
+		if( error != 10060 )
+		{
+			LOG_ERROR("Socket recv failed, error = %i", WSAGetLastError() );
+		}
 	}
 	return iResult;
 }
@@ -74,6 +91,7 @@ void UDPSocket::Close()
 			std::cout << "Socket close failed, error = " << WSAGetLastError() << std::endl;
 
 		}
+		m_isBound = false;
 	}
 }
 

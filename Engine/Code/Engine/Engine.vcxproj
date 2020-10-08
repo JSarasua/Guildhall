@@ -211,6 +211,8 @@
     <ClCompile Include="Physics2D\PolygonCollider2D.cpp" />
     <ClCompile Include="Physics2D\Rigidbody2D.cpp" />
     <ClCompile Include="Platform\Window.cpp" />
+    <ClCompile Include="Queues\BlockingQueue.cpp" />
+    <ClCompile Include="Queues\SynchronizedLockFreeQueue.cpp" />
     <ClCompile Include="Renderer\BitmapFont.cpp" />
     <ClCompile Include="Renderer\BufferAttribute.cpp" />
     <ClCompile Include="Renderer\Camera.cpp" />
@@ -302,6 +304,8 @@
     <ClInclude Include="Physics2D\PolygonCollider2D.hpp" />
     <ClInclude Include="Physics2D\Rigidbody2D.hpp" />
     <ClInclude Include="Platform\Window.hpp" />
+    <ClInclude Include="Queues\BlockingQueue.hpp" />
+    <ClInclude Include="Queues\SynchronizedLockFreeQueue.hpp" />
     <ClInclude Include="Renderer\BitmapFont.hpp" />
     <ClInclude Include="Renderer\BufferAttribute.hpp" />
     <ClInclude Include="Renderer\Camera.hpp" />

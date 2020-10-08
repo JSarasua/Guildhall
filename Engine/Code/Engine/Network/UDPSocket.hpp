@@ -13,6 +13,9 @@ public:
 	int Receive();
 	void Close();
 
+	bool IsSocketValid() { return m_socket != INVALID_SOCKET; }
+	bool IsSocketBound() { return m_isBound; }
+
 	static const int BufferSize = 512;
 	using Buffer = std::array<char, BufferSize>;
 
@@ -28,4 +31,6 @@ private:
 
 	Buffer m_sendBuffer;
 	Buffer m_receiveBuffer;
+
+	bool m_isBound = false;
 };

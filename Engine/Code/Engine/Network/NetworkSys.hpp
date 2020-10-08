@@ -1,5 +1,7 @@
 #pragma once
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Queues/BlockingQueue.hpp"
+#include "Engine/Queues/SynchronizedLockFreeQueue.hpp"
 
 #ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
 #define  _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -12,6 +14,8 @@
 #include <vector>
 #include <winsock2.h>
 #include <WS2tcpip.h>
+#include <thread>
+#include <atomic>
 
 class TCPServer;
 class TCPClient;
@@ -102,6 +106,9 @@ public:
 	bool SendUDPMessage( EventArgs const& args );
 	bool CloseUDPPort( EventArgs const& args );
 
+	void ReaderThread();
+	void WriterThread();
+
 private:
 	std::vector<TCPServer*> m_TCPServers;
 	std::vector<TCPClient*> m_TCPClients;
@@ -111,6 +118,14 @@ private:
 	TCPSocket* m_TCPServerToClientSocket = nullptr;
 	TCPSocket* m_TCPClientToServerSocket = nullptr;
 
-	UDPSocket* m_UDPReceiverSocket = nullptr;
-	UDPSocket* m_UDPSenderSocket = nullptr;
+// 	UDPSocket* m_UDPReceiverSocket = nullptr;
+// 	UDPSocket* m_UDPSenderSocket = nullptr;
+	UDPSocket* m_UDPSocket = nullptr;
+
+	BlockingQueue<std::string> m_writerQueue;
+	SynchronizedLockFreeQueue<std::string> m_readerQueue;
+
+	std::thread* m_UDPReaderThread = nullptr;
+	std::thread* m_UDPWriterThread = nullptr;
+	std::atomic<bool> m_isQuitting = false;
 };

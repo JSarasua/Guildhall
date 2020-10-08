@@ -286,6 +286,12 @@
     <ClCompile Include="Network\UDPSocket.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="Queues\BlockingQueue.cpp">
+      <Filter>Queues</Filter>
+    </ClCompile>
+    <ClCompile Include="Queues\SynchronizedLockFreeQueue.cpp">
+      <Filter>Queues</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -557,6 +563,12 @@
     </ClInclude>
     <ClInclude Include="Network\UDPSocket.hpp">
       <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Queues\BlockingQueue.hpp">
+      <Filter>Queues</Filter>
+    </ClInclude>
+    <ClInclude Include="Queues\SynchronizedLockFreeQueue.hpp">
+      <Filter>Queues</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
