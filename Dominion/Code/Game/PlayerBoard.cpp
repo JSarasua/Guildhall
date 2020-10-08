@@ -199,9 +199,11 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 			int actionsToGain = cardToPlay->m_actionsGained;
 			int cardDraw = cardToPlay->m_cardDraw;
 			int buysToGain = cardToPlay->m_buysGained;
+			int coinsToGain = cardToPlay->m_coins;
 
 			m_numberOfActionsAvailable += actionsToGain;
 			m_numberOfBuysAvailable += buysToGain;
+			m_currentCoins += coinsToGain;
 			Draw( cardDraw );
 
 			if( cardToPlay->m_OpponentsDrawCard )
