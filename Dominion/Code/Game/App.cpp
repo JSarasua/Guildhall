@@ -31,6 +31,7 @@ void App::Startup()
 {
 
 	Clock::SystemStartup();
+	Clock::GetMaster()->SetFrameLimits( 1.0/60.0, 2.0 );
 
 	XmlDocument gameConfigDoc;
 	const XmlElement& gameConfigRootElement = GetRootElement( gameConfigDoc, "Data/GameConfig.xml" );

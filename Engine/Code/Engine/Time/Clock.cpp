@@ -2,6 +2,10 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Core/Time.hpp"
 
+#include <chrono>
+#include <thread>
+//#include <synchapi.h>
+
 static Clock* s_theMasterClock = nullptr;
 
 Clock::Clock()
@@ -27,6 +31,10 @@ void Clock::Update( double deltaSeconds )
 {
 	if( !m_isPaused )
 	{
+		if( deltaSeconds < m_minFrameTime )
+		{
+			std::this_thread::sleep_for( std::chrono::microseconds( (long long)(m_minFrameTime - deltaSeconds) ) );
+		}
 		double tempDeltaSeconds = ClampDouble( deltaSeconds, m_minFrameTime, m_maxFrameTime );
 		m_deltaTimeSeconds = tempDeltaSeconds * m_timeScale;
 		m_currentTimeSeconds += m_deltaTimeSeconds;

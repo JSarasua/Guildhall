@@ -6,6 +6,7 @@
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Time/Timer.hpp"
 #include "Game/PlayerBoard.hpp"
 #include "Game/CardDefinition.hpp"
 #include <vector>
@@ -296,6 +297,10 @@ public:
 	MonteCarloNoTree* m_mc = nullptr;
 	bool m_isAutoPlayEnabled = false;
 	bool m_isDebugScreenEnabled = false;
+
+	Timer m_timer;
+	int m_simCount = 0;
+	int m_totalSimCount = 0;
 
 private:
 	void RenderDevConsole();

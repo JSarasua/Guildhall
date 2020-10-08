@@ -68,6 +68,8 @@ void Game::Startup()
 	m_mcts = new MonteCarlo();
 	CardDefinition::InitializeCards();
 	InitializeGameState();
+
+	m_timer.SetSeconds( 0 );
 }
 
 void Game::Shutdown()
@@ -400,7 +402,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f11Key.WasJustPressed() )
 	{
-		m_isDebugScreenEnabled = !m_isDebugScreenEnabled;
+		m_mcts->RunSimulations( 10000 );
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -975,8 +977,9 @@ void Game::DebugDrawGame()
 			bigMoneyStr = Stringf( "Big Money Best move: End Phase" );
 		}
 		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
-
 	}
+	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 15.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
+
 
 
 	if( m_isDebugScreenEnabled )
@@ -1030,20 +1033,45 @@ void Game::AutoPlayGame()
 {
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
-		//inputMove_t move = m_mc->GetBestMove();
-		inputMove_t move = m_mcts->GetBestMove();
-		if( move.m_moveType == INVALID_MOVE )
+
+		if( m_timer.CheckAndDecrement() )
 		{
 
+			if( m_simCount < 10'000 )
+			{
+				m_mcts->RunSimulations( 100 );
+				m_simCount += 100;
+				m_totalSimCount += 100;
+
+			}
+			else
+			{
+				if( m_simCount >= 10'000 )
+				{
+					m_simCount = 0;
+				}
+				//inputMove_t move = m_mc->GetBestMove();
+				inputMove_t move = m_mcts->GetBestMove();
+				if( move.m_moveType == INVALID_MOVE )
+				{
+
+				}
+				else
+				{
+					PlayMoveIfValid( move );
+				}
+
+				DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+			}
 		}
 		else
 		{
-			PlayMoveIfValid( move );
+
 		}
 
-		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mcts->RunSimulations( 1000 );
-		//m_mc->RunSimulations( 1000 );
+
+// 		m_mcts->RunSimulations( 1000 );
+// 		//m_mc->RunSimulations( 1000 );
 	}
 	else
 	{
