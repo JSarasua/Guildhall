@@ -302,8 +302,12 @@ bool NetworkSys::SendUDPMessage( EventArgs const& args )
 
 bool NetworkSys::CloseUDPPort( EventArgs const& args )
 {
+	UNUSED( args );
 	//TODO
-
+	if( m_UDPSocket )
+	{
+		m_UDPSocket->Close();
+	}
 	return false;
 }
 
