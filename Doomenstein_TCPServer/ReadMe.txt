@@ -1,10 +1,11 @@
 Jonathan Sarasua
-SD3-A1
-Due: 9/17/2020
+SD3-A2
+Due: 10/8/2020
 
 Console Commands:
 ~: Toggle Console
 
+TCP
 Server Commands
 	StartTCPServer: starts server
 	StopTCPServer: Stops listening server
@@ -14,3 +15,8 @@ Client Commands
 	TCPClientConnect host=HOSTNAME port=PORT | host defaults to "", port defaults to 48000
 	DisconnectClient
 	SendMessageToServer msg="MESSAGE"
+
+UDP
+OpenUDPPort bindPort=<PortNumber> sendToPort=<PortNumber>
+SendUDPMessage msg="<Message>"
+CloseUDPPort bindPort=<PortNumber>
