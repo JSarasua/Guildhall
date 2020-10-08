@@ -69,15 +69,33 @@ int UDPSocket::Send( int length )
 int UDPSocket::Receive()
 {
 	int fromLen = BufferSize;
+
 	int iResult = ::recvfrom( m_socket, &m_receiveBuffer[0], BufferSize, 0, reinterpret_cast<SOCKADDR*>(&m_bindAddress), &fromLen );
 	if( iResult == SOCKET_ERROR )
 	{
 		int error = WSAGetLastError();
 		if( error != 10060 )
 		{
-			LOG_ERROR("Socket recv failed, error = %i", WSAGetLastError() );
+			std::cout << "Socket recvfrom failed, error = " << WSAGetLastError() << std::endl;
 		}
 	}
+	else
+	{
+		std::array<char, 128> addressStr;
+		DWORD outlen = static_cast<DWORD>(addressStr.size());
+		int addrSize = sizeof( m_bindAddress );
+		int iResultOfReceiveAddress = WSAAddressToStringA( reinterpret_cast<SOCKADDR*>(&m_bindAddress), addrSize, nullptr, &addressStr[0], &outlen );
+		
+		if( iResultOfReceiveAddress == SOCKET_ERROR )
+		{
+			std::cout << "Call to WSAAddressToStringA failed: " << WSAGetLastError() << std::endl;
+		}
+
+		addressStr[outlen - 1] = NULL;
+
+		m_receiveAddress = std::string( &addressStr[0] );
+	}
+
 	return iResult;
 }
 

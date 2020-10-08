@@ -22,6 +22,8 @@ public:
 	Buffer& SendBuffer() { return m_sendBuffer; }
 	Buffer& ReceiveBuffer() { return m_receiveBuffer; }
 
+	std::string GetLastReceiveAddress() { return m_receiveAddress; }
+
 protected:
 
 private:
@@ -31,6 +33,8 @@ private:
 
 	Buffer m_sendBuffer;
 	Buffer m_receiveBuffer;
+
+	std::string m_receiveAddress;
 
 	bool m_isBound = false;
 };
