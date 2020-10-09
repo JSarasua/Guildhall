@@ -1,4 +1,6 @@
 #include"Game/App.hpp"
+#include "Game/Server.hpp"
+#include "Game/Client.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
@@ -8,6 +10,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
@@ -19,7 +22,9 @@ App::App()
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
-	g_theGame =  new Game();
+	g_theServer = new Server();
+	g_theClient = new Client();
+	//g_theGame =  new Game();
 	g_theConsole = new DevConsole();
 	g_theEventSystem = new EventSystem();
 	//g_gameConfigBlackboard = new NamedStrings();
@@ -41,7 +46,9 @@ void App::Startup()
 	g_theRenderer->StartUp( g_theWindow );
 	g_theRenderer->Setup( nullptr );
 	DebugRenderSystemStartup( g_theRenderer );
-	g_theGame->Startup();
+	g_theServer->Startup();
+	g_theClient->Startup();
+	//g_theGame->Startup();
 	g_theConsole->Startup();
 
 	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
@@ -49,8 +56,12 @@ void App::Startup()
 
 void App::Shutdown()
 {
-	g_theGame->Shutdown();
-	delete g_theGame;
+	g_theServer->Shutdown();
+	delete g_theServer;
+	g_theClient->Shutdown();
+	delete g_theClient;
+// 	g_theGame->Shutdown();
+// 	delete g_theGame;
 	DebugRenderSystemShutdown();
 	g_theRenderer->Shutdown();
 	delete g_theRenderer;
@@ -124,6 +135,8 @@ void App::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theConsole->BeginFrame();
+	g_theServer->BeginFrame();
+	g_theClient->BeginFrame();
 }
 
 void App::Update(float deltaSeconds)
@@ -132,14 +145,16 @@ void App::Update(float deltaSeconds)
 	CheckController();
 
 
-	g_theGame->Update(deltaSeconds);
+	g_theServer->Update( deltaSeconds );
+	g_theClient->Update( deltaSeconds );
+	//g_theGame->Update(deltaSeconds);
 }
 
 
 void App::Render()
 {
-	g_theGame->Render();
-
+	g_theClient->Render();
+	//g_theGame->Render();
 }
 void App::EndFrame()
 {
@@ -148,14 +163,13 @@ void App::EndFrame()
 	g_theInput->EndFrame();
 	g_theWindow->EndFrame();
 	g_theAudio->EndFrame();
+	g_theServer->EndFrame();
+	g_theClient->EndFrame();
 }
 
 void App::RestartGame()
 {
-	g_theGame->Shutdown();
-	delete g_theGame;
-	g_theGame = new Game();
-	g_theGame->Startup();
+	g_theServer->RestartGame();
 }
 
 bool App::GetDebugGameMode()
@@ -190,26 +204,15 @@ void App::TogglePause()
 
 void App::PauseGame()
 {
+	g_theServer->PauseGame();
 	m_isPaused = true;
-	if( g_theGame->m_gameState == PLAYING )
-	{
-		g_theGame->m_gameState = PAUSED;
-	}
 
-	Clock* masterClock = Clock::GetMaster();
-	masterClock->Pause();
 }
 
 void App::UnPauseGame()
 {
 	m_isPaused = false;
-	if( g_theGame->m_gameState == PAUSED )
-	{
-		g_theGame->m_gameState = PLAYING;
-	}
-
-	Clock* masterClock = Clock::GetMaster();
-	masterClock->Resume();
+	g_theServer->UnpauseGame();
 }
 
 void App::CheckButtonPresses()

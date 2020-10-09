@@ -10,6 +10,8 @@ class RenderContext;
 class AudioSystem;
 /*class InputSystem;*/
 class SpriteSheet;
+class Server;
+class Client;
 
 constexpr int PLAYER_HEALTH = 100;
 constexpr int ENEMY_HEALTH = 30;
@@ -40,6 +42,8 @@ extern const IntVec2 STEP_NORTHEAST;
 
 extern App* g_theApp;
 extern Game* g_theGame;
+extern Server* g_theServer;
+extern Client* g_theClient;
 extern Window* g_theWindow;
 extern RenderContext* g_theRenderer;
 extern AudioSystem* g_theAudio;

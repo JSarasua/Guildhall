@@ -11,6 +11,8 @@
 
 App* g_theApp = nullptr;
 Game* g_theGame = nullptr;
+Server* g_theServer = nullptr;
+Client* g_theClient = nullptr;
 RenderContext* g_theRenderer = nullptr;
 /*InputSystem* g_theInput = nullptr;*/
 Window* g_theWindow = nullptr;

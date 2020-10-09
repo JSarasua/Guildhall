@@ -191,6 +191,7 @@
     <ClCompile Include="AudioDefinition.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletDefinition.cpp" />
+    <ClCompile Include="Client.cpp" />
     <ClCompile Include="EnemyBoss.cpp" />
     <ClCompile Include="EnemySpawner.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="MapGenStep_FromImage.cpp" />
     <ClCompile Include="MapGenStep_Mutate.cpp" />
     <ClCompile Include="MapGenStep_Worm.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="TileMetaData.cpp" />
@@ -219,6 +221,7 @@
     <ClInclude Include="AudioDefinition.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="BulletDefinition.hpp" />
+    <ClInclude Include="Client.hpp" />
     <ClInclude Include="EnemyBoss.hpp" />
     <ClInclude Include="EnemySpawner.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
@@ -234,6 +237,7 @@
     <ClInclude Include="MapGenStep_FromImage.hpp" />
     <ClInclude Include="MapGenStep_Mutate.hpp" />
     <ClInclude Include="MapGenStep_Worm.hpp" />
+    <ClInclude Include="Server.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="TileMetaData.hpp" />

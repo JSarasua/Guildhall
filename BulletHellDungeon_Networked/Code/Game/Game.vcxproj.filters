@@ -94,6 +94,12 @@
     <ClCompile Include="AudioDefinition.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -172,6 +178,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="AudioDefinition.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
