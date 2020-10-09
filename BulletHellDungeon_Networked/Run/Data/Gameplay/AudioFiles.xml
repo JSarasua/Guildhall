@@ -1,0 +1,111 @@
+<AudioFiles>
+  <AudioDefinition
+    Name="LoadingMusic"
+    Sound="Anticipation.mp3"
+    IsLooped="false"
+    IsBackgroundMusic ="true"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="AttractMusic"
+    Sound="AttractMusic.mp3"
+    IsLooped="true"
+    IsBackgroundMusic ="true"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="GamePlayMusic"
+    Sound="GameplayMusic.mp3"
+    IsLooped="true"
+    IsBackgroundMusic ="true"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="PlayerDeath"
+    Sound="PlayerDied.wav"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="PlayerHit"
+    Sound="PlayerHit.wav"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="VictorySound"
+    Sound="Victory.mp3"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+  Name="RocketShot"
+  Sound="Bonus_Sound_FX/Explosion_Dull.wav"
+  IsLooped="false"
+  IsBackgroundMusic ="false"
+  IsSFX ="false"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="RifleShot1"
+    Sound="Bonus_Sound_FX/Rifle_Shot_01.wav"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="true"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="RifleShot2"
+    Sound="Bonus_Sound_FX/Rifle_Shot_02.wav"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="true"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="SmallGunShot"
+    Sound="Bonus_Sound_FX/Small_Gun_Shot.wav"
+    IsLooped="false"
+    IsBackgroundMusic ="false"
+    IsSFX ="true"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+  Name="Flame"
+  Sound="Bonus_Sound_FX/Flamethrower.flac"
+  IsLooped="true"
+  IsBackgroundMusic ="false"
+  IsSFX ="true"
+  >
+  </AudioDefinition>
+
+  <AudioDefinition
+    Name="Laser"
+    Sound="Bonus_Sound_FX/Laser.wav"
+    IsLooped="true"
+    IsBackgroundMusic ="false"
+    IsSFX ="true"
+  >
+  </AudioDefinition>
+
+
+</AudioFiles>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<MapDefinitions>
+
+  <MapDefinition name="Level1" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level1Map_V2.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+  <MapDefinition name="Level2" width="45" height="45" fillTile="Grass" edgeTile="Water" startPosition="4.5,41.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level2Map_V2.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+  <MapDefinition name="Level3" width="60" height="60" fillTile="Grass" edgeTile="Water" startPosition="55.5,55.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/Level3Map.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+  
+  <MapDefinition name="JamesMap" width="30" height="30" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
+    <GenerationSteps>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/James1_30x30.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+  <MapDefinition name="TestLevel" width="100" height="100" fillTile="Grass" edgeTile="Water" startPosition="2.5,2.5">
+    <GenerationSteps>
+      <Mutate iterations="1" ifTileType="Lava" setTags="ImageTest" chanceToMutate="0.001"/>
+      <FromImage iterations="1" ifTags="ImageTest" fromImageFilePath="Data/Images/FromImageTest_JMSWUZHERE.png" rotations="0"/>
+      <Worm iterations="2" changeToType="Lava" wormLength="10"/>
+      <CellularAutomata chanceToRun="1" iterations="1" ifTileType="Grass" ifNeighborTileType ="Lava" changeToType="Stone" numOfNeighbors="1~999" chanceToMutate="1"/>
+      <Mutate iterations="1" ifTileType="Grass" changeToType="Stone" chanceToMutate="0.1"/>
+      <Mutate chanceToRun="1" iterations="1" ifTileType="Stone" changeToType="Lava" chanceToMutate="0.1"/>
+
+      <FromImage iterations="1" fromImageFilePath="Data/Images/FromImageTest.png" uAlignment="0.5~0.5" vAlignment="0.5~0.5" rotations="0"/>
+      <FromImage iterations="1" fromImageFilePath="Data/Images/FromImageTest_JMSWUZHERE.png" uAlignment="0.0~0.0" vAlignment="0.0~0.0" rotations="0"/>
+    </GenerationSteps>
+  </MapDefinition>
+
+
+</MapDefinitions>

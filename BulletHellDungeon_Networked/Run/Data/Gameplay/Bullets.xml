@@ -1,0 +1,62 @@
+<BulletDefinitions>
+
+  <BulletDefinition
+    name="bulletTest"
+    spriteCoords="0,3"
+    spriteTint="255,255,255"
+    minDrawBounds="-0.1,-0.1"
+    maxDrawBounds="0.1,0.1"
+    physicsRadius=" 0.03"
+    bulletSpeed="4"
+    blendMode ="ALPHA"
+    damage="8"
+    lifetime="1.5"
+  >
+  </BulletDefinition>
+
+  <BulletDefinition
+    name="bigRock"
+    spriteCoords="3,0"
+    spriteTint="255,255,255"
+    minDrawBounds="-0.3,-0.3"
+    maxDrawBounds="0.3,0.3"
+    physicsRadius=" 0.25"
+    bulletSpeed="3.5"
+    blendMode ="ALPHA"
+    damage="50"
+    lifetime="4"
+  >
+  </BulletDefinition>
+
+  <BulletDefinition
+    name="laser"
+    spriteCoords="1,3"
+    spriteTint="255,255,255"
+    minDrawBounds="-0.1,-0.1"
+    maxDrawBounds="0.1,0.1"
+    physicsRadius=" 0.1"
+    bulletSpeed="10"
+    blendMode ="ADDITIVE"
+    damage="1"
+    lifetime="2"
+  >
+  </BulletDefinition>
+
+  <BulletDefinition
+    name="flame"
+    spriteCoords="0,0"
+    spriteTint="255,255,255"
+    minDrawBounds="-0.2,-0.2"
+    maxDrawBounds="0.2,0.2"
+    physicsRadius=" 0.2"
+    bulletSpeed="3"
+    blendMode ="ADDITIVE"
+    damage="5"
+    lifetime="0.7"
+  >
+  </BulletDefinition>
+
+  
+</BulletDefinitions>
+
+

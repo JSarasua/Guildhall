@@ -1,0 +1,24 @@
+<AdventureDefinitions>
+
+	<AdventureDefinition name="Balrog" title="Kill the Balrog">
+		<StartConditions startMap="The Village" startOnTileType="Grass"/>
+		<VictoryConditions actorDied="Balrog"/>
+		<Map name="The Village" mapDefinition="Village">
+			<Portal type="StairsDown" onTile="StoneFloor" toMap="The Cellar" toTile="StoneFloor" reciprocalType="StairsUp"/>
+		</Map>
+		<Map name="The Cellar" mapDefinition="Cellar">
+			<Portal type="StairsDown" onTile="StoneFloor" toMap ="Upper Crypt" reciprocalType="StairsUp"/>
+		</Map>
+		<Map name="Upper Crypt" mapDefinition="Crypt">
+			<Portal type="StairsDown" onTile="StoneFloor" toMap="Lower Crypt" reciprocalType="StairsUp"/>
+		</Map>
+		<Map name="Lower Crypt" mapDefinition="Crypt">
+			<Portal type="TeleportVortex" toMap="Temple of Evil"/>
+		</Map>
+		<Map name="Temple of Evil" mapDefinition="DungeonTemple">
+			<Actor type="Balrog" onTile="Altar"/>
+		</Map>
+	</AdventureDefinition>
+
+</AdventureDefinitions>
+
