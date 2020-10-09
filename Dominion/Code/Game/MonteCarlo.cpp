@@ -340,6 +340,7 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 				return newNode;
 			}
 		}
+
 	}
 	else
 	{
