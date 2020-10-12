@@ -24,6 +24,8 @@ public:
 	void UpdateCamera();
 	void Render();
 
+	void UpdateDebugMouse();
+
 	//Update State
 	void UpdateGameState();
 	void UpdateLoading( float deltaSeconds );
@@ -32,6 +34,7 @@ public:
 	void UpdateVictory( float deltaSeconds );
 	void UpdatePaused( float deltaSeconds );
 	void UpdatePlaying( float deltaSeconds );
+
 
 	//RenderState
 	void RenderLoading();
@@ -46,11 +49,12 @@ public:
 	void EndRender();
 
 
+	void RenderMouse();
 	void RenderWorld();
 	void RenderEntities();
 	void RenderUI();
 
-	void CheckInput();
+	void CheckButtonPresses();
 
 public:
 	Camera* m_camera = nullptr;
@@ -61,7 +65,11 @@ public:
 
 	int m_frameCounter = 0;
 
-	enum eGameState m_gameState = INVALIDGAMESTATE;
+	enum eGameState m_gameState = LOADING;
+
+	//Mouse
+	Vec2 m_mousePositionOnMainCamera;
+	Vec2 m_mousePositionOnUICamera;
 
 	//UI
 	AABB2 m_pausedMenu;

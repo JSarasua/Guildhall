@@ -146,9 +146,6 @@ void Game::Render()
 	default: ERROR_AND_DIE( "Invalid Game State" );
 		break;
 	}
-
-
-
 }
 
 
@@ -347,26 +344,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	
 	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
 
-	if( m_gameState == ATTRACT )
-	{
-		if( leftMouseButton.WasJustReleased() )
-		{
-			if( m_isMouseOverMainMenuPlay )
-			{
-				m_gameState = PLAYING;
-				g_theApp->UnPauseGame();
-
-				AudioDefinition::StopAllSounds();
-				AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
-				gamePlayAudio->PlaySound();
-			}
-			else if( m_isMouseOverMainMenuQuit )
-			{
-				g_theApp->HandleQuitRequested();
-			}
-
-		}
-	}
+// 	if( m_gameState == ATTRACT )
+// 	{
+// 		if( leftMouseButton.WasJustReleased() )
+// 		{
+// 			if( m_isMouseOverMainMenuPlay )
+// 			{
+// 				m_gameState = PLAYING;
+// 				g_theApp->UnPauseGame();
+// 
+// 				AudioDefinition::StopAllSounds();
+// 				AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
+// 				gamePlayAudio->PlaySound();
+// 			}
+// 			else if( m_isMouseOverMainMenuQuit )
+// 			{
+// 				g_theApp->HandleQuitRequested();
+// 			}
+// 
+// 		}
+// 	}
 	if( m_gameState == PLAYING )
 	{
 		if( controller.GetButtonState( XBOX_BUTTON_ID_Y ).WasJustPressed() )
@@ -845,30 +842,30 @@ void Game::UpdateAttract( float deltaSeconds )
 	UNUSED( deltaSeconds );
 	m_world->Update( 0.f );
 
-	UpdateDebugMouse();
-
-	AABB2 mainMenuBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	AABB2 playButtonBounds = mainMenuBounds;
-	AABB2 quitButtonBounds;
-	Vec2 buttonDimensions = mainMenuBounds.GetDimensions();
-	buttonDimensions *= 0.1f;
-	playButtonBounds.SetDimensions( buttonDimensions );
-	playButtonBounds.Translate( Vec2( 0.f, -1.f ) );
-	quitButtonBounds = playButtonBounds;
-	quitButtonBounds.Translate( Vec2( 0.f, -1.f ) );
-
-
-	m_isMouseOverMainMenuPlay = false;
-	m_isMouseOverMainMenuQuit = false;
-
-	if( playButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
-	{
-		m_isMouseOverMainMenuPlay = true;
-	}
-	else if( quitButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
-	{
-		m_isMouseOverMainMenuQuit = true;
-	}
+// 	UpdateDebugMouse();
+// 
+// 	AABB2 mainMenuBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+// 	AABB2 playButtonBounds = mainMenuBounds;
+// 	AABB2 quitButtonBounds;
+// 	Vec2 buttonDimensions = mainMenuBounds.GetDimensions();
+// 	buttonDimensions *= 0.1f;
+// 	playButtonBounds.SetDimensions( buttonDimensions );
+// 	playButtonBounds.Translate( Vec2( 0.f, -1.f ) );
+// 	quitButtonBounds = playButtonBounds;
+// 	quitButtonBounds.Translate( Vec2( 0.f, -1.f ) );
+// 
+// 
+// 	m_isMouseOverMainMenuPlay = false;
+// 	m_isMouseOverMainMenuQuit = false;
+// 
+// 	if( playButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
+// 	{
+// 		m_isMouseOverMainMenuPlay = true;
+// 	}
+// 	else if( quitButtonBounds.IsPointInside( m_mousePositionOnMainCamera ) )
+// 	{
+// 		m_isMouseOverMainMenuQuit = true;
+// 	}
 
 }
 
@@ -976,74 +973,75 @@ void Game::UpdatePlaying( float deltaSeconds )
 
 void Game::RenderLoading()
 {
-	g_theRenderer->ClearScreen( Rgba8::BLACK );
+	return;
 
-	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	m_camera.SetColorTarget( 0, colorTarget );
-	
-	g_theRenderer->BeginCamera( m_camera );
-	Texture* loadingScreenTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/LoadingScreen.png" );
-	
-	g_theRenderer->SetModelMatrix( Mat44() );
-	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-	g_theRenderer->BindTexture( loadingScreenTex );
-	g_theRenderer->BindShader( (Shader*)nullptr );
-	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
 
-	//g_theRenderer->DrawTextAtPosition( "LOADING", Vec2( -3.f, -3.f ), 1.f );
-	
-	g_theRenderer->EndCamera( m_camera );
-
-	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-	m_camera.SetColorTarget( nullptr );
-	g_theRenderer->ReleaseRenderTarget( colorTarget );
+// 	g_theRenderer->ClearScreen( Rgba8::BLACK );
+// 
+// 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+// 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+// 	m_camera.SetColorTarget( 0, colorTarget );
+// 	
+// 	g_theRenderer->BeginCamera( m_camera );
+// 	Texture* loadingScreenTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/LoadingScreen.png" );
+// 	
+// 	g_theRenderer->SetModelMatrix( Mat44() );
+// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+// 	g_theRenderer->BindTexture( loadingScreenTex );
+// 	g_theRenderer->BindShader( (Shader*)nullptr );
+// 	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+// 	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
+// 
+// 	g_theRenderer->EndCamera( m_camera );
+// 
+// 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+// 	m_camera.SetColorTarget( nullptr );
+// 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 }
 
 void Game::RenderAttract()
 {
-	g_theRenderer->ClearScreen( Rgba8::BLACK );
+	return;
 
-	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-	m_camera.SetColorTarget( 0, colorTarget );
-
-	g_theRenderer->BeginCamera( m_camera );
-
-	Texture* mainMenuTex;
-	
-	if( m_isMouseOverMainMenuPlay )
-	{
-		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
-	}
-	else if( m_isMouseOverMainMenuQuit )
-	{
-		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
-	}
-	else
-	{
-		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
-	}
-	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-
-
-	g_theRenderer->SetModelMatrix( Mat44() );
-	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-	g_theRenderer->BindTexture( mainMenuTex );
-	g_theRenderer->BindShader( (Shader*)nullptr );
-	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
-
-	RenderMouse();
-// 	g_theRenderer->DrawTextAtPosition( "Bullet Hell Dungeon", Vec2( -4.75f, 1.f ), 0.5f );
-// 	g_theRenderer->DrawTextAtPosition( "[SPACE] or [LMB] to Play", Vec2( -3.f, -2.f ), 0.25f );
-	g_theRenderer->EndCamera( m_camera );
-
-	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-	m_camera.SetColorTarget( nullptr );
-	g_theRenderer->ReleaseRenderTarget( colorTarget );
+// 	g_theRenderer->ClearScreen( Rgba8::BLACK );
+// 
+// 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
+// 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
+// 	m_camera.SetColorTarget( 0, colorTarget );
+// 
+// 	g_theRenderer->BeginCamera( m_camera );
+// 
+// 	Texture* mainMenuTex;
+// 	
+// 	if( m_isMouseOverMainMenuPlay )
+// 	{
+// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
+// 	}
+// 	else if( m_isMouseOverMainMenuQuit )
+// 	{
+// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
+// 	}
+// 	else
+// 	{
+// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
+// 	}
+// 	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
+// 
+// 
+// 	g_theRenderer->SetModelMatrix( Mat44() );
+// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+// 	g_theRenderer->BindTexture( mainMenuTex );
+// 	g_theRenderer->BindShader( (Shader*)nullptr );
+// 	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
+// 
+// 	RenderMouse();
+// 	g_theRenderer->EndCamera( m_camera );
+// 
+// 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
+// 	m_camera.SetColorTarget( nullptr );
+// 	g_theRenderer->ReleaseRenderTarget( colorTarget );
 }
 
 void Game::RenderDeath()

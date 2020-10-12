@@ -77,7 +77,7 @@ private:
 	void AddImageTest();
 	void AddBlackboardTest();
 
-
+	void SetGameState( eGameState newGameState ) { m_gameState = newGameState; }
 
 	//Updates
 	void UpdateCamera( float deltaSeconds );

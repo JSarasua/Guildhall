@@ -20,6 +20,7 @@ public:
 	void UnpauseGame();
 
 	void Update( float deltaSeconds );
+	void UpdateGameState( eGameState newGamestate );
 
 	std::vector<Vertex_PCU> const& GetTileVertsToRender();
 	std::vector<Entity*> const& GetEntitiesToRender();

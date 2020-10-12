@@ -68,6 +68,11 @@ void Server::Update( float deltaSeconds )
 	g_theGame->Update( deltaSeconds );
 }
 
+void Server::UpdateGameState( eGameState newGamestate )
+{
+	g_theGame->SetGameState( newGamestate );
+}
+
 std::vector<Vertex_PCU> const& Server::GetTileVertsToRender()
 {
 	return g_theGame->GetTileVertsToRender();
