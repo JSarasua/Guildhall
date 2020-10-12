@@ -447,7 +447,61 @@ void Client::RenderVictory()
 
 void Client::RenderPaused()
 {
-	g_theGame->RenderPaused();
+	//g_theGame->RenderPaused();
+	BeginRender();
+
+	g_theRenderer->BeginCamera( *m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theGame->RenderGame();
+	g_theRenderer->EndCamera( *m_camera );
+
+	g_theRenderer->BeginCamera( *m_UICamera );
+	RenderUI();
+
+	AABB2 gameCamera = AABB2( m_UICamera->GetOrthoBottomLeft(), m_UICamera->GetOrthoTopRight() );
+	Texture* pauseTexture = nullptr;
+
+	if( m_isMouseOverPausedQuit )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuQuit.png" );
+	}
+	else if( m_isMouseOverPausedRestart )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuRestart.png" );
+	}
+	else if( m_isMouseOverPausedResume )
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenuPlay.png" );
+	}
+	else
+	{
+		pauseTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/PauseMenu.png" );
+	}
+
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->DrawAABB2Filled( gameCamera, Rgba8( 0, 0, 0, 128 ) );
+	g_theRenderer->BindTexture( pauseTexture );
+	g_theRenderer->DrawAABB2Filled( m_pausedMenu, Rgba8::WHITE );
+	// 	g_theRenderer->DrawAlignedTextAtPosition( "RESUME", m_pausedResumeButton, 5.f, Vec2( 0.5f, 0.7f ), m_pausedResumeButtonTint );
+	// 	g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_pausedRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_pausedRestartButtonTint );
+	// 	g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_pausedQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_pausedQuitButtonTint );
+	g_theRenderer->EndCamera( *m_UICamera );
+
+	g_theRenderer->BeginCamera( *m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	RenderMouse();
+	g_theRenderer->EndCamera( *m_camera );
+
+	EndRender();
 }
 
 void Client::RenderPlaying()
@@ -609,11 +663,13 @@ void Client::CheckButtonPresses()
 		{
 			if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
 			{
+				m_gameState = PLAYING;
 				g_theGame->RebuildWorld();
 				g_theApp->UnPauseGame();
 			}
 			else if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
 			{
+				m_gameState = PLAYING;
 				g_theApp->UnPauseGame();
 			}
 			else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
