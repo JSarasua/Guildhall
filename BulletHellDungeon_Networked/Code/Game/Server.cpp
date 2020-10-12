@@ -68,3 +68,18 @@ void Server::Update( float deltaSeconds )
 	g_theGame->Update( deltaSeconds );
 }
 
+std::vector<Vertex_PCU> const& Server::GetTileVertsToRender()
+{
+	return g_theGame->GetTileVertsToRender();
+}
+
+std::vector<Entity*> const& Server::GetEntitiesToRender()
+{
+	return g_theGame->GetEntitiesToRender();
+}
+
+eGameState Server::GetCurrentGameState()
+{
+	return g_theGame->m_gameState;
+}
+

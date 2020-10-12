@@ -603,6 +603,16 @@ void Game::TriggerVictoryState()
 	AudioDefinition::StopAllSounds();
 }
 
+std::vector<Vertex_PCU> const& Game::GetTileVertsToRender()
+{
+	return m_world->m_currentMap->GetTileVertsToRender();
+}
+
+std::vector<Entity*> const& Game::GetEntitiesToRender()
+{
+	return m_world->m_currentMap->GetEntitiesToRender();
+}
+
 void Game::UpdateConsoleTest( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );

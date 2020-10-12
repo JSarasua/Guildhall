@@ -33,6 +33,9 @@ public:
 	void Render();
 	void RenderDebugMode();
 
+	std::vector<Vertex_PCU> const& GetTileVertsToRender() { return m_vertsToRender; }
+	std::vector<Entity*> const& GetEntitiesToRender() { return m_entities; }
+
 	int GetTileIndexForTileCoordinates( const IntVec2& tileCoords );
 	IntVec2 GetTileCoordinatesForTileIndex( int tileIndex ) const;
 	bool IsValidTileCoordinates( const IntVec2& tileCoords ) const;

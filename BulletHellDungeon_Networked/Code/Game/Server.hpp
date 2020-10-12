@@ -1,4 +1,10 @@
 #pragma once
+#include <vector>
+
+struct Vertex_PCU;
+class Entity;
+
+enum eGameState : int;
 
 class Server
 {
@@ -14,5 +20,9 @@ public:
 	void UnpauseGame();
 
 	void Update( float deltaSeconds );
+
+	std::vector<Vertex_PCU> const& GetTileVertsToRender();
+	std::vector<Entity*> const& GetEntitiesToRender();
+	eGameState GetCurrentGameState();
 
 };

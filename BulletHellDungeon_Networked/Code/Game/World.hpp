@@ -33,8 +33,9 @@ public:
 	void GetPlayers(std::vector<Actor*>& players);
 	int GetBossHealth() const;
 
-private:
+public:
 	Map* m_currentMap = nullptr;
+private:
 	Game* m_game = nullptr;
 
 	std::vector<Map*> m_maps;

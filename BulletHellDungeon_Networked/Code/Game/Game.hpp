@@ -24,9 +24,13 @@ enum eGameState
 class Actor;
 class World;
 
+struct Vertex_PCU;
+
 
 class Game
 {
+	friend class Server;
+	friend class Client;
 public:
 	Game();
 	~Game();
@@ -40,8 +44,13 @@ public:
 	Vec2	GetMousePositionOnMainCamera();
 	AABB2	GetUICamera() const;
 	AABB2	GetCamera() const;
+	Camera* GetCameraPointer() { return &m_camera; }
+	Camera* GetUICameraPointer() { return &m_UICamera; }
 	void	AddScreenShake( float screenShakeIncrement );
 	void	TriggerVictoryState();
+
+	std::vector<Vertex_PCU> const& GetTileVertsToRender();
+	std::vector<Entity*> const& GetEntitiesToRender();
 
 private:
 	//Update State
