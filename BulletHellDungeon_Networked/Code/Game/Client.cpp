@@ -40,7 +40,7 @@ void Client::EndFrame()
 
 void Client::Update( float deltaSeconds )
 {
-
+	UpdateCamera();
 
 }
 
@@ -81,7 +81,18 @@ void Client::Render()
 
 void Client::RenderLoading()
 {
-	g_theGame->RenderLoading();
+	//g_theGame->RenderLoading();
+	BeginRender();
+	Texture* loadingScreenTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/LoadingScreen.png" );
+
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( loadingScreenTex );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	AABB2 cameraBounds = AABB2( m_camera->GetOrthoBottomLeft(), m_camera->GetOrthoTopRight() );
+	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
+	EndRender();
 }
 
 void Client::RenderAttract()
