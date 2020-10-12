@@ -54,6 +54,9 @@ public:
 	std::vector<Vertex_PCU> const& GetTileVertsToRender();
 	std::vector<Entity*> const& GetEntitiesToRender();
 
+	int GetPlayerHealth() const;
+	int	GetBossHealth() const;
+
 private:
 	//Update State
 	void UpdateLoading( float deltaSeconds );
@@ -110,7 +113,7 @@ private:
 	//Misc
 	IntVec2 GetCurrentMapBounds() const;
 	void	RebuildWorld();
-	int		GetBossHealth() const;
+
 
 private:
 	World* m_world = nullptr;

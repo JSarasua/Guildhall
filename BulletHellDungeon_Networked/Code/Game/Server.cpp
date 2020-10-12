@@ -2,6 +2,9 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Time/Clock.hpp"
+#include "Game/Actor.hpp"
+#include "Engine/Renderer/SpriteDefinition.hpp"
+#include "Game/WeaponDefinition.hpp"
 
 Server::Server()
 {
@@ -71,6 +74,21 @@ void Server::Update( float deltaSeconds )
 void Server::UpdateGameState( eGameState newGamestate )
 {
 	g_theGame->SetGameState( newGamestate );
+}
+
+int Server::GetPlayerHealth()
+{
+	return g_theGame->GetPlayerHealth();
+}
+
+int Server::GetBossHealth()
+{
+	return g_theGame->GetBossHealth();
+}
+
+SpriteDefinition const* Server::GetPlayerWeaponSprite() const
+{
+	return g_theGame->m_player->GetCurrentWeapon()->GetWeaponSpriteDef();
 }
 
 std::vector<Vertex_PCU> const& Server::GetTileVertsToRender()

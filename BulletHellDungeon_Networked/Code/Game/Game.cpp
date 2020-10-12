@@ -113,7 +113,7 @@ void Game::Update( float deltaSeconds )
 			{
 				m_gameState = DEATH;
 				m_deathTimer.Reset();
-				AudioDefinition::StopAllSounds();
+				//AudioDefinition::StopAllSounds();
 			}
 		}
 	}
@@ -610,6 +610,19 @@ std::vector<Entity*> const& Game::GetEntitiesToRender()
 	return m_world->m_currentMap->GetEntitiesToRender();
 }
 
+int Game::GetPlayerHealth() const
+{
+	if( m_player )
+	{
+		return m_player->GetHealth();
+	}
+	else
+	{
+		return 0;
+	}
+
+}
+
 void Game::UpdateConsoleTest( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
@@ -871,97 +884,97 @@ void Game::UpdateAttract( float deltaSeconds )
 
 void Game::UpdateDeath( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
-
-	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-	Vec2 uiDims = uiBounds.GetDimensions();
-	m_deadMenu = uiBounds;
-	m_deadMenu.SetDimensions( uiDims * 0.8f );
-	m_deadContinueButton = m_deadMenu.GetBoxAtBottom( 0.5f );
-	Vec2 deadContinueButtonDims = m_deadContinueButton.GetDimensions();
-	deadContinueButtonDims = deadContinueButtonDims * Vec2( 0.2f, 0.2f );
-	m_deadContinueButton.SetDimensions( deadContinueButtonDims );
-	m_deadContinueButton.Translate( Vec2( 0.f, 7.f ) );
-
-	UpdateDebugMouse();
-
-	m_isMouseOverDeadContinue = false;
-	if( m_deathTimer.HasElapsed() )
-	{
-		if( m_deadContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
-		{
-			m_isMouseOverDeadContinue = true;
-		}
-	}
+// 	UNUSED( deltaSeconds );
+// 
+// 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+// 	Vec2 uiDims = uiBounds.GetDimensions();
+// 	m_deadMenu = uiBounds;
+// 	m_deadMenu.SetDimensions( uiDims * 0.8f );
+// 	m_deadContinueButton = m_deadMenu.GetBoxAtBottom( 0.5f );
+// 	Vec2 deadContinueButtonDims = m_deadContinueButton.GetDimensions();
+// 	deadContinueButtonDims = deadContinueButtonDims * Vec2( 0.2f, 0.2f );
+// 	m_deadContinueButton.SetDimensions( deadContinueButtonDims );
+// 	m_deadContinueButton.Translate( Vec2( 0.f, 7.f ) );
+// 
+// 	UpdateDebugMouse();
+// 
+// 	m_isMouseOverDeadContinue = false;
+// 	if( m_deathTimer.HasElapsed() )
+// 	{
+// 		if( m_deadContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
+// 		{
+// 			m_isMouseOverDeadContinue = true;
+// 		}
+// 	}
 }
 
 void Game::UpdateVictory( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
-
-	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-	Vec2 uiDims = uiBounds.GetDimensions();
-	m_victoryMenu = uiBounds;
-	m_victoryMenu.SetDimensions( uiDims * 0.8f );
-	m_victoryContinueButton = m_victoryMenu.GetBoxAtBottom( 0.5f );
-	Vec2 victoryContinueButtonDims = m_victoryContinueButton.GetDimensions();
-	victoryContinueButtonDims = victoryContinueButtonDims * Vec2( 0.2f, 0.2f );
-	m_victoryContinueButton.SetDimensions( victoryContinueButtonDims );
-	m_victoryContinueButton.Translate( Vec2( 0.f, 7.f ) );
-	
-	UpdateDebugMouse();
-
-	m_isMouseOverVictoryContinue = false;
-	if( m_victoryTimer.HasElapsed() )
-	{
-		if( m_victoryContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
-		{
-			m_isMouseOverVictoryContinue = true;
-		}
-	}
+// 	UNUSED( deltaSeconds );
+// 
+// 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+// 	Vec2 uiDims = uiBounds.GetDimensions();
+// 	m_victoryMenu = uiBounds;
+// 	m_victoryMenu.SetDimensions( uiDims * 0.8f );
+// 	m_victoryContinueButton = m_victoryMenu.GetBoxAtBottom( 0.5f );
+// 	Vec2 victoryContinueButtonDims = m_victoryContinueButton.GetDimensions();
+// 	victoryContinueButtonDims = victoryContinueButtonDims * Vec2( 0.2f, 0.2f );
+// 	m_victoryContinueButton.SetDimensions( victoryContinueButtonDims );
+// 	m_victoryContinueButton.Translate( Vec2( 0.f, 7.f ) );
+// 	
+// 	UpdateDebugMouse();
+// 
+// 	m_isMouseOverVictoryContinue = false;
+// 	if( m_victoryTimer.HasElapsed() )
+// 	{
+// 		if( m_victoryContinueButton.IsPointInside( m_mousePositionOnUICamera ) )
+// 		{
+// 			m_isMouseOverVictoryContinue = true;
+// 		}
+// 	}
 }
 
 void Game::UpdatePaused( float deltaSeconds )
 {
-	UNUSED( deltaSeconds );
-
-	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-	Vec2 uiDims = uiBounds.GetDimensions();
-	m_pausedMenu = uiBounds;
-	m_pausedMenu.SetDimensions( Vec2( uiDims.x, uiDims.x ) * 0.5f );
-	AABB2 carvingPauseMenu = m_pausedMenu;
-	Vec2 buttonDimension = carvingPauseMenu.GetDimensions();
-	buttonDimension.x *= 0.3f;
-	carvingPauseMenu.SetDimensions( buttonDimension );
-	carvingPauseMenu.CarveBoxOffTop( 0.43f );
-	m_pausedResumeButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
-	m_pausedRestartButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
-	m_pausedQuitButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
-
-	UpdateDebugMouse();
-
-	m_pausedResumeButtonTint= Rgba8::WHITE;
-	m_pausedRestartButtonTint = Rgba8::WHITE;
-	m_pausedQuitButtonTint = Rgba8::WHITE;
-	m_isMouseOverPausedResume = false;
-	m_isMouseOverPausedRestart = false;
-	m_isMouseOverPausedQuit = false;
-
-	if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
-	{
-		m_pausedResumeButtonTint= Rgba8::YELLOW;
-		m_isMouseOverPausedResume = true;
-	}
-	else if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
-	{
-		m_pausedRestartButtonTint = Rgba8::YELLOW;
-		m_isMouseOverPausedRestart = true;
-	}
-	else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
-	{
-		m_pausedQuitButtonTint = Rgba8::YELLOW;
-		m_isMouseOverPausedQuit = true;
-	}
+// 	UNUSED( deltaSeconds );
+// 
+// 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
+// 	Vec2 uiDims = uiBounds.GetDimensions();
+// 	m_pausedMenu = uiBounds;
+// 	m_pausedMenu.SetDimensions( Vec2( uiDims.x, uiDims.x ) * 0.5f );
+// 	AABB2 carvingPauseMenu = m_pausedMenu;
+// 	Vec2 buttonDimension = carvingPauseMenu.GetDimensions();
+// 	buttonDimension.x *= 0.3f;
+// 	carvingPauseMenu.SetDimensions( buttonDimension );
+// 	carvingPauseMenu.CarveBoxOffTop( 0.43f );
+// 	m_pausedResumeButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
+// 	m_pausedRestartButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
+// 	m_pausedQuitButton = carvingPauseMenu.CarveBoxOffTop( 0.f, 9.f );
+// 
+// 	UpdateDebugMouse();
+// 
+// 	m_pausedResumeButtonTint= Rgba8::WHITE;
+// 	m_pausedRestartButtonTint = Rgba8::WHITE;
+// 	m_pausedQuitButtonTint = Rgba8::WHITE;
+// 	m_isMouseOverPausedResume = false;
+// 	m_isMouseOverPausedRestart = false;
+// 	m_isMouseOverPausedQuit = false;
+// 
+// 	if( m_pausedResumeButton.IsPointInside( m_mousePositionOnUICamera ) )
+// 	{
+// 		m_pausedResumeButtonTint= Rgba8::YELLOW;
+// 		m_isMouseOverPausedResume = true;
+// 	}
+// 	else if( m_pausedRestartButton.IsPointInside( m_mousePositionOnUICamera ) )
+// 	{
+// 		m_pausedRestartButtonTint = Rgba8::YELLOW;
+// 		m_isMouseOverPausedRestart = true;
+// 	}
+// 	else if( m_pausedQuitButton.IsPointInside( m_mousePositionOnUICamera ) )
+// 	{
+// 		m_pausedQuitButtonTint = Rgba8::YELLOW;
+// 		m_isMouseOverPausedQuit = true;
+// 	}
 }
 
 void Game::UpdatePlaying( float deltaSeconds )

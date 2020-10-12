@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
 
-struct Vertex_PCU;
 class Entity;
+class SpriteDefinition;
+
+struct Vertex_PCU;
 
 enum eGameState : int;
 
@@ -21,6 +23,10 @@ public:
 
 	void Update( float deltaSeconds );
 	void UpdateGameState( eGameState newGamestate );
+
+	int GetPlayerHealth();
+	int GetBossHealth();
+	SpriteDefinition const* GetPlayerWeaponSprite() const;
 
 	std::vector<Vertex_PCU> const& GetTileVertsToRender();
 	std::vector<Entity*> const& GetEntitiesToRender();

@@ -53,6 +53,7 @@ public:
 	void RenderWorld();
 	void RenderEntities();
 	void RenderUI();
+	void RenderConsole();
 
 	void CheckButtonPresses();
 
