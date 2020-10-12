@@ -64,6 +64,9 @@
     <ClCompile Include="MonteCarlo.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="CardPile.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -112,6 +115,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="TreeMapNode.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="CardPile.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

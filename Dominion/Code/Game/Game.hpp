@@ -29,17 +29,7 @@ class MonteCarlo;
 struct light_t;
 struct Vertex_PCUTBN;
 
-int constexpr GAMENOTOVER	= -1;
-int constexpr PLAYER_1		= 0;
-int constexpr PLAYER_2		= 1;
-int constexpr TIE			= 3;
 
-int constexpr MONEYPILESIZE = 50;
-int constexpr VPPileSize = 8;
-int constexpr CURSEPILESIZE = 10;
-int constexpr ACTIONPILESIZE = 10;
-
-int constexpr NUMBEROFPILES = (int)NUM_CARDS;
 
 
 enum eGamePhase
