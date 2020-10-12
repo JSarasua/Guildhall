@@ -1,6 +1,8 @@
 #include "Game/Client.hpp"
 #include "Game/Game.hpp"
 #include "Game/Server.hpp"
+#include "Game/App.hpp"
+#include "Game/AudioDefinition.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
@@ -30,7 +32,11 @@ void Client::Shutdown()
 
 void Client::BeginFrame()
 {
-
+	if( m_frameCounter == 1 )
+	{
+		g_theGame->LoadAssets();
+		g_theGame->InitializeDefinitions();
+	}
 }
 
 void Client::EndFrame()
@@ -41,6 +47,25 @@ void Client::EndFrame()
 void Client::Update( float deltaSeconds )
 {
 	UpdateCamera();
+	UpdateGameState();
+
+	switch( m_gameState )
+	{
+	case LOADING: UpdateLoading( deltaSeconds );
+		break;
+	case ATTRACT: //UpdateAttract( deltaSeconds );
+		break;
+	case PLAYING: //UpdatePlaying( deltaSeconds );
+		break;
+	case PAUSED: //UpdatePaused( deltaSeconds );
+		break;
+	case DEATH: //UpdateDeath( deltaSeconds );
+		break;
+	case VICTORY: //UpdateVictory( deltaSeconds );
+		break;
+	default: ERROR_AND_DIE( "Invalid Game State" );
+		break;
+	}
 
 }
 
@@ -56,8 +81,9 @@ void Client::Render()
 	
 	//BeginRender();
 
-	eGameState currentGamestate = g_theServer->GetCurrentGameState();
-	switch( currentGamestate )
+	//eGameState currentGamestate = g_theServer->GetCurrentGameState();
+	UpdateGameState();
+	switch( m_gameState )
 	{
 	case LOADING: RenderLoading();
 		break;
@@ -76,6 +102,63 @@ void Client::Render()
 	}
 
 	//EndRender();
+
+}
+
+void Client::UpdateGameState()
+{
+	m_gameState = g_theServer->GetCurrentGameState();
+}
+
+void Client::UpdateLoading( float deltaSeconds )
+{
+	UNUSED( deltaSeconds );
+
+	if( m_frameCounter > 1 )
+	{
+
+	}
+	else if( m_frameCounter == 1 )
+	{
+		AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
+		attractScreenSound->PlaySound();
+	}
+	else if( m_frameCounter == 0 )
+	{
+		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
+		g_theAudio->PlaySound( loadingSound );
+	}
+
+	if( m_frameCounter == 2 )
+	{
+
+	}
+
+	m_frameCounter++;
+}
+
+void Client::UpdateAttract( float deltaSeconds )
+{
+
+}
+
+void Client::UpdateDeath( float deltaSeconds )
+{
+
+}
+
+void Client::UpdateVictory( float deltaSeconds )
+{
+
+}
+
+void Client::UpdatePaused( float deltaSeconds )
+{
+
+}
+
+void Client::UpdatePlaying( float deltaSeconds )
+{
 
 }
 

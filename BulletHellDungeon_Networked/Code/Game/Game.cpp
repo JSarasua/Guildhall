@@ -818,18 +818,18 @@ void Game::UpdateLoading( float deltaSeconds )
 	}
 	else if( m_frameCounter == 1 )
 	{
-		LoadAssets();
-		InitializeDefinitions();
+// 		LoadAssets();
+// 		InitializeDefinitions();
 		m_world->Startup();
 		m_player = m_world->GetPlayer();
 
-		AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-		attractScreenSound->PlaySound();
+// 		AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
+// 		attractScreenSound->PlaySound();
 	}
 	else if( m_frameCounter == 0 )
 	{
-		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
-		g_theAudio->PlaySound( loadingSound );
+// 		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
+// 		g_theAudio->PlaySound( loadingSound );
 	}
 
 	if( m_frameCounter == 2 )

@@ -1,4 +1,6 @@
 #pragma once
+#include "Game/Game.hpp"
+
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "Engine/Core/Rgba8.hpp"
@@ -22,6 +24,14 @@ public:
 	void UpdateCamera();
 	void Render();
 
+	//Update State
+	void UpdateGameState();
+	void UpdateLoading( float deltaSeconds );
+	void UpdateAttract( float deltaSeconds );
+	void UpdateDeath( float deltaSeconds );
+	void UpdateVictory( float deltaSeconds );
+	void UpdatePaused( float deltaSeconds );
+	void UpdatePlaying( float deltaSeconds );
 
 	//RenderState
 	void RenderLoading();
@@ -49,6 +59,9 @@ public:
 	Texture* m_backBuffer = nullptr;
 	Texture* m_colorTarget = nullptr;
 
+	int m_frameCounter = 0;
+
+	enum eGameState m_gameState = INVALIDGAMESTATE;
 
 	//UI
 	AABB2 m_pausedMenu;

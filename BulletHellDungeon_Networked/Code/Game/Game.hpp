@@ -11,6 +11,8 @@
 
 enum eGameState
 {
+	INVALIDGAMESTATE = -1,
+
 	LOADING,
 	ATTRACT,
  	DEATH,
