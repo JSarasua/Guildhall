@@ -8,6 +8,7 @@
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
 #include <vector>
 
 
@@ -447,7 +448,7 @@ void Client::RenderVictory()
 
 void Client::RenderPaused()
 {
-	//g_theGame->RenderPaused();
+//	g_theGame->RenderPaused();
 	BeginRender();
 
 	g_theRenderer->BeginCamera( *m_camera );
@@ -506,7 +507,25 @@ void Client::RenderPaused()
 
 void Client::RenderPlaying()
 {
-	g_theGame->RenderPlaying();
+//	g_theGame->RenderPlaying();
+
+	BeginRender();
+
+	g_theRenderer->BeginCamera( *m_camera );
+	g_theRenderer->SetModelMatrix( Mat44() );
+	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
+	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
+	g_theRenderer->BindTexture( nullptr );
+	g_theRenderer->BindShader( (Shader*)nullptr );
+	g_theGame->RenderGame();
+	RenderMouse();
+	g_theRenderer->EndCamera( *m_camera );
+
+	g_theRenderer->BeginCamera( *m_UICamera );
+	RenderUI();
+	g_theRenderer->EndCamera( *m_UICamera );
+
+	EndRender();
 }
 
 void Client::BeginRender()
@@ -516,17 +535,20 @@ void Client::BeginRender()
 	 m_backBuffer = g_theRenderer->GetBackBuffer();
 	m_colorTarget = g_theRenderer->AcquireRenderTargetMatching( m_backBuffer );
 	m_camera->SetColorTarget( 0, m_colorTarget );
-
-	//g_theRenderer->BeginCamera( *m_camera );
+	m_UICamera->SetColorTarget( 0, m_colorTarget );
 }
 
 void Client::EndRender()
 {
-	//g_theRenderer->EndCamera( *m_camera );
 
 	g_theRenderer->CopyTexture( m_backBuffer, m_colorTarget );
 	m_camera->SetColorTarget( nullptr );
 	g_theRenderer->ReleaseRenderTarget( m_colorTarget );
+
+	DebugRenderBeginFrame();
+	DebugRenderWorldToCamera( m_camera );
+	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
+	DebugRenderEndFrame();
 }
 
 void Client::RenderMouse()
