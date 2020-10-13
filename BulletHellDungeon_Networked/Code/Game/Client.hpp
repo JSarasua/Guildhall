@@ -50,6 +50,7 @@ public:
 
 
 	void RenderMouse();
+	void RenderGame();
 	void RenderWorld();
 	void RenderEntities();
 	void RenderUI();

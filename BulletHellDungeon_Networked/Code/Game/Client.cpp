@@ -3,6 +3,7 @@
 #include "Game/Server.hpp"
 #include "Game/Actor.hpp"
 #include "Game/App.hpp"
+#include "Game/Entity.hpp"
 #include "Game/AudioDefinition.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
@@ -10,7 +11,6 @@
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include <vector>
-
 
 Client::Client()
 {
@@ -319,7 +319,6 @@ void Client::UpdatePlaying( float deltaSeconds )
 
 void Client::RenderLoading()
 {
-	//g_theGame->RenderLoading();
 	BeginRender();
 	g_theRenderer->BeginCamera( *m_camera );
 
@@ -338,7 +337,6 @@ void Client::RenderLoading()
 
 void Client::RenderAttract()
 {
-//	g_theGame->RenderAttract();
 	BeginRender();
 	g_theRenderer->BeginCamera( *m_camera );
 	Texture* mainMenuTex;
@@ -373,8 +371,6 @@ void Client::RenderAttract()
 
 void Client::RenderDeath()
 {
-// 	g_theGame->RenderDeath();
-
 	Rgba8 backgroundTint = Rgba8( 0, 0, 0, 0 );
 	if( m_deathTimer.HasElapsed() )
 	{
@@ -397,7 +393,7 @@ void Client::RenderDeath()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( (Shader*)nullptr );
-	g_theGame->RenderGame();
+	RenderGame();
 
 	g_theRenderer->EndCamera( *m_camera );
 
@@ -448,7 +444,6 @@ void Client::RenderVictory()
 
 void Client::RenderPaused()
 {
-//	g_theGame->RenderPaused();
 	BeginRender();
 
 	g_theRenderer->BeginCamera( *m_camera );
@@ -457,7 +452,7 @@ void Client::RenderPaused()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( (Shader*)nullptr );
-	g_theGame->RenderGame();
+	RenderGame();
 	g_theRenderer->EndCamera( *m_camera );
 
 	g_theRenderer->BeginCamera( *m_UICamera );
@@ -488,9 +483,6 @@ void Client::RenderPaused()
 	g_theRenderer->DrawAABB2Filled( gameCamera, Rgba8( 0, 0, 0, 128 ) );
 	g_theRenderer->BindTexture( pauseTexture );
 	g_theRenderer->DrawAABB2Filled( m_pausedMenu, Rgba8::WHITE );
-	// 	g_theRenderer->DrawAlignedTextAtPosition( "RESUME", m_pausedResumeButton, 5.f, Vec2( 0.5f, 0.7f ), m_pausedResumeButtonTint );
-	// 	g_theRenderer->DrawAlignedTextAtPosition( "RESTART", m_pausedRestartButton, 5.f, Vec2( 0.5f, 0.5f ), m_pausedRestartButtonTint );
-	// 	g_theRenderer->DrawAlignedTextAtPosition( "QUIT", m_pausedQuitButton, 5.f, Vec2( 0.5f, 0.3f ), m_pausedQuitButtonTint );
 	g_theRenderer->EndCamera( *m_UICamera );
 
 	g_theRenderer->BeginCamera( *m_camera );
@@ -507,8 +499,6 @@ void Client::RenderPaused()
 
 void Client::RenderPlaying()
 {
-//	g_theGame->RenderPlaying();
-
 	BeginRender();
 
 	g_theRenderer->BeginCamera( *m_camera );
@@ -517,7 +507,8 @@ void Client::RenderPlaying()
 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
 	g_theRenderer->BindTexture( nullptr );
 	g_theRenderer->BindShader( (Shader*)nullptr );
-	g_theGame->RenderGame();
+	RenderWorld();
+	RenderEntities();
 	RenderMouse();
 	g_theRenderer->EndCamera( *m_camera );
 
@@ -562,6 +553,12 @@ void Client::RenderMouse()
 	g_theRenderer->DrawAABB2Filled( mouseAABB, Rgba8::WHITE );
 }
 
+void Client::RenderGame()
+{
+	RenderWorld();
+	RenderEntities();
+}
+
 void Client::RenderWorld()
 {
 	Texture const& tex = g_tileSpriteSheet->GetTexture();
@@ -569,6 +566,21 @@ void Client::RenderWorld()
 
 	std::vector<Vertex_PCU> const& verts = g_theServer->GetTileVertsToRender();
 	g_theRenderer->DrawVertexArray( verts );
+}
+
+void Client::RenderEntities()
+{
+	std::vector<Entity*> const& entitiesToRender= g_theServer->GetEntitiesToRender();
+
+	for( size_t entityIndex = 0; entityIndex < entitiesToRender.size(); entityIndex++ )
+	{
+		Entity* entityToRender = entitiesToRender[entityIndex];
+
+		if( entityToRender )
+		{
+			entityToRender->Render();
+		}
+	}
 }
 
 void Client::RenderUI()
