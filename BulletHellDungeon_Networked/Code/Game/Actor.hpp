@@ -4,6 +4,7 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Time/Timer.hpp"
 #include <vector>
+#include "Engine/Core/EventSystem.hpp"
 
 class ActorDefinition;
 class WeaponDefinition;
@@ -69,6 +70,8 @@ public:
 
 	BulletDefinition const* GetBulletDefinition() const;
 	WeaponDefinition const* GetCurrentWeapon() const;
+
+	bool UpdateInput( EventArgs const& args );
 
 protected:
 	void UpdateFromJoystick();

@@ -12,6 +12,7 @@
 #include "Game/BulletDefinition.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Game/AudioDefinition.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef ) :
 	m_actorDef(actorDef),
@@ -32,6 +33,9 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 		m_playerInvulnerabilityTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+
+		//g_theEventSystem->SubscribeMethodToEvent( "StartTCPServer", CONSOLECOMMAND, this, &NetworkSys::StartTCPServer );
+		g_theEventSystem->SubscribeMethodToEvent( "Input", NOCONSOLECOMMAND, this, &Actor::UpdateInput );
 	}
 	else if( m_name == "Boss" )
 	{
@@ -76,6 +80,8 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 		m_firingTimer.SetSeconds( Clock::GetMaster(), 0.25 );
 		m_dodgeTimer.SetSeconds( Clock::GetMaster(), 0.5 );
 		m_playerInvulnerabilityTimer.SetSeconds( Clock::GetMaster(), 0.5 );
+		g_theEventSystem->SubscribeMethodToEvent( "Input", NOCONSOLECOMMAND, this, &Actor::UpdateInput );
+
 	}
 	else if( m_name == "Boss" )
 	{
@@ -364,63 +370,24 @@ WeaponDefinition const* Actor::GetCurrentWeapon() const
 	return m_weapons[m_currentWeaponIndex];
 }
 
-void Actor::UpdateFromJoystick()
+bool Actor::UpdateInput( EventArgs const& args )
 {
-	const XboxController& controller = g_theInput->GetXboxController( m_playerController );
-	if( controller.IsConnected() )
-	{
-		const float& joystickOrientation = controller.GetLeftJoystick().GetAngleDegrees();
-		const float& joystickMagnitude = controller.GetLeftJoystick().GetMagnitude();
+	Vec2 mousePos = args.GetValue( "mousePos", Vec2() );
+	bool isShooting = args.GetValue( "isShooting", false );
+	bool isDodging = args.GetValue( "isDodging", false );
+	int changeWeapons = args.GetValue( "changeWeapons", 0 );
+	Vec2 moveVec = args.GetValue( "moveVec", Vec2() );
 
-		const float& actorSpeed = m_actorDef->m_speed;
-		//const float& actorTurnSpeed = m_actorDef->m_turnSpeed;
-
-		if( joystickMagnitude != 0 )
-		{
-			m_orientationDegrees = joystickOrientation;
-			//m_orientationDegrees = GetTurnedToward( m_orientationDegrees, joystickOrientation, actorTurnSpeed * deltaSeconds );
-			m_velocity  = Vec2::MakeFromPolarDegrees( m_orientationDegrees, joystickMagnitude * actorSpeed );
-		}
-		else if( controller.GetLeftJoystick().GetMagnitude() == 0 )
-		{
-			m_velocity *= 0.f;
-		}
-	}
-}
-
-void Actor::UpdateFromKeyboard()
-{
-	const float& actorSpeed = m_actorDef->m_speed;
-
-	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
-	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
-	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
-
-	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
-	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
-	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
-	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
-	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
-	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
-	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
-	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
-	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
-	float deltaMouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
-	
-	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
+	//WeaponDirection
 	Vec2 weaponDirection = mousePos - GetPosition();
-
 	WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
 	std::string weaponName = weaponDef->GetWeaponName();
 	if( weaponDirection.x >= 0.f )
 	{
-		//m_weaponOffset = weaponDef->GetWeaponOffsetRight();
 		m_isWeaponFlipped = true;
 	}
 	else
 	{
-		//m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
 		m_isWeaponFlipped = false;
 	}
 
@@ -437,9 +404,7 @@ void Actor::UpdateFromKeyboard()
 	}
 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
 
-
-
-	if( rightMouseButton.WasJustPressed() || spaceKey.WasJustPressed() )
+	if( isDodging )
 	{
 		if( m_dodgeTimer.HasElapsed() )
 		{
@@ -451,7 +416,7 @@ void Actor::UpdateFromKeyboard()
 
 	if( !m_isDodging )
 	{
-		if( leftMouseButton.IsPressed() )
+		if( isShooting )
 		{
 			m_isFiring = m_firingTimer.HasElapsed();
 			if( m_isFiring )
@@ -480,7 +445,7 @@ void Actor::UpdateFromKeyboard()
 				m_firingTimer.Reset();
 			}
 		}
-		if( leftMouseButton.WasJustReleased() )
+		if( !isShooting )
 		{
 			if( weaponName == "Flamethrower" || weaponName == "LaserGun" )
 			{
@@ -489,98 +454,242 @@ void Actor::UpdateFromKeyboard()
 			}
 		}
 
-		if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
-		{
-			m_velocity.x = -actorSpeed;
-		}
-		else if( rightArrow.IsPressed() && !leftArrow.IsPressed() )
-		{
-			m_velocity.x = actorSpeed;
-		}
-		else if( leftArrow.IsPressed() && rightArrow.IsPressed() )
-		{
-			m_velocity.x = 0.f;
-		}
+		const float& actorSpeed = m_actorDef->m_speed;
+		m_velocity = moveVec * actorSpeed;
 
-
-		if( downArrow.IsPressed() && !upArrow.IsPressed() )
-		{
-			m_velocity.y = -actorSpeed;
-		}
-		else if( upArrow.IsPressed() && !downArrow.IsPressed() )
-		{
-			m_velocity.y = actorSpeed;
-		}
-		else if( upArrow.IsPressed() && downArrow.IsPressed() )
-		{
-			m_velocity.y = 0.f;
-		}
-
-		if( leftArrow.WasJustReleased() || rightArrow.WasJustReleased() )
-		{
-			m_velocity.x = 0.f;
-		}
-		if( upArrow.WasJustReleased() || downArrow.WasJustReleased() )
-		{
-			m_velocity.y = 0.f;
-		}
-
-
-
-		if( sKey.IsPressed() && !fKey.IsPressed() )
-		{
-			m_velocity.x = -actorSpeed;
-		}
-		else if( fKey.IsPressed() && !sKey.IsPressed() )
-		{
-			m_velocity.x = actorSpeed;
-		}
-		else if( sKey.IsPressed() && fKey.IsPressed() )
-		{
-			m_velocity.x = 0.f;
-		}
-
-		if( dKey.IsPressed() && !eKey.IsPressed() )
-		{
-			m_velocity.y = -actorSpeed;
-		}
-		else if( eKey.IsPressed() && !dKey.IsPressed() )
-		{
-			m_velocity.y = actorSpeed;
-		}
-		else if( eKey.IsPressed() && dKey.IsPressed() )
-		{
-			m_velocity.y = 0.f;
-		}
-
-		if( sKey.WasJustReleased() || fKey.WasJustReleased() )
-		{
-			m_velocity.x = 0.f;
-		}
-		if( eKey.WasJustReleased() || dKey.WasJustReleased() )
-		{
-			m_velocity.y = 0.f;
-		}
-
-		if( wKey.WasJustPressed() )
-		{
-			DecrementActiveWeapon();
-		}
-
-		if( rKey.WasJustPressed() )
+		if( changeWeapons > 0 )
 		{
 			IncrementActiveWeapon();
 		}
-
-		if( deltaMouseWheelScroll > 0.f )
-		{
-			IncrementActiveWeapon();
-		}
-		else if( deltaMouseWheelScroll < 0.f )
+		else if( changeWeapons < 0 )
 		{
 			DecrementActiveWeapon();
 		}
 	}
+
+
+
+	return true;
+}
+
+void Actor::UpdateFromJoystick()
+{
+	const XboxController& controller = g_theInput->GetXboxController( m_playerController );
+	if( controller.IsConnected() )
+	{
+		const float& joystickOrientation = controller.GetLeftJoystick().GetAngleDegrees();
+		const float& joystickMagnitude = controller.GetLeftJoystick().GetMagnitude();
+
+		const float& actorSpeed = m_actorDef->m_speed;
+		//const float& actorTurnSpeed = m_actorDef->m_turnSpeed;
+
+		if( joystickMagnitude != 0 )
+		{
+			m_orientationDegrees = joystickOrientation;
+			//m_orientationDegrees = GetTurnedToward( m_orientationDegrees, joystickOrientation, actorTurnSpeed * deltaSeconds );
+			m_velocity  = Vec2::MakeFromPolarDegrees( m_orientationDegrees, joystickMagnitude * actorSpeed );
+		}
+		else if( controller.GetLeftJoystick().GetMagnitude() == 0 )
+		{
+			m_velocity *= 0.f;
+		}
+	}
+}
+
+void Actor::UpdateFromKeyboard()
+{
+	return;
+// 	const float& actorSpeed = m_actorDef->m_speed;
+// 
+// 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+// 	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
+// 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+// 	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
+// 
+// 	const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
+// 	const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
+// 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
+// 	const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+// 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+// 	const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+// 	const KeyButtonState& spaceKey = g_theInput->GetKeyStates( SPACE_KEY );
+// 	const KeyButtonState& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
+// 	const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
+// 	float deltaMouseWheelScroll = g_theInput->GetDeltaMouseWheelScroll();
+// 	
+// 	Vec2 mousePos = g_theGame->GetMousePositionOnMainCamera();
+// 	Vec2 weaponDirection = mousePos - GetPosition();
+// 
+// 	WeaponDefinition const* weaponDef = m_weapons[m_currentWeaponIndex];
+// 	std::string weaponName = weaponDef->GetWeaponName();
+// 	if( weaponDirection.x >= 0.f )
+// 	{
+// 		//m_weaponOffset = weaponDef->GetWeaponOffsetRight();
+// 		m_isWeaponFlipped = true;
+// 	}
+// 	else
+// 	{
+// 		//m_weaponOffset = weaponDef->GetWeaponOffsetLeft();
+// 		m_isWeaponFlipped = false;
+// 	}
+// 
+// 	float weaponDirectionDegrees = weaponDirection.GetAngleDegrees();
+// 	bool isMoving = !m_velocity.IsAlmostEqual( Vec2( 0.f, 0.f ) );
+// 	m_weaponOffset = weaponDef->GetWeaponOffset( weaponDirectionDegrees, isMoving );
+// 	if( GetShortestAngularDistance( 112.5f, weaponDirectionDegrees ) < 90.f )
+// 	{
+// 		m_isWeaponInFront = false;
+// 	}
+// 	else
+// 	{
+// 		m_isWeaponInFront = true;
+// 	}
+// 	m_weaponOrientationDegrees = weaponDirection.GetAngleDegrees();
+// 
+// 
+// 
+// 	if( rightMouseButton.WasJustPressed() || spaceKey.WasJustPressed() )
+// 	{
+// 		if( m_dodgeTimer.HasElapsed() )
+// 		{
+// 			m_dodgeTimer.Reset();
+// 			m_isDodging = true;
+// 			m_weapons[m_currentWeaponIndex]->GetAudioDefinition()->StopSound();
+// 		}
+// 	}
+// 
+// 	if( !m_isDodging )
+// 	{
+// 		if( leftMouseButton.IsPressed() )
+// 		{
+// 			m_isFiring = m_firingTimer.HasElapsed();
+// 			if( m_isFiring )
+// 			{
+// 				float screenShakeIncrement = weaponDef->GetScreenShakeIncremenet();
+// 				g_theGame->AddScreenShake( screenShakeIncrement );
+// 				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
+// 
+// 				if( weaponName == "Flamethrower" || weaponName == "LaserGun" )
+// 				{
+// 					if( shootSound->IsPlaying() )
+// 					{
+// 
+// 					}
+// 					else
+// 					{
+// 						shootSound->PlaySound();
+// 					}
+// 				}
+// 				else
+// 				{
+// 					shootSound->StopSound();
+// 					shootSound->PlaySound();
+// 				}
+// 
+// 				m_firingTimer.Reset();
+// 			}
+// 		}
+// 		if( leftMouseButton.WasJustReleased() )
+// 		{
+// 			if( weaponName == "Flamethrower" || weaponName == "LaserGun" )
+// 			{
+// 				AudioDefinition* shootSound = m_weapons[m_currentWeaponIndex]->GetAudioDefinition();
+// 				shootSound->StopSound();
+// 			}
+// 		}
+// 
+// 		if( leftArrow.IsPressed() && !rightArrow.IsPressed() )
+// 		{
+// 			m_velocity.x = -actorSpeed;
+// 		}
+// 		else if( rightArrow.IsPressed() && !leftArrow.IsPressed() )
+// 		{
+// 			m_velocity.x = actorSpeed;
+// 		}
+// 		else if( leftArrow.IsPressed() && rightArrow.IsPressed() )
+// 		{
+// 			m_velocity.x = 0.f;
+// 		}
+// 
+// 
+// 		if( downArrow.IsPressed() && !upArrow.IsPressed() )
+// 		{
+// 			m_velocity.y = -actorSpeed;
+// 		}
+// 		else if( upArrow.IsPressed() && !downArrow.IsPressed() )
+// 		{
+// 			m_velocity.y = actorSpeed;
+// 		}
+// 		else if( upArrow.IsPressed() && downArrow.IsPressed() )
+// 		{
+// 			m_velocity.y = 0.f;
+// 		}
+// 
+// 		if( leftArrow.WasJustReleased() || rightArrow.WasJustReleased() )
+// 		{
+// 			m_velocity.x = 0.f;
+// 		}
+// 		if( upArrow.WasJustReleased() || downArrow.WasJustReleased() )
+// 		{
+// 			m_velocity.y = 0.f;
+// 		}
+// 
+// 
+// 
+// 		if( sKey.IsPressed() && !fKey.IsPressed() )
+// 		{
+// 			m_velocity.x = -actorSpeed;
+// 		}
+// 		else if( fKey.IsPressed() && !sKey.IsPressed() )
+// 		{
+// 			m_velocity.x = actorSpeed;
+// 		}
+// 		else if( sKey.IsPressed() && fKey.IsPressed() )
+// 		{
+// 			m_velocity.x = 0.f;
+// 		}
+// 
+// 		if( dKey.IsPressed() && !eKey.IsPressed() )
+// 		{
+// 			m_velocity.y = -actorSpeed;
+// 		}
+// 		else if( eKey.IsPressed() && !dKey.IsPressed() )
+// 		{
+// 			m_velocity.y = actorSpeed;
+// 		}
+// 		else if( eKey.IsPressed() && dKey.IsPressed() )
+// 		{
+// 			m_velocity.y = 0.f;
+// 		}
+// 
+// 		if( sKey.WasJustReleased() || fKey.WasJustReleased() )
+// 		{
+// 			m_velocity.x = 0.f;
+// 		}
+// 		if( eKey.WasJustReleased() || dKey.WasJustReleased() )
+// 		{
+// 			m_velocity.y = 0.f;
+// 		}
+// 
+// 		if( wKey.WasJustPressed() )
+// 		{
+// 			DecrementActiveWeapon();
+// 		}
+// 
+// 		if( rKey.WasJustPressed() )
+// 		{
+// 			IncrementActiveWeapon();
+// 		}
+// 
+// 		if( deltaMouseWheelScroll > 0.f )
+// 		{
+// 			IncrementActiveWeapon();
+// 		}
+// 		else if( deltaMouseWheelScroll < 0.f )
+// 		{
+// 			DecrementActiveWeapon();
+// 		}
+// 	}
 
 }
 

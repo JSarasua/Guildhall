@@ -312,6 +312,7 @@ void Client::UpdatePaused( float deltaSeconds )
 
 void Client::UpdatePlaying( float deltaSeconds )
 {
+	UNUSED( deltaSeconds );
 // 	g_theGame->Update( deltaSeconds );
 // 	g_theGame->UpdateCamera( deltaSeconds );
 	UpdateDebugMouse();
@@ -685,6 +686,42 @@ void Client::CheckButtonPresses()
 
 			gamePlaySound->PlaySound();
 		}
+
+		const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
+		const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
+		const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
+		const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
+
+		const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
+		const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
+		const KeyButtonState& spaceKey = g_theInput->GetKeyStates( ' ' );
+		const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
+		float deltaMouseScroll = g_theInput->GetDeltaMouseWheelScroll();
+
+		Vec2 moveVec;
+		float upDir    = (float)eKey.IsPressed();
+		float leftDir  = (float)sKey.IsPressed();
+		float downDir  = (float)dKey.IsPressed();
+		float rightDir = (float)fKey.IsPressed();
+		moveVec.x = rightDir - leftDir;
+		moveVec.y = upDir - downDir;
+
+		Vec2 mousePos = m_mousePositionOnMainCamera;
+		bool shooting = leftMouseButton.IsPressed();
+		int changeWeapons = 0;
+		changeWeapons = (int)rKey.WasJustPressed() - (int)wKey.WasJustPressed();
+		changeWeapons += (int)(deltaMouseScroll > 0);
+		changeWeapons -= (int)(deltaMouseScroll < 0 );
+
+		bool isDodging = spaceKey.IsPressed() || rightMouseButton.IsPressed();
+
+		EventArgs args;
+		args.SetValue( "mousePos", mousePos );
+		args.SetValue( "isShooting", shooting );
+		args.SetValue( "changeWeapons", changeWeapons );
+		args.SetValue( "moveVec", moveVec );
+		args.SetValue( "isDodging", isDodging );
+		g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
 // 		if( f6Key.WasJustPressed() )
 // 		{
 // 			m_world->MoveToNextMap();
