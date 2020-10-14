@@ -12,51 +12,49 @@ class Client
 {
 public:
 	Client();
-	~Client();
+	virtual ~Client();
 
-	void Startup();
-	void Shutdown();
+	virtual void Startup() = 0;
+	virtual void Shutdown() = 0;
 
-	void BeginFrame();
-	void EndFrame();
+	virtual void BeginFrame() = 0;
+	virtual void EndFrame() = 0;
 
-	void Update( float deltaSeconds );
-	void UpdateCamera();
-	void Render();
+	virtual void Update( float deltaSeconds ) = 0;
+	virtual void UpdateCamera() = 0;
+	virtual void Render() = 0;
 
-	void UpdateDebugMouse();
+	virtual void UpdateDebugMouse() = 0;
 
 	//Update State
-	void UpdateGameState();
-	void UpdateLoading( float deltaSeconds );
-	void UpdateAttract( float deltaSeconds );
-	void UpdateDeath( float deltaSeconds );
-	void UpdateVictory( float deltaSeconds );
-	void UpdatePaused( float deltaSeconds );
-	void UpdatePlaying( float deltaSeconds );
-
+	virtual void UpdateGameState() = 0;
+	virtual void UpdateLoading( float deltaSeconds ) = 0;
+	virtual void UpdateAttract( float deltaSeconds ) = 0;
+	virtual void UpdateDeath( float deltaSeconds ) = 0;
+	virtual void UpdateVictory( float deltaSeconds ) = 0;
+	virtual void UpdatePaused( float deltaSeconds ) = 0;
+	virtual void UpdatePlaying( float deltaSeconds ) = 0;
 
 	//RenderState
-	void RenderLoading();
-	void RenderAttract();
-	void RenderDeath();
-	void RenderVictory();
-	void RenderPaused();
-	void RenderPlaying();
+	virtual void RenderLoading() = 0;
+	virtual void RenderAttract() = 0;
+	virtual void RenderDeath() = 0;
+	virtual void RenderVictory() = 0;
+	virtual void RenderPaused() = 0;
+	virtual void RenderPlaying() = 0;
 
 	//New render methods
-	void BeginRender();
-	void EndRender();
+	virtual void BeginRender() = 0;
+	virtual void EndRender() = 0;
 
+	virtual void RenderMouse() = 0;
+	virtual void RenderGame() = 0;
+	virtual void RenderWorld() = 0;
+	virtual void RenderEntities() = 0;
+	virtual void RenderUI() = 0;
+	virtual void RenderConsole() = 0;
 
-	void RenderMouse();
-	void RenderGame();
-	void RenderWorld();
-	void RenderEntities();
-	void RenderUI();
-	void RenderConsole();
-
-	void CheckButtonPresses();
+	virtual void CheckButtonPresses() = 0;
 
 public:
 	Camera* m_camera = nullptr;

@@ -35,6 +35,8 @@ class Game
 	friend class AuthServer;
 	friend class RemoteServer;
 	friend class Client;
+	friend class PlayerClient;
+
 public:
 	Game();
 	~Game();
