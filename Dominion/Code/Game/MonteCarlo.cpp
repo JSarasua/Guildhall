@@ -2,9 +2,56 @@
 //#include "Game/Game.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/GameCommon.hpp"
+#include "Engine/Core/JobSystem.hpp"
+
+
+class SimulationJob : public Job
+{
+
+	SimulationJob( MonteCarlo* mctsToUse, int numberOfSimulations );
+	virtual void Execute() override;
+	virtual void CallBackFunction() override;
+
+	int m_numberOfSimulations = 0;
+	MonteCarlo* m_mctsToUse = nullptr;
+};
+
+SimulationJob::SimulationJob( MonteCarlo* mctsToUse, int numberOfSimulations) :
+	m_numberOfSimulations( numberOfSimulations ),
+	m_mctsToUse( mctsToUse ),
+	Job()
+{}
 
 
 
+
+void SimulationJob::Execute()
+{
+	for( int currentSimIndex = 0; currentSimIndex < m_numberOfSimulations; currentSimIndex++ )
+	{
+		expand_t expandResult = m_mctsToUse->GetBestNodeToSelect( m_mctsToUse->m_currentHeadNode );
+
+		if( nullptr == expandResult.nodeToExpand )
+		{
+			//can't select
+			break;
+		}
+		TreeMapNode* expandedNode = m_mctsToUse->ExpandNode( expandResult );
+		if( nullptr == expandedNode )
+		{
+			//can't expand
+			break;
+		}
+		//Returns an int to handle case of ties
+		int whoWon = m_mctsToUse->RunSimulationOnNode( expandedNode );
+		m_mctsToUse->BackPropagateResult( whoWon, expandedNode );
+	}
+}
+
+void SimulationJob::CallBackFunction()
+{
+
+}
 
 MonteCarlo::~MonteCarlo()
 {
@@ -17,10 +64,20 @@ void MonteCarlo::Startup( gamestate_t const& newGameState )
 	m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
 	m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
 	m_currentHeadNode = m_headNode;
+
+	m_mcJobSystem = new JobSystem();
 }
 
 void MonteCarlo::Shutdown()
 {
+	if( m_mcJobSystem )
+	{
+		m_mcJobSystem->Shutdown();
+		delete m_mcJobSystem;
+		m_mcJobSystem = nullptr;
+	}
+
+
 	if( m_headNode )
 	{
 		delete m_headNode;

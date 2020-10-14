@@ -3,6 +3,7 @@
 #include "Game/TreeMapNode.hpp"
 #include "Game/Game.hpp"
 
+class JobSystem;
 
 struct ucbResult_t
 {
@@ -27,6 +28,7 @@ struct bestNode_t
 
 class MonteCarlo
 {
+	friend class SimulationJob;
 public:
 	MonteCarlo() = default;
 	~MonteCarlo();
@@ -36,29 +38,35 @@ public:
 
 	//Base MCTS methods
 	void RunSimulations( int numberOfSimulations );
-	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
-	//TreeMapNode* GetBestNodeToSelectAndExpand( TreeMapNode* currentNode );
+	inputMove_t GetBestMove();
+	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
+
+protected:
 	expand_t GetBestNodeToSelect( TreeMapNode* currentNode ); //Returns null if all nodes have been explored
 	TreeMapNode* ExpandNode( expand_t expandData ); //Returns null if can't expand
+	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
 	void BackPropagateResult( int whoWon, TreeMapNode* node );
-	//inputMove_t GetBestInputChoiceFromChildren( TreeMapNode* node );
-	float GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter = SQRT_2 );
+
+// 	inputMove_t GetBestMoveSafe();
+// 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
+
+	
 	//Helper Methods
+	float GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter = SQRT_2 );
 	float GetUCBValueAtNode( TreeMapNode const* node, float explorationParameter = SQRT_2 );
 	bool CanExpand( TreeMapNode const* node );
-	inputMove_t GetBestMove();
 	//bestNode_t GetHighestWinRateChildNode( TreeMapNode const* node );
+	//inputMove_t GetBestInputChoiceFromChildren( TreeMapNode* node );
 
-	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 	//void ResetGame();
 	TreeMapNode const* GetCurrentHeadNode();
 public:
-// 	TreeNode* m_headNode = nullptr;
-// 	TreeNode* m_currentHeadNode = nullptr;
 
 	TreeMapNode* m_headNode = nullptr;
 	TreeMapNode* m_currentHeadNode = nullptr;
 	//int m_player = CIRCLEPLAYER;
+
+	JobSystem* m_mcJobSystem = nullptr;
 };
 
 
