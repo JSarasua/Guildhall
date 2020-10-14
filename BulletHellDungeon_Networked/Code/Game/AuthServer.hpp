@@ -13,7 +13,7 @@ class AuthServer : public Server
 {
 public:
 	AuthServer();
-	~AuthServer();
+	virtual ~AuthServer();
 
 	virtual void Startup() override;
 	virtual void Shutdown() override;

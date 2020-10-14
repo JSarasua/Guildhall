@@ -6,14 +6,14 @@
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
 
-AuthServer::AuthServer()
+AuthServer::AuthServer() : Server()
 {
-	g_theGame = new Game();
+	//g_theGame = new Game();
 }
 
 AuthServer::~AuthServer()
 {
-	delete g_theGame;
+	//delete g_theGame;
 }
 
 void AuthServer::Startup()

@@ -12,24 +12,24 @@ class Server
 {
 public:
 	Server();
-	~Server();
-	virtual void Startup();
-	virtual void Shutdown();
-	virtual void BeginFrame();
-	virtual void EndFrame();
-	virtual void RestartGame();
-	virtual void PauseGame();
-	virtual void UnpauseGame();
+	virtual ~Server();
+	virtual void Startup() = 0;
+	virtual void Shutdown() = 0;
+	virtual void BeginFrame() = 0;
+	virtual void EndFrame() = 0;
+	virtual void RestartGame() = 0;
+	virtual void PauseGame() = 0;
+	virtual void UnpauseGame() = 0;
 
-	virtual void Update( float deltaSeconds );
-	virtual void UpdateGameState( eGameState newGamestate );
+	virtual void Update( float deltaSeconds ) = 0;
+	virtual void UpdateGameState( eGameState newGamestate ) = 0;
 
-	virtual int GetPlayerHealth();
-	virtual int GetBossHealth();
-	virtual SpriteDefinition const* GetPlayerWeaponSprite() const;
+	virtual int GetPlayerHealth() = 0;
+	virtual int GetBossHealth() = 0;
+	virtual SpriteDefinition const* GetPlayerWeaponSprite() const = 0;
 
-	virtual std::vector<Vertex_PCU> const& GetTileVertsToRender();
-	virtual std::vector<Entity*> const& GetEntitiesToRender();
-	virtual eGameState GetCurrentGameState();
+	virtual std::vector<Vertex_PCU> const& GetTileVertsToRender() = 0;
+	virtual std::vector<Entity*> const& GetEntitiesToRender() = 0;
+	virtual eGameState GetCurrentGameState() = 0;
 
 };
