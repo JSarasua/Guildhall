@@ -10,7 +10,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
-
+#include "Game/AuthServer.hpp"
 
 //Constants for calculation ship position change
 const float NOTIME = 0.f;
@@ -22,7 +22,7 @@ App::App()
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
-	g_theServer = new Server();
+	g_theServer = new AuthServer();
 	g_theClient = new Client();
 	//g_theGame =  new Game();
 	g_theConsole = new DevConsole();

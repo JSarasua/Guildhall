@@ -32,6 +32,8 @@ struct Vertex_PCU;
 class Game
 {
 	friend class Server;
+	friend class AuthServer;
+	friend class RemoteServer;
 	friend class Client;
 public:
 	Game();

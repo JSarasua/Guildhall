@@ -106,6 +106,12 @@
     <ClCompile Include="RemoteClient.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="AuthServer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteServer.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -196,6 +202,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="RemoteClient.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthServer.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteServer.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

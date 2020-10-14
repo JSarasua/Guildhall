@@ -189,6 +189,7 @@
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="AudioDefinition.cpp" />
+    <ClCompile Include="AuthServer.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletDefinition.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="MapGenStep_Worm.cpp" />
     <ClCompile Include="PlayerClient.cpp" />
     <ClCompile Include="RemoteClient.cpp" />
+    <ClCompile Include="RemoteServer.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
@@ -221,6 +223,7 @@
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="AudioDefinition.hpp" />
+    <ClInclude Include="AuthServer.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="BulletDefinition.hpp" />
     <ClInclude Include="Client.hpp" />
@@ -241,6 +244,7 @@
     <ClInclude Include="MapGenStep_Worm.hpp" />
     <ClInclude Include="PlayerClient.hpp" />
     <ClInclude Include="RemoteClient.hpp" />
+    <ClInclude Include="RemoteServer.hpp" />
     <ClInclude Include="Server.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
