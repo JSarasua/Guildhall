@@ -100,6 +100,12 @@
     <ClCompile Include="Client.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerClient.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteClient.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -184,6 +190,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="Client.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerClient.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoteClient.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

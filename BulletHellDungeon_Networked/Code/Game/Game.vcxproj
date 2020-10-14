@@ -207,6 +207,8 @@
     <ClCompile Include="MapGenStep_FromImage.cpp" />
     <ClCompile Include="MapGenStep_Mutate.cpp" />
     <ClCompile Include="MapGenStep_Worm.cpp" />
+    <ClCompile Include="PlayerClient.cpp" />
+    <ClCompile Include="RemoteClient.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
@@ -237,6 +239,8 @@
     <ClInclude Include="MapGenStep_FromImage.hpp" />
     <ClInclude Include="MapGenStep_Mutate.hpp" />
     <ClInclude Include="MapGenStep_Worm.hpp" />
+    <ClInclude Include="PlayerClient.hpp" />
+    <ClInclude Include="RemoteClient.hpp" />
     <ClInclude Include="Server.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
