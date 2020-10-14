@@ -71,9 +71,9 @@ private:
 	void UpdatePlaying( float deltaSeconds );
 
 	//RenderState
-	void RenderLoading();
-	void RenderAttract();
-	void RenderDeath();
+// 	void RenderLoading();
+// 	void RenderAttract();
+// 	void RenderDeath();
 	void RenderVictory();
 	void RenderPaused();
 	void RenderPlaying();

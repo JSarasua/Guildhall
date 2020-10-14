@@ -372,6 +372,11 @@ WeaponDefinition const* Actor::GetCurrentWeapon() const
 
 bool Actor::UpdateInput( EventArgs const& args )
 {
+	if( m_weapons.size() == 0 )
+	{
+		return true;
+	}
+
 	Vec2 mousePos = args.GetValue( "mousePos", Vec2() );
 	bool isShooting = args.GetValue( "isShooting", false );
 	bool isDodging = args.GetValue( "isDodging", false );

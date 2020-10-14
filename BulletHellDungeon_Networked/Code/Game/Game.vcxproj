@@ -208,10 +208,12 @@
     <ClCompile Include="MapGenStep_FromImage.cpp" />
     <ClCompile Include="MapGenStep_Mutate.cpp" />
     <ClCompile Include="MapGenStep_Worm.cpp" />
+    <ClCompile Include="MultiPlayerGame.cpp" />
     <ClCompile Include="PlayerClient.cpp" />
     <ClCompile Include="RemoteClient.cpp" />
     <ClCompile Include="RemoteServer.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="SinglePlayerGame.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="TileMetaData.cpp" />
@@ -242,10 +244,12 @@
     <ClInclude Include="MapGenStep_FromImage.hpp" />
     <ClInclude Include="MapGenStep_Mutate.hpp" />
     <ClInclude Include="MapGenStep_Worm.hpp" />
+    <ClInclude Include="MultiPlayerGame.hpp" />
     <ClInclude Include="PlayerClient.hpp" />
     <ClInclude Include="RemoteClient.hpp" />
     <ClInclude Include="RemoteServer.hpp" />
     <ClInclude Include="Server.hpp" />
+    <ClInclude Include="SinglePlayerGame.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="TileMetaData.hpp" />

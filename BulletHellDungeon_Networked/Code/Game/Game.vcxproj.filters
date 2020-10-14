@@ -112,6 +112,12 @@
     <ClCompile Include="RemoteServer.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="SinglePlayerGame.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiPlayerGame.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -208,6 +214,12 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="RemoteServer.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="SinglePlayerGame.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiPlayerGame.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

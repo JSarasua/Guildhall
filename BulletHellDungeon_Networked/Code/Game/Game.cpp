@@ -129,23 +129,23 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render()
 {
-	switch( m_gameState )
-	{
-	case LOADING: RenderLoading();
-		break;
-	case ATTRACT: RenderAttract();
-		break;
- 	case DEATH: RenderDeath();
- 		break;
- 	case VICTORY: RenderVictory();
- 		break;
- 	case PAUSED: RenderPaused();
- 		break;
-	case PLAYING: RenderPlaying();
-		break;
-	default: ERROR_AND_DIE( "Invalid Game State" );
-		break;
-	}
+// 	switch( m_gameState )
+// 	{
+// 	case LOADING: RenderLoading();
+// 		break;
+// 	case ATTRACT: RenderAttract();
+// 		break;
+//  	case DEATH: RenderDeath();
+//  		break;
+//  	case VICTORY: RenderVictory();
+//  		break;
+//  	case PAUSED: RenderPaused();
+//  		break;
+// 	case PLAYING: RenderPlaying();
+// 		break;
+// 	default: ERROR_AND_DIE( "Invalid Game State" );
+// 		break;
+// 	}
 }
 
 
@@ -984,159 +984,10 @@ void Game::UpdatePlaying( float deltaSeconds )
 	UpdateDebugMouse();
 }
 
-void Game::RenderLoading()
-{
-	return;
 
 
-// 	g_theRenderer->ClearScreen( Rgba8::BLACK );
-// 
-// 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-// 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-// 	m_camera.SetColorTarget( 0, colorTarget );
-// 	
-// 	g_theRenderer->BeginCamera( m_camera );
-// 	Texture* loadingScreenTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/LoadingScreen.png" );
-// 	
-// 	g_theRenderer->SetModelMatrix( Mat44() );
-// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-// 	g_theRenderer->BindTexture( loadingScreenTex );
-// 	g_theRenderer->BindShader( (Shader*)nullptr );
-// 	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-// 	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
-// 
-// 	g_theRenderer->EndCamera( m_camera );
-// 
-// 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-// 	m_camera.SetColorTarget( nullptr );
-// 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-}
 
-void Game::RenderAttract()
-{
-	return;
 
-// 	g_theRenderer->ClearScreen( Rgba8::BLACK );
-// 
-// 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-// 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-// 	m_camera.SetColorTarget( 0, colorTarget );
-// 
-// 	g_theRenderer->BeginCamera( m_camera );
-// 
-// 	Texture* mainMenuTex;
-// 	
-// 	if( m_isMouseOverMainMenuPlay )
-// 	{
-// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuPlay.png" );
-// 	}
-// 	else if( m_isMouseOverMainMenuQuit )
-// 	{
-// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenuQuit.png" );
-// 	}
-// 	else
-// 	{
-// 		mainMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/MainMenu.png" );
-// 	}
-// 	AABB2 cameraBounds = AABB2( m_camera.GetOrthoBottomLeft(), m_camera.GetOrthoTopRight() );
-// 
-// 
-// 	g_theRenderer->SetModelMatrix( Mat44() );
-// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-// 	g_theRenderer->BindTexture( mainMenuTex );
-// 	g_theRenderer->BindShader( (Shader*)nullptr );
-// 	g_theRenderer->DrawAABB2Filled( cameraBounds, Rgba8::WHITE );
-// 
-// 	RenderMouse();
-// 	g_theRenderer->EndCamera( m_camera );
-// 
-// 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-// 	m_camera.SetColorTarget( nullptr );
-// 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-}
-
-void Game::RenderDeath()
-{
-	return;
-// 	Rgba8 backgroundTint = Rgba8( 0, 0, 0, 0 );
-// 	if( m_deathTimer.HasElapsed() )
-// 	{
-// 		backgroundTint.a = 150;
-// 	}
-// 	else
-// 	{
-// 		float elapsedTime = (float)m_deathTimer.GetElapsedSeconds();
-// 		float totalTime = (float)m_deathTimer.GetSecondsRemaining() + elapsedTime;
-// 
-// 		float tint = 150.f * (elapsedTime / totalTime);
-// 		backgroundTint.a = (unsigned char)tint;
-// 	}
-// 
-// 	g_theRenderer->ClearScreen( Rgba8::BLACK );
-// 
-// 	Texture* backbuffer = g_theRenderer->GetBackBuffer();
-// 	Texture* colorTarget = g_theRenderer->AcquireRenderTargetMatching( backbuffer );
-// 	m_camera.SetColorTarget( 0, colorTarget );
-// 	m_UICamera.SetColorTarget( 0, colorTarget );
-// 
-// 	g_theRenderer->BeginCamera( m_camera );
-// 	g_theRenderer->SetModelMatrix( Mat44() );
-// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-// 	g_theRenderer->BindTexture( nullptr );
-// 	g_theRenderer->BindShader( (Shader*)nullptr );
-// 	RenderGame();
-// 	g_theRenderer->EndCamera( m_camera );
-// 
-// 	g_theRenderer->BeginCamera( m_UICamera );
-// 	RenderUI();
-// 
-// 	AABB2 gameCamera = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
-// 	g_theRenderer->BindTexture( nullptr );
-// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-// 	g_theRenderer->DrawAABB2Filled( gameCamera, backgroundTint );
-// 
-// 	Texture* deathMenuTex = nullptr;
-// 	
-// 	if( m_isMouseOverDeadContinue )
-// 	{
-// 		deathMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenuContinue.png" );
-// 	}
-// 	else
-// 	{
-// 		deathMenuTex = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/DeadMenu.png" );
-// 	}
-// 
-// 
-// 	if( m_deathTimer.HasElapsed() )
-// 	{
-//  		g_theRenderer->BindTexture( deathMenuTex );
-// 		g_theRenderer->DrawAABB2Filled( m_deadMenu, Rgba8::WHITE );
-// 	}
-// 
-// 	g_theRenderer->EndCamera( m_UICamera );
-// 
-// 	g_theRenderer->BeginCamera( m_camera );
-// 	g_theRenderer->SetModelMatrix( Mat44() );
-// 	g_theRenderer->SetBlendMode( eBlendMode::ALPHA );
-// 	g_theRenderer->SetDepth( eDepthCompareMode::COMPARE_ALWAYS, eDepthWriteMode::WRITE_ALL );
-// 	g_theRenderer->BindTexture( nullptr );
-// 	g_theRenderer->BindShader( (Shader*)nullptr );
-// 	RenderMouse();
-// 	g_theRenderer->EndCamera( m_camera );
-// 
-// 	g_theRenderer->CopyTexture( backbuffer, colorTarget );
-// 	m_camera.SetColorTarget( nullptr );
-// 	g_theRenderer->ReleaseRenderTarget( colorTarget );
-// 	GUARANTEE_OR_DIE( g_theRenderer->GetTotalRenderTargetPoolSize() < 8, "Created too many render targets" );
-// 
-// 	DebugRenderBeginFrame();
-// 	DebugRenderWorldToCamera( &m_camera );
-// 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
-// 	DebugRenderEndFrame();
-}
 
 void Game::RenderVictory()
 {
