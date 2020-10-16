@@ -32,7 +32,7 @@ enum eCards
 	CURSE,
 	
 	//Action
-	Village,
+	Village, //Make sure Village is always first action, code depends on it
 	Smithy,
 	CouncilRoom,
 	Festival,

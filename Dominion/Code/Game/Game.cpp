@@ -159,7 +159,7 @@ void Game::InitializeGameState()
 
 
 	PlayerBoard starterDeck = PlayerBoard( &m_rand );
-	std::vector<CardDefinition const*> starterCards;
+	std::vector<CardData_t> starterCards;
 	starterCards.reserve( 10 );
 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
 	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
@@ -178,20 +178,21 @@ void Game::InitializeGameState()
 	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
 
 
-
+	CardData_t copperData( copper, (int)COPPER );
+	CardData_t estateData( estate, (int)ESTATE );
 
 	//7 copper
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
 	//3 estate
-	starterCards.push_back( estate );
-	starterCards.push_back( estate );
-	starterCards.push_back( estate );
+	starterCards.push_back( estateData );
+	starterCards.push_back( estateData );
+	starterCards.push_back( estateData );
 	starterDeck.InitializeDeck( starterCards );
 
 	m_currentGameState = new gamestate_t();
@@ -657,12 +658,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 void Game::DebugDrawGame()
 {
 	//Render Player 2s hand at top of screen
+	int numberOfUniqueCards = CardPile::GetNumberOfPossibleUniqueCards();
+	CardPile player1Hand = m_currentGameState->m_playerBoards[0].GetHand();
+	CardPile player2Hand = m_currentGameState->m_playerBoards[1].GetHand();
 
-	std::vector<CardDefinition const*> player1Hand = m_currentGameState->m_playerBoards[0].GetHand();
-	std::vector<CardDefinition const*> player2Hand = m_currentGameState->m_playerBoards[1].GetHand();
-
-	std::vector<CardDefinition const*> player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
-	std::vector<CardDefinition const*> player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
+	CardPile player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
+	CardPile player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
 
 	pileData_t const* piles = &m_currentGameState->m_cardPiles[0];
 
@@ -795,7 +796,7 @@ void Game::DebugDrawGame()
 
 	AABB2 player1HandAABB = carvingBoard;
 
-	AABB2 carvingPlayer2Hand = player2HandAABB;
+	//AABB2 carvingPlayer2Hand = player2HandAABB;
 
 	Rgba8 handColor = Rgba8::WindsorTan;
 	Rgba8 playAreaColor = Rgba8::Tan;
@@ -809,26 +810,42 @@ void Game::DebugDrawGame()
 
 	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
 
-	for( size_t player2HandIndex = 0; player2HandIndex < player2Hand.size(); player2HandIndex++ )
+	float player2HandSize = (float)player2Hand.TotalCount();
+	int player2HandIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
 	{
-		float player2HandSize = (float)player2Hand.size();
-		float carvingNumber = player2HandSize - (float)player2HandIndex;
-		AABB2 cardArea = carvingPlayer2Hand.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player2Hand[player2HandIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+		int countOfCard = player2Hand.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player2HandSize - (float)player2HandIndex;
+			AABB2 cardArea = player2HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player2HandIndex++;
+		}
 	}
 
-	for( size_t player2PlayAreaIndex = 0; player2PlayAreaIndex < player2PlayArea.size(); player2PlayAreaIndex++ )
+	float player2PlayAreaSize = (float)player2PlayArea.TotalCount();
+	int player2PlayAreaIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
 	{
-		float player2PlayAreaSize = (float)player2PlayArea.size();
-		float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
-		AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player2PlayArea[player2PlayAreaIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+		int countOfCard = player2PlayArea.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
+			AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player2PlayAreaIndex++;
+		}
 	}
 
 	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
@@ -895,29 +912,43 @@ void Game::DebugDrawGame()
 		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
 	}
 
-	for( size_t player1PlayAreaIndex = 0; player1PlayAreaIndex < player1PlayArea.size(); player1PlayAreaIndex++ )
+	float player1PlayAreaSize = (float)player1PlayArea.TotalCount();
+	int player1PlayAreaIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
 	{
-		float player1PlayAreaSize = (float)player1PlayArea.size();
-		float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
-		AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player1PlayArea[player1PlayAreaIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+		int countOfCard = player1PlayArea.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
+			AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player1PlayAreaIndex++;
+		}
 	}
 
-	for( size_t player1HandIndex = 0; player1HandIndex < player1Hand.size(); player1HandIndex++ )
+	float player1HandSize = (float)player1Hand.TotalCount();
+	int player1HandIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
 	{
-		float player1HandSize = (float)player1Hand.size();
-		float carvingNumber = player1HandSize - (float)player1HandIndex;
-		AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-		CardDefinition const* card = player1Hand[player1HandIndex];
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		std::string cardName = card->GetCardName();
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+		int countOfCard = player1Hand.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player1HandSize - (float)player1HandIndex;
+			AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player1HandIndex++;
+		}
 	}
-
-
 
 
 	if( IsGameOver() == PLAYER_1 )
@@ -948,7 +979,8 @@ void Game::DebugDrawGame()
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
 			{
-				CardDefinition const* card = playerDeck->GetHand()[currentBestMove.m_cardHandIndexToPlay];
+				int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
 				moveStr = Stringf( "Best Move: Play %s", card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == END_PHASE )
@@ -969,7 +1001,8 @@ void Game::DebugDrawGame()
 		}
 		else if( bigMoneyMove.m_moveType == PLAY_CARD )
 		{
-			CardDefinition const* card = playerDeck->GetHand()[bigMoneyMove.m_cardHandIndexToPlay];
+			int cardHandIndex = bigMoneyMove.m_cardHandIndexToPlay;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
 			bigMoneyStr = Stringf( "Big Money Best Move: Play %s", card->GetCardName().c_str() );
 		}
 		else if( bigMoneyMove.m_moveType == END_PHASE )
@@ -1120,7 +1153,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			//Decrement coins
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
-			playerDeck->AddCardToDiscardPile( pileData.m_card );
+			playerDeck->AddCardToDiscardPile( pileIndex );
 			playerDeck->m_numberOfBuysAvailable--;
 		}
 		else if( moveToPlay.m_moveType == END_PHASE )
@@ -1212,24 +1245,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 	}
 	else if( moveType == PLAY_CARD )
 	{
-		std::vector<CardDefinition const*> hand = playerDeck->m_hand;
-
-		if( playerDeck->m_numberOfActionsAvailable > 0 )
-		{
-			if( hand.size() > 0 )
-			{
-				int cardIndex = moveToPlay.m_cardHandIndexToPlay;
-				if( cardIndex >= 0 && cardIndex < hand.size() )
-				{
-					if( hand[cardIndex]->GetCardType() == ACTION_TYPE )
-					{
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
+		return playerDeck->CanPlayCard( moveToPlay.m_cardHandIndexToPlay, &gameState );
 	}
 	else if( moveType == END_PHASE )
 	{
@@ -1337,15 +1353,14 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 		int numberOfActions = playerDeck->m_numberOfActionsAvailable;
 		if( numberOfActions > 0 )
 		{
-			std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
-			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+			CardPile const& hand = playerDeck->GetHand();
+			for( int cardIndex = eCards::Village; cardIndex < eCards::NUM_CARDS; cardIndex++ )
 			{
-				CardDefinition const* card = hand[handIndex];
-				if( card->GetCardType() == ACTION_TYPE )
+				if( hand.CountOfCard( cardIndex ) > 0 )
 				{
 					inputMove_t newMove = move;
 					newMove.m_moveType = PLAY_CARD;
-					newMove.m_cardHandIndexToPlay = (int)handIndex;
+					newMove.m_cardHandIndexToPlay = cardIndex;
 					validMoves.push_back( newMove );
 				}
 			}
@@ -1406,20 +1421,20 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 
 	if( currentPhase == ACTION_PHASE )
 	{
-		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
-		int numberOfActionsAvailable = playerDeck->m_numberOfActionsAvailable;
-		if( numberOfActionsAvailable > 0 )
-		{
-			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
-			{
-				CardDefinition const* card = hand[handIndex];
-				if( card->GetCardType() == ACTION_TYPE )
-				{
-					numberOfValidMoves++;
-				}
-			}
-		}
-
+		numberOfValidMoves += playerDeck->GetNumberOfValidActionsToPlay();
+// 		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
+// 		int numberOfActionsAvailable = playerDeck->m_numberOfActionsAvailable;
+// 		if( numberOfActionsAvailable > 0 )
+// 		{
+// 			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
+// 			{
+// 				CardDefinition const* card = hand[handIndex];
+// 				if( card->GetCardType() == ACTION_TYPE )
+// 				{
+// 					numberOfValidMoves++;
+// 				}
+// 			}
+// 		}
 	}
 	else if( currentPhase == BUY_PHASE )
 	{
@@ -1489,7 +1504,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			//Decrement coins
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
-			playerDeck->AddCardToDiscardPile( pileData.m_card );
+			playerDeck->AddCardToDiscardPile( pileIndex );
 			playerDeck->m_numberOfBuysAvailable--;
 		}
 		else if( move.m_moveType == END_PHASE )
@@ -1607,7 +1622,7 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 gamestate_t Game::GetRandomInitialGameState()
 {
 	PlayerBoard starterDeck = PlayerBoard( &m_rand );
-	std::vector<CardDefinition const*> starterCards;
+	std::vector<CardData_t> starterCards;
 	starterCards.reserve( 10 );
 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
 	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
@@ -1625,18 +1640,21 @@ gamestate_t Game::GetRandomInitialGameState()
 	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
 	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
 
+	CardData_t copperData( copper, (int)COPPER );
+	CardData_t estateData( estate, (int)ESTATE );
+
 	//7 copper
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
-	starterCards.push_back( copper );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
+	starterCards.push_back( copperData );
 	//3 estate
-	starterCards.push_back( estate );
-	starterCards.push_back( estate );
-	starterCards.push_back( estate );
+	starterCards.push_back( estateData );
+	starterCards.push_back( estateData );
+	starterCards.push_back( estateData );
 	starterDeck.InitializeDeck( starterCards );
 
 	gamestate_t newGameState;

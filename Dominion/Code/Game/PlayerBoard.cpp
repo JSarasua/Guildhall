@@ -1,28 +1,29 @@
 #include "Game/PlayerBoard.hpp"
-#include "Game/CardDefinition.hpp"
+//#include "Game/CardDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/Game.hpp"
 
 PlayerBoard::PlayerBoard( RandomNumberGenerator* rand )
 {
 	m_rand = rand;
-	m_hand.reserve( 10 );
-	m_discardPile.reserve( 10 );
-	m_playArea.reserve( 10 );
+
 	m_deck.reserve( 30 );
 }
 
 PlayerBoard::PlayerBoard()
 {
-	m_hand.reserve( 10 );
-	m_discardPile.reserve( 10 );
-	m_playArea.reserve( 10 );
+
 	m_deck.reserve( 30 );
 }
 
-void PlayerBoard::InitializeDeck( std::vector<CardDefinition const*>& deck )
+void PlayerBoard::InitializeDeck( std::vector<CardData_t>& deck )
 {
 	m_deck.swap( deck );
+
+	for( size_t deckIndex = 0; deckIndex < m_deck.size(); deckIndex++ )
+	{
+		m_sortedDeck.AddCard( m_deck[deckIndex].cardIndex );
+	}
 }
 
 void PlayerBoard::ResetBoard()
@@ -39,62 +40,59 @@ void PlayerBoard::InitializeRand( RandomNumberGenerator* rand )
 	m_rand = rand;
 }
 
-void PlayerBoard::AddCardToDiscardPile( CardDefinition const* cardToAdd )
+void PlayerBoard::AddCardToDiscardPile( int cardIndex )
 {
-	m_discardPile.push_back( cardToAdd );
+	m_discardPile.AddCard( cardIndex );
 }
 
-std::vector<CardDefinition const*> const& PlayerBoard::GetHand() const
+CardPile const& PlayerBoard::GetHand() const
 {
 	return m_hand;
 }
 
-std::vector<CardDefinition const*>& PlayerBoard::GetPlayArea()
+CardPile const& PlayerBoard::GetPlayArea() const
 {
 	return m_playArea;
 }
 
-CardDefinition const* PlayerBoard::TakeCardFromHand( size_t cardIndex )
+void PlayerBoard::TakeCardFromHand( size_t cardIndex )
 {
-	CardDefinition const* cardToTake = nullptr;
-	if( !m_hand.empty() )
-	{
-		cardToTake = m_hand[cardIndex]; //Save off the card
-		m_hand[cardIndex] = m_hand.back(); //Move the back element to where the taken card was
-		m_hand.pop_back(); //Remove the last element
-	}
-
-	return cardToTake;
+	m_hand.RemoveCard( (int)cardIndex );
 }
 
 int PlayerBoard::GetCurrentVictoryPoints() const
 {
+
+
 	int currentVPCount = 0;
 
-	size_t handSize = m_hand.size();
-	for( size_t handIndex = 0; handIndex < handSize; handIndex++ )
-	{
-		int cardVPs = m_hand[handIndex]->GetCardVPs();
-		currentVPCount += cardVPs;
-	}
-	size_t discardSize = m_discardPile.size();
-	for( size_t discardIndex = 0; discardIndex < discardSize; discardIndex++ )
-	{
-		int cardVPs = m_discardPile[discardIndex]->GetCardVPs();
-		currentVPCount += cardVPs;
-	}
-	size_t playerAreaSize = m_playArea.size();
-	for( size_t playerAreaIndex = 0; playerAreaIndex < playerAreaSize; playerAreaIndex++ )
-	{
-		int cardVPs = m_playArea[playerAreaIndex]->GetCardVPs();
-		currentVPCount += cardVPs;
-	}
-	size_t deckSize = m_deck.size();
-	for( size_t deckIndex = 0; deckIndex < deckSize; deckIndex++ )
-	{
-		int cardVPs = m_deck[deckIndex]->GetCardVPs();
-		currentVPCount += cardVPs;
-	}
+	int countOfProvinces = 0;
+	countOfProvinces += m_hand.CountOfCard( PROVINCE );
+	countOfProvinces += m_discardPile.CountOfCard( PROVINCE );
+	countOfProvinces += m_playArea.CountOfCard( PROVINCE );
+	countOfProvinces += m_sortedDeck.CountOfCard( PROVINCE );
+	currentVPCount += countOfProvinces * 6;
+
+	int countOfDuchies = 0;
+	countOfDuchies += m_hand.CountOfCard( DUCHY );
+	countOfDuchies += m_discardPile.CountOfCard( DUCHY );
+	countOfDuchies += m_playArea.CountOfCard( DUCHY );
+	countOfDuchies += m_sortedDeck.CountOfCard( DUCHY );
+	currentVPCount += countOfDuchies * 3;
+
+	int countOfEstates = 0;
+	countOfEstates += m_hand.CountOfCard( ESTATE );
+	countOfEstates += m_discardPile.CountOfCard( ESTATE );
+	countOfEstates += m_playArea.CountOfCard( ESTATE );
+	countOfEstates += m_sortedDeck.CountOfCard( ESTATE );
+	currentVPCount += countOfEstates; //Worth 1 VP
+
+	int countOfCurses = 0;
+	countOfCurses += m_hand.CountOfCard( CURSE );
+	countOfCurses += m_discardPile.CountOfCard( CURSE );
+	countOfCurses += m_playArea.CountOfCard( CURSE );
+	countOfCurses += m_sortedDeck.CountOfCard( CURSE );
+	currentVPCount -= countOfCurses; //Worth -1 VP
 
 	return currentVPCount;
 }
@@ -110,8 +108,8 @@ void PlayerBoard::ShuffleDeck()
 	for( int deckIndex = 0; deckIndex < deckSize; deckIndex++ )
 	{
 		int indexToSwapWith = m_rand->RollRandomIntInRange( deckIndex, deckSize - 1 );
-		CardDefinition const* firstCard = m_deck[deckIndex];
-		CardDefinition const* secondCard = m_deck[indexToSwapWith];
+		CardData_t firstCard = m_deck[deckIndex];
+		CardData_t secondCard = m_deck[indexToSwapWith];
 
 		m_deck[deckIndex] = secondCard;
 		m_deck[indexToSwapWith] = firstCard;
@@ -120,43 +118,53 @@ void PlayerBoard::ShuffleDeck()
 
 void PlayerBoard::AddDiscardPileToDeck()
 {
-	m_deck.insert( m_deck.end(), m_discardPile.begin(), m_discardPile.end() );
-	m_discardPile.clear();
+	size_t uniqueCardCount = m_discardPile.GetNumberOfPossibleUniqueCards();
+	for( size_t cardIndex = 0; cardIndex < uniqueCardCount; cardIndex++ )
+	{
+		int pileSize = m_discardPile[cardIndex];
+		if( pileSize > 0 )
+		{
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+			for( int pileIndex = 0; pileIndex < pileSize; pileIndex++ )
+			{
+				m_deck.emplace_back( card, (int)cardIndex );
+			}
+		}
+	}
+	m_sortedDeck.InsertPile( m_discardPile );
+
+	m_discardPile.Clear();
 }
 
 void PlayerBoard::DiscardHand()
 {
-	m_discardPile.insert( m_discardPile.end(), m_hand.begin(), m_hand.end() );
-	m_hand.clear();
+	m_discardPile.InsertPile( m_hand );
+	m_hand.Clear();
 }
 
 void PlayerBoard::DiscardPlayArea()
 {
-	m_discardPile.insert( m_discardPile.end(), m_playArea.begin(), m_playArea.end() );
-	m_playArea.clear();
+	m_discardPile.InsertPile( m_playArea );
+	m_playArea.Clear();
 }
 
 void PlayerBoard::PlayTreasureCards()
 {
-	size_t handIndex = 0;
-	while( handIndex < m_hand.size() )
-	{
-		CardDefinition const* card = m_hand[handIndex];
-		if( nullptr == card )
-		{
-			ERROR_AND_DIE( "Card returned null." );
-		}
+	int copperCardCount = m_hand.CountOfCard( COPPER );
+	int silverCardCount = m_hand.CountOfCard( SILVER );
+	int goldCardCount = m_hand.CountOfCard( GOLD );
 
-		if( card->GetCardType() == TREASURE_TYPE )
-		{
-			m_currentCoins += card->GetCoins();
-			PlayCard( handIndex, nullptr );
-		}
-		else
-		{
-			handIndex++;
-		}
-	}
+	m_currentCoins += copperCardCount;
+	m_currentCoins += silverCardCount * 2;
+	m_currentCoins += goldCardCount * 3;
+
+	m_hand.RemoveCard( COPPER, copperCardCount );
+	m_hand.RemoveCard( SILVER, silverCardCount );
+	m_hand.RemoveCard( GOLD, goldCardCount );
+
+	m_playArea.AddCard( COPPER, copperCardCount );
+	m_playArea.AddCard( SILVER, silverCardCount );
+	m_playArea.AddCard( GOLD, goldCardCount );
 }
 
 void PlayerBoard::Draw( int numberToDraw )
@@ -171,13 +179,12 @@ void PlayerBoard::Draw( int numberToDraw )
 
 		if( !m_deck.empty() )
 		{
-			CardDefinition const* cardToDraw = m_deck.back();
+			CardData_t& cardData = m_deck.back();
+			m_hand.AddCard( cardData.cardIndex );
 			m_deck.pop_back();
-			m_hand.push_back( cardToDraw );
+			m_sortedDeck.RemoveCard( cardData.cardIndex );
 		}
 	}
-
-
 }
 
 void PlayerBoard::Draw5()
@@ -189,8 +196,14 @@ void PlayerBoard::Draw5()
 
 void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 {
-	CardDefinition const* cardToPlay = TakeCardFromHand( handIndex );
-	m_playArea.push_back( cardToPlay );
+	if( m_hand[handIndex] <= 0 )
+	{
+		return;
+	}
+
+	m_hand.RemoveCard( (int)handIndex );
+	m_playArea.AddCard( (int)handIndex );
+	CardDefinition const* cardToPlay = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
 
 	if( cardToPlay->GetCardType() == ACTION_TYPE )
 	{
@@ -232,7 +245,7 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 					if( pileData.m_pileSize > 0 )
 					{
 						pileData.m_pileSize -= 1;
-						player1Deck->AddCardToDiscardPile( pileData.m_card );
+						player1Deck->m_discardPile.AddCard( CURSE );
 					}
 				}
 				if( player2Deck != this )
@@ -241,7 +254,7 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 					if( pileData.m_pileSize > 0 )
 					{
 						pileData.m_pileSize -= 1;
-						player2Deck->AddCardToDiscardPile( pileData.m_card );
+						player2Deck->m_discardPile.AddCard( CURSE );
 					}
 				}
 			}
@@ -254,12 +267,40 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 
 }
 
+bool PlayerBoard::CanPlayCard( int handIndex, gamestate_t const* gameState ) const
+{
+	UNUSED( gameState );
+	if( m_numberOfActionsAvailable > 0 )
+	{
+		if( m_hand.CountOfCard( handIndex ) > 0 )
+		{
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
+			if( card && card->GetCardType() == ACTION_TYPE )
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+int PlayerBoard::GetNumberOfValidActionsToPlay() const
+{
+	if( m_numberOfActionsAvailable > 0 )
+	{
+		return m_hand.GetNumberOfUniqueActions();
+	}
+
+	return 0;
+}
+
 bool PlayerBoard::UnorderedCompare( PlayerBoard const& compare ) const
 {
-	bool isHandEqual = CardDefinition::UnorderedCompare( m_hand, compare.m_hand );
-	bool isDiscardEqual = CardDefinition::UnorderedCompare( m_discardPile, compare.m_discardPile );
-	bool isPlayAreaEqual = CardDefinition::UnorderedCompare( m_playArea, compare.m_playArea );
-	bool isDeckEqual = CardDefinition::UnorderedCompare( m_deck, compare.m_deck );
+	bool isHandEqual = m_hand == compare.m_hand;
+	bool isDiscardEqual = m_discardPile == compare.m_discardPile;
+	bool isPlayAreaEqual = m_playArea == compare.m_playArea;
+	bool isDeckEqual = m_sortedDeck == compare.m_sortedDeck;
 	bool isCurrentCoinsEqual = ( m_currentCoins == compare.m_currentCoins );
 	bool isActionsEqual = ( m_numberOfActionsAvailable == compare.m_numberOfActionsAvailable );
 	bool isBuysEqual = ( m_numberOfBuysAvailable == compare.m_numberOfBuysAvailable );
@@ -273,4 +314,3 @@ bool PlayerBoard::UnorderedCompare( PlayerBoard const& compare ) const
 
 	return false;
 }
-
