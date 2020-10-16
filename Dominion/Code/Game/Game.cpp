@@ -377,6 +377,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 			//m_mc->RunSimulations( 400 );
 			m_mcts->RunSimulations( 400 );
+			m_simCount += 400;
 		}
 		else
 		{
@@ -1012,6 +1013,12 @@ void Game::DebugDrawGame()
 		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
 	}
 	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 15.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
+
+	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.81f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current expand time: %f", (float)m_mcts->m_expandTime ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.79f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim time: %f", (float)m_mcts->m_simTime ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.77f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current backpropagation time: %f", (float)m_mcts->m_backpropagationTime ).c_str() );
 
 
 

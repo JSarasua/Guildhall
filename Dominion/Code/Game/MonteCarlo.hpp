@@ -67,6 +67,12 @@ public:
 	//int m_player = CIRCLEPLAYER;
 
 	JobSystem* m_mcJobSystem = nullptr;
+
+	double m_totalTime = 0;
+	double m_selectTime = 0;
+	double m_expandTime = 0;
+	double m_simTime = 0;
+	double m_backpropagationTime = 0;
 };
 
 

@@ -3,6 +3,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/JobSystem.hpp"
+#include "Engine/Core/Time.hpp"
 
 
 class SimulationJob : public Job
@@ -89,27 +90,50 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
 	{
+		double startSelectTime = GetCurrentTimeSeconds();
 		expand_t expandResult = GetBestNodeToSelect( m_currentHeadNode );
+		double endSelectTime = GetCurrentTimeSeconds();
+		m_selectTime += (endSelectTime - startSelectTime);
+		m_totalTime += (endSelectTime - startSelectTime);
 
 		if( nullptr == expandResult.nodeToExpand )
 		{
 			//can't select
 			break;
 		}
+
+		double startExpandTime = GetCurrentTimeSeconds();
 		TreeMapNode* expandedNode = ExpandNode( expandResult );
+		double endExpandTime = GetCurrentTimeSeconds();
+		m_expandTime += (endExpandTime - startExpandTime);
+		m_totalTime += (endExpandTime - startExpandTime);
+
 		if( nullptr == expandedNode )
 		{
 			//can't expand
 			break;
 		}
 		//Returns an int to handle case of ties
+		double startSimTime = GetCurrentTimeSeconds();
 		int whoWon = RunSimulationOnNode( expandedNode );
+		double endSimTime = GetCurrentTimeSeconds();
+		m_simTime += (endSimTime - startSimTime);
+		m_totalTime += (endSimTime - startSimTime);
+
+		double startBackPropTime = GetCurrentTimeSeconds();
 		BackPropagateResult( whoWon, expandedNode );
+		double endBackPropTime = GetCurrentTimeSeconds();
+		m_backpropagationTime += (endBackPropTime - startBackPropTime);
+		m_totalTime += (endBackPropTime - startBackPropTime);
 	}
 }
 
 int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 {
+	double randomMoveTime = 0;
+	double updateGameStateTime = 0;
+	double isGameOverTime = 0;
+
 	gamestate_t currentGameState = *node->m_data->m_currentGamestate;
 	currentGameState.ShuffleDecks();
 
@@ -123,9 +147,21 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 
 	while( isGameOver == GAMENOTOVER )
 	{
+		double randomMoveStart = GetCurrentTimeSeconds();
 		move = g_theGame->GetRandomMoveAtGameState( currentGameState );
+		double randomMoveEnd = GetCurrentTimeSeconds();
+		randomMoveTime += randomMoveEnd - randomMoveStart;
+
+		double gameStateStart = GetCurrentTimeSeconds();
 		currentGameState = g_theGame->GetGameStateAfterMove( currentGameState, move );
+		double gameStateEnd = GetCurrentTimeSeconds();
+		updateGameStateTime += gameStateEnd - gameStateStart;
+
+		double gameOverStart = GetCurrentTimeSeconds();
 		isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
+		double gameOverEnd = GetCurrentTimeSeconds();
+		isGameOverTime += gameOverEnd - gameOverStart;
+
 	}
 
 	return isGameOver;
@@ -370,6 +406,7 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 		newNode->m_data = new data_t( metaData_t(), input, newGameState );
 
 		expandNode->m_possibleOutcomes[input].push_back( newNode );
+
 		return newNode;
 	}
 
@@ -393,7 +430,7 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 				gamestate_t* newGameState = new gamestate_t( g_theGame->GetGameStateAfterMove( currentGameState, currentMove ) );
 				newNode->m_data = new data_t( metaData_t(), input, newGameState );
 				newVectorOfOutComes.push_back( newNode );
-				
+
 				return newNode;
 			}
 		}
