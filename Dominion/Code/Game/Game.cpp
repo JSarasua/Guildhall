@@ -1626,6 +1626,80 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 
 }
 
+inputMove_t Game::GetMoveUsingSingleWitch( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
+	{
+		return newMove;
+	}
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+		if( validMoves.size() == 1 )
+		{
+			return validMoves[0];
+		}
+		else
+		{
+			for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+			{
+				if( validMoves[moveIndex].m_moveType != END_PHASE )
+				{
+					return validMoves[moveIndex];
+				}
+			}
+
+			newMove.m_moveType = END_PHASE;
+			return newMove;
+		}
+
+	}
+	else
+	{
+
+		PlayerBoard const* playerDeck = &currentGameState.m_playerBoards[0];
+		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
+		{
+			playerDeck = &currentGameState.m_playerBoards[1];
+		}
+
+		int currentMoney = playerDeck->GetCurrentMoney();
+		newMove.m_moveType = BUY_MOVE;
+		if( playerDeck->m_numberOfBuysAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else if( playerDeck->HasCard( Witch ) && currentMoney >= 5 )
+		{
+			newMove.m_cardIndexToBuy = (int)Witch;
+		}
+		else if( currentMoney >= 8 )
+		{
+			newMove.m_cardIndexToBuy = (int)PROVINCE;
+		}
+		else if( currentMoney >= 6 )
+		{
+			newMove.m_cardIndexToBuy = (int)GOLD;
+		}
+		else if( currentMoney >= 3 )
+		{
+			newMove.m_cardIndexToBuy = (int)SILVER;
+		}
+		else
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+
+		return newMove;
+	}
+
+}
+
 gamestate_t Game::GetRandomInitialGameState()
 {
 	PlayerBoard starterDeck = PlayerBoard( &m_rand );

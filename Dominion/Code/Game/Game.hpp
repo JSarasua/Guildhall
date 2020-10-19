@@ -253,6 +253,7 @@ public:
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 private:
 	void InitializeGameState();

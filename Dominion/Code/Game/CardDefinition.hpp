@@ -76,5 +76,7 @@ public:
 
 	bool m_OpponentsGetCurse = false;
 	bool m_OpponentsDrawCard = false;
+	bool m_trashUpToFourCards = false;
+	bool m_discardUptoHandSizeToDrawThatMany = false;
 
 };

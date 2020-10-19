@@ -70,6 +70,7 @@ public:
 	size_t GetDiscardSize() { return (size_t)m_discardPile.TotalCount(); }
 	int GetNumberOfValidActionsToPlay() const;
 	bool UnorderedCompare( PlayerBoard const& compare ) const;
+	bool HasCard( int cardIndex ) const;
 
 public:
 

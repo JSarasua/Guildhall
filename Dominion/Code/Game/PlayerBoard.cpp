@@ -258,6 +258,16 @@ void PlayerBoard::PlayCard( size_t handIndex, gamestate_t* gameState  )
 					}
 				}
 			}
+
+			if( cardToPlay->m_discardUptoHandSizeToDrawThatMany )
+			{
+
+			}
+
+			if( cardToPlay->m_trashUpToFourCards )
+			{
+
+			}
 		}
 		else
 		{
@@ -308,6 +318,19 @@ bool PlayerBoard::UnorderedCompare( PlayerBoard const& compare ) const
 	if( isHandEqual && isDiscardEqual && 
 		isPlayAreaEqual && isCurrentCoinsEqual && 
 		isActionsEqual && isBuysEqual && isDeckEqual )
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool PlayerBoard::HasCard( int cardIndex ) const
+{
+	if( m_hand.CountOfCard( cardIndex ) ||
+		m_discardPile.CountOfCard( cardIndex ) ||
+		m_playArea.CountOfCard( cardIndex ) ||
+		m_sortedDeck.CountOfCard( cardIndex ) )
 	{
 		return true;
 	}
