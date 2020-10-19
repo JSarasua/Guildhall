@@ -44,11 +44,14 @@ enum eBossState
 class Actor : public Entity
 {
 	friend class Map;
-public:
-	Actor() = delete;
-	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef);
+	friend class EntityFactory;
+private:
+	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef );
 	Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef, PlayerController playerController);
 	~Actor();
+public:
+	Actor() = delete;
+
 
 	virtual void Startup() override;
 	virtual void Update( float deltaSeconds );

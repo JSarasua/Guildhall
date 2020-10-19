@@ -7,6 +7,7 @@
 #include "Game/Actor.hpp"
 #include "Game/ActorDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
+#include "Game/EntityFactory.hpp"
 
 EnemySpawner::EnemySpawner( Vec2 const& position, FloatRange const& spawnRadius, IntRange const& numberOfEnemiesToSpawn, float playerCheckRadius, Actor* player, Map* currentMap ) :
 	m_position(position),
@@ -74,7 +75,8 @@ void EnemySpawner::Update()
 				int numOfWeaponTypes = (int)m_weapons.size() - 1;
 				int randomWeaponType = randGen.RollRandomIntInRange( 0, numOfWeaponTypes );
 
-				Actor* entityToSpawn = new Actor( spawnPosition, Vec2(), 0.f, 0.f, m_enemyTypes[randomEnemyType] );
+				//Actor* entityToSpawn = new Actor( spawnPosition, Vec2(), 0.f, 0.f, m_enemyTypes[randomEnemyType] );
+				Actor* entityToSpawn = EntityFactory::CreateActor( m_enemyTypes[randomEnemyType], spawnPosition );
 				entityToSpawn->SetEnemy( m_player );
 				entityToSpawn->AddWeapon( m_weapons[randomWeaponType] );
 				m_map->SpawnEntity( entityToSpawn );

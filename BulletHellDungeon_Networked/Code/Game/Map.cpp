@@ -22,6 +22,7 @@
 #include "Game/WeaponDefinition.hpp"
 #include "Game/EnemySpawner.hpp"
 #include "Game/Loot.hpp"
+#include "Game/EntityFactory.hpp"
 
 
 
@@ -359,7 +360,8 @@ void Map::SpawnBullet( Entity* shooter )
 			{
 				float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 				float bulletOrientationWithSpread = bulletOrientation + spread;
-				m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity );
+				m_entities[entityIndex] = EntityFactory::CreateBullet( bulletDef, bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletSpeedMultiplier, actorVelocity );
+				//m_entities[entityIndex] = new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity );
 
 				bulletCount--;
 				if( bulletCount <= 0 )
@@ -378,7 +380,8 @@ void Map::SpawnBullet( Entity* shooter )
 	{
 		float spread = g_theGame->m_rand.RollRandomFloatInRange( -bulletSpread, bulletSpread );
 		float bulletOrientationWithSpread = bulletOrientation + spread;
-		m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity ) );
+		m_entities.push_back( EntityFactory::CreateBullet( bulletDef, bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletSpeedMultiplier, actorVelocity ) );
+		//m_entities.push_back( new Bullet( bulletPosition, bulletOrientationWithSpread, bulletType, FACTION_GOOD, bulletDef, bulletSpeedMultiplier, actorVelocity ) );
 	}
 
 	shooter->SetIsFiring( false );
@@ -544,7 +547,8 @@ void Map::ResolveEntityCollisions( Entity* currentEntity )
 							bool doesLootDrop = g_theGame->m_rand.RollPercentChance( 0.25f );
 							if( doesLootDrop )
 							{
-								Loot* loot = new Loot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand ) );
+								Loot* loot = EntityFactory::CreateLoot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand ) );
+								//Loot* loot = new Loot( enemy->GetPosition(), WeaponDefinition::GetRandomWeapon( g_theGame->m_rand ) );
 								m_entities.push_back( loot );
 							}
 						}
@@ -648,7 +652,8 @@ void Map::GarbageCollectEntities()
 				if( entity->m_entityType == ENTITY_TYPE_NPC_ENEMY )
 				{
 					Actor* enemy = (Actor*)entity;
-					Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
+					Loot* loot = EntityFactory::CreateLoot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
+					//Loot* loot = new Loot( enemy->GetPosition(), enemy->GetCurrentWeapon() );
 					m_entities.push_back( loot );
 				}
 
@@ -687,8 +692,8 @@ void Map::AddPlayer( Actor* player )
 	else
 	{
 		ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
-		playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
-
+		//playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
+		playerToAdd = EntityFactory::CreatePlayer( playerActorDef, Vec2( 2.5f, 2.5f ) );
 		WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
 		//WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
 		playerToAdd->AddWeapon( pistolWeapon );
