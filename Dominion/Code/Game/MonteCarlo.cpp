@@ -311,6 +311,55 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 
 }
 
+void MonteCarlo::UpdateBestMove()
+{
+	float bestWinRate = -10000.f;
+	float lowestOpponentWinRate = 10000.f;
+	inputMove_t bestMove;
+	bestNode_t worstOpponentNode;
+	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
+
+	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
+	{
+		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
+	}
+	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
+	{
+		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
+
+		float sumOfWins = 0;
+		float sumOfSims = 0;
+
+		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
+		{
+			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
+			float wins = (float)metaData.m_numberOfWins;
+			float sims = (float)metaData.m_numberOfSimulations;
+
+			sumOfWins += wins;
+			sumOfSims += sims;
+		}
+
+		float childWinRate = sumOfWins/sumOfSims;
+		if( childWinRate > 0.999f ) //A winnning move
+		{
+			bestWinRate = childWinRate;
+			bestMove = validMoveIter.first;
+			break;
+		}
+		else if( bestWinRate < childWinRate )
+		{
+			bestWinRate = childWinRate;
+			bestMove = validMoveIter.first;
+		}
+	}
+
+	//Think about getting worst opponentNode
+	m_bestMoveLock.lock();
+	m_bestMove = bestMove;
+	m_bestMoveLock.unlock();
+}
+
 //The best node to select follows these rules
 //1. Can the current node be expanded (input that haven't been tried)?
 //2. Has the current Gamestate never been reached before? (Previous input has created multiple cases)
@@ -579,49 +628,58 @@ bool MonteCarlo::CanExpand( TreeMapNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	float bestWinRate = -10000.f;
-	float lowestOpponentWinRate = 10000.f;
+	UpdateBestMove();
+
 	inputMove_t bestMove;
-	bestNode_t worstOpponentNode;
-	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
+	m_bestMoveLock.lock();
+	bestMove = m_bestMove;
+	m_bestMoveLock.unlock();
 
-	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
-	{
-		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
-	}
-	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
-	{
-		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
-
-		float sumOfWins = 0;
-		float sumOfSims = 0;
-
-		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
-		{
-			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
-			float wins = (float)metaData.m_numberOfWins;
-			float sims = (float)metaData.m_numberOfSimulations;
-
-			sumOfWins += wins;
-			sumOfSims += sims;
-		}
-
-		float childWinRate = sumOfWins/sumOfSims;
-		if( childWinRate > 0.999f ) //A winnning move
-		{
-			bestWinRate = childWinRate;
-			bestMove = validMoveIter.first;
-			return bestMove;
-		}
-		else if( bestWinRate < childWinRate )
-		{
-			bestWinRate = childWinRate;
-			bestMove = validMoveIter.first;
-		}
-	}
-
-	//Think about getting worst opponentNode
 	return bestMove;
+
+// 	float bestWinRate = -10000.f;
+// 	float lowestOpponentWinRate = 10000.f;
+// 	inputMove_t bestMove;
+// 	bestNode_t worstOpponentNode;
+// 	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
+// 
+// 	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
+// 	{
+// 		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
+// 	}
+// 	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
+// 	{
+// 		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
+// 
+// 		float sumOfWins = 0;
+// 		float sumOfSims = 0;
+// 
+// 		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
+// 		{
+// 			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
+// 			float wins = (float)metaData.m_numberOfWins;
+// 			float sims = (float)metaData.m_numberOfSimulations;
+// 
+// 			sumOfWins += wins;
+// 			sumOfSims += sims;
+// 		}
+// 
+// 		float childWinRate = sumOfWins/sumOfSims;
+// 		if( childWinRate > 0.999f ) //A winnning move
+// 		{
+// 			bestWinRate = childWinRate;
+// 			bestMove = validMoveIter.first;
+// 			return bestMove;
+// 		}
+// 		else if( bestWinRate < childWinRate )
+// 		{
+// 			bestWinRate = childWinRate;
+// 			bestMove = validMoveIter.first;
+// 		}
+// 	}
+// 
+// 	//Think about getting worst opponentNode
+// 	return bestMove;
 }
 
 // bestNode_t MonteCarlo::GetHighestWinRateChildNode( TreeMapNode const* node )

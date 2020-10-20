@@ -51,6 +51,8 @@ public:
 	void SetExplorationParameter( float explorationParameter ) { m_ucbValue = explorationParameter; }
 
 protected:
+	void UpdateBestMove();
+
 	expand_t GetBestNodeToSelect( TreeMapNode* currentNode ); //Returns null if all nodes have been explored
 	TreeMapNode* ExpandNode( expand_t expandData ); //Returns null if can't expand
 	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
@@ -84,6 +86,17 @@ public:
 	double m_backpropagationTime = 0;
 
 	float m_ucbValue = 50.f;
+
+
+	//lock
+	std::mutex m_gameStateChangeLock;
+	bool m_didGameStateChange = false;
+	inputMove_t m_moveToMake = inputMove_t();
+	gamestate_t m_newGameState = gamestate_t();
+
+	//lock
+	std::mutex m_bestMoveLock;
+	inputMove_t m_bestMove = inputMove_t();
 };
 
 
