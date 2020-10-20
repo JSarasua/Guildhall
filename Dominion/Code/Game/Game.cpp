@@ -159,94 +159,102 @@ void Game::InitializeGameState()
 	}
 
 
-	PlayerBoard starterDeck = PlayerBoard( &m_rand );
-	std::vector<CardData_t> starterCards;
-	starterCards.reserve( 10 );
-	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
-	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
-	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
-	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
-	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
-	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
-	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
-	
-	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
-	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
-	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
-	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
-	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
-	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
-	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
+// 	PlayerBoard starterDeck = PlayerBoard( &m_rand );
+// 	std::vector<CardData_t> starterCards;
+// 	starterCards.reserve( 10 );
+// 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
+// 	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
+// 	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
+// 	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
+// 	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
+// 	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
+// 	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
+// 	
+// 	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
+// 	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
+// 	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
+// 	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
+// 	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
+// 	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
+// 	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
+// 
+// 
+// 	CardData_t copperData( copper, (int)COPPER );
+// 	CardData_t estateData( estate, (int)ESTATE );
+// 
+// 	//7 copper
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	starterCards.push_back( copperData );
+// 	//3 estate
+// 	starterCards.push_back( estateData );
+// 	starterCards.push_back( estateData );
+// 	starterCards.push_back( estateData );
+// 	starterDeck.InitializeDeck( starterCards );
 
-
-	CardData_t copperData( copper, (int)COPPER );
-	CardData_t estateData( estate, (int)ESTATE );
-
-	//7 copper
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	starterCards.push_back( copperData );
-	//3 estate
-	starterCards.push_back( estateData );
-	starterCards.push_back( estateData );
-	starterCards.push_back( estateData );
-	starterDeck.InitializeDeck( starterCards );
-
-	m_currentGameState = new gamestate_t();
-	m_currentGameState->m_isFirstMove = false;
-	m_currentGameState->m_playerBoards[0] = starterDeck;
-	m_currentGameState->m_playerBoards[1] = starterDeck;
-	
-	m_currentGameState->m_playerBoards[0].ShuffleDeck();
-	m_currentGameState->m_playerBoards[1].ShuffleDeck();
-
-	m_currentGameState->m_playerBoards[0].Draw5();
-	m_currentGameState->m_playerBoards[1].Draw5();
-
-	m_currentGameState->m_currentPhase = ACTION_PHASE;
-
-	//std::array<pileData_t>& cardPiles = m_currentGameState->m_cardPiles;
-	pileData_t* cardPiles = &m_currentGameState->m_cardPiles[0];
-	cardPiles[(int)eCards::COPPER].m_card = copper;
-	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::SILVER].m_card = silver;
-	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::GOLD].m_card = gold;
-	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::ESTATE].m_card = estate;
-	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::DUCHY].m_card = duchy;
-	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::PROVINCE].m_card = province;
-	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::CURSE].m_card = curse;
-	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
-	cardPiles[(int)eCards::Village].m_card = village;
-	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Smithy].m_card = smithy;
-	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Festival].m_card = festival;
-	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
-	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Market].m_card = market;
-	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
-	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Witch].m_card = witch;
-	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
-
-
-	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
+	//m_currentGameState = new gamestate_t();
+	m_currentGameState = new gamestate_t( GetRandomInitialGameState() );
+// 	m_currentGameState->m_isFirstMove = false;
+// 	m_currentGameState->m_playerBoards[0] = starterDeck;
+// 	m_currentGameState->m_playerBoards[1] = starterDeck;
+// 	
+// 	m_currentGameState->m_playerBoards[0].ShuffleDeck();
+// 	m_currentGameState->m_playerBoards[1].ShuffleDeck();
+// 
+// 	m_currentGameState->m_playerBoards[0].Draw5();
+// 	m_currentGameState->m_playerBoards[1].Draw5();
+// 
+// 	m_currentGameState->m_currentPhase = ACTION_PHASE;
+// 
+// 	//std::array<pileData_t>& cardPiles = m_currentGameState->m_cardPiles;
+// 	pileData_t* cardPiles = &m_currentGameState->m_cardPiles[0];
+// 	cardPiles[(int)eCards::COPPER].m_card = copper;
+// 	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
+// 	cardPiles[(int)eCards::SILVER].m_card = silver;
+// 	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
+// 	cardPiles[(int)eCards::GOLD].m_card = gold;
+// 	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
+// 	cardPiles[(int)eCards::ESTATE].m_card = estate;
+// 	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
+// 	cardPiles[(int)eCards::DUCHY].m_card = duchy;
+// 	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
+// 	cardPiles[(int)eCards::PROVINCE].m_card = province;
+// 	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
+// 	cardPiles[(int)eCards::CURSE].m_card = curse;
+// 	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
+// 	cardPiles[(int)eCards::Village].m_card = village;
+// 	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::Smithy].m_card = smithy;
+// 	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::Festival].m_card = festival;
+// 	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
+// 	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::Market].m_card = market;
+// 	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
+// 	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
+// 	cardPiles[(int)eCards::Witch].m_card = witch;
+// 	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
+// 
+// 	
+// 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
 // 	m_mc->SetCurrentGameState( *m_currentGameState );
 // 	m_mc->ResetPossibleMoves();
  	m_mcts->Shutdown();
- 	m_mcts->Startup( *m_currentGameState );
+ 	m_mcts->Startup();
+	m_mcts->SetInitialGameState( *m_currentGameState );
+}
+
+void Game::RestartGame()
+{
+	*m_currentGameState = GetRandomInitialGameState();
+	m_mcts->SetInitialGameState( *m_currentGameState );
 }
 
 void Game::CheckCollisions()
@@ -392,7 +400,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f7Key.WasJustPressed() )
 	{
-		InitializeGameState();
+		RestartGame();
+		//InitializeGameState();
 	}
 	if( f8Key.WasJustPressed() )
 	{

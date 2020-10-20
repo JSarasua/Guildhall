@@ -257,6 +257,7 @@ public:
 	gamestate_t GetRandomInitialGameState();
 private:
 	void InitializeGameState();
+	void RestartGame();
 
 	void CheckCollisions();
 	void UpdateEntities( float deltaSeconds );

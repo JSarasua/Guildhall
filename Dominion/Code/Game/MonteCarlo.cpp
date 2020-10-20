@@ -42,16 +42,24 @@ MonteCarlo::~MonteCarlo()
 {
 }
 
-void MonteCarlo::Startup( gamestate_t const& newGameState )
+void MonteCarlo::Startup()
 {
-	m_headNode = new TreeMapNode();
-	m_headNode->m_data = new data_t();
-	m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
-	m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
-	m_currentHeadNode = m_headNode;
+	if( !m_headNode )
+	{
+		m_headNode = new TreeMapNode();
+		m_headNode->m_data = new data_t();
+		m_headNode->m_data->m_currentGamestate = new gamestate_t();
+		m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
+		m_currentHeadNode = m_headNode;
 
-	m_mcJobSystem = new JobSystem();
-	m_mcJobSystem->AddWorkerThreads( 5 );
+		m_mcJobSystem = new JobSystem();
+		m_mcJobSystem->AddWorkerThreads( 5 );
+	}
+	else
+	{
+		m_currentHeadNode = m_headNode;
+	}
+
 }
 
 void MonteCarlo::Shutdown()
@@ -71,8 +79,10 @@ void MonteCarlo::Shutdown()
 	m_currentHeadNode = nullptr;
 }
 
-void MonteCarlo::Reset( gamestate_t const& newGameState )
+void MonteCarlo::SetInitialGameState( gamestate_t const& newGameState )
 {
+	m_currentHeadNode = m_headNode;
+	UpdateGame( inputMove_t(), newGameState );
 // 	auto outComesIter = m_headNode->m_possibleOutcomes.find( inputMove_t() );
 // 	if( outComesIter != m_headNode->m_possibleOutcomes.end() )
 // 	{
@@ -321,8 +331,11 @@ void MonteCarlo::UpdateBestMove()
 
 	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
 	{
-		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
+		//Need an initial game state to be able to choose best move
+		return;
+		//UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
 	}
+
 	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
 	{
 		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;

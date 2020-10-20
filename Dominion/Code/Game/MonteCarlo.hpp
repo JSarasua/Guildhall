@@ -40,9 +40,9 @@ public:
 	MonteCarlo() = default;
 	~MonteCarlo();
 
-	void Startup(  gamestate_t const& newGameState  );
+	void Startup();
 	void Shutdown();
-	void Reset( gamestate_t const& newGameState );
+	void SetInitialGameState( gamestate_t const& newGameState );
 
 	//Base MCTS methods
 	void RunSimulations( int numberOfSimulations );
