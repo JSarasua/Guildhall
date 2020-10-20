@@ -2,6 +2,7 @@
 //#include "Game/TreeNode.hpp"
 #include "Game/TreeMapNode.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Queues/SynchronizedLockFreeQueue.hpp"
 
 class JobSystem;
 
@@ -26,6 +27,12 @@ struct bestNode_t
 	TreeMapNode const* node = nullptr;
 };
 
+struct sim_t
+{
+	TreeMapNode* nodeToSim = nullptr;
+	int result = -1;
+};
+
 class MonteCarlo
 {
 	friend class SimulationJob;
@@ -35,11 +42,13 @@ public:
 
 	void Startup(  gamestate_t const& newGameState  );
 	void Shutdown();
+	void Reset( gamestate_t const& newGameState );
 
 	//Base MCTS methods
 	void RunSimulations( int numberOfSimulations );
 	inputMove_t GetBestMove();
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
+	void SetExplorationParameter( float explorationParameter ) { m_ucbValue = explorationParameter; }
 
 protected:
 	expand_t GetBestNodeToSelect( TreeMapNode* currentNode ); //Returns null if all nodes have been explored
@@ -73,6 +82,8 @@ public:
 	double m_expandTime = 0;
 	double m_simTime = 0;
 	double m_backpropagationTime = 0;
+
+	float m_ucbValue = 50.f;
 };
 
 

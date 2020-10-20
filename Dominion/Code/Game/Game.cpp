@@ -27,6 +27,7 @@
 #include "Engine/Input/XboxController.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/Vec4.hpp"
+#include "Engine/Core/Time.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -242,8 +243,8 @@ void Game::InitializeGameState()
 
 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
-	m_mc->SetCurrentGameState( *m_currentGameState );
-	m_mc->ResetPossibleMoves();
+// 	m_mc->SetCurrentGameState( *m_currentGameState );
+// 	m_mc->ResetPossibleMoves();
  	m_mcts->Shutdown();
  	m_mcts->Startup( *m_currentGameState );
 }
@@ -395,7 +396,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f8Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 500 );
+		m_mcts->RunSimulations( 100'000 );
+		m_simCount += 100'000;
+		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
 	}
 	if( f9Key.WasJustPressed() )
 	{
@@ -1074,10 +1077,10 @@ void Game::AutoPlayGame()
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
 
-		if( m_timer.CheckAndDecrement() )
-		{
+// 		if( m_timer.CheckAndDecrement() )
+// 		{
 
-			if( m_simCount < 10'000 )
+			if( m_simCount < 1'000 )
 			{
 				m_mcts->RunSimulations( 100 );
 				m_simCount += 100;
@@ -1086,7 +1089,7 @@ void Game::AutoPlayGame()
 			}
 			else
 			{
-				if( m_simCount >= 10'000 )
+				if( m_simCount >= 1'000 )
 				{
 					m_simCount = 0;
 				}
@@ -1103,11 +1106,11 @@ void Game::AutoPlayGame()
 
 				DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 			}
-		}
-		else
-		{
-
-		}
+		//}
+// 		else
+// 		{
+// 
+// 		}
 
 
 // 		m_mcts->RunSimulations( 1000 );
@@ -1470,14 +1473,28 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 
 gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move )
 {
-	gamestate_t newGameState = currentGameState;
+	static double validCheckTime = 0;
+	static double endPhaseTime = 0;
+	static double buyPhaseTime = 0;
+	static double playPhaseTime = 0;
+	static double gameOverTime = 0;
+	static double moveTime = 0;
 
+	double gameOverStart = GetCurrentTimeSeconds();
+	gamestate_t newGameState = currentGameState;
 	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
 	{
 		return newGameState;
 	}
+	double gameOverEnd = GetCurrentTimeSeconds();
+	gameOverTime += gameOverEnd - gameOverStart;
+	
+	double validCheckStart = GetCurrentTimeSeconds();
 	if( IsMoveValidForGameState( move, newGameState ) )
 	{
+		double validCheckEnd = GetCurrentTimeSeconds();
+		validCheckTime += validCheckEnd - validCheckStart;
+
 		PlayerBoard* playerDeck = nullptr;
 		int nextPlayersTurn = 0;
 		if( move.m_whoseMoveIsIt == PLAYER_1 )
@@ -1491,7 +1508,9 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			nextPlayersTurn = PLAYER_1;
 		}
 
-
+		double buyPhaseStart = GetCurrentTimeSeconds();
+		double playPhaseStart = GetCurrentTimeSeconds();
+		double endPhaseStart = GetCurrentTimeSeconds();
 		if( move.m_moveType == PLAY_CARD )
 		{
 			if( playerDeck->m_numberOfActionsAvailable > 0 )
@@ -1500,7 +1519,11 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 				int handIndex = move.m_cardHandIndexToPlay;
 				playerDeck->PlayCard( handIndex, &newGameState );
 			}
-			return newGameState;
+
+			double playPhaseEnd = GetCurrentTimeSeconds();
+			playPhaseTime += playPhaseEnd - playPhaseStart;
+			moveTime += playPhaseEnd - playPhaseStart;
+			//return newGameState;
 		}
 		else if( move.m_moveType == BUY_MOVE )
 		{
@@ -1513,6 +1536,10 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			playerDeck->DecrementCoins( cardCost );
 			playerDeck->AddCardToDiscardPile( pileIndex );
 			playerDeck->m_numberOfBuysAvailable--;
+
+			double buyPhaseEnd = GetCurrentTimeSeconds();
+			buyPhaseTime += buyPhaseEnd - buyPhaseStart;
+			moveTime += buyPhaseEnd - buyPhaseStart;
 		}
 		else if( move.m_moveType == END_PHASE )
 		{
@@ -1535,6 +1562,10 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 				playerDeck->m_numberOfBuysAvailable = 1;
 				playerDeck->m_currentCoins = 0;
 			}
+
+			double endPhaseEnd = GetCurrentTimeSeconds();
+			endPhaseTime += endPhaseEnd - endPhaseStart;
+			moveTime += endPhaseEnd - endPhaseStart;
 		}
 		else
 		{

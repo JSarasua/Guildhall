@@ -4,21 +4,23 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/JobSystem.hpp"
 #include "Engine/Core/Time.hpp"
-
+#include <thread>
+#include <chrono>
 
 class SimulationJob : public Job
 {
-
-	SimulationJob( MonteCarlo* mctsToUse, int numberOfSimulations );
+public:
+	SimulationJob( MonteCarlo* mctsToUse, TreeMapNode* simNode );
 	virtual void Execute() override;
 	virtual void CallBackFunction() override;
 
-	int m_numberOfSimulations = 0;
 	MonteCarlo* m_mctsToUse = nullptr;
+	TreeMapNode* nodeToSimulate = nullptr;
+	int m_whoWonSim = -1;
 };
 
-SimulationJob::SimulationJob( MonteCarlo* mctsToUse, int numberOfSimulations) :
-	m_numberOfSimulations( numberOfSimulations ),
+SimulationJob::SimulationJob( MonteCarlo* mctsToUse, TreeMapNode* simNode ) :
+	nodeToSimulate( simNode ),
 	m_mctsToUse( mctsToUse ),
 	Job()
 {}
@@ -28,30 +30,12 @@ SimulationJob::SimulationJob( MonteCarlo* mctsToUse, int numberOfSimulations) :
 
 void SimulationJob::Execute()
 {
-	for( int currentSimIndex = 0; currentSimIndex < m_numberOfSimulations; currentSimIndex++ )
-	{
-		expand_t expandResult = m_mctsToUse->GetBestNodeToSelect( m_mctsToUse->m_currentHeadNode );
-
-		if( nullptr == expandResult.nodeToExpand )
-		{
-			//can't select
-			break;
-		}
-		TreeMapNode* expandedNode = m_mctsToUse->ExpandNode( expandResult );
-		if( nullptr == expandedNode )
-		{
-			//can't expand
-			break;
-		}
-		//Returns an int to handle case of ties
-		int whoWon = m_mctsToUse->RunSimulationOnNode( expandedNode );
-		m_mctsToUse->BackPropagateResult( whoWon, expandedNode );
-	}
+	m_whoWonSim = m_mctsToUse->RunSimulationOnNode( nodeToSimulate );
 }
 
 void SimulationJob::CallBackFunction()
 {
-
+	m_mctsToUse->BackPropagateResult( m_whoWonSim, nodeToSimulate );
 }
 
 MonteCarlo::~MonteCarlo()
@@ -67,6 +51,7 @@ void MonteCarlo::Startup( gamestate_t const& newGameState )
 	m_currentHeadNode = m_headNode;
 
 	m_mcJobSystem = new JobSystem();
+	m_mcJobSystem->AddWorkerThreads( 5 );
 }
 
 void MonteCarlo::Shutdown()
@@ -84,6 +69,43 @@ void MonteCarlo::Shutdown()
 		delete m_headNode;
 	}
 	m_currentHeadNode = nullptr;
+}
+
+void MonteCarlo::Reset( gamestate_t const& newGameState )
+{
+// 	auto outComesIter = m_headNode->m_possibleOutcomes.find( inputMove_t() );
+// 	if( outComesIter != m_headNode->m_possibleOutcomes.end() )
+// 	{
+// 		std::vector<TreeMapNode*> outcomes = outComesIter->second;
+// 		bool didFindNode = false;
+// 		for( size_t outcomesIndex = 0; outcomesIndex < outcomes.size(); outcomesIndex++ )
+// 		{
+// 			gamestate_t const& gameState = *outcomes[outcomesIndex]->m_data->m_currentGamestate;
+// 			if( gameState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
+// 			{
+// 				m_currentHeadNode = outcomes[outcomesIndex];
+// 				didFindNode = true;
+// 				break;
+// 			}
+// 		}
+// 
+// 		if( !didFindNode )
+// 		{
+// 			m_headNode = new TreeMapNode();
+// 			m_headNode->m_data = new data_t();
+// 			m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
+// 			m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
+// 			m_currentHeadNode = m_headNode;
+// 
+// 			m_mcJobSystem = new JobSystem();
+// 			m_mcJobSystem->AddWorkerThreads( 5 );
+// 		}
+// 	}
+// 	else
+// 	{
+// 		ERROR_AND_DIE("Should have found the invalid move on reset");
+// 	}
+
 }
 
 void MonteCarlo::RunSimulations( int numberOfSimulations )
@@ -113,18 +135,38 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			//can't expand
 			break;
 		}
-		//Returns an int to handle case of ties
-		double startSimTime = GetCurrentTimeSeconds();
-		int whoWon = RunSimulationOnNode( expandedNode );
-		double endSimTime = GetCurrentTimeSeconds();
-		m_simTime += (endSimTime - startSimTime);
-		m_totalTime += (endSimTime - startSimTime);
 
-		double startBackPropTime = GetCurrentTimeSeconds();
-		BackPropagateResult( whoWon, expandedNode );
-		double endBackPropTime = GetCurrentTimeSeconds();
-		m_backpropagationTime += (endBackPropTime - startBackPropTime);
-		m_totalTime += (endBackPropTime - startBackPropTime);
+		if( m_headNode->m_data->m_metaData.m_numberOfSimulations > 100 )
+		{
+			SimulationJob* simJob = new SimulationJob( this, expandedNode );
+			m_mcJobSystem->PostJob( simJob );
+			m_mcJobSystem->ClaimAndDeleteCompletedJobs();
+		}
+		else
+		{
+			//Returns an int to handle case of ties
+			double startSimTime = GetCurrentTimeSeconds();
+			// 		SimulationJob* simJob = new SimulationJob( this, expandedNode );
+			// 		m_mcJobSystem->PostJob( simJob );
+			int whoWon = RunSimulationOnNode( expandedNode );
+			double endSimTime = GetCurrentTimeSeconds();
+			m_simTime += (endSimTime - startSimTime);
+			m_totalTime += (endSimTime - startSimTime);
+
+			double startBackPropTime = GetCurrentTimeSeconds();
+			//m_mcJobSystem->ClaimAndDeleteCompletedJobs();
+			BackPropagateResult( whoWon, expandedNode );
+			double endBackPropTime = GetCurrentTimeSeconds();
+			m_backpropagationTime += (endBackPropTime - startBackPropTime);
+			m_totalTime += (endBackPropTime - startBackPropTime);
+		}
+		
+		int numberOfJobsQueue = m_mcJobSystem->GetNumberOfJobsQueued();
+		if( numberOfJobsQueue > 10 )
+		{
+			std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+			//Sleep( 1 );
+		}
 	}
 }
 
@@ -335,7 +377,7 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		for( auto outcomesAfterMove : nodeToCheck->m_possibleOutcomes )
 		{
 			std::vector<TreeMapNode*> const& childNodesForMove = outcomesAfterMove.second;
-			float ucbValue = GetAverageUCBValue( childNodesForMove );
+			float ucbValue = GetAverageUCBValue( childNodesForMove, m_ucbValue );
 			if( ucbValue > highestUCBValue )
 			{
 				highestUCBValue = ucbValue;
