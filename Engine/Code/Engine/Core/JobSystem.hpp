@@ -8,13 +8,14 @@ class WorkerThread
 {
 	friend class JobSystem;
 public:
-	WorkerThread();
+	WorkerThread( JobSystem* owningJobSystem );
 	~WorkerThread();
 	
 	void WorkerMain();
 
 protected:
 	std::thread* m_workerThread = nullptr;
+	JobSystem* m_owningJobSystem = nullptr;
 };
 
 
@@ -46,6 +47,7 @@ public:
 	void AddWorkerThreads( int numberOfThreadsToAdd );
 	void ClaimAndDeleteCompletedJobs();
 	void PostJob( Job* job );
+	int GetNumberOfJobsQueued();
 
 protected:
 	std::deque<Job*> m_jobsQueued;

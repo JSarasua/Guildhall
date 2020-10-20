@@ -54,7 +54,7 @@ void JobSystem::Shutdown()
 
 void JobSystem::AddWorkerThread()
 {
-	m_workerThreads.push_back( new WorkerThread() );
+	m_workerThreads.push_back( new WorkerThread( this ) );
 }
 
 void JobSystem::AddWorkerThreads( int numberOfThreadsToAdd )
@@ -89,7 +89,17 @@ void JobSystem::PostJob( Job* job )
 	m_jobsQueuedLock.unlock();
 }
 
-WorkerThread::WorkerThread()
+int JobSystem::GetNumberOfJobsQueued()
+{
+	int numberOfJobsQueued = 0;
+	m_jobsQueuedLock.lock();
+	numberOfJobsQueued = (int)m_jobsQueued.size();
+	m_jobsQueuedLock.unlock();
+
+	return numberOfJobsQueued;
+}
+
+WorkerThread::WorkerThread( JobSystem* owningJobSystem ) : m_owningJobSystem( owningJobSystem )
 {
 	m_workerThread = new std::thread( &WorkerThread::WorkerMain, this );
 }
@@ -103,15 +113,15 @@ void WorkerThread::WorkerMain()
 {
 	while( !g_isQuitting )
 	{
-		g_theJobSystem->m_jobsQueuedLock.lock();
-		if( !g_theJobSystem->m_jobsQueued.empty() )
+		m_owningJobSystem->m_jobsQueuedLock.lock();
+		if( !m_owningJobSystem->m_jobsQueued.empty() )
 		{
-			Job* jobToWork = g_theJobSystem->m_jobsQueued.front();
-			g_theJobSystem->m_jobsQueued.pop_front();
-			g_theJobSystem->m_jobsQueuedLock.unlock();
+			Job* jobToWork = m_owningJobSystem->m_jobsQueued.front();
+			m_owningJobSystem->m_jobsQueued.pop_front();
+			m_owningJobSystem->m_jobsQueuedLock.unlock();
 
-			g_theJobSystem->m_jobsRunningLock.lock();
-			std::deque<Job*>& jobsRunningPreRun = g_theJobSystem->m_jobsRunning;
+			m_owningJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunningPreRun = m_owningJobSystem->m_jobsRunning;
 			bool didAddJob = false;
 			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunningPreRun.size(); jobsRunningIndex++ )
 			{
@@ -127,12 +137,12 @@ void WorkerThread::WorkerMain()
 			{
 				jobsRunningPreRun.push_back( jobToWork );
 			}
-			g_theJobSystem->m_jobsRunningLock.unlock();
+			m_owningJobSystem->m_jobsRunningLock.unlock();
 
 			jobToWork->Execute();
 
-			g_theJobSystem->m_jobsRunningLock.lock();
-			std::deque<Job*>& jobsRunning = g_theJobSystem->m_jobsRunning;
+			m_owningJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunning = m_owningJobSystem->m_jobsRunning;
 			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunning.size(); jobsRunningIndex++ )
 			{
 				Job* currentJob = jobsRunning[jobsRunningIndex];
@@ -141,15 +151,15 @@ void WorkerThread::WorkerMain()
 					jobsRunning[jobsRunningIndex] = nullptr;
 				}
 			}
-			g_theJobSystem->m_jobsRunningLock.unlock();
+			m_owningJobSystem->m_jobsRunningLock.unlock();
 
-			g_theJobSystem->m_jobsCompletedLock.lock();
-			g_theJobSystem->m_jobsCompleted.push_back( jobToWork );
-			g_theJobSystem->m_jobsCompletedLock.unlock();
+			m_owningJobSystem->m_jobsCompletedLock.lock();
+			m_owningJobSystem->m_jobsCompleted.push_back( jobToWork );
+			m_owningJobSystem->m_jobsCompletedLock.unlock();
 		}
 		else
 		{
-			g_theJobSystem->m_jobsQueuedLock.unlock();
+			m_owningJobSystem->m_jobsQueuedLock.unlock();
 
 			std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
 		}
