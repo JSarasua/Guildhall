@@ -36,7 +36,12 @@ void SimulationJob::Execute()
 void SimulationJob::CallBackFunction()
 {
 	m_mctsToUse->BackPropagateResult( m_whoWonSim, nodeToSimulate );
+	m_mctsToUse->m_totalNumberOfSimulationsRun++;
 }
+
+
+
+
 
 MonteCarlo::~MonteCarlo()
 {
@@ -54,6 +59,8 @@ void MonteCarlo::Startup()
 
 		m_mcJobSystem = new JobSystem();
 		m_mcJobSystem->AddWorkerThreads( 5 );
+
+		m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
 	}
 	else
 	{
@@ -69,6 +76,14 @@ void MonteCarlo::Shutdown()
 		m_mcJobSystem->Shutdown();
 		delete m_mcJobSystem;
 		m_mcJobSystem = nullptr;
+	}
+
+	if( m_mainThread )
+	{
+		m_isQuitting = true;
+		m_mainThread->join();
+		delete m_mainThread;
+		m_mainThread = nullptr;
 	}
 
 
@@ -321,6 +336,28 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 
 }
 
+void MonteCarlo::WorkerMain()
+{
+	while( !m_isQuitting )
+	{
+		if( m_numberOfSimulationsToRun > 0 )
+		{
+			RunSimulations( 1 );
+			UpdateBestMove();
+			m_numberOfSimulationsToRun--;
+		}
+		else
+		{
+			std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+		}
+
+		if( UpdateGameIfChanged() )
+		{
+			UpdateBestMove();
+		}
+	}
+}
+
 void MonteCarlo::UpdateBestMove()
 {
 	float bestWinRate = -10000.f;
@@ -371,6 +408,63 @@ void MonteCarlo::UpdateBestMove()
 	m_bestMoveLock.lock();
 	m_bestMove = bestMove;
 	m_bestMoveLock.unlock();
+}
+
+bool MonteCarlo::UpdateGameIfChanged()
+{
+	m_gameStateChangeLock.lock();
+	bool didGameStateChange = m_didGameStateChange;
+	gamestate_t newGameState = m_newGameState;
+	inputMove_t newInputMove = m_moveToMake;
+
+	if( m_didGameStateChange )
+	{
+		m_didGameStateChange = false;
+	}
+	m_gameStateChangeLock.unlock();
+
+	if( didGameStateChange )
+	{
+		std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
+		auto outcomeIter = possibleOutcomes.find( newInputMove );
+
+		if( outcomeIter != possibleOutcomes.end() )
+		{
+			std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
+			for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
+			{
+				gamestate_t const& outcomeState = *outcomesFromMove[outcomesIndex]->m_data->m_currentGamestate;
+				if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
+				{
+					m_currentHeadNode = outcomesFromMove[outcomesIndex];
+					return didGameStateChange;
+				}
+			}
+
+			//outcome doesn't exist for gamestate
+			TreeMapNode* newTreeNode = new TreeMapNode();
+			newTreeNode->m_parentNode = m_currentHeadNode;
+			gamestate_t* gameState = new gamestate_t( newGameState );
+			newTreeNode->m_data = new data_t( metaData_t(), newInputMove, gameState );
+			outcomesFromMove.push_back( newTreeNode );
+
+			m_currentHeadNode = newTreeNode;
+		}
+		else
+		{
+			//input doesn't exist
+			possibleOutcomes[newInputMove] = std::vector<TreeMapNode*>();
+			TreeMapNode* newTreeNode = new TreeMapNode();
+			newTreeNode->m_parentNode = m_currentHeadNode;
+			gamestate_t* gameState = new gamestate_t( newGameState );
+			newTreeNode->m_data = new data_t( metaData_t(), newInputMove, gameState );
+			possibleOutcomes[newInputMove].push_back( newTreeNode );
+
+			m_currentHeadNode = newTreeNode;
+		}
+	}
+
+	return didGameStateChange;
 }
 
 //The best node to select follows these rules
@@ -641,7 +735,7 @@ bool MonteCarlo::CanExpand( TreeMapNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	UpdateBestMove();
+	//UpdateBestMove();
 
 	inputMove_t bestMove;
 	m_bestMoveLock.lock();
@@ -723,43 +817,54 @@ inputMove_t MonteCarlo::GetBestMove()
 
 void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState )
 {
-	std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
-	auto outcomeIter = possibleOutcomes.find( movePlayed );
+	m_gameStateChangeLock.lock();
+	m_didGameStateChange = true;
+	m_moveToMake = movePlayed;
+	m_newGameState = newGameState;
+	m_gameStateChangeLock.unlock();
 
-	if( outcomeIter != possibleOutcomes.end() )
-	{
-		std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
-		for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
-		{
-			gamestate_t const& outcomeState = *outcomesFromMove[outcomesIndex]->m_data->m_currentGamestate;
-			if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
-			{
-				m_currentHeadNode = outcomesFromMove[outcomesIndex];
-				return;
-			}
-		}
+// 	std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
+// 	auto outcomeIter = possibleOutcomes.find( movePlayed );
+// 
+// 	if( outcomeIter != possibleOutcomes.end() )
+// 	{
+// 		std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
+// 		for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
+// 		{
+// 			gamestate_t const& outcomeState = *outcomesFromMove[outcomesIndex]->m_data->m_currentGamestate;
+// 			if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
+// 			{
+// 				m_currentHeadNode = outcomesFromMove[outcomesIndex];
+// 				return;
+// 			}
+// 		}
+// 
+// 		//outcome doesn't exist for gamestate
+// 		TreeMapNode* newTreeNode = new TreeMapNode();
+// 		newTreeNode->m_parentNode = m_currentHeadNode;
+// 		gamestate_t* gameState = new gamestate_t( newGameState );
+// 		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
+// 		outcomesFromMove.push_back( newTreeNode );
+// 
+// 		m_currentHeadNode = newTreeNode;
+// 	}
+// 	else
+// 	{
+// 		//input doesn't exist
+// 		possibleOutcomes[movePlayed] = std::vector<TreeMapNode*>();
+// 		TreeMapNode* newTreeNode = new TreeMapNode();
+// 		newTreeNode->m_parentNode = m_currentHeadNode;
+// 		gamestate_t* gameState = new gamestate_t( newGameState );
+// 		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
+// 		possibleOutcomes[movePlayed].push_back( newTreeNode );
+// 
+// 		m_currentHeadNode = newTreeNode;
+// 	}
+}
 
-		//outcome doesn't exist for gamestate
-		TreeMapNode* newTreeNode = new TreeMapNode();
-		newTreeNode->m_parentNode = m_currentHeadNode;
-		gamestate_t* gameState = new gamestate_t( newGameState );
-		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
-		outcomesFromMove.push_back( newTreeNode );
-
-		m_currentHeadNode = newTreeNode;
-	}
-	else
-	{
-		//input doesn't exist
-		possibleOutcomes[movePlayed] = std::vector<TreeMapNode*>();
-		TreeMapNode* newTreeNode = new TreeMapNode();
-		newTreeNode->m_parentNode = m_currentHeadNode;
-		gamestate_t* gameState = new gamestate_t( newGameState );
-		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
-		possibleOutcomes[movePlayed].push_back( newTreeNode );
-
-		m_currentHeadNode = newTreeNode;
-	}
+void MonteCarlo::AddSimulations( int simulationsToAdd )
+{
+	m_numberOfSimulationsToRun += simulationsToAdd;
 }
 
 TreeMapNode const* MonteCarlo::GetCurrentHeadNode()

@@ -45,14 +45,21 @@ public:
 	void SetInitialGameState( gamestate_t const& newGameState );
 
 	//Base MCTS methods
-	void RunSimulations( int numberOfSimulations );
 	inputMove_t GetBestMove();
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 	void SetExplorationParameter( float explorationParameter ) { m_ucbValue = explorationParameter; }
+	void AddSimulations( int simulationsToAdd );
+
+	int GetNumberOfSimulationsRun() const { return m_totalNumberOfSimulationsRun; }
+	int GetCurrentNumberOfSimulationsLeft() const { return m_numberOfSimulationsToRun; }
 
 protected:
+	//Thread
+	void WorkerMain();
+	
+	void RunSimulations( int numberOfSimulations );
 	void UpdateBestMove();
-
+	bool UpdateGameIfChanged();
 	expand_t GetBestNodeToSelect( TreeMapNode* currentNode ); //Returns null if all nodes have been explored
 	TreeMapNode* ExpandNode( expand_t expandData ); //Returns null if can't expand
 	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
@@ -78,6 +85,7 @@ public:
 	//int m_player = CIRCLEPLAYER;
 
 	JobSystem* m_mcJobSystem = nullptr;
+	std::thread* m_mainThread = nullptr;
 
 	double m_totalTime = 0;
 	double m_selectTime = 0;
@@ -97,6 +105,10 @@ public:
 	//lock
 	std::mutex m_bestMoveLock;
 	inputMove_t m_bestMove = inputMove_t();
+
+	std::atomic<bool> m_isQuitting = false;
+	std::atomic<int> m_totalNumberOfSimulationsRun = 0;
+	std::atomic<int> m_numberOfSimulationsToRun = 0;
 };
 
 

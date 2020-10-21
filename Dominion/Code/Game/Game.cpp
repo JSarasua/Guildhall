@@ -70,7 +70,7 @@ void Game::Startup()
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 
-	m_timer.SetSeconds( 0 );
+	m_timer.SetSeconds( 2 );
 }
 
 void Game::Shutdown()
@@ -385,7 +385,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 			//m_mc->RunSimulations( 400 );
-			m_mcts->RunSimulations( 400 );
+			m_mcts->AddSimulations( 400 );
+			//m_mcts->RunSimulations( 400 );
 			m_simCount += 400;
 		}
 		else
@@ -405,8 +406,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f8Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 100'000 );
-		m_simCount += 100'000;
+		m_mcts->AddSimulations( 100'000 );
+		//m_mcts->RunSimulations( 100'000 );
+		//m_simCount += 100'000;
 		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
 	}
 	if( f9Key.WasJustPressed() )
@@ -416,7 +418,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f11Key.WasJustPressed() )
 	{
-		m_mcts->RunSimulations( 10000 );
+		m_mcts->AddSimulations( 1'000 );
+		//m_mcts->RunSimulations( 10000 );
 	}
 	if( enterKey.WasJustPressed() )
 	{
@@ -1024,7 +1027,10 @@ void Game::DebugDrawGame()
 		}
 		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
 	}
-	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 15.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
+	m_totalSimCount = m_mcts->GetNumberOfSimulationsRun();
+	m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
+	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.87f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current remaining sim count: %i", m_simCount ).c_str() );
 
 	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
 	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
@@ -1083,53 +1089,44 @@ void Game::DebugDrawGameStateInfo()
 
 void Game::AutoPlayGame()
 {
-	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	if( IsGameOver() == GAMENOTOVER )
 	{
-
-// 		if( m_timer.CheckAndDecrement() )
-// 		{
-
-			if( m_simCount < 1'000 )
+		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+		{
+			m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
+			if( m_simCount < 500 )
 			{
-				m_mcts->RunSimulations( 100 );
-				m_simCount += 100;
-				m_totalSimCount += 100;
-
-			}
-			else
-			{
-				if( m_simCount >= 1'000 )
+				if( m_timer.CheckAndDecrement() )
 				{
-					m_simCount = 0;
-				}
-				//inputMove_t move = m_mc->GetBestMove();
-				inputMove_t move = m_mcts->GetBestMove();
-				if( move.m_moveType == INVALID_MOVE )
-				{
+					m_mcts->AddSimulations( 1000 );
 
+					//inputMove_t move = m_mc->GetBestMove();
+					inputMove_t move = m_mcts->GetBestMove();
+					if( move.m_moveType == INVALID_MOVE )
+					{
+
+					}
+					else
+					{
+						PlayMoveIfValid( move );
+					}
+
+					DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 				}
 				else
 				{
-					PlayMoveIfValid( move );
+
 				}
-
-				DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 			}
-		//}
-// 		else
-// 		{
-// 
-// 		}
 
+		}
+		else
+		{
+			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+			PlayMoveIfValid( bigMoneyAI );
+		}
+	}
 
-// 		m_mcts->RunSimulations( 1000 );
-// 		//m_mc->RunSimulations( 1000 );
-	}
-	else
-	{
-		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
-		PlayMoveIfValid( bigMoneyAI );
-	}
 }
 
 void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
