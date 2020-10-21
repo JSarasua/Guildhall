@@ -89,6 +89,13 @@ void JobSystem::PostJob( Job* job )
 	m_jobsQueuedLock.unlock();
 }
 
+void JobSystem::PostPriorityJob( Job* job )
+{
+	m_priorityJobsQueuedLock.lock();
+	m_priorityJobsQueued.push_back( job );
+	m_priorityJobsQueuedLock.unlock();
+}
+
 int JobSystem::GetNumberOfJobsQueued()
 {
 	int numberOfJobsQueued = 0;
@@ -113,6 +120,55 @@ void WorkerThread::WorkerMain()
 {
 	while( !g_isQuitting )
 	{
+		m_owningJobSystem->m_priorityJobsQueuedLock.lock();
+		if( !m_owningJobSystem->m_priorityJobsQueued.empty() )
+		{
+			Job* jobToWork = m_owningJobSystem->m_priorityJobsQueued.front();
+			m_owningJobSystem->m_priorityJobsQueued.pop_front();
+			m_owningJobSystem->m_priorityJobsQueuedLock.unlock();
+
+			m_owningJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunningPreRun = m_owningJobSystem->m_jobsRunning;
+			bool didAddJob = false;
+			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunningPreRun.size(); jobsRunningIndex++ )
+			{
+				Job* currentJob = jobsRunningPreRun[jobsRunningIndex];
+				if( !currentJob )
+				{
+					jobsRunningPreRun[jobsRunningIndex] = jobToWork;
+					didAddJob = true;
+					break;
+				}
+			}
+			if( !didAddJob )
+			{
+				jobsRunningPreRun.push_back( jobToWork );
+			}
+			m_owningJobSystem->m_jobsRunningLock.unlock();
+
+			jobToWork->Execute();
+
+			m_owningJobSystem->m_jobsRunningLock.lock();
+			std::deque<Job*>& jobsRunning = m_owningJobSystem->m_jobsRunning;
+			for( size_t jobsRunningIndex = 0; jobsRunningIndex < jobsRunning.size(); jobsRunningIndex++ )
+			{
+				Job* currentJob = jobsRunning[jobsRunningIndex];
+				if( jobToWork == currentJob )
+				{
+					jobsRunning[jobsRunningIndex] = nullptr;
+				}
+			}
+			m_owningJobSystem->m_jobsRunningLock.unlock();
+
+			m_owningJobSystem->m_jobsCompletedLock.lock();
+			m_owningJobSystem->m_jobsCompleted.push_back( jobToWork );
+			m_owningJobSystem->m_jobsCompletedLock.unlock();
+		}
+		else
+		{
+			m_owningJobSystem->m_priorityJobsQueuedLock.unlock();
+		}
+
 		m_owningJobSystem->m_jobsQueuedLock.lock();
 		if( !m_owningJobSystem->m_jobsQueued.empty() )
 		{

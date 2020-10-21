@@ -47,12 +47,15 @@ public:
 	void AddWorkerThreads( int numberOfThreadsToAdd );
 	void ClaimAndDeleteCompletedJobs();
 	void PostJob( Job* job );
+	void PostPriorityJob( Job* job );
 	int GetNumberOfJobsQueued();
 
 protected:
+	std::deque<Job*> m_priorityJobsQueued;
 	std::deque<Job*> m_jobsQueued;
 	std::deque<Job*> m_jobsRunning;
 	std::deque<Job*> m_jobsCompleted;
+	std::mutex m_priorityJobsQueuedLock;
 	std::mutex m_jobsQueuedLock;
 	std::mutex m_jobsRunningLock;
 	std::mutex m_jobsCompletedLock;
