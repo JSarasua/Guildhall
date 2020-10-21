@@ -300,6 +300,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& f1Key = g_theInput->GetKeyStates( F1_KEY );
 	const KeyButtonState& f2Key = g_theInput->GetKeyStates( F2_KEY );
 	const KeyButtonState& f3Key = g_theInput->GetKeyStates( F3_KEY );
+	const KeyButtonState& f4Key = g_theInput->GetKeyStates( F4_KEY );
  	const KeyButtonState& f5Key = g_theInput->GetKeyStates( F5_KEY );
  	const KeyButtonState& f6Key = g_theInput->GetKeyStates( F6_KEY );
  	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
@@ -351,24 +352,38 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	if( f1Key.WasJustPressed() )
 	{
 		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mc->RunSimulations( 400 );
+		m_mcts->AddSimulations( 1 );
+		//m_mc->RunSimulations( 400 );
 /*		m_mcts->RunSimulations( 1000 );*/
 
 	}
 	if( f2Key.WasJustPressed() )
 	{
-		inputMove_t move = m_mc->GetBestMove();
-		PlayMoveIfValid( move );
+		//DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+		m_mcts->AddSimulations( 1000 );
+		//inputMove_t move = m_mc->GetBestMove();
+		//PlayMoveIfValid( move );
 		//inputMove_t move = m_mcts->GetBestMove();
 
 /*		PlayMoveIfValid( move.m_move );*/
 	}
 	if( f3Key.WasJustPressed() )
 	{
-		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
-		PlayMoveIfValid( bigMoneyAI );
+		m_mcts->AddSimulations( 1'000'000 );
+
+	}
+	if( f4Key.WasJustPressed() )
+	{
+		inputMove_t move = m_mcts->GetBestMove();
+		PlayMoveIfValid( move );
 	}
 	if( f5Key.WasJustPressed() )
+	{
+		inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+		PlayMoveIfValid( bigMoneyAI );
+
+	}
+	if( f6Key.WasJustPressed() )
 	{
 		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 		{
@@ -395,26 +410,24 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			PlayMoveIfValid( bigMoneyAI );
 		}
 	}
-	if( f6Key.WasJustPressed() )
-	{
-		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
-	}
 	if( f7Key.WasJustPressed() )
 	{
-		RestartGame();
+		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
+
 		//InitializeGameState();
 	}
 	if( f8Key.WasJustPressed() )
+	{
+		RestartGame();
+	}
+	if( f9Key.WasJustPressed() )
 	{
 		m_mcts->AddSimulations( 100'000 );
 		//m_mcts->RunSimulations( 100'000 );
 		//m_simCount += 100'000;
 		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
-	}
-	if( f9Key.WasJustPressed() )
-	{
-		inputMove_t move = m_mcts->GetBestMove();
-		PlayMoveIfValid( move );
+// 		inputMove_t move = m_mcts->GetBestMove();
+// 		PlayMoveIfValid( move );
 	}
 	if( f11Key.WasJustPressed() )
 	{

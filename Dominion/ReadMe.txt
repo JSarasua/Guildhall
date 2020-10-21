@@ -1,7 +1,26 @@
 Jonathan Sarasua
-Milestone 2
+Milestone 4
 
+AI controls
+F1: Add 1 simulation
+F2: Add 1000 simulations
+F3: Add 100,000 simulations
+F4: Play best mcts move
+F5: Play best big money move
+F6: Play mcts or big money depending on turn
+F7: Auto play game
+F8: Restart game
+
+Play the Game:
 Currently the controls pass between both players
 Enter key: Move to next phase. If moving from Action to Buy phase will play all treasure cards
 
-1-7 keys: In the buy phase each key represents 1-7 of the piles you can buy.
+
+Buy Phase
+1-8 keys: In the buy phase each key represents 1-8 of the piles you can buy in first row.
+q-y keys: represent second row keys to buy
+
+Action phase
+1-9 keys: Plays that card in hand using the key as an index
+
+Enter Key: Ends the phase

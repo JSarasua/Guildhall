@@ -181,6 +181,7 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			double startBackPropTime = GetCurrentTimeSeconds();
 			//m_mcJobSystem->ClaimAndDeleteCompletedJobs();
 			BackPropagateResult( whoWon, expandedNode );
+			m_totalNumberOfSimulationsRun++;
 			double endBackPropTime = GetCurrentTimeSeconds();
 			m_backpropagationTime += (endBackPropTime - startBackPropTime);
 			m_totalTime += (endBackPropTime - startBackPropTime);
@@ -350,6 +351,7 @@ void MonteCarlo::WorkerMain()
 		{
 			std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
 		}
+		m_mcJobSystem->ClaimAndDeleteCompletedJobs();
 
 		if( UpdateGameIfChanged() )
 		{
