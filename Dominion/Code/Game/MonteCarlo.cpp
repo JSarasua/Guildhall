@@ -71,13 +71,6 @@ void MonteCarlo::Startup()
 
 void MonteCarlo::Shutdown()
 {
-	if( m_mcJobSystem )
-	{
-		m_mcJobSystem->Shutdown();
-		delete m_mcJobSystem;
-		m_mcJobSystem = nullptr;
-	}
-
 	if( m_mainThread )
 	{
 		m_isQuitting = true;
@@ -86,6 +79,12 @@ void MonteCarlo::Shutdown()
 		m_mainThread = nullptr;
 	}
 
+	if( m_mcJobSystem )
+	{
+		m_mcJobSystem->Shutdown();
+		delete m_mcJobSystem;
+		m_mcJobSystem = nullptr;
+	}
 
 	if( m_headNode )
 	{
