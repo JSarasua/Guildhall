@@ -322,17 +322,39 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
 {
-	float sumOfUCBValues = 0.f;
+	//float sumOfUCBValues = 0.f;
+	float totalSimulations = 0.f;
+	float averageUCBValue = 0.f;
+	for( size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++ )
+	{
+		totalSimulations += nodes[nodeIndex]->m_data->m_metaData.m_numberOfSimulations;
+	}
+
+	if( totalSimulations == 0.f )
+	{
+		return explorationParameter;
+	}
 
 	for( size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++ )
 	{
 		TreeMapNode const* currentNode = nodes[nodeIndex];
-		sumOfUCBValues += GetUCBValueAtNode( currentNode, explorationParameter );
+		float currentNumberOfSims = (float)nodes[nodeIndex]->m_data->m_metaData.m_numberOfSimulations;
+		float weight = currentNumberOfSims / totalSimulations;
+		float currentUCBValue = GetUCBValueAtNode( currentNode, explorationParameter );
+
+		averageUCBValue += currentUCBValue * weight;
+		//sumOfUCBValues += GetUCBValueAtNode( currentNode, explorationParameter );
 	}
 
-	float count = (float)nodes.size();
+	if( averageUCBValue < 0.f )
+	{
+		ERROR_AND_DIE("Should never be less than 0");
+	}
 
-	return sumOfUCBValues/count;
+	//float count = (float)nodes.size();
+
+	//return sumOfUCBValues/count;
+	return averageUCBValue;
 
 }
 
@@ -540,6 +562,11 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 				highestUCBValue = ucbValue;
 				moveToMake = outcomesAfterMove.first;
 			}
+		}
+
+		if( moveToMake.m_moveType == INVALID_MOVE )
+		{
+			ERROR_AND_DIE("Should never give an invalid move");
 		}
 
 		//Find if the best move makes a gamestate that has existed before

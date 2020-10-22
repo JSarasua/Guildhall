@@ -337,3 +337,8 @@ bool PlayerBoard::HasCard( int cardIndex ) const
 
 	return false;
 }
+
+int PlayerBoard::GetCardIndexFromHandIndex( int handIndex )
+{
+	return m_hand.GetCardIndexFromCountIndex( handIndex );
+}

@@ -306,6 +306,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& f7Key = g_theInput->GetKeyStates( F7_KEY );
  	const KeyButtonState& f8Key = g_theInput->GetKeyStates( F8_KEY );
 	const KeyButtonState& f9Key = g_theInput->GetKeyStates( F9_KEY );
+	const KeyButtonState& f10Key = g_theInput->GetKeyStates( F10_KEY );
  	const KeyButtonState& f11Key = g_theInput->GetKeyStates( F11_KEY );
 //	const KeyButtonState& f12Key = g_theInput->GetKeyStates( F12_KEY );
 	const KeyButtonState& num1Key = g_theInput->GetKeyStates( '1' );
@@ -422,12 +423,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f9Key.WasJustPressed() )
 	{
-		m_mcts->AddSimulations( 100'000 );
-		//m_mcts->RunSimulations( 100'000 );
-		//m_simCount += 100'000;
-		m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
-// 		inputMove_t move = m_mcts->GetBestMove();
-// 		PlayMoveIfValid( move );
+		m_randomMove = GetRandomMoveAtGameState( *m_currentGameState );
+	}
+	if( f10Key.WasJustPressed() )
+	{
+		PlayMoveIfValid( m_randomMove );
 	}
 	if( f11Key.WasJustPressed() )
 	{
@@ -457,7 +457,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 0;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 0 );
 			PlayMoveIfValid( move );
 		}
 
@@ -477,7 +477,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 1;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 1 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -496,7 +496,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 2;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 2 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -515,7 +515,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 3;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 3 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -534,7 +534,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 4;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 4 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -554,7 +554,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 5;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 5 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -574,7 +574,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 6;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 6 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -593,7 +593,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 7;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 7 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -612,7 +612,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = 8;
+			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 8 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -1040,16 +1040,39 @@ void Game::DebugDrawGame()
 		}
 		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
 	}
+
+	if( m_randomMove.m_moveType != INVALID_MOVE )
+	{
+		std::string randomMoveStr;
+		if( m_randomMove.m_moveType == BUY_MOVE )
+		{
+			CardDefinition const* card = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndexToBuy].m_card;
+			randomMoveStr = Stringf( "Random Move: Buy %s", card->GetCardName().c_str() );
+		}
+		else if( m_randomMove.m_moveType == PLAY_CARD )
+		{
+			int cardHandIndex = m_randomMove.m_cardHandIndexToPlay;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
+			randomMoveStr = Stringf( "Random Move: Play %s", card->GetCardName().c_str() );
+		}
+		else if( m_randomMove.m_moveType == END_PHASE )
+		{
+			randomMoveStr = Stringf( "Random move: End Phase" );
+		}
+		DebugAddScreenText( Vec4( 0.5f, 0.93f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, randomMoveStr.c_str() );
+	}
+
+
 	m_totalSimCount = m_mcts->GetNumberOfSimulationsRun();
 	m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
 	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
 	DebugAddScreenText( Vec4( 0.5f, 0.87f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current remaining sim count: %i", m_simCount ).c_str() );
 
-	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.81f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current expand time: %f", (float)m_mcts->m_expandTime ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.79f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim time: %f", (float)m_mcts->m_simTime ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.77f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current backpropagation time: %f", (float)m_mcts->m_backpropagationTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.81f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current expand time: %f", (float)m_mcts->m_expandTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.79f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim time: %f", (float)m_mcts->m_simTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.77f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current backpropagation time: %f", (float)m_mcts->m_backpropagationTime ).c_str() );
 
 
 
@@ -1219,6 +1242,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 	m_mc->ResetPossibleMoves();
 
 	m_mcts->UpdateGame( moveToPlay, *m_currentGameState );
+	m_randomMove = inputMove_t();
 }
 
 bool Game::IsMoveValid( inputMove_t const& moveToPlay ) const
@@ -1479,7 +1503,7 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 				int pileSize = piles[pileIndex].m_pileSize;
 				int cardCost = card->GetCardCost();
 
-				if( pileSize > 0 && currentMoney > cardCost )
+				if( pileSize > 0 && currentMoney >= cardCost )
 				{
 					numberOfValidMoves++;
 				}

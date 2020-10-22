@@ -95,3 +95,21 @@ int CardPile::GetNumberOfUniqueActions() const
 	return uniqueActionCount;
 }
 
+int CardPile::GetCardIndexFromCountIndex( int countIndex )
+{
+	int cardNumToHit = countIndex + 1;
+	int currentCount = 0;
+
+	size_t pileCount = m_cards.size();
+	for( size_t pileIndex = 0; pileIndex < pileCount; pileIndex++ )
+	{
+		currentCount += CountOfCard( (int)pileIndex );
+		if( currentCount >= cardNumToHit )
+		{
+			return (int)pileIndex;
+		}
+	}
+
+	return -1;
+}
+

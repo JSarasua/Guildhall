@@ -278,7 +278,9 @@ private:
 	Camera m_camera;
 
 public:
-	
+	inputMove_t m_randomMove;
+
+
 	Rgba8 m_clearColor = Rgba8::BLACK;
 	float m_currentTime = 0.f;
 	RandomNumberGenerator m_rand;

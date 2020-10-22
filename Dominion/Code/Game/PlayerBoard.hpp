@@ -71,6 +71,7 @@ public:
 	int GetNumberOfValidActionsToPlay() const;
 	bool UnorderedCompare( PlayerBoard const& compare ) const;
 	bool HasCard( int cardIndex ) const;
+	int GetCardIndexFromHandIndex( int handIndex );
 
 public:
 
