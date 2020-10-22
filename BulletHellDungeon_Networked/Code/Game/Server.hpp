@@ -3,6 +3,7 @@
 
 class Entity;
 class SpriteDefinition;
+class Game;
 
 struct Vertex_PCU;
 
@@ -11,7 +12,7 @@ enum eGameState : int;
 class Server
 {
 public:
-	Server();
+	Server( Game* game );
 	virtual ~Server();
 	virtual void Startup() = 0;
 	virtual void Shutdown() = 0;

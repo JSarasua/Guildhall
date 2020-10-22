@@ -39,7 +39,13 @@ Game::Game() : m_imageTest(IMAGETESTPATH)
 	m_world = new World(this);
 }
 
-Game::~Game(){}
+Game::~Game()
+{
+	delete m_world;
+	delete m_mapDefDoc;
+	delete m_tileDefDoc;
+	delete m_actorDefDoc;
+}
 
 void Game::Startup()
 {
@@ -76,7 +82,10 @@ void Game::Startup()
 	m_victoryTimer.Stop();
 }
 
-void Game::Shutdown(){}
+void Game::Shutdown()
+{
+	m_world->Shutdown();
+}
 
 void Game::RunFrame(){}
 
@@ -884,7 +893,7 @@ void Game::UpdateAttract( float deltaSeconds )
 
 void Game::UpdateDeath( float deltaSeconds )
 {
-// 	UNUSED( deltaSeconds );
+ 	UNUSED( deltaSeconds );
 // 
 // 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 // 	Vec2 uiDims = uiBounds.GetDimensions();
@@ -910,7 +919,7 @@ void Game::UpdateDeath( float deltaSeconds )
 
 void Game::UpdateVictory( float deltaSeconds )
 {
-// 	UNUSED( deltaSeconds );
+ 	UNUSED( deltaSeconds );
 // 
 // 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 // 	Vec2 uiDims = uiBounds.GetDimensions();
@@ -936,7 +945,7 @@ void Game::UpdateVictory( float deltaSeconds )
 
 void Game::UpdatePaused( float deltaSeconds )
 {
-// 	UNUSED( deltaSeconds );
+ 	UNUSED( deltaSeconds );
 // 
 // 	AABB2 uiBounds = AABB2( m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight() );
 // 	Vec2 uiDims = uiBounds.GetDimensions();

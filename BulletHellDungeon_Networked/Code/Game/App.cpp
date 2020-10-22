@@ -3,6 +3,10 @@
 #include "Game/Client.hpp"
 #include "Game/AuthServer.hpp"
 #include "Game/PlayerClient.hpp"
+#include "Game/RemoteServer.hpp"
+#include "Game/SinglePlayerGame.hpp"
+#include "Game/MultiPlayerGame.hpp"
+#include "Game/Game.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
@@ -12,6 +16,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Engine/Time/Clock.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Game/AudioDefinition.hpp"
 
 
 //Constants for calculation ship position change
@@ -24,7 +29,8 @@ App::App()
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
 	g_theRenderer = new RenderContext();
-	g_theServer = new AuthServer();
+	Game* game = new SinglePlayerGame();
+	g_theServer = new AuthServer( game );
 	g_theClient = new PlayerClient();
 	//g_theGame =  new Game();
 	g_theConsole = new DevConsole();
@@ -54,6 +60,8 @@ void App::Startup()
 	g_theConsole->Startup();
 
 	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
+	g_theEventSystem->SubscribeMethodToEvent( "StartMultiplayerServer", CONSOLECOMMAND, this, &App::StartMultiplayerServer );
+	g_theEventSystem->SubscribeMethodToEvent( "ConnectToMultiplayerServer", CONSOLECOMMAND, this, &App::ConnectToMultiplayerServer );
 }
 
 void App::Shutdown()
@@ -188,6 +196,54 @@ bool App::QuitRequested( const EventArgs* args )
 {
 	UNUSED(args);
 	g_theApp->HandleQuitRequested();
+	return true;
+}
+
+bool App::StartMultiplayerServer( EventArgs const& args )
+{
+	int portNumber = args.GetValue( "port", 48000 );
+	UNUSED( portNumber );
+
+	//RestartGame();
+	AudioDefinition::StopAllSounds();
+	g_theConsole->SetIsOpen( false );
+	g_theServer->Shutdown();
+	delete g_theServer;
+	g_theClient->Shutdown();
+	delete g_theClient;
+
+	Game* game = new SinglePlayerGame();
+	g_theServer = new AuthServer( game );
+	g_theClient = new PlayerClient();
+
+	g_theServer->Startup();
+	g_theClient->Startup();
+
+	return true;
+}
+
+bool App::ConnectToMultiplayerServer( EventArgs const& args )
+{
+	std::string ip = args.GetValue( "ip", "127.0.0.1" );
+	int portNumber = args.GetValue( "port", 48001 );
+	UNUSED( ip );
+	UNUSED( portNumber );
+
+	AudioDefinition::StopAllSounds();
+	g_theConsole->SetIsOpen( false );
+	g_theServer->Shutdown();
+	g_theClient->Shutdown();
+
+	delete g_theServer;
+	delete g_theClient;
+
+	Game* game = new MultiPlayerGame();
+	g_theServer = new RemoteServer( game );
+	g_theClient = new PlayerClient();
+
+	g_theServer->Startup();
+	g_theClient->Startup();
+
 	return true;
 }
 

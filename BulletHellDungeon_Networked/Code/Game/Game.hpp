@@ -36,6 +36,7 @@ class Game
 	friend class RemoteServer;
 	friend class Client;
 	friend class PlayerClient;
+	friend class RemoteClient;
 
 public:
 	Game();

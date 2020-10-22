@@ -5,8 +5,9 @@
 #include "Game/Actor.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
+#include "Game/Game.hpp"
 
-AuthServer::AuthServer() : Server()
+AuthServer::AuthServer( Game* game ) : Server( game )
 {
 	//g_theGame = new Game();
 }

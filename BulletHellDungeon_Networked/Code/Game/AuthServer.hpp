@@ -4,6 +4,7 @@
 
 class Entity;
 class SpriteDefinition;
+class Game;
 
 struct Vertex_PCU;
 
@@ -12,7 +13,7 @@ enum eGameState : int;
 class AuthServer : public Server
 {
 public:
-	AuthServer();
+	AuthServer( Game* game );
 	virtual ~AuthServer();
 
 	virtual void Startup() override;

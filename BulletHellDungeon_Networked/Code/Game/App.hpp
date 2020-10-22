@@ -35,6 +35,9 @@ public:
 
 	static bool QuitRequested(const EventArgs* args);
 
+	bool StartMultiplayerServer( EventArgs const& args );
+	bool ConnectToMultiplayerServer( EventArgs const& args );
+
 	void TogglePause();
 	void PauseGame();
 	void UnPauseGame();

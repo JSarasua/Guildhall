@@ -108,6 +108,7 @@ Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientati
 
 Actor::~Actor()
 {
+	g_theEventSystem->UnsubscribeObject( this );
 	return;
 }
 
@@ -471,8 +472,6 @@ bool Actor::UpdateInput( EventArgs const& args )
 			DecrementActiveWeapon();
 		}
 	}
-
-
 
 	return true;
 }

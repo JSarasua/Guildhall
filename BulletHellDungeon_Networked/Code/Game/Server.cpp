@@ -5,15 +5,18 @@
 #include "Game/Actor.hpp"
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
+#include "Game/SinglePlayerGame.hpp"
+#include "Game/MultiPlayerGame.hpp"
 
-Server::Server()
+Server::Server( Game* game )
 {
-	g_theGame = new Game();
+	g_theGame = game;
 }
 
 Server::~Server()
 {
 	delete g_theGame;
+	g_theGame = nullptr;
 }
 
 // void Server::Startup()
