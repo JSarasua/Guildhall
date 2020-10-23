@@ -65,6 +65,9 @@ protected:
 	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
 	void BackPropagateResult( int whoWon, TreeMapNode* node );
 
+	inputMove_t GetBestMoveToDepth( int depth, TreeMapNode* currentNode );
+	float GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
+	int GetWhoseMoveAtDepth( int depth, TreeMapNode const* node );
 // 	inputMove_t GetBestMoveSafe();
 // 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 

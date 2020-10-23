@@ -310,6 +310,150 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 // 
 // }
 
+inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode )
+{
+	if( depth == 0 )
+	{
+		g_theConsole->ErrorString( "Depth cannot be 0" );
+		return inputMove_t();
+	}
+
+	float bestWinRate = -1.f;
+	bool hasFirstMoveBeenCheck = false;
+	inputMove_t bestMove;
+
+	int whoseMove = currentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+	int whoseMoveAtDepth = GetWhoseMoveAtDepth( depth, currentNode );
+
+	for( auto move : currentNode->m_possibleOutcomes )
+	{
+		std::vector<TreeMapNode*> const& outcomes = move.second;
+		float totalSims = 0.f;
+		float averageWinRate = 0.f;
+		for( TreeMapNode const* outcome : outcomes )
+		{
+			totalSims += (float)outcome->m_data->m_metaData.m_numberOfSimulations;
+		}
+
+		if( totalSims == 0.f )
+		{
+			continue;
+		}
+
+		for( TreeMapNode const* outcome : outcomes )
+		{
+			float currentWinRate = GetBestWinRateAtDepth( depth - 1, outcome );
+			float currentSims = (float)outcome->m_data->m_metaData.m_numberOfSimulations;
+			averageWinRate += currentWinRate * ( currentSims / totalSims );
+		}
+
+		if( !hasFirstMoveBeenCheck )
+		{
+			hasFirstMoveBeenCheck = true;
+
+			bestWinRate = averageWinRate;
+			bestMove = move.first;
+		}
+		else
+		{
+			//If its the opponents move at depth then flip then we want the worst win rate
+			if( whoseMove == whoseMoveAtDepth )
+			{
+				if( averageWinRate > bestWinRate )
+				{
+					averageWinRate = bestWinRate;
+					bestMove = move.first;
+				}
+			}
+			else
+			{
+				if( averageWinRate < bestWinRate )
+				{
+					averageWinRate = bestWinRate;
+					bestMove = move.first;
+				}
+			}
+		}
+	}
+
+	return bestMove;
+}
+
+float MonteCarlo::GetBestWinRateAtDepth( int depth, TreeMapNode const* node )
+{
+	size_t moveCount = node->m_possibleOutcomes.size();
+	if( moveCount == 0 || depth == 0 )
+	{
+		return node->m_data->m_metaData.GetWinRate();
+	}
+
+	float bestWinRate = -1.f;
+
+	for( auto move : node->m_possibleOutcomes )
+	{
+		std::vector<TreeMapNode*> const& outcomesFromMove = move.second;
+		float sims = 0.f;
+		float currentAverageWinRate = 0.f;
+		for( auto outcome : outcomesFromMove )
+		{
+			sims += outcome->m_data->m_metaData.m_numberOfSimulations;
+		}
+
+		for( auto outcome : outcomesFromMove )
+		{
+			TreeMapNode const* childNode = outcome;
+			float currentNodeWinRate = GetBestWinRateAtDepth( depth - 1, childNode );
+			float currentSims = (float)childNode->m_data->m_metaData.m_numberOfSimulations;
+			currentAverageWinRate += currentNodeWinRate * ( currentSims / sims );
+		}
+
+		if( currentAverageWinRate > bestWinRate )
+		{
+			bestWinRate = currentAverageWinRate;
+		}
+	}
+
+	return bestWinRate;
+}
+
+int MonteCarlo::GetWhoseMoveAtDepth( int depth, TreeMapNode const* node )
+{
+	TreeMapNode const* currentNode = node;
+	if( currentNode )
+	{
+		while( depth > 0 )
+		{
+			if( node->m_possibleOutcomes.size() > 0 )
+			{
+				auto move = node->m_possibleOutcomes.begin();
+				std::vector<TreeMapNode*> outcomes = move->second;
+				if( outcomes.size() > 0 )
+				{
+					currentNode = outcomes[0];
+
+				}
+				else
+				{
+					break;
+				}
+			}
+			else
+			{
+				break;
+			}
+
+			depth--;
+		}
+
+		return currentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+	}
+	else
+	{
+		g_theConsole->ErrorString( "Can't get depth at node because node is null" );
+		return -1;
+	}
+}
+
 // inputMove_t MonteCarlo::GetBestInputChoiceFromChildren( TreeMapNode* node )
 // {
 // 	for( auto moveOutcomes: node->m_possibleOutcomes )
@@ -383,49 +527,52 @@ void MonteCarlo::WorkerMain()
 
 void MonteCarlo::UpdateBestMove()
 {
-	float bestWinRate = -10000.f;
-	float lowestOpponentWinRate = 10000.f;
-	inputMove_t bestMove;
-	bestNode_t worstOpponentNode;
-	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
-
-	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
-	{
-		//Need an initial game state to be able to choose best move
-		return;
-		//UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
-	}
-
-	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
-	{
-		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
-
-		float sumOfWins = 0;
-		float sumOfSims = 0;
-
-		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
-		{
-			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
-			float wins = (float)metaData.m_numberOfWins;
-			float sims = (float)metaData.m_numberOfSimulations;
-
-			sumOfWins += wins;
-			sumOfSims += sims;
-		}
-
-		float childWinRate = sumOfWins/sumOfSims;
-		if( childWinRate > 0.999f ) //A winnning move
-		{
-			bestWinRate = childWinRate;
-			bestMove = validMoveIter.first;
-			break;
-		}
-		else if( bestWinRate < childWinRate )
-		{
-			bestWinRate = childWinRate;
-			bestMove = validMoveIter.first;
-		}
-	}
+	inputMove_t bestMove = GetBestMoveToDepth( 5, m_currentHeadNode );
+// 	
+// 
+// 	float bestWinRate = -10000.f;
+// 	float lowestOpponentWinRate = 10000.f;
+// 	inputMove_t bestMove;
+// 	bestNode_t worstOpponentNode;
+// 	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
+// 
+// 	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
+// 	{
+// 		//Need an initial game state to be able to choose best move
+// 		return;
+// 		//UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
+// 	}
+// 
+// 	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
+// 	{
+// 		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
+// 
+// 		float sumOfWins = 0;
+// 		float sumOfSims = 0;
+// 
+// 		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
+// 		{
+// 			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
+// 			float wins = (float)metaData.m_numberOfWins;
+// 			float sims = (float)metaData.m_numberOfSimulations;
+// 
+// 			sumOfWins += wins;
+// 			sumOfSims += sims;
+// 		}
+// 
+// 		float childWinRate = sumOfWins/sumOfSims;
+// 		if( childWinRate > 0.999f ) //A winnning move
+// 		{
+// 			bestWinRate = childWinRate;
+// 			bestMove = validMoveIter.first;
+// 			break;
+// 		}
+// 		else if( bestWinRate < childWinRate )
+// 		{
+// 			bestWinRate = childWinRate;
+// 			bestMove = validMoveIter.first;
+// 		}
+// 	}
 
 	//Think about getting worst opponentNode
 	m_bestMoveLock.lock();
@@ -730,6 +877,8 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 		BackPropagateResult( whoWon, parentNode );
 	}
 }
+
+
 
 float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationParameter )
 {

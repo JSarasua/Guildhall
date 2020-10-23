@@ -116,6 +116,9 @@ public:
 
 struct metaData_t
 {
+public:
+	float GetWinRate() { return m_numberOfWins / (float)m_numberOfSimulations; }
+
 	float m_numberOfWins = 0;
 	int m_numberOfSimulations = 0;
 };
