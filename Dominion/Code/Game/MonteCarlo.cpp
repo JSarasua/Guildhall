@@ -566,7 +566,9 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 
 		if( moveToMake.m_moveType == INVALID_MOVE )
 		{
-			ERROR_AND_DIE("Should never give an invalid move");
+			g_theConsole->ErrorString( "Selected move to make is invalid" );
+			break;
+			//ERROR_AND_DIE("Should never give an invalid move");
 		}
 
 		//Find if the best move makes a gamestate that has existed before
@@ -680,15 +682,31 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 
 void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 {
-	int whoJustMoved = node->m_data->m_currentGamestate->WhoJustMoved();
-	if( !node->m_parentNode )
+/*	int whoJustMoved = node->m_data->m_currentGamestate->WhoJustMoved();*/
+	int whoJustMoved = -1;
+	if( node->m_parentNode )
+	{
+		if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
+		{
+			whoJustMoved = PLAYER_1;
+		}
+		else
+		{
+			whoJustMoved = node->m_parentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+		}
+	}
+	else
 	{
 		whoJustMoved = PLAYER_1;
 	}
-	else if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
-	{
-		whoJustMoved = PLAYER_1;
-	}
+// 	if( !node->m_parentNode )
+// 	{
+// 		whoJustMoved = PLAYER_1;
+// 	}
+// 	else if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
+// 	{
+// 		whoJustMoved = PLAYER_1;
+// 	}
 
 	metaData_t& metaData = node->m_data->m_metaData;
 	if( whoJustMoved == whoWon )
