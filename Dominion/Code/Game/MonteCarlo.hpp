@@ -19,6 +19,7 @@ struct expand_t
 	inputMove_t m_input;
 	gamestate_t gameState;
 	TreeMapNode* nodeToExpand = nullptr;
+	TreeMapNode* nodeToSelect = nullptr; //Only used if repeating a node
 };
 
 struct bestNode_t
@@ -65,6 +66,9 @@ protected:
 	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
 	void BackPropagateResult( int whoWon, TreeMapNode* node );
 
+	//Methods of Getting the "Best Move"
+	inputMove_t GetMostPlayedMove( TreeMapNode* currentNode ); 
+	inputMove_t GetBestWinRateMove( TreeMapNode* currentNode ); //Best average winrate
 	inputMove_t GetBestMoveToDepth( int depth, TreeMapNode* currentNode );
 	float GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
 	int GetWhoseMoveAtDepth( int depth, TreeMapNode const* node );
@@ -96,7 +100,7 @@ public:
 	double m_simTime = 0;
 	double m_backpropagationTime = 0;
 
-	float m_ucbValue = 50.f;
+	float m_ucbValue = 5.f;
 
 
 	//lock
