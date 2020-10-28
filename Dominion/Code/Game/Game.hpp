@@ -220,15 +220,12 @@ public:
 struct data_t
 {
 	data_t() = default;
-	data_t( metaData_t const& metaData, inputMove_t const& move, gamestate_t* gameState ) :
+	data_t( metaData_t const& metaData, gamestate_t* gameState ) :
 		m_metaData( metaData ),
-		m_moveToReachNode( move ),
 		m_currentGamestate( gameState )
 	{	}
 
 	metaData_t m_metaData;
-
-	inputMove_t m_moveToReachNode;
 	gamestate_t* m_currentGamestate = nullptr;
 };
 

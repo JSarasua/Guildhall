@@ -407,8 +407,10 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		}
 		else
 		{
-			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
-			PlayMoveIfValid( bigMoneyAI );
+			inputMove_t singleWitchAI = GetMoveUsingSingleWitch( *m_currentGameState );
+			PlayMoveIfValid( singleWitchAI );
+// 			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
+// 			PlayMoveIfValid( bigMoneyAI );
 		}
 	}
 	if( f7Key.WasJustPressed() )
@@ -711,6 +713,7 @@ void Game::DebugDrawGame()
 
 	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
 	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
+	Vec2 turnPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.85f ) );
 	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
 	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
 	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
@@ -741,7 +744,26 @@ void Game::DebugDrawGame()
 	std::string buysStr = Stringf( "Buys: %i", buysAmount );
 	std::string actionsStr = Stringf( "Actions: %i", actionsAmount );
 	eGamePhase phase = m_currentGameState->m_currentPhase;
+	int whoseTurn = m_currentGameState->m_whoseMoveIsIt;
 	std::string phaseStr;
+	std::string whoseTurnStr;
+	std::string player1ActionPhaseStr = "Player 1: Action Phase";
+	std::string player1BuyPhaseStr = "Player 1: Buy Phase";
+	std::string player2ActionPhaseStr = "Player 2: Action Phase";
+	std::string player2BuyPhaseStr = "Player 2: Buy Phase";
+	
+	if( whoseTurn == PLAYER_1 )
+	{
+		whoseTurnStr = "Turn: Player 1";
+	}
+	else if( whoseTurn == PLAYER_2 )
+	{
+		whoseTurnStr = "Turn: Player 2";
+	}
+	else
+	{
+		whoseTurnStr = "No current player to move";
+	}
 
 	if( phase == ACTION_PHASE )
 	{
@@ -779,6 +801,7 @@ void Game::DebugDrawGame()
 	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
 
 	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), turnPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, whoseTurnStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
@@ -1016,29 +1039,30 @@ void Game::DebugDrawGame()
 			{
 				moveStr = Stringf( "Best move: End Phase" );
 			}
-			DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, moveStr.c_str() );
+			DebugAddScreenText( Vec4( 0.5f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 		}
 	}
 	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
 	{
-		inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
+		inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
+		//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
 		std::string bigMoneyStr;
 		if( bigMoneyMove.m_moveType == BUY_MOVE )
 		{
 			CardDefinition const* card = m_currentGameState->m_cardPiles[bigMoneyMove.m_cardIndexToBuy].m_card;
-			bigMoneyStr = Stringf( "Big Money Best Move: Buy %s", card->GetCardName().c_str() );
+			bigMoneyStr = Stringf( "Single Witch Best Move: Buy %s", card->GetCardName().c_str() );
 		}
 		else if( bigMoneyMove.m_moveType == PLAY_CARD )
 		{
 			int cardHandIndex = bigMoneyMove.m_cardHandIndexToPlay;
 			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-			bigMoneyStr = Stringf( "Big Money Best Move: Play %s", card->GetCardName().c_str() );
+			bigMoneyStr = Stringf( "Single Witch Best Move: Play %s", card->GetCardName().c_str() );
 		}
 		else if( bigMoneyMove.m_moveType == END_PHASE )
 		{
-			bigMoneyStr = Stringf( "Big Money Best move: End Phase" );
+			bigMoneyStr = Stringf( "Single Witch Best move: End Phase" );
 		}
-		DebugAddScreenText( Vec4( 0.5f, 0.95f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, bigMoneyStr.c_str() );
+		DebugAddScreenText( Vec4( 0.5f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, bigMoneyStr.c_str() );
 	}
 
 	if( m_randomMove.m_moveType != INVALID_MOVE )
@@ -1059,14 +1083,14 @@ void Game::DebugDrawGame()
 		{
 			randomMoveStr = Stringf( "Random move: End Phase" );
 		}
-		DebugAddScreenText( Vec4( 0.5f, 0.93f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, randomMoveStr.c_str() );
+		DebugAddScreenText( Vec4( 0.5f, 0.93f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, randomMoveStr.c_str() );
 	}
 
 
 	m_totalSimCount = m_mcts->GetNumberOfSimulationsRun();
 	m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
-	DebugAddScreenText( Vec4( 0.5f, 0.90f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.87f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current remaining sim count: %i", m_simCount ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.92f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.9f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current remaining sim count: %i", m_simCount ).c_str() );
 
 // 	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
 // 	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
@@ -1748,7 +1772,7 @@ inputMove_t Game::GetMoveUsingSingleWitch( gamestate_t const& currentGameState )
 		{
 			newMove.m_moveType = END_PHASE;
 		}
-		else if( playerDeck->HasCard( Witch ) && currentMoney >= 5 )
+		else if( !playerDeck->HasCard( Witch ) && currentMoney >= 5 )
 		{
 			newMove.m_cardIndexToBuy = (int)Witch;
 		}

@@ -34,6 +34,12 @@ struct sim_t
 	int result = -1;
 };
 
+struct playerWinRate_t
+{
+	float winRate = 0.f;
+	int whoseMove = -1;
+};
+
 class MonteCarlo
 {
 	friend class SimulationJob;
@@ -70,7 +76,9 @@ protected:
 	inputMove_t GetMostPlayedMove( TreeMapNode* currentNode ); 
 	inputMove_t GetBestWinRateMove( TreeMapNode* currentNode ); //Best average winrate
 	inputMove_t GetBestMoveToDepth( int depth, TreeMapNode* currentNode );
-	float GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
+	inputMove_t GetBestMoveNegaMax( TreeMapNode const* currentNode );
+	float GetBestWinRateForPlayer( TreeMapNode const* currentNode, int playerToCheck, bool hasTurnFlipped );
+	playerWinRate_t GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
 	int GetWhoseMoveAtDepth( int depth, TreeMapNode const* node );
 // 	inputMove_t GetBestMoveSafe();
 // 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
