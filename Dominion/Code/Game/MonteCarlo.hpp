@@ -60,6 +60,7 @@ public:
 	int GetNumberOfSimulationsRun() const { return m_totalNumberOfSimulationsRun; }
 	int GetCurrentNumberOfSimulationsLeft() const { return m_numberOfSimulationsToRun; }
 
+	void SetSimMethod( SIMMETHOD simMethod );
 protected:
 	//Thread
 	void WorkerMain();
@@ -83,7 +84,9 @@ protected:
 // 	inputMove_t GetBestMoveSafe();
 // 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 
-	
+	inputMove_t GetMoveForSimsUsingHeuristic( gamestate_t const& gameState );
+
+
 	//Helper Methods
 	float GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter = SQRT_2 );
 	float GetUCBValueAtNode( TreeMapNode const* node, float explorationParameter = SQRT_2 );
@@ -120,6 +123,9 @@ public:
 	//lock
 	std::mutex m_bestMoveLock;
 	inputMove_t m_bestMove = inputMove_t();
+
+	std::mutex m_simMethodLock;
+	SIMMETHOD m_simMethod = SIMMETHOD::RANDOM;
 
 	std::atomic<bool> m_isQuitting = false;
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;

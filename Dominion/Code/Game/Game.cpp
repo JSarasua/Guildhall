@@ -67,6 +67,8 @@ void Game::Startup()
 	//m_mcts->Startup( CIRCLEPLAYER );
 	m_mc = new MonteCarloNoTree();
 	m_mcts = new MonteCarlo();
+	m_mcts->SetSimMethod( m_mctsSimMethod );
+
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 
@@ -285,9 +287,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	UNUSED( deltaSeconds );
 	UNUSED( controller );
 
-// 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
+ 	const KeyButtonState& leftArrow = g_theInput->GetKeyStates( 0x25 );
 // 	const KeyButtonState& upArrow = g_theInput->GetKeyStates( 0x26 );
-// 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
+ 	const KeyButtonState& rightArrow = g_theInput->GetKeyStates( 0x27 );
 // 	const KeyButtonState& downArrow = g_theInput->GetKeyStates( 0x28 );
 
 // 	const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
@@ -350,6 +352,42 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 	const KeyButtonState& enterKey = g_theInput->GetKeyStates( ENTER_KEY );
 
+	if( leftArrow.WasJustPressed() )
+	{
+		switch( m_mctsSimMethod )
+		{
+		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+			break;
+		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::RANDOM;
+			break;
+		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+			break;
+		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+			break;
+		default:
+			break;
+		}
+
+		m_mcts->SetSimMethod( m_mctsSimMethod );
+	}
+	if( rightArrow.WasJustPressed() )
+	{
+		switch( m_mctsSimMethod )
+		{
+		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+			break;
+		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+			break;
+		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::RANDOM;
+			break;
+		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::RANDOM;
+			break;
+		default:
+			break;
+		}
+
+		m_mcts->SetSimMethod( m_mctsSimMethod );
+	}
 	if( f1Key.WasJustPressed() )
 	{
 		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
@@ -712,6 +750,7 @@ void Game::DebugDrawGame()
 	gameBoard.SetDimensions( gameDims );
 
 	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
+	Vec2 simMethodPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.93f ) );
 	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
 	Vec2 turnPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.85f ) );
 	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
@@ -751,6 +790,21 @@ void Game::DebugDrawGame()
 	std::string player1BuyPhaseStr = "Player 1: Buy Phase";
 	std::string player2ActionPhaseStr = "Player 2: Action Phase";
 	std::string player2BuyPhaseStr = "Player 2: Buy Phase";
+	std::string simMethodStr;
+
+	switch( m_mctsSimMethod )
+	{
+	case SIMMETHOD::RANDOM: simMethodStr = "Rollout Method: RANDOM";
+		break;
+	case SIMMETHOD::BIGMONEY: simMethodStr = "Rollout Method: BIG MONEY";
+		break;
+	case SIMMETHOD::SINGLEWITCH: simMethodStr = "Rollout Method: SINGLE Witch";
+		break;
+	case SIMMETHOD::GREEDY: simMethodStr = "Rollout Method: GREEDY";
+		break;
+	default: simMethodStr = "Rollout Method: DEFAULT";
+		break;
+	}
 	
 	if( whoseTurn == PLAYER_1 )
 	{
@@ -800,6 +854,7 @@ void Game::DebugDrawGame()
 	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
 
+	DebugAddScreenText( Vec4( Vec2(), simMethodPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, simMethodStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), turnPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, whoseTurnStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );

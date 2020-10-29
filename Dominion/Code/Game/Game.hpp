@@ -30,7 +30,13 @@ struct light_t;
 struct Vertex_PCUTBN;
 
 
-
+enum class SIMMETHOD
+{
+	RANDOM,
+	BIGMONEY,
+	SINGLEWITCH,
+	GREEDY
+};
 
 enum eGamePhase
 {
@@ -298,4 +304,5 @@ public:
 
 private:
 	void RenderDevConsole();
+	SIMMETHOD m_mctsSimMethod = SIMMETHOD::RANDOM; 
 };
