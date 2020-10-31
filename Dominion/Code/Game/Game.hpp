@@ -36,7 +36,8 @@ enum class SIMMETHOD
 	BIGMONEY,
 	SINGLEWITCH,
 	SARASUA1,
-	GREEDY
+	GREEDY,
+	DOUBLEWITCH
 };
 
 enum class AIStrategy
@@ -45,7 +46,8 @@ enum class AIStrategy
 	BIGMONEY,
 	SINGLEWITCH,
 	SARASUA1,
-	MCTS
+	MCTS,
+	DOUBLEWITCH
 };
 
 enum eGamePhase
@@ -271,6 +273,7 @@ public:
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 

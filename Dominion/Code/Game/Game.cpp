@@ -356,7 +356,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		switch( m_player2Strategy )
 		{
-		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::MCTS;
+		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::DOUBLEWITCH;
 			break;
 		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::RANDOM;
 			break;
@@ -365,6 +365,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::SINGLEWITCH;
 			break;
 		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::SARASUA1;
+			break;
+		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::MCTS;
 			break;
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
@@ -382,7 +384,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			break;
 		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::MCTS;
 			break;
-		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::RANDOM;
+		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::DOUBLEWITCH;
+			break;
+		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::RANDOM;
 			break;
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
@@ -392,7 +396,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		switch( m_player1Strategy )
 		{
-		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::MCTS;
+		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::DOUBLEWITCH;
 			break;
 		case AIStrategy::BIGMONEY: m_player1Strategy = AIStrategy::RANDOM;
 			break;
@@ -401,6 +405,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::SINGLEWITCH;
 			break;
 		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::SARASUA1;
+			break;
+		case AIStrategy::DOUBLEWITCH: m_player1Strategy = AIStrategy::MCTS;
 			break;
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
@@ -418,7 +424,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			break;
 		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::MCTS;
 			break;
-		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::RANDOM;
+		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::DOUBLEWITCH;
+			break;
+		case AIStrategy::DOUBLEWITCH: m_player1Strategy = AIStrategy::RANDOM;
 			break;
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
@@ -428,7 +436,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	{
 		switch( m_mctsSimMethod )
 		{
-		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::SARASUA1;
+		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
 			break;
 		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::RANDOM;
 			break;
@@ -437,6 +445,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		case SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
 		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+			break;
+		case SIMMETHOD::DOUBLEWITCH: m_mctsSimMethod = SIMMETHOD::SARASUA1;
 			break;
 		default:
 			break;
@@ -454,9 +464,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			break;
 		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::SARASUA1;
 			break;
-		case  SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::RANDOM;
+		case  SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
 			break;
 		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::RANDOM;
+			break;
+		case SIMMETHOD::DOUBLEWITCH: m_mctsSimMethod = SIMMETHOD::RANDOM;
 			break;
 		default:
 			break;
@@ -1162,6 +1174,8 @@ void Game::DebugDrawGame()
 			break;
 		case AIStrategy::MCTS: aiStratStr = "MCTS";
 			break;
+		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
+			break;
 		default: aiStratStr = "Invalid Strat for player 1";
 			break;
 		}
@@ -1204,6 +1218,8 @@ void Game::DebugDrawGame()
 		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
 			break;
 		case AIStrategy::MCTS: aiStratStr = "MCTS";
+			break;
+		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
 			break;
 		default: aiStratStr = "Invalid Strat for player 2";
 			break;
@@ -1860,6 +1876,8 @@ inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy )
 		break;
 	case AIStrategy::SINGLEWITCH: return GetMoveUsingSingleWitch( *m_currentGameState );
 		break;
+	case AIStrategy::DOUBLEWITCH: return GetMoveUsingDoubleWitch( *m_currentGameState );
+		break;
 	case AIStrategy::SARASUA1: return GetMoveUsingSarasua1( *m_currentGameState );
 		break;
 	case AIStrategy::MCTS: return m_mcts->GetBestMove();
@@ -2021,6 +2039,80 @@ inputMove_t Game::GetMoveUsingSingleWitch( gamestate_t const& currentGameState )
 		return newMove;
 	}
 
+}
+
+inputMove_t Game::GetMoveUsingDoubleWitch( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
+	{
+		return newMove;
+	}
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+		if( validMoves.size() == 1 )
+		{
+			return validMoves[0];
+		}
+		else
+		{
+			for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+			{
+				if( validMoves[moveIndex].m_moveType != END_PHASE )
+				{
+					return validMoves[moveIndex];
+				}
+			}
+
+			newMove.m_moveType = END_PHASE;
+			return newMove;
+		}
+
+	}
+	else
+	{
+
+		PlayerBoard const* playerDeck = &currentGameState.m_playerBoards[0];
+		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
+		{
+			playerDeck = &currentGameState.m_playerBoards[1];
+		}
+
+		int currentMoney = playerDeck->GetCurrentMoney();
+		int witchCount = playerDeck->GetCountOfCard( eCards::Witch );
+		newMove.m_moveType = BUY_MOVE;
+		if( playerDeck->m_numberOfBuysAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else if( witchCount < 2 && currentMoney >= 5 )
+		{
+			newMove.m_cardIndexToBuy = (int)Witch;
+		}
+		else if( currentMoney >= 8 )
+		{
+			newMove.m_cardIndexToBuy = (int)PROVINCE;
+		}
+		else if( currentMoney >= 6 )
+		{
+			newMove.m_cardIndexToBuy = (int)GOLD;
+		}
+		else if( currentMoney >= 3 )
+		{
+			newMove.m_cardIndexToBuy = (int)SILVER;
+		}
+		else
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+
+		return newMove;
+	}
 }
 
 inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )

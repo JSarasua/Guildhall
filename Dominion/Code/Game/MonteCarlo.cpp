@@ -534,6 +534,8 @@ inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameSta
 		break;
 	case SIMMETHOD::SINGLEWITCH: return g_theGame->GetMoveUsingSingleWitch( gameState );
 		break;
+	case SIMMETHOD::DOUBLEWITCH: return g_theGame->GetMoveUsingDoubleWitch( gameState );
+		break;
 	case SIMMETHOD::SARASUA1: return g_theGame->GetMoveUsingSarasua1( gameState );
 		break;
 	case SIMMETHOD::GREEDY: return inputMove_t(); //INVALID
