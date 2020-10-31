@@ -35,7 +35,17 @@ enum class SIMMETHOD
 	RANDOM,
 	BIGMONEY,
 	SINGLEWITCH,
+	SARASUA1,
 	GREEDY
+};
+
+enum class AIStrategy
+{
+	RANDOM,
+	BIGMONEY,
+	SINGLEWITCH,
+	SARASUA1,
+	MCTS
 };
 
 enum eGamePhase
@@ -257,10 +267,13 @@ public:
 	std::vector<inputMove_t> GetValidMovesAtGameState( gamestate_t const& gameState );
 	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
+	inputMove_t GetBestMoveUsingAIStrategy( AIStrategy aiStrategy );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
+
 private:
 	void InitializeGameState();
 	void RestartGame();
@@ -305,4 +318,7 @@ public:
 private:
 	void RenderDevConsole();
 	SIMMETHOD m_mctsSimMethod = SIMMETHOD::RANDOM; 
+	AIStrategy m_player1Strategy = AIStrategy::MCTS;
+	AIStrategy m_player2Strategy = AIStrategy::SINGLEWITCH;
+
 };

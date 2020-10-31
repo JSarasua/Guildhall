@@ -342,3 +342,15 @@ int PlayerBoard::GetCardIndexFromHandIndex( int handIndex )
 {
 	return m_hand.GetCardIndexFromCountIndex( handIndex );
 }
+
+int PlayerBoard::GetCountOfCard( int cardIndex ) const
+{
+	int handCount = m_hand.CountOfCard( cardIndex );
+	int playAreaCount = m_playArea.CountOfCard( cardIndex );
+	int discardPileCount = m_discardPile.CountOfCard( cardIndex );
+	int deckCount = m_sortedDeck.CountOfCard( cardIndex );
+
+	int cardCount = handCount + playAreaCount + discardPileCount + deckCount;
+
+	return cardCount;
+}

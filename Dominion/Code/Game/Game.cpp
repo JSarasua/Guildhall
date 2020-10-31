@@ -329,8 +329,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
  	const KeyButtonState& uKey = g_theInput->GetKeyStates( 'U' );
  	const KeyButtonState& iKey = g_theInput->GetKeyStates( 'I' );
 // 	const KeyButtonState& num0Key = g_theInput->GetKeyStates( '0' );
-// 	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
-// 	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
+	const KeyButtonState& lBracketKey = g_theInput->GetKeyStates( LBRACKET_KEY );
+	const KeyButtonState& rBracketKey = g_theInput->GetKeyStates( RBRACKET_KEY );
 // 	const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
 // 	const KeyButtonState& tKey = g_theInput->GetKeyStates( 'T' );
 // 	const KeyButtonState& gKey = g_theInput->GetKeyStates( 'G' );
@@ -348,19 +348,93 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
 // 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
 // 	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
-// 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
-// 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
+	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
+	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 	const KeyButtonState& enterKey = g_theInput->GetKeyStates( ENTER_KEY );
 
+	if( lBracketKey.WasJustPressed() )
+	{
+		switch( m_player2Strategy )
+		{
+		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::MCTS;
+			break;
+		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::RANDOM;
+			break;
+		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::BIGMONEY;
+			break;
+		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::SINGLEWITCH;
+			break;
+		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::SARASUA1;
+			break;
+		default: ERROR_AND_DIE("Invalid AI strategy");
+			break;
+		}
+	}
+	if( rBracketKey.WasJustPressed() )
+	{
+		switch( m_player2Strategy )
+		{
+		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::BIGMONEY;
+			break;
+		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::SINGLEWITCH;
+			break;
+		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::SARASUA1;
+			break;
+		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::MCTS;
+			break;
+		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::RANDOM;
+			break;
+		default: ERROR_AND_DIE("Invalid AI strategy");
+			break;
+		}
+	}
+	if( commaKey.WasJustPressed() )
+	{
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::MCTS;
+			break;
+		case AIStrategy::BIGMONEY: m_player1Strategy = AIStrategy::RANDOM;
+			break;
+		case AIStrategy::SINGLEWITCH: m_player1Strategy = AIStrategy::BIGMONEY;
+			break;
+		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::SINGLEWITCH;
+			break;
+		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::SARASUA1;
+			break;
+		default: ERROR_AND_DIE("Invalid AI strategy");
+			break;
+		}
+	}
+	if( periodKey.WasJustPressed() )
+	{
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::BIGMONEY;
+			break;
+		case AIStrategy::BIGMONEY: m_player1Strategy = AIStrategy::SINGLEWITCH;
+			break;
+		case AIStrategy::SINGLEWITCH: m_player1Strategy = AIStrategy::SARASUA1;
+			break;
+		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::MCTS;
+			break;
+		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::RANDOM;
+			break;
+		default: ERROR_AND_DIE("Invalid AI strategy");
+			break;
+		}
+	}
 	if( leftArrow.WasJustPressed() )
 	{
 		switch( m_mctsSimMethod )
 		{
-		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::SARASUA1;
 			break;
 		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::RANDOM;
 			break;
 		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+			break;
+		case SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
 		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
@@ -378,7 +452,9 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			break;
 		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
-		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::RANDOM;
+		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::SARASUA1;
+			break;
+		case  SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::RANDOM;
 			break;
 		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::RANDOM;
 			break;
@@ -427,7 +503,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 		{
 			//inputMove_t move = m_mc->GetBestMove();
-			inputMove_t move = m_mcts->GetBestMove();
+			inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
 			if( move.m_moveType == INVALID_MOVE )
 			{
 
@@ -438,17 +514,14 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			}
 
 			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-			//m_mc->RunSimulations( 400 );
 			m_mcts->AddSimulations( 400 );
-			//m_mcts->RunSimulations( 400 );
 			m_simCount += 400;
 		}
 		else
 		{
-			inputMove_t singleWitchAI = GetMoveUsingSingleWitch( *m_currentGameState );
-			PlayMoveIfValid( singleWitchAI );
-// 			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
-// 			PlayMoveIfValid( bigMoneyAI );
+			inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
+			PlayMoveIfValid( move );
+
 		}
 	}
 	if( f7Key.WasJustPressed() )
@@ -802,6 +875,8 @@ void Game::DebugDrawGame()
 		break;
 	case SIMMETHOD::GREEDY: simMethodStr = "Rollout Method: GREEDY";
 		break;
+	case SIMMETHOD::SARASUA1: simMethodStr = "Rollout Method: SARASUA1";
+		break;
 	default: simMethodStr = "Rollout Method: DEFAULT";
 		break;
 	}
@@ -1073,8 +1148,25 @@ void Game::DebugDrawGame()
 
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
+		inputMove_t player1BestMove = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		std::string aiStratStr;
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
+			break;
+		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
+			break;
+		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
+			break;
+		case AIStrategy::MCTS: aiStratStr = "MCTS";
+			break;
+		default: aiStratStr = "Invalid Strat for player 1";
+			break;
+		}
 		//inputMove_t currentBestMove = m_mc->GetBestMove();
-		inputMove_t currentBestMove = m_mcts->GetBestMove();
+		inputMove_t currentBestMove = player1BestMove;
 		if( currentBestMove.m_moveType != INVALID_MOVE )
 		{
 			std::string moveStr;
@@ -1082,42 +1174,61 @@ void Game::DebugDrawGame()
 			if( currentBestMove.m_moveType == BUY_MOVE )
 			{
 				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
-				moveStr = Stringf( " Best Move: Buy %s", card->GetCardName().c_str() );
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
 			{
 				int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
 				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-				moveStr = Stringf( "Best Move: Play %s", card->GetCardName().c_str() );
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == END_PHASE )
 			{
-				moveStr = Stringf( "Best move: End Phase" );
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: End Phase", aiStratStr.c_str() );
 			}
-			DebugAddScreenText( Vec4( 0.5f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 		}
 	}
 	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
 	{
-		inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
+		inputMove_t player2BestMove = GetBestMoveUsingAIStrategy( m_player2Strategy );
+		std::string aiStratStr;
+		switch( m_player2Strategy )
+		{
+		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
+			break;
+		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
+			break;
+		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
+			break;
+		case AIStrategy::MCTS: aiStratStr = "MCTS";
+			break;
+		default: aiStratStr = "Invalid Strat for player 2";
+			break;
+		}
+
+		inputMove_t currentBestMove = player2BestMove;
+		//inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
 		//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
-		std::string bigMoneyStr;
-		if( bigMoneyMove.m_moveType == BUY_MOVE )
+		std::string moveStr;
+		if( currentBestMove.m_moveType == BUY_MOVE )
 		{
-			CardDefinition const* card = m_currentGameState->m_cardPiles[bigMoneyMove.m_cardIndexToBuy].m_card;
-			bigMoneyStr = Stringf( "Single Witch Best Move: Buy %s", card->GetCardName().c_str() );
+			CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+			moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 		}
-		else if( bigMoneyMove.m_moveType == PLAY_CARD )
+		else if( currentBestMove.m_moveType == PLAY_CARD )
 		{
-			int cardHandIndex = bigMoneyMove.m_cardHandIndexToPlay;
+			int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
 			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-			bigMoneyStr = Stringf( "Single Witch Best Move: Play %s", card->GetCardName().c_str() );
+			moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 		}
-		else if( bigMoneyMove.m_moveType == END_PHASE )
+		else if( currentBestMove.m_moveType == END_PHASE )
 		{
-			bigMoneyStr = Stringf( "Single Witch Best move: End Phase" );
+			moveStr = Stringf( "Best Move for Player 2 using %s strategy: End Phase", aiStratStr.c_str() );
 		}
-		DebugAddScreenText( Vec4( 0.5f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, bigMoneyStr.c_str() );
+		DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 	}
 
 	if( m_randomMove.m_moveType != INVALID_MOVE )
@@ -1208,37 +1319,77 @@ void Game::AutoPlayGame()
 	{
 		if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 		{
-			m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
-			if( m_simCount < 500 )
+			if( m_player1Strategy == AIStrategy::MCTS )
 			{
-				if( m_timer.CheckAndDecrement() )
+				m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
+				if( m_simCount < 500 )
 				{
-					m_mcts->AddSimulations( 1000 );
-
-					//inputMove_t move = m_mc->GetBestMove();
-					inputMove_t move = m_mcts->GetBestMove();
-					if( move.m_moveType == INVALID_MOVE )
+					if( m_timer.CheckAndDecrement() )
 					{
+						m_mcts->AddSimulations( 1000 );
 
+						//inputMove_t move = m_mc->GetBestMove();
+						inputMove_t move = m_mcts->GetBestMove();
+						if( move.m_moveType == INVALID_MOVE )
+						{
+
+						}
+						else
+						{
+							PlayMoveIfValid( move );
+						}
+
+						DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 					}
 					else
 					{
-						PlayMoveIfValid( move );
+
 					}
-
-					DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-				}
-				else
-				{
-
 				}
 			}
+			else
+			{
+				inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
+				PlayMoveIfValid( move );
+			}
+			
 
 		}
 		else
 		{
-			inputMove_t bigMoneyAI = GetMoveUsingBigMoney( *m_currentGameState );
-			PlayMoveIfValid( bigMoneyAI );
+			if( m_player2Strategy == AIStrategy::MCTS )
+			{
+				m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
+				if( m_simCount < 500 )
+				{
+					if( m_timer.CheckAndDecrement() )
+					{
+						m_mcts->AddSimulations( 1000 );
+
+						//inputMove_t move = m_mc->GetBestMove();
+						inputMove_t move = m_mcts->GetBestMove();
+						if( move.m_moveType == INVALID_MOVE )
+						{
+
+						}
+						else
+						{
+							PlayMoveIfValid( move );
+						}
+
+						DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+					}
+					else
+					{
+
+					}
+				}
+			}
+			else
+			{
+				inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
+				PlayMoveIfValid( move );
+			}
 		}
 	}
 
@@ -1699,6 +1850,25 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 	return newGameState;
 }
 
+inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy )
+{
+	switch( aiStrategy )
+	{
+	case AIStrategy::RANDOM: return GetRandomMoveAtGameState( *m_currentGameState );
+		break;
+	case AIStrategy::BIGMONEY: return GetMoveUsingBigMoney( *m_currentGameState );
+		break;
+	case AIStrategy::SINGLEWITCH: return GetMoveUsingSingleWitch( *m_currentGameState );
+		break;
+	case AIStrategy::SARASUA1: return GetMoveUsingSarasua1( *m_currentGameState );
+		break;
+	case AIStrategy::MCTS: return m_mcts->GetBestMove();
+		break;
+	default: return inputMove_t();
+		break;
+	}
+}
+
 inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState )
 {
 	std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
@@ -1851,6 +2021,167 @@ inputMove_t Game::GetMoveUsingSingleWitch( gamestate_t const& currentGameState )
 		return newMove;
 	}
 
+}
+
+inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
+	{
+		return newMove;
+	}
+	inputMove_t randomMove = GetRandomMoveAtGameState( currentGameState );
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+
+	PlayerBoard const& playerBoard = currentGameState.m_playerBoards[whoseMove];
+
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		if( playerBoard.m_numberOfActionsAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else
+		{
+			newMove.m_moveType = PLAY_CARD;
+			if( playerBoard.CanPlayCard( Village, &currentGameState ) )
+			{
+				newMove.m_cardHandIndexToPlay = Village;
+			}
+			else if( playerBoard.CanPlayCard( Festival, &currentGameState ) )
+			{
+				newMove.m_cardHandIndexToPlay = Festival;
+			}
+			else if( playerBoard.CanPlayCard( Laboratory, &currentGameState ) )
+			{
+				newMove.m_cardHandIndexToPlay = Laboratory;
+			}
+			else if( playerBoard.CanPlayCard( Market, &currentGameState ) )
+			{
+				newMove.m_cardHandIndexToPlay = Market;
+			}
+			else if( playerBoard.CanPlayCard( Witch, &currentGameState ) )
+			{
+				newMove.m_cardHandIndexToPlay = Witch;
+			}
+			else
+			{
+				return randomMove;
+				//newMove = GetRandomMoveAtGameState( currentGameState );
+			}
+		}
+
+	}
+	else if( currentGameState.m_currentPhase == BUY_PHASE )
+	{
+		newMove.m_moveType = BUY_MOVE;
+		int currentMoney = playerBoard.GetCurrentMoney();
+		int buys = playerBoard.m_numberOfBuysAvailable;
+
+		if( buys > 0 )
+		{
+			int witchCount = playerBoard.GetCountOfCard( eCards::Witch );
+			int laboratoryCount = playerBoard.GetCountOfCard( eCards::Laboratory );
+			int villageCount = playerBoard.GetCountOfCard( eCards::Village );
+			//int goldCount = playerBoard.GetCountOfCard( GOLD );
+			int silverCount = playerBoard.GetCountOfCard( eCards::SILVER );
+			int provincesLeft = currentGameState.m_cardPiles[eCards::PROVINCE].m_pileSize;
+
+			if( currentMoney >= 5 && (witchCount < 2 || laboratoryCount < 1) )
+			{
+				if( witchCount < 2 )
+				{
+					newMove.m_cardIndexToBuy = eCards::Witch;
+				}
+				else if( laboratoryCount < 1 )
+				{
+					newMove.m_cardIndexToBuy = eCards::Laboratory;
+				}
+			}
+			else if( currentMoney >= 8 )
+			{
+				newMove.m_cardIndexToBuy = eCards::PROVINCE;
+			}
+			else if( currentMoney >= 6 )
+			{
+				if( provincesLeft < 3 )
+				{
+					newMove.m_cardIndexToBuy = eCards::DUCHY;
+				}
+				else
+				{
+					newMove.m_cardIndexToBuy = eCards::GOLD;
+				}
+			}
+			else if( currentMoney >= 5 )
+			{
+				if( provincesLeft <= 5 )
+				{
+					newMove.m_cardIndexToBuy = eCards::DUCHY;
+				}
+				else if( silverCount < 3 )
+				{
+					newMove.m_cardIndexToBuy = eCards::SILVER;
+				}
+				else if( laboratoryCount < 2 )
+				{
+					newMove.m_cardIndexToBuy = eCards::Laboratory;
+				}
+				else if( villageCount < 1 )
+				{
+					newMove.m_cardIndexToBuy = eCards::Village;
+				}
+				else
+				{
+					newMove.m_cardIndexToBuy = eCards::SILVER;
+				}
+			}
+			else if( currentMoney >= 3 )
+			{
+				if( provincesLeft <= 2 )
+				{
+					newMove.m_cardIndexToBuy = eCards::ESTATE;
+				}
+				else if( silverCount < 3 )
+				{
+					newMove.m_cardIndexToBuy = eCards::SILVER;
+				}
+				else if( villageCount < 1 )
+				{
+					newMove.m_cardIndexToBuy = eCards::Village;
+				}
+				else if( silverCount < 7 )
+				{
+					newMove.m_cardIndexToBuy = eCards::SILVER;
+				}
+				else
+				{
+					newMove.m_moveType = END_PHASE;
+				}
+			}
+			else
+			{
+				newMove.m_moveType = END_PHASE;
+			}
+
+		}
+		else
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+	}
+
+	if( IsMoveValidForGameState( newMove, currentGameState ) )
+	{
+		return newMove;
+	}
+	else
+	{
+		return randomMove;
+	}
 }
 
 gamestate_t Game::GetRandomInitialGameState()
