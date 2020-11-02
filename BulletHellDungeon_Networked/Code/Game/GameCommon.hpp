@@ -1,5 +1,7 @@
 #pragma once
-struct Vec2;
+#include <string>
+#include "Engine/Math/vec2.hpp"
+
 struct Rgba8;
 struct IntVec2;
 
@@ -54,4 +56,33 @@ extern SpriteSheet* g_portraitSpriteSheet;
 extern SpriteSheet* g_weaponSpriteSheet;
 extern SpriteSheet* g_bulletsSpriteSheet;
 
+struct Header
+{
+	uint16_t m_id = 0;
+	uint16_t m_size = 0;
+};
 
+struct InputMessage
+{
+	Vec2 mousePos = Vec2();
+	Vec2 moveVec = Vec2();
+	int changeWeapons = 0;
+	bool isShooting = false;
+	bool isDodging = false;
+};
+
+struct InputPacket
+{
+	Header header;
+	InputMessage message;
+
+public:
+	std::string ToString()
+	{
+		std::string inputPacketStr;
+		inputPacketStr.append( (char*)&header, 4 );
+		inputPacketStr.append( (char*)&message, 22 );
+
+		return inputPacketStr;
+	}
+};

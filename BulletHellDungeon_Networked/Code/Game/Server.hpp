@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/Client.hpp"
 #include <vector>
 
 class Entity;

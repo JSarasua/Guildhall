@@ -34,4 +34,7 @@ public:
 	virtual std::vector<Vertex_PCU> const& GetTileVertsToRender() override;
 	virtual std::vector<Entity*> const& GetEntitiesToRender() override;
 	virtual eGameState GetCurrentGameState() override;
+
+public:
+	std::vector<Client*> m_clients;
 };

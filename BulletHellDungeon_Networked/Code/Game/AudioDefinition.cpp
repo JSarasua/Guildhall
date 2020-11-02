@@ -8,7 +8,7 @@ float AudioDefinition::s_masterVolume = 0.5f;
 float AudioDefinition::s_backgroundMusicVolume = 0.5f;
 float AudioDefinition::s_SFXVolume = 1.f;
 
-void AudioDefinition::PlaySound()
+void AudioDefinition::PlayGameSound()
 {
 	float bgMusicVolume = 1.f;
 	float sfxVolume = 1.f;

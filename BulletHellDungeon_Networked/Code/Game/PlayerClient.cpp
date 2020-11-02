@@ -169,7 +169,7 @@ void PlayerClient::UpdateLoading( float deltaSeconds )
 	else if( m_frameCounter == 1 )
 	{
 		AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-		attractScreenSound->PlaySound();
+		attractScreenSound->PlayGameSound();
 	}
 	else if( m_frameCounter == 0 )
 	{
@@ -735,7 +735,7 @@ void PlayerClient::CheckButtonPresses()
 
 				AudioDefinition::StopAllSounds();
 				AudioDefinition* gamePlayAudio = AudioDefinition::GetAudioDefinition( "GamePlayMusic" );
-				gamePlayAudio->PlaySound();
+				gamePlayAudio->PlayGameSound();
 			}
 			else if( m_isMouseOverMainMenuQuit )
 			{
@@ -759,7 +759,7 @@ void PlayerClient::CheckButtonPresses()
 			gamePlaySound->StopSound();
 			g_theGame->RebuildWorld();
 
-			gamePlaySound->PlaySound();
+			gamePlaySound->PlayGameSound();
 		}
 
 		const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
@@ -840,7 +840,7 @@ void PlayerClient::CheckButtonPresses()
 
 					AudioDefinition::StopAllSounds();
 					AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-					attractScreenSound->PlaySound();
+					attractScreenSound->PlayGameSound();
 				}
 			}
 		}
@@ -860,7 +860,7 @@ void PlayerClient::CheckButtonPresses()
 
 					AudioDefinition::StopAllSounds();
 					AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-					attractScreenSound->PlaySound();
+					attractScreenSound->PlayGameSound();
 				}
 			}
 		}

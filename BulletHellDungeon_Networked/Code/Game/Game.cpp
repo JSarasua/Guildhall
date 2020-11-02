@@ -388,7 +388,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			gamePlaySound->StopSound();
 			RebuildWorld();
 			
-			gamePlaySound->PlaySound();
+			gamePlaySound->PlayGameSound();
 		}
 		if( f6Key.WasJustPressed() )
 		{
@@ -431,7 +431,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 					AudioDefinition::StopAllSounds();
 					AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-					attractScreenSound->PlaySound();
+					attractScreenSound->PlayGameSound();
 				}
 			}
 		}
@@ -451,7 +451,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 					AudioDefinition::StopAllSounds();
 					AudioDefinition* attractScreenSound = AudioDefinition::GetAudioDefinition( "AttractMusic" );
-					attractScreenSound->PlaySound();
+					attractScreenSound->PlayGameSound();
 				}
 			}
 		}

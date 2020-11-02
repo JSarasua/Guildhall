@@ -25,7 +25,7 @@ public:
 	static float s_backgroundMusicVolume;
 	static float s_SFXVolume;
 
-	void PlaySound();
+	void PlayGameSound();
 	void StopSound();
 	void UpdateVolume();
 	bool IsPlaying() const;

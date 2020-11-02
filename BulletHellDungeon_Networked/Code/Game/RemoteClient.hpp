@@ -1,6 +1,8 @@
 #pragma once
 #include "Game/Client.hpp"
 
+class UDPSocket;
+
 class RemoteClient : public Client
 {
 public:
@@ -51,6 +53,8 @@ public:
 	virtual void CheckButtonPresses() override;
 
 public:
+	void SetUDPSocket( UDPSocket* newUDPSocket );
+
 public:
 	Camera* m_camera = nullptr;
 	Camera* m_UICamera = nullptr;
@@ -93,4 +97,8 @@ public:
 	AABB2 m_victoryMenu;
 	AABB2 m_victoryContinueButton;
 	bool m_isMouseOverVictoryContinue = false;
+
+	//Get and receive messages from Player Client
+private:
+	UDPSocket* m_UDPSocket = nullptr;
 };

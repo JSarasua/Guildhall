@@ -439,13 +439,13 @@ bool Actor::UpdateInput( EventArgs const& args )
 					}
 					else
 					{
-						shootSound->PlaySound();
+						shootSound->PlayGameSound();
 					}
 				}
 				else
 				{
 					shootSound->StopSound();
-					shootSound->PlaySound();
+					shootSound->PlayGameSound();
 				}
 
 				m_firingTimer.Reset();
