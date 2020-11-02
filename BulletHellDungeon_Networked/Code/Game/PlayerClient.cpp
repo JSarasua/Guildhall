@@ -10,6 +10,7 @@
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Network/UDPSocket.hpp"
 #include <vector>
 
 PlayerClient::PlayerClient()
@@ -17,9 +18,20 @@ PlayerClient::PlayerClient()
 
 }
 
+PlayerClient::PlayerClient( UDPSocket* clientUDPSocket )
+{
+	m_UDPSocket = clientUDPSocket;
+
+	if( m_UDPSocket )
+	{
+//		g_theEventSystem->SubscribeMethodToEvent( "Input", NOCONSOLECOMMAND, this, )
+	}
+}
+
 PlayerClient::~PlayerClient()
 {
 
+	//delete m_UDPSocket;
 }
 
 void PlayerClient::Startup()
@@ -174,7 +186,7 @@ void PlayerClient::UpdateLoading( float deltaSeconds )
 	else if( m_frameCounter == 0 )
 	{
 		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
-		g_theAudio->PlaySound( loadingSound );
+		g_theAudio->PlayGameSound( loadingSound );
 	}
 
 	if( m_frameCounter == 2 )

@@ -1,13 +1,17 @@
 #pragma once
-#include "Game/Game.hpp"
+//#include "Game/Game.hpp"
 
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Time/Timer.hpp"
 #include "Engine/Core/Rgba8.hpp"
 //#include "Engine/Network/UDPSocket.hpp"
 
+class Game;
 class Camera;
 class Texture;
+
+enum eGameState : int;
+
 
 class Client
 {
@@ -66,7 +70,7 @@ public:
 
 	int m_frameCounter = 0;
 
-	enum eGameState m_gameState = LOADING;
+	enum eGameState m_gameState = (eGameState)0;
 
 	//Mouse
 	Vec2 m_mousePositionOnMainCamera;

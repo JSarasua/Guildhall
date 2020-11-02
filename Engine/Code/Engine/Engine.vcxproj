@@ -197,7 +197,6 @@
     <ClCompile Include="Math\Vec3.cpp" />
     <ClCompile Include="Math\Vec4.cpp" />
     <ClCompile Include="Network\NetworkSys.cpp" />
-    <ClCompile Include="Network\NetworkSystem.cpp" />
     <ClCompile Include="Network\TCPClient.cpp" />
     <ClCompile Include="Network\TCPServer.cpp" />
     <ClCompile Include="Network\TCPSocket.cpp" />
@@ -290,7 +289,6 @@
     <ClInclude Include="Math\Vec3.hpp" />
     <ClInclude Include="Math\Vec4.hpp" />
     <ClInclude Include="Network\NetworkSys.hpp" />
-    <ClInclude Include="Network\NetworkSystem.hpp" />
     <ClInclude Include="Network\TCPClient.hpp" />
     <ClInclude Include="Network\TCPServer.hpp" />
     <ClInclude Include="Network\TCPSocket.hpp" />

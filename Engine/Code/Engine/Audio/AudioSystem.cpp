@@ -90,7 +90,7 @@ SoundID AudioSystem::CreateOrGetSound( const std::string& soundFilePath )
 
 
 //-----------------------------------------------------------------------------------------------
-SoundPlaybackID AudioSystem::PlaySound( SoundID soundID, bool isLooped, float volume, float balance, float speed, bool isPaused )
+SoundPlaybackID AudioSystem::PlayGameSound( SoundID soundID, bool isLooped, float volume, float balance, float speed, bool isPaused )
 {
 	size_t numSounds = m_registeredSounds.size();
 	if( soundID < 0 || soundID >= numSounds )

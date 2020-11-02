@@ -64,7 +64,7 @@ public:
 
 	int m_frameCounter = 0;
 
-	enum eGameState m_gameState = LOADING;
+	enum eGameState m_gameState = (eGameState)0;
 
 	//Mouse
 	Vec2 m_mousePositionOnMainCamera;

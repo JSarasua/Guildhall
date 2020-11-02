@@ -1,10 +1,13 @@
 #pragma once
 #include "Game/Client.hpp"
 
+class UDPSocket;
+
 class PlayerClient : public Client
 {
 public:
 	PlayerClient();
+	PlayerClient( UDPSocket* clientUDPSocket );
 	virtual ~PlayerClient();
 
 
@@ -60,7 +63,7 @@ public:
 
 	int m_frameCounter = 0;
 
-	enum eGameState m_gameState = LOADING;
+	enum eGameState m_gameState = (eGameState)0;
 
 	//Mouse
 	Vec2 m_mousePositionOnMainCamera;
@@ -93,4 +96,7 @@ public:
 	AABB2 m_victoryMenu;
 	AABB2 m_victoryContinueButton;
 	bool m_isMouseOverVictoryContinue = false;
+
+private:
+	UDPSocket* m_UDPSocket = nullptr;
 };
