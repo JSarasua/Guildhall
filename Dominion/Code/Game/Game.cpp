@@ -889,6 +889,8 @@ void Game::DebugDrawGame()
 		break;
 	case SIMMETHOD::SARASUA1: simMethodStr = "Rollout Method: SARASUA1";
 		break;
+	case SIMMETHOD::DOUBLEWITCH: simMethodStr = "Rollout Method: DOUBLE Witch";
+		break;
 	default: simMethodStr = "Rollout Method: DEFAULT";
 		break;
 	}
@@ -1202,6 +1204,12 @@ void Game::DebugDrawGame()
 			}
 			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 		}
+		else
+		{
+			std::string moveStr;
+			moveStr = Stringf( "Move for Player 1 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+		}
 	}
 	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
 	{
@@ -1226,25 +1234,35 @@ void Game::DebugDrawGame()
 		}
 
 		inputMove_t currentBestMove = player2BestMove;
-		//inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
-		//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
-		std::string moveStr;
-		if( currentBestMove.m_moveType == BUY_MOVE )
+		if( currentBestMove.m_moveType != INVALID_MOVE )
 		{
-			CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
-			moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			//inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
+			//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
+			std::string moveStr;
+			if( currentBestMove.m_moveType == BUY_MOVE )
+			{
+				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == PLAY_CARD )
+			{
+				int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == END_PHASE )
+			{
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: End Phase", aiStratStr.c_str() );
+			}
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 		}
-		else if( currentBestMove.m_moveType == PLAY_CARD )
+		else
 		{
-			int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
-			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-			moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			std::string moveStr;
+			moveStr = Stringf( "Move for Player 2 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
 		}
-		else if( currentBestMove.m_moveType == END_PHASE )
-		{
-			moveStr = Stringf( "Best Move for Player 2 using %s strategy: End Phase", aiStratStr.c_str() );
-		}
-		DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+
 	}
 
 	if( m_randomMove.m_moveType != INVALID_MOVE )
@@ -2361,6 +2379,51 @@ gamestate_t Game::GetRandomInitialGameState()
 	newGameState.m_isFirstMove = false;
 
 	return newGameState;
+}
+
+void Game::RandomizeUnknownInfoForGameState( gamestate_t& currentGameState )
+{
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	int opponent = -1;
+
+	if( whoseMove == PLAYER_1 )
+	{
+		opponent = PLAYER_2;
+	}
+	else
+	{
+		opponent = PLAYER_1;
+	}
+
+	currentGameState.m_playerBoards[whoseMove].ShuffleDeck();
+	currentGameState.m_playerBoards[opponent].RandomizeHandAndDeck();
+}
+
+int Game::GetCurrentPlayersScore( gamestate_t const& currentGameState )
+{
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+
+	PlayerBoard const& playerBoard = currentGameState.m_playerBoards[whoseMove];
+	int playerScore = playerBoard.GetCurrentVictoryPoints();
+	return playerScore;
+}
+
+int Game::GetOpponentsScore( gamestate_t const& currentGameState )
+{
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	int opponentsMove = -1;
+	if( whoseMove == PLAYER_1 )
+	{
+		opponentsMove = PLAYER_2;
+	}
+	else
+	{
+		opponentsMove = PLAYER_1;
+	}
+
+	PlayerBoard const& playerBoard = currentGameState.m_playerBoards[opponentsMove];
+	int playerScore = playerBoard.GetCurrentVictoryPoints();
+	return playerScore;
 }
 
 void Game::RenderDevConsole()

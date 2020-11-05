@@ -319,7 +319,7 @@ inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode 
 		return inputMove_t();
 	}
 
-	float bestWinRate = -1.f;
+	float bestWinRate = -999999.f;
 	bool hasFirstMoveBeenCheck = false;
 	inputMove_t bestMove;
 
@@ -444,7 +444,7 @@ playerWinRate_t MonteCarlo::GetBestWinRateAtDepth( int depth, TreeMapNode const*
 		return playerWinRate;
 	}
 
-	float bestWinRate = -1.f;
+	float bestWinRate = -9999999.f;
 	int whoseMove = node->m_data->m_currentGamestate->m_whoseMoveIsIt;
 	for( auto move : node->m_possibleOutcomes )
 	{
@@ -565,7 +565,6 @@ void MonteCarlo::SetSimMethod( SIMMETHOD simMethod )
 
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
 {
-	//float sumOfUCBValues = 0.f;
 	float totalSimulations = 0.f;
 	float averageUCBValue = 0.f;
 	for( size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++ )
@@ -589,14 +588,11 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 		//sumOfUCBValues += GetUCBValueAtNode( currentNode, explorationParameter );
 	}
 
-	if( averageUCBValue < 0.f )
-	{
-		ERROR_AND_DIE("Should never be less than 0");
-	}
+// 	if( averageUCBValue < 0.f )
+// 	{
+// 		ERROR_AND_DIE("Should never be less than 0");
+// 	}
 
-	//float count = (float)nodes.size();
-
-	//return sumOfUCBValues/count;
 	return averageUCBValue;
 
 }
@@ -742,6 +738,8 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		}
 	}
 
+	g_theGame->RandomizeUnknownInfoForGameState( currentGameState );
+
 	//Always choose the current Node if it can be expanded
 	if( CanExpand( nodeToCheck ) )
 	{
@@ -754,7 +752,7 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 	while( !CanExpand( nodeToCheck ) )
 	{
 		//Get Best move to make
-		float highestUCBValue = -1.f;
+		float highestUCBValue = -999999.f;
 		inputMove_t moveToMake;
 		for( auto outcomesAfterMove : nodeToCheck->m_possibleOutcomes )
 		{
@@ -956,8 +954,8 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 
 inputMove_t MonteCarlo::GetMostPlayedMove( TreeMapNode* currentNode )
 {
-	int mostSims = -1;
-	float bestWinRate = -1.f;
+	int mostSims = -99999;
+	float bestWinRate = -999999.f;
 	inputMove_t bestMove;
 
 	for( auto move : currentNode->m_possibleOutcomes )
@@ -1065,8 +1063,41 @@ float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationP
 		return SQRT_2;
 	}
 
+	float score = 0.f;
 
-	float ucb = numberOfWins/numberOfSimulations + explorationParameter * SquareRootFloat( NaturalLog(numberOfSimulationsAtParent) / numberOfSimulations ); 
+	SCORESTRATEGY scoreStategy;
+	m_scoreStrategyLock.lock();
+	scoreStategy = m_scoreStrategy;
+	m_scoreStrategyLock.unlock();
+
+
+	//Winpoint = Wins/Total Games Player
+	//Diff = My VP score - their VP score
+
+
+	switch( scoreStategy )
+	{
+		//WinPercentage = Winpoint
+	case SCORESTRATEGY::WINPERCENTAGE:
+	{
+		score = numberOfWins/numberOfSimulations;
+		break;
+	}
+		//MCDOM = Winpoint + Diff/100
+	case SCORESTRATEGY::MCDOM:
+	{
+		gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+		int myVPs = g_theGame->GetCurrentPlayersScore( currentGameState );
+		int theirVPs = g_theGame->GetOpponentsScore( currentGameState );
+		int diffVPs = myVPs - theirVPs;
+		score = numberOfWins/numberOfSimulations + ((float)diffVPs)/100.f;
+		break;
+	}
+	default: ERROR_AND_DIE("Score stategy for UCB calculation is invalid");
+		break;
+	}
+
+	float ucb = score + explorationParameter * SquareRootFloat( NaturalLog(numberOfSimulationsAtParent) / numberOfSimulations ); 
 
 	return ucb;
 }

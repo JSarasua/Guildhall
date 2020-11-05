@@ -159,6 +159,14 @@ struct gamestate_t
 {
 public:
 	gamestate_t() = default;
+	gamestate_t( gamestate_t const& copyGameState ) :
+		m_whoseMoveIsIt( copyGameState.m_whoseMoveIsIt ),
+		m_currentPhase( copyGameState.m_currentPhase )
+	{
+		m_playerBoards[0] = copyGameState.m_playerBoards[0];
+		m_playerBoards[1] = copyGameState.m_playerBoards[1];
+		memcpy( &m_cardPiles[0], &copyGameState.m_cardPiles[0], NUMBEROFPILES * sizeof(pileData_t) );
+	}
 	gamestate_t( pileData_t gamePiles[NUMBEROFPILES], PlayerBoard const& player1Deck, PlayerBoard const& player2Deck, int whoseMove, eGamePhase const& currentPhase ) :
 		m_whoseMoveIsIt( whoseMove ), m_currentPhase( currentPhase )
 	{
@@ -276,7 +284,11 @@ public:
 	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
+	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );
 
+
+	int GetCurrentPlayersScore( gamestate_t const& currentGameState );
+	int GetOpponentsScore( gamestate_t const& currentGameState );
 private:
 	void InitializeGameState();
 	void RestartGame();

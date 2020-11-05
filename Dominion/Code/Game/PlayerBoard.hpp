@@ -74,6 +74,10 @@ public:
 	int GetCardIndexFromHandIndex( int handIndex );
 	int GetCountOfCard( int cardIndex ) const;
 
+	void RandomizeHandAndDeck();
+
+private:
+	void AddHandToDeck();
 public:
 
 	CardPile m_hand;

@@ -354,3 +354,31 @@ int PlayerBoard::GetCountOfCard( int cardIndex ) const
 
 	return cardCount;
 }
+
+void PlayerBoard::RandomizeHandAndDeck()
+{
+	int handCount = m_hand.TotalCount();
+	AddHandToDeck();
+	ShuffleDeck();
+	Draw( handCount );
+}
+
+void PlayerBoard::AddHandToDeck()
+{
+	size_t uniqueCardCount = m_hand.GetNumberOfPossibleUniqueCards();
+	for( size_t cardIndex = 0; cardIndex < uniqueCardCount; cardIndex++ )
+	{
+		int pileSize = m_hand[cardIndex];
+		if( pileSize > 0 )
+		{
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+			for( int pileIndex = 0; pileIndex < pileSize; pileIndex++ )
+			{
+				m_deck.emplace_back( card, (int)cardIndex );
+			}
+		}
+	}
+	m_sortedDeck.InsertPile( m_hand );
+
+	m_hand.Clear();
+}

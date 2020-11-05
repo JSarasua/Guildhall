@@ -40,6 +40,12 @@ struct playerWinRate_t
 	int whoseMove = -1;
 };
 
+enum class SCORESTRATEGY
+{
+	WINPERCENTAGE,
+	MCDOM
+};
+
 class MonteCarlo
 {
 	friend class SimulationJob;
@@ -126,6 +132,9 @@ public:
 
 	std::mutex m_simMethodLock;
 	SIMMETHOD m_simMethod = SIMMETHOD::RANDOM;
+
+	std::mutex m_scoreStrategyLock;
+	SCORESTRATEGY m_scoreStrategy = SCORESTRATEGY::MCDOM;
 
 	std::atomic<bool> m_isQuitting = false;
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;
