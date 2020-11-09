@@ -1,6 +1,7 @@
 #include "Engine/Network/UDPSocket.hpp"
 #include <iostream>
 
+#pragma  comment( lib, "Ws2_32.lib" )
 
 #ifdef TEST_MODE
 #define LOG_ERROR(...) printf(Stringf(__VA_ARGS__) + std::string("\n"))
