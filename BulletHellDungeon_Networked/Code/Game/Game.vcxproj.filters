@@ -121,6 +121,9 @@
     <ClCompile Include="EntityFactory.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="UDPGameConnection.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -226,6 +229,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="EntityFactory.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPGameConnection.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

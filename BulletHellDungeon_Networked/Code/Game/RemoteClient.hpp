@@ -1,12 +1,13 @@
 #pragma once
 #include "Game/Client.hpp"
 
-class UDPSocket;
+class UDPGameConnection;
 
 class RemoteClient : public Client
 {
 public:
 	RemoteClient();
+	RemoteClient( UDPGameConnection* newUDPConnection );
 	virtual ~RemoteClient();
 
 
@@ -53,7 +54,7 @@ public:
 	virtual void CheckButtonPresses() override;
 
 public:
-	void SetUDPSocket( UDPSocket* newUDPSocket );
+	void SetUDPSocket( UDPGameConnection* newUDPConnection );
 
 public:
 	Camera* m_camera = nullptr;
@@ -100,5 +101,6 @@ public:
 
 	//Get and receive messages from Player Client
 private:
-	UDPSocket* m_UDPSocket = nullptr;
+	UDPGameConnection* m_UDPConnection = nullptr;
+	int m_playerID = -1;
 };

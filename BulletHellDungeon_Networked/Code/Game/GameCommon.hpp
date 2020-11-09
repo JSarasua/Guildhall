@@ -76,6 +76,17 @@ struct InputPacket
 	Header header;
 	InputMessage message;
 
+	static InputPacket ToPacket( char const* packetStr )
+	{
+		Header* newHeader = (Header*)packetStr;
+		InputMessage* newMessage = (InputMessage*)(packetStr + 4);
+		
+		InputPacket newPacket;
+		newPacket.header = *newHeader;
+		newPacket.message = *newMessage;
+		return newPacket;
+	}
+
 public:
 	std::string ToString()
 	{
@@ -85,4 +96,11 @@ public:
 
 		return inputPacketStr;
 	}
+};
+
+struct AddressedInputPacket
+{
+	bool isValid = false;
+	std::string IPAddress;
+	InputPacket packet;
 };

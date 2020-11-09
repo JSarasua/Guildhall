@@ -5,15 +5,21 @@
 #include "Game/App.hpp"
 #include "Game/Entity.hpp"
 #include "Game/AudioDefinition.hpp"
+#include "Game/UDPGameConnection.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
-#include "Engine/Network/UDPSocket.hpp"
 #include <vector>
 
 RemoteClient::RemoteClient()
+{
+
+}
+
+RemoteClient::RemoteClient( UDPGameConnection* newUDPConnection ) :
+	m_UDPConnection( newUDPConnection )
 {
 
 }
@@ -269,84 +275,42 @@ void RemoteClient::RenderConsole()
 
 void RemoteClient::CheckButtonPresses()
 {
-	XboxController const& controller = g_theInput->GetXboxController( 0 );
+	//XboxController const& controller = g_theInput->GetXboxController( 0 );
 	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
 
 	if( m_gameState == PLAYING )
 	{
-// 		if( m_UDPSocket )
-// 		{
-// 			if( m_UDPSocket->IsSocketBound() )
-// 			{
-// 
-// 				UDPSocket::Buffer& buffer = m_UDPSocket->ReceiveBuffer();
-// 			}
-// 		}
-// 
-// 		if( controller.GetButtonState( XBOX_BUTTON_ID_Y ).WasJustPressed() )
-// 		{
-// 			g_theConsole->SetIsOpen( !g_theConsole->IsOpen() );
-// 		}
-
-		const KeyButtonState& eKey = g_theInput->GetKeyStates( 'E' );
-		const KeyButtonState& sKey = g_theInput->GetKeyStates( 'S' );
-		const KeyButtonState& dKey = g_theInput->GetKeyStates( 'D' );
-		const KeyButtonState& fKey = g_theInput->GetKeyStates( 'F' );
-
-		const KeyButtonState& wKey = g_theInput->GetKeyStates( 'W' );
-		const KeyButtonState& rKey = g_theInput->GetKeyStates( 'R' );
-		const KeyButtonState& spaceKey = g_theInput->GetKeyStates( ' ' );
-		const KeyButtonState& rightMouseButton = g_theInput->GetMouseButton( RightMouseButton );
-		float deltaMouseScroll = g_theInput->GetDeltaMouseWheelScroll();
-
-		Vec2 moveVec;
-		float upDir    = (float)eKey.IsPressed();
-		float leftDir  = (float)sKey.IsPressed();
-		float downDir  = (float)dKey.IsPressed();
-		float rightDir = (float)fKey.IsPressed();
-		moveVec.x = rightDir - leftDir;
-		moveVec.y = upDir - downDir;
-
-		Vec2 mousePos = m_mousePositionOnMainCamera;
-		bool isShooting = leftMouseButton.IsPressed();
-		int changeWeapons = 0;
-		changeWeapons = (int)rKey.WasJustPressed() - (int)wKey.WasJustPressed();
-		changeWeapons += (int)(deltaMouseScroll > 0);
-		changeWeapons -= (int)(deltaMouseScroll < 0);
-
-		bool isDodging = spaceKey.IsPressed() || rightMouseButton.IsPressed();
+		AddressedInputPacket inputPacket = m_UDPConnection->PopFirstReceivedPacket();
+		if( inputPacket.isValid )
+		{
+			InputMessage const& input = inputPacket.packet.message;
+			int changeWeapons = input.changeWeapons;
+			bool isDodging = input.isDodging;
+			bool isShooting = input.isShooting;
+			Vec2 mousePos = input.mousePos;
+			Vec2 moveVec = input.moveVec;
 
 
-// 		if( m_UDPSocket->IsSocketBound() )
-// 		{
-// 			InputMessage message;
-// 			message.mousePos = mousePos;
-// 			message.moveVec = moveVec;
-// 			message.changeWeapons = changeWeapons;
-// 			message.isShooting = isShooting;
-// 			message.isDodging = isDodging;
-// 			InputPacket packet;
-// 		}
-// 		else
-// 		{
-// 			EventArgs args;
-// 			args.SetValue( "mousePos", mousePos );
-// 			args.SetValue( "isShooting", isShooting );
-// 			args.SetValue( "changeWeapons", changeWeapons );
-// 			args.SetValue( "moveVec", moveVec );
-// 			args.SetValue( "isDodging", isDodging );
-// 			g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
-// 		}
+			EventArgs args;
+			args.SetValue( "changeWeapons", changeWeapons );
+			args.SetValue( "isDodging", isDodging );
+			args.SetValue( "isShooting", isShooting );
+			args.SetValue( "mousePos", mousePos );
+			args.SetValue( "moveVec", moveVec );
+			args.SetValue( "playerID", m_playerID );
+			g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
+		}
 	}
 }
 
-void RemoteClient::SetUDPSocket( UDPSocket* newUDPSocket )
+void RemoteClient::SetUDPSocket( UDPGameConnection* newUDPConnection )
 {
-// 	if( m_UDPSocket )
-// 	{
-// 		delete m_UDPSocket;
-// 	}
-// 
-// 	m_UDPSocket = newUDPSocket;
+	if( m_UDPConnection )
+	{
+		delete m_UDPConnection;
+		m_UDPConnection = nullptr;
+	}
+
+	m_UDPConnection = newUDPConnection;
 }
 

@@ -218,6 +218,7 @@
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="TileMetaData.cpp" />
+    <ClCompile Include="UDPGameConnection.cpp" />
     <ClCompile Include="WeaponDefinition.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
@@ -255,6 +256,7 @@
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="TileMetaData.hpp" />
+    <ClInclude Include="UDPGameConnection.hpp" />
     <ClInclude Include="WeaponDefinition.hpp" />
     <ClInclude Include="World.hpp" />
   </ItemGroup>
