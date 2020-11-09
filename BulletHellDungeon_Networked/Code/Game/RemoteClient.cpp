@@ -275,9 +275,6 @@ void RemoteClient::RenderConsole()
 
 void RemoteClient::CheckButtonPresses()
 {
-	//XboxController const& controller = g_theInput->GetXboxController( 0 );
-	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton( LeftMouseButton );
-
 	if( m_gameState == PLAYING )
 	{
 		AddressedInputPacket inputPacket = m_UDPConnection->PopFirstReceivedPacket();

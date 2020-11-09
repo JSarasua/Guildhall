@@ -1,13 +1,13 @@
 #pragma once
 #include "Game/Client.hpp"
 
-class UDPSocket;
+class UDPGameConnection;
 
 class PlayerClient : public Client
 {
 public:
 	PlayerClient();
-	PlayerClient( UDPSocket* clientUDPSocket );
+	PlayerClient( UDPGameConnection* clientUDPSocket );
 	virtual ~PlayerClient();
 
 
@@ -98,5 +98,6 @@ public:
 	bool m_isMouseOverVictoryContinue = false;
 
 private:
-	UDPSocket* m_UDPSocket = nullptr;
+	UDPGameConnection* m_UDPConnection = nullptr;
+	int m_playerID = -1;
 };

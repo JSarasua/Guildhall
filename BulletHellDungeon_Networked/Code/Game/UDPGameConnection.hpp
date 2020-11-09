@@ -37,6 +37,7 @@ public:
 	std::string GetLastReceiveAddress();
 
 	AddressedInputPacket PopFirstReceivedPacket();
+
 private:
 	void ReaderThread();
 	void WriterThread();

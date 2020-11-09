@@ -60,10 +60,7 @@ UDPGameConnection::Buffer& UDPGameConnection::ReceiveBuffer()
 
 void UDPGameConnection::SendUDPMessage( std::string const& message )
 {
-	Buffer& sendBuffer = m_UDPSocket->SendBuffer();
-	memcpy( &sendBuffer[0], message.c_str(), message.size() );
-
-	Send( (int)message.size() );
+	m_writerQueue.push( message );
 }
 
 BufferMessage UDPGameConnection::ReceiveMessage()

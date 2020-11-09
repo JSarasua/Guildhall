@@ -5,12 +5,12 @@
 #include "Game/App.hpp"
 #include "Game/Entity.hpp"
 #include "Game/AudioDefinition.hpp"
+#include "Game/UDPGameConnection.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/RenderContext.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
 #include "Engine/Renderer/DebugRender.hpp"
-#include "Engine/Network/UDPSocket.hpp"
 #include <vector>
 
 PlayerClient::PlayerClient()
@@ -18,20 +18,14 @@ PlayerClient::PlayerClient()
 
 }
 
-PlayerClient::PlayerClient( UDPSocket* clientUDPSocket )
+PlayerClient::PlayerClient( UDPGameConnection* clientUDPSocket )
 {
-	m_UDPSocket = clientUDPSocket;
-
-	if( m_UDPSocket )
-	{
-//		g_theEventSystem->SubscribeMethodToEvent( "Input", NOCONSOLECOMMAND, this, )
-	}
+	m_UDPConnection = clientUDPSocket;
 }
 
 PlayerClient::~PlayerClient()
 {
-
-	//delete m_UDPSocket;
+	delete m_UDPConnection;
 }
 
 void PlayerClient::Startup()
@@ -802,13 +796,32 @@ void PlayerClient::CheckButtonPresses()
 
 		bool isDodging = spaceKey.IsPressed() || rightMouseButton.IsPressed();
 
-		EventArgs args;
-		args.SetValue( "mousePos", mousePos );
-		args.SetValue( "isShooting", shooting );
-		args.SetValue( "changeWeapons", changeWeapons );
-		args.SetValue( "moveVec", moveVec );
-		args.SetValue( "isDodging", isDodging );
-		g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
+		if( m_UDPConnection )
+		{
+			InputMessage message;
+			message.changeWeapons = changeWeapons;
+			message.isDodging = isDodging;
+			message.isShooting = shooting;
+			message.mousePos = mousePos;
+			message.moveVec = moveVec;
+			InputPacket packet;
+			packet.message = message;
+			
+			std::string messageStr = packet.ToString();
+			m_UDPConnection->SendUDPMessage( messageStr );
+		}
+		else
+		{
+			EventArgs args;
+			args.SetValue( "mousePos", mousePos );
+			args.SetValue( "isShooting", shooting );
+			args.SetValue( "changeWeapons", changeWeapons );
+			args.SetValue( "moveVec", moveVec );
+			args.SetValue( "isDodging", isDodging );
+			g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
+		}
+
+
 		// 		if( f6Key.WasJustPressed() )
 		// 		{
 		// 			m_world->MoveToNextMap();
