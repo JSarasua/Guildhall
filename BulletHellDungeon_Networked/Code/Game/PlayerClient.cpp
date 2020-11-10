@@ -818,6 +818,7 @@ void PlayerClient::CheckButtonPresses()
 			args.SetValue( "changeWeapons", changeWeapons );
 			args.SetValue( "moveVec", moveVec );
 			args.SetValue( "isDodging", isDodging );
+			args.SetValue( "actorID", m_playerID );
 			g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
 		}
 

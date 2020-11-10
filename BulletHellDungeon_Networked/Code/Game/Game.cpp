@@ -505,7 +505,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 IntVec2 Game::GetCurrentMapBounds() const
 {
-	return m_world->getCurrentMapBounds();
+	return m_world->GetCurrentMapBounds();
 }
 
 

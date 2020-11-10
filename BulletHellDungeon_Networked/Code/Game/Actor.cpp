@@ -375,7 +375,13 @@ bool Actor::UpdateInput( EventArgs const& args )
 {
 	if( m_weapons.size() == 0 )
 	{
-		return true;
+		return false;
+	}
+
+	int actorID = args.GetValue( "actorID", -1 );
+	if( actorID != m_playerController )
+	{
+		return false;
 	}
 
 	Vec2 mousePos = args.GetValue( "mousePos", Vec2() );

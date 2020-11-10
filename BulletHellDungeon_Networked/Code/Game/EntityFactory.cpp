@@ -24,6 +24,12 @@ Actor* EntityFactory::CreateActor( ActorDefinition const* actorDef, Vec2 initial
 
 Actor* EntityFactory::CreatePlayer( ActorDefinition const* actorDef, Vec2 initialPosition /*= Vec2()*/, Vec2 initialVelocity /*= Vec2()*/, float initialOrientationDegrees /*= 0.f*/, float initialAngularVelocity /*= 0.f*/, PlayerController playerController /*= Player_1 */ )
 {
+
+	if( playerController >= MaxNumPlayers )
+	{
+		return nullptr;
+	}
+
 	Actor* newActor = new Actor( initialPosition, initialVelocity, initialOrientationDegrees, initialAngularVelocity, actorDef, playerController );
 	return newActor;
 }

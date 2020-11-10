@@ -53,7 +53,7 @@ public:
 	void AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags);
 
 	void SpawnEntity( Entity* entityToSpawn );
-	void AddPlayer( Actor* player );
+	void AddPlayer( Actor* player, int playerSlot = 0 );
 	void DeletePlayer();
 
 	bool IsBossDead() const;

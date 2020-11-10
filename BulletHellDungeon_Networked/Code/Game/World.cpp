@@ -15,7 +15,7 @@ void World::Startup()
 	//m_currentMap = new Map(IntVec2(INT_MAP_SIZE_X,INT_MAP_SIZE_Y), m_game);
 	m_currentMap = new Map("Level1");
 	m_currentMap->SpawnSpawnersLevel1();
-	m_currentMap->AddPlayer( nullptr );
+	m_currentMap->AddPlayer( nullptr, 0 );
 	m_currentMap->Startup();
 	m_maps.push_back( m_currentMap );
 	
@@ -66,8 +66,8 @@ void World::RenderDebug() const
 
 void World::MoveToNextMap()
 {
-	Actor* player = GetPlayer();
-
+	std::vector<Actor*> players;
+	GetPlayers( players );
 // 	m_maps[m_currentMapIndex]->Shutdown();
 // 	delete m_maps[m_currentMapIndex];
 // 	m_maps[m_currentMapIndex] = nullptr;
@@ -81,7 +81,11 @@ void World::MoveToNextMap()
 	{
 		m_currentMapIndex = newMapIndex;
 		m_currentMap = m_maps[m_currentMapIndex];
-		m_currentMap->AddPlayer( player );
+
+		for( size_t playerIndex = 0; playerIndex < players.size(); playerIndex++ )
+		{
+			m_currentMap->AddPlayer( players[playerIndex], (int)playerIndex );
+		}
 	}
 }
 
@@ -100,7 +104,7 @@ int World::GetBossHealth() const
 	return m_currentMap->GetBossHealth();
 }
 
-IntVec2 World::getCurrentMapBounds() const
+IntVec2 World::GetCurrentMapBounds() const
 {
 	return m_currentMap->GetMapBounds();
 }

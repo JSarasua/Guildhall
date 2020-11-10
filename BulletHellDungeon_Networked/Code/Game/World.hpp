@@ -41,5 +41,5 @@ private:
 	std::vector<Map*> m_maps;
 	int m_currentMapIndex = 0;
 public:
-	IntVec2 getCurrentMapBounds() const;
+	IntVec2 GetCurrentMapBounds() const;
 };

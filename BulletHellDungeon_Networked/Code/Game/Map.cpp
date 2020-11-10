@@ -675,33 +675,41 @@ void Map::GarbageCollectEntities()
 	}
 }
 
-void Map::AddPlayer( Actor* player )
+void Map::AddPlayer( Actor* player, int playerSlot )
 {
 	Actor* playerToAdd = player;
-
-	if( m_entities[0] )
+	
+	if( playerSlot < MaxNumPlayers )
 	{
-		delete m_entities[0];
-		m_entities[0] = nullptr;
-	}
+		if( m_entities[playerSlot] )
+		{
+			delete m_entities[playerSlot];
+			m_entities[playerSlot] = nullptr;
+		}
 
-	if( nullptr != player )
-	{
-		m_entities[0] = player;
+		if( nullptr != playerToAdd )
+		{
+			m_entities[playerSlot] = playerToAdd;
+		}
+		else
+		{
+			ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
+			//playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
+			playerToAdd = EntityFactory::CreatePlayer( playerActorDef, Vec2( 2.5f, 2.5f ), Vec2(), 0.f, 0.f, (PlayerController)playerSlot );
+			WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
+			//WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
+			playerToAdd->AddWeapon( pistolWeapon );
+			//playerToAdd->AddWeapon( shotgunWeapon );
+
+			m_entities[playerSlot] = playerToAdd;
+		}
 	}
 	else
 	{
-		ActorDefinition* playerActorDef = ActorDefinition::s_definitions["Player"];
-		//playerToAdd = new Actor( Vec2( 2.5, 2.5f ), Vec2( 0.f, 0.f ), 0.f, 0.f, playerActorDef, Player_1 );
-		playerToAdd = EntityFactory::CreatePlayer( playerActorDef, Vec2( 2.5f, 2.5f ) );
-		WeaponDefinition* pistolWeapon = WeaponDefinition::s_definitions["Pistol"];
-		//WeaponDefinition* shotgunWeapon = WeaponDefinition::s_definitions["Shotgun"];
-		playerToAdd->AddWeapon( pistolWeapon );
-		//playerToAdd->AddWeapon( shotgunWeapon );
-
-		m_entities[0] = playerToAdd;
-		
+		return;
 	}
+
+
 
 	for( size_t spawnerIndex = 0; spawnerIndex < m_enemySpawners.size(); spawnerIndex++ )
 	{

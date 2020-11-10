@@ -13,4 +13,6 @@ public:
 	static Bullet* CreateBullet( BulletDefinition const* bulletDef, Vec2 const& initialPosition = Vec2(), float orientationDegrees = 0.f, EntityType type = ENTITY_TYPE_GOOD_BULLET, EntityFaction faction = FACTION_GOOD, float speedMultiplier = 1.f, Vec2 const& entityVelocity = Vec2() );
 	static Loot* CreateLoot( Vec2 const& initialPosition, WeaponDefinition const* lootDef );
 	static void DeleteEntity( Entity* entityToDelete );
+
+	static int currentPlayerController;
 };
