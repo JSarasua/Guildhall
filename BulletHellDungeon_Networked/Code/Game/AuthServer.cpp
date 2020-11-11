@@ -20,19 +20,11 @@ AuthServer::~AuthServer()
 void AuthServer::Startup()
 {
 	g_theGame->Startup();
-	m_TCPGameConnection->Startup();
-
-	EventArgs args;
-	args.SetValue("port", 48000 );
-	m_TCPGameConnection->StartTCPServer( args );
 }
 
 void AuthServer::Shutdown()
 {
 	g_theGame->Shutdown();
-
-	EventArgs args;
-	m_TCPGameConnection->StopTCPServer( args );
 }
 
 void AuthServer::BeginFrame()

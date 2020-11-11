@@ -7,6 +7,8 @@
 #include "Engine/Renderer/Camera.hpp"
 #include "Game.hpp"
 
+class TCPGameConnection;
+
 class App
 {
 public:
@@ -58,5 +60,7 @@ private:
 	bool m_debugCameraMode = false;
 	bool m_noClip = false;
 	bool m_isSpedUp = false;
+
+	TCPGameConnection* m_TCPConnection = nullptr;
 
 };

@@ -373,6 +373,11 @@ void PlayerClient::RenderAttract()
 	RenderMouse();
 
 	g_theRenderer->EndCamera( *m_camera );
+
+	g_theRenderer->BeginCamera( *m_UICamera );
+	RenderConsole();
+	g_theRenderer->EndCamera( *m_UICamera );
+
 	EndRender();
 }
 

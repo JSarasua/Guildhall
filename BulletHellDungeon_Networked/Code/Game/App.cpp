@@ -7,6 +7,7 @@
 #include "Game/SinglePlayerGame.hpp"
 #include "Game/MultiPlayerGame.hpp"
 #include "Game/Game.hpp"
+#include "Game/TCPGameConnection.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Math/MathUtils.hpp"
@@ -37,6 +38,8 @@ App::App()
 	g_theEventSystem = new EventSystem();
 	//g_gameConfigBlackboard = new NamedStrings();
 
+	m_TCPConnection = new TCPGameConnection();
+
 }
 
 App::~App() {}
@@ -59,6 +62,8 @@ void App::Startup()
 	//g_theGame->Startup();
 	g_theConsole->Startup();
 
+	m_TCPConnection->Startup();
+
 	g_theEventSystem->SubscribeToEvent("quit", CONSOLECOMMAND, QuitRequested);
 	g_theEventSystem->SubscribeMethodToEvent( "StartMultiplayerServer", CONSOLECOMMAND, this, &App::StartMultiplayerServer );
 	g_theEventSystem->SubscribeMethodToEvent( "ConnectToMultiplayerServer", CONSOLECOMMAND, this, &App::ConnectToMultiplayerServer );
@@ -66,6 +71,9 @@ void App::Startup()
 
 void App::Shutdown()
 {
+	m_TCPConnection->Shutdown();
+	delete m_TCPConnection;
+
 	g_theServer->Shutdown();
 	delete g_theServer;
 	g_theClient->Shutdown();
@@ -145,6 +153,9 @@ void App::BeginFrame()
 	g_theRenderer->BeginFrame();
 	g_theInput->BeginFrame();
 	g_theConsole->BeginFrame();
+
+	m_TCPConnection->BeginFrame();
+
 	g_theServer->BeginFrame();
 	g_theClient->BeginFrame();
 }
@@ -201,6 +212,8 @@ bool App::QuitRequested( const EventArgs* args )
 
 bool App::StartMultiplayerServer( EventArgs const& args )
 {
+	m_TCPConnection->StartTCPServer( args );
+
 	int portNumber = args.GetValue( "port", 48000 );
 	UNUSED( portNumber );
 
@@ -219,11 +232,15 @@ bool App::StartMultiplayerServer( EventArgs const& args )
 	g_theServer->Startup();
 	g_theClient->Startup();
 
+	g_theServer->m_TCPGameConnection = m_TCPConnection;
+
 	return true;
 }
 
 bool App::ConnectToMultiplayerServer( EventArgs const& args )
 {
+	m_TCPConnection->TCPClientConnect( args );
+
 	std::string ip = args.GetValue( "ip", "127.0.0.1" );
 	int portNumber = args.GetValue( "port", 48001 );
 	UNUSED( ip );
@@ -243,6 +260,8 @@ bool App::ConnectToMultiplayerServer( EventArgs const& args )
 
 	g_theServer->Startup();
 	g_theClient->Startup();
+
+	g_theServer->m_TCPGameConnection = m_TCPConnection;
 
 	return true;
 }
