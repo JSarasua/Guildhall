@@ -11,12 +11,18 @@
 Server::Server( Game* game )
 {
 	g_theGame = game;
+	m_TCPGameConnection = new TCPGameConnection();
 }
 
 Server::~Server()
 {
 	delete g_theGame;
 	g_theGame = nullptr;
+
+	m_TCPGameConnection->Shutdown();
+
+	delete m_TCPGameConnection;
+	m_TCPGameConnection = nullptr;
 }
 
 // void Server::Startup()

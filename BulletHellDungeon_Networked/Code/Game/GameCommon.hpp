@@ -104,3 +104,21 @@ struct AddressedInputPacket
 	std::string IPAddress;
 	InputPacket packet;
 };
+
+
+struct UpdateEntityMessage
+{
+	Vec2 position;
+	Vec2 velocity;
+	float orientationDegrees;
+	float weaponOrientationDegrees;
+	float angularVelocity;
+	int health;
+	bool isDead;
+};
+
+struct AddPlayerMessage
+{
+	Vec2 position;
+	int playerID;
+};

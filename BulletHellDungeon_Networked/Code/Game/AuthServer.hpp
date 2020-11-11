@@ -37,4 +37,6 @@ public:
 
 public:
 	std::vector<Client*> m_clients;
+	//Use network sys
+
 };

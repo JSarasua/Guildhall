@@ -124,6 +124,9 @@
     <ClCompile Include="UDPGameConnection.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="TCPGameConnection.cpp">
+      <Filter>General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.hpp">
@@ -232,6 +235,9 @@
       <Filter>General</Filter>
     </ClInclude>
     <ClInclude Include="UDPGameConnection.hpp">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPGameConnection.hpp">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

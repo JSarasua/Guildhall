@@ -215,6 +215,7 @@
     <ClCompile Include="RemoteServer.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="SinglePlayerGame.cpp" />
+    <ClCompile Include="TCPGameConnection.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="TileMetaData.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="RemoteServer.hpp" />
     <ClInclude Include="Server.hpp" />
     <ClInclude Include="SinglePlayerGame.hpp" />
+    <ClInclude Include="TCPGameConnection.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="TileMetaData.hpp" />

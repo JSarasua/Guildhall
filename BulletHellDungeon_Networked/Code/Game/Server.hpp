@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/Client.hpp"
+#include "Game/TCPGameConnection.hpp"
 #include <vector>
 
 class Entity;
@@ -34,4 +35,6 @@ public:
 	virtual std::vector<Entity*> const& GetEntitiesToRender() = 0;
 	virtual eGameState GetCurrentGameState() = 0;
 
+public:
+	TCPGameConnection* m_TCPGameConnection = nullptr;
 };
