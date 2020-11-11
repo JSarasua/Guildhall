@@ -13,6 +13,7 @@ public:
 	void Listen();
 	void StopListen();
 	TCPSocket Accept();
+	bool IsListenSocketValid() { return m_listenSocket != INVALID_SOCKET; }
 
 
 private:
