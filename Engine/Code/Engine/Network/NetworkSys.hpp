@@ -25,9 +25,9 @@ class UDPSocket;
 constexpr uint16_t SERVERLISTENING = 1;
 constexpr uint16_t TEXTMESSAGE = 2;
 constexpr uint16_t CLIENTDISCONNECT = 3;
-constexpr uint16_t ADDPLAYER = 4;
-constexpr uint16_t ADDENTITY = 5;
-constexpr uint16_t UPDATEPLAYER = 6;
+// constexpr uint16_t ADDPLAYER = 4;
+// constexpr uint16_t ADDENTITY = 5;
+// constexpr uint16_t UPDATEPLAYER = 6;
 
 struct MessageHeader
 {

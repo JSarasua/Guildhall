@@ -525,6 +525,11 @@ int Game::GetBossHealth() const
 	return m_world->GetBossHealth();
 }
 
+void Game::AddPlayer( int playerSlot )
+{
+	m_world->AddNewPlayer( playerSlot );
+}
+
 AABB2 Game::GetUICamera() const
 {
 	AABB2 uiCameraBox = AABB2(m_UICamera.GetOrthoBottomLeft(), m_UICamera.GetOrthoTopRight());

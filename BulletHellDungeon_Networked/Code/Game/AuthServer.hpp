@@ -35,8 +35,8 @@ public:
 	virtual std::vector<Entity*> const& GetEntitiesToRender() override;
 	virtual eGameState GetCurrentGameState() override;
 
+	bool HandleReceiveTCPMessage( EventArgs const& args );
+
 public:
 	std::vector<Client*> m_clients;
-	//Use network sys
-
 };

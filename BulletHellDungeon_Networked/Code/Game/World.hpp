@@ -33,6 +33,8 @@ public:
 	void GetPlayers(std::vector<Actor*>& players);
 	int GetBossHealth() const;
 
+	void AddNewPlayer( int playerSlot );
+
 public:
 	Map* m_currentMap = nullptr;
 private:

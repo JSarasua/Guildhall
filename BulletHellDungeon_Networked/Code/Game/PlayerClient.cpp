@@ -785,6 +785,10 @@ void PlayerClient::CheckButtonPresses()
 		float deltaMouseScroll = g_theInput->GetDeltaMouseWheelScroll();
 
 		Vec2 moveVec;
+		if( eKey.IsPressed() )
+		{
+			g_theConsole->PrintString( Rgba8::WHITE, "E" );
+		}
 		float upDir    = (float)eKey.IsPressed();
 		float leftDir  = (float)sKey.IsPressed();
 		float downDir  = (float)dKey.IsPressed();

@@ -76,22 +76,30 @@ void TCPGameConnection::BeginFrame()
 				TCPData data = m_TCPServerToClientSocket->Receive();
 				// 				if( data.GetLength() != 0 )
 				// 				{
-				const char* dataArray = data.GetData();
-				MessageHeader* messageHeader = (MessageHeader*)dataArray;
-				if( messageHeader->m_id == CLIENTDISCONNECT )
-				{
-					g_theConsole->PrintString( Rgba8::GREEN, "Client is disconnecting" );
-					m_TCPServerToClientSocket->Close();
-				}
-				else if( messageHeader->m_id == TEXTMESSAGE )
-				{
-					std::string dataStr = dataArray + 4;
-					//std::string dataStr = std::string( data.GetData(), data.GetLength() );
-					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
-					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
-				}
+				//const char* dataArray = data.GetData();
+				int dataLength = (int)data.GetLength();
+				std::string dataStr;
+				dataStr.resize(dataLength);
+				memcpy( &dataStr[0], data.GetData(), dataLength );
 
-				//}
+				EventArgs args;
+				args.SetValue( "data", dataStr );
+				args.SetValue( "length", dataLength );
+				g_theEventSystem->FireEvent("TCPMessageReceived", NOCONSOLECOMMAND, &args );
+// 
+// 				MessageHeader* messageHeader = (MessageHeader*)dataStr.c_str();
+// 				if( messageHeader->m_id == CLIENTDISCONNECT )
+// 				{
+// 					g_theConsole->PrintString( Rgba8::GREEN, "Client is disconnecting" );
+// 					m_TCPServerToClientSocket->Close();
+// 				}
+// 				else if( messageHeader->m_id == TEXTMESSAGE )
+// 				{
+// 					std::string dataStr = dataArray + 4;
+// 					//std::string dataStr = std::string( data.GetData(), data.GetLength() );
+// 					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
+// 					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
+// 				}
 			}
 		}
 	}

@@ -61,6 +61,7 @@ public:
 
 	int GetPlayerHealth() const;
 	int	GetBossHealth() const;
+	void AddPlayer( int playerSlot );
 
 private:
 	//Update State

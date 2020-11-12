@@ -56,6 +56,13 @@ extern SpriteSheet* g_portraitSpriteSheet;
 extern SpriteSheet* g_weaponSpriteSheet;
 extern SpriteSheet* g_bulletsSpriteSheet;
 
+//constexpr uint16_t SERVERLISTENING = 1;
+//constexpr uint16_t TEXTMESSAGE = 2;
+//constexpr uint16_t CLIENTDISCONNECT = 3;
+constexpr uint16_t ADDPLAYER = 4;
+constexpr uint16_t ADDENTITY = 5;
+constexpr uint16_t UPDATEPLAYER = 6;
+
 struct Header
 {
 	uint16_t m_id = 0;
@@ -115,10 +122,38 @@ struct UpdateEntityMessage
 	float angularVelocity;
 	int health;
 	bool isDead;
+
 };
 
 struct AddPlayerMessage
 {
 	Vec2 position;
-	int playerID;
+	int playerID = -1;
+};
+
+struct AddPlayerPacket
+{
+	Header header = Header{ADDPLAYER,0};
+	AddPlayerMessage message;
+
+
+	static AddPlayerPacket ToPacket( char const* packetStr )
+	{
+		Header* newHeader = (Header*)packetStr;
+		AddPlayerMessage* newMessage = (AddPlayerMessage*)(packetStr + 4);
+
+		AddPlayerPacket newPacket;
+		newPacket.header = *newHeader;
+		newPacket.message = *newMessage;
+		return newPacket;
+	}
+
+	std::string ToString()
+	{
+		std::string packetStr;
+		packetStr.append( (char*)&header, 4 );
+		packetStr.append( (char*)&message, 22 );
+
+		return packetStr;
+	}
 };

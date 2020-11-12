@@ -20,6 +20,22 @@ RemoteServer::~RemoteServer()
 void RemoteServer::Startup()
 {
 	g_theGame->Startup();
+
+	if( m_TCPGameConnection )
+	{
+		EventArgs args;
+		AddPlayerMessage message;
+		AddPlayerPacket packet;
+		packet.header.m_id = ADDPLAYER;
+		
+		std::string addPlayerStr = packet.ToString();
+		int messageSize = (int)addPlayerStr.size();
+		args.SetValue( "msg", addPlayerStr );
+		args.SetValue( "size", messageSize );
+
+
+		m_TCPGameConnection->SendMessageToServer( args );
+	}
 }
 
 void RemoteServer::Shutdown()

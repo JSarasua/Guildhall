@@ -304,6 +304,9 @@ void Map::SpawnTiles()
 void Map::SpawnEntities()
 {
 	m_entities.push_back( nullptr );
+	m_entities.push_back( nullptr );
+	m_entities.push_back( nullptr );
+	m_entities.push_back( nullptr );
 
 }
 

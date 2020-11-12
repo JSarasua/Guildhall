@@ -104,6 +104,11 @@ int World::GetBossHealth() const
 	return m_currentMap->GetBossHealth();
 }
 
+void World::AddNewPlayer( int playerSlot )
+{
+	m_currentMap->AddPlayer( nullptr, playerSlot );
+}
+
 IntVec2 World::GetCurrentMapBounds() const
 {
 	return m_currentMap->GetMapBounds();
