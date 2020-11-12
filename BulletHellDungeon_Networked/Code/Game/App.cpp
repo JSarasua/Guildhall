@@ -221,8 +221,12 @@ bool App::StartMultiplayerServer( EventArgs const& args )
 	AudioDefinition::StopAllSounds();
 	g_theConsole->SetIsOpen( false );
 	g_theServer->Shutdown();
-	delete g_theServer;
 	g_theClient->Shutdown();
+	
+	g_theEventSystem->UnsubscribeObject( g_theServer );
+	g_theEventSystem->UnsubscribeObject( g_theClient );
+	
+	delete g_theServer;
 	delete g_theClient;
 
 	Game* game = new SinglePlayerGame();
@@ -250,6 +254,9 @@ bool App::ConnectToMultiplayerServer( EventArgs const& args )
 	g_theConsole->SetIsOpen( false );
 	g_theServer->Shutdown();
 	g_theClient->Shutdown();
+
+	g_theEventSystem->UnsubscribeObject( g_theServer );
+	g_theEventSystem->UnsubscribeObject( g_theClient );
 
 	delete g_theServer;
 	delete g_theClient;
