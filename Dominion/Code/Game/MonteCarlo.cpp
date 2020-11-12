@@ -546,6 +546,47 @@ inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameSta
 
 }
 
+std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t const& gameState )
+{
+	std::vector<inputMove_t> allMoves;
+	allMoves.reserve( 10 );
+
+	std::vector<inputMove_t> moves;
+	moves.reserve( 10 );
+	
+	inputMove_t bigMoneyMove = g_theGame->GetMoveUsingBigMoney( gameState );
+	inputMove_t singleWitchMove = g_theGame->GetMoveUsingSingleWitch( gameState );
+	inputMove_t doubleWitchMove = g_theGame->GetMoveUsingDoubleWitch( gameState );
+	inputMove_t sarasua1Move = g_theGame->GetMoveUsingSarasua1( gameState );
+	inputMove_t highestVPMove = g_theGame->GetMoveUsingHighestVP( gameState );
+
+	allMoves.push_back( bigMoneyMove );
+	allMoves.push_back( singleWitchMove );
+	allMoves.push_back( doubleWitchMove );
+	allMoves.push_back( sarasua1Move );
+	allMoves.push_back( highestVPMove );
+
+	for( inputMove_t const& move : allMoves )
+	{
+		bool isMoveInList = false;
+		for( inputMove_t const& noDupMove : moves )
+		{
+			if( move == noDupMove )
+			{
+				isMoveInList = true;
+				break;
+			}
+		}
+
+		if( !isMoveInList )
+		{
+			moves.push_back( move );
+		}
+	}
+
+	return moves;
+}
+
 void MonteCarlo::SetSimMethod( SIMMETHOD simMethod )
 {
 	m_simMethodLock.lock();
@@ -825,11 +866,29 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 
 TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 {
+	EXPANSIONSTRATEGY strategy;
+	m_expansionStrategyLock.lock();
+	strategy = m_expansionStrategy;
+	m_expansionStrategyLock.unlock();
+
+	switch( strategy )
+	{
+	case EXPANSIONSTRATEGY::ALLMOVES: return ExpandNodeUsingAllMoves( expandData );
+		break;
+	case EXPANSIONSTRATEGY::HEURISTICS: return ExpandNodeUsingHeuristics( expandData );
+		break;
+	default: return ExpandNodeUsingAllMoves( expandData );
+		break;
+	}
+}
+
+TreeMapNode* MonteCarlo::ExpandNodeUsingAllMoves( expand_t expandData )
+{
 	TreeMapNode* expandNode = expandData.nodeToExpand;
 	TreeMapNode* nodeToSelect = expandData.nodeToSelect;
 	inputMove_t const& input = expandData.m_input;
 	gamestate_t const& gameState = expandData.gameState;
-	
+
 	if( !expandNode )
 	{
 		if( nodeToSelect )
@@ -838,7 +897,7 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 		}
 		else
 		{
-			ERROR_AND_DIE("expand and select node null");
+			ERROR_AND_DIE( "expand and select node null" );
 		}
 	}
 	if( expandNode->m_data->m_currentGamestate->m_isFirstMove )
@@ -857,7 +916,83 @@ TreeMapNode* MonteCarlo::ExpandNode( expand_t expandData )
 	{
 		gamestate_t const& currentGameState = *expandNode->m_data->m_currentGamestate;
 		std::vector<inputMove_t> validMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
-		
+
+		//Find first inputMove that hasn't been created and add it
+		for( size_t validMoveIndex = 0; validMoveIndex < validMoves.size(); validMoveIndex++ )
+		{
+			inputMove_t const& currentMove = validMoves[validMoveIndex];
+			auto outcome = expandNode->m_possibleOutcomes.find( currentMove );
+			if( outcome == expandNode->m_possibleOutcomes.end() )
+			{
+				expandNode->m_possibleOutcomes[currentMove] = std::vector<TreeMapNode*>();
+				std::vector<TreeMapNode*>& newVectorOfOutComes = expandNode->m_possibleOutcomes[currentMove];
+
+				TreeMapNode* newNode = new TreeMapNode();
+				newNode->m_parentNode = expandNode;
+				gamestate_t* newGameState = new gamestate_t( g_theGame->GetGameStateAfterMove( currentGameState, currentMove ) );
+				newNode->m_data = new data_t( metaData_t(), newGameState );
+				newVectorOfOutComes.push_back( newNode );
+
+				return newNode;
+			}
+		}
+
+	}
+	else if( nodeToSelect )
+	{
+		return nodeToSelect;
+	}
+	else
+	{
+		//This must be a move that already exists but a new gamestate
+		TreeMapNode* newNode = new TreeMapNode();
+		newNode->m_parentNode = expandNode;
+		gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = new data_t( metaData_t(), newGameState );
+
+		expandNode->m_possibleOutcomes[input].push_back( newNode );
+
+		return newNode;
+	}
+
+	return nullptr;
+}
+
+TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
+{
+	TreeMapNode* expandNode = expandData.nodeToExpand;
+	TreeMapNode* nodeToSelect = expandData.nodeToSelect;
+	inputMove_t const& input = expandData.m_input;
+	gamestate_t const& gameState = expandData.gameState;
+
+	if( !expandNode )
+	{
+		if( nodeToSelect )
+		{
+			return nodeToSelect;
+		}
+		else
+		{
+			ERROR_AND_DIE( "expand and select node null" );
+		}
+	}
+	if( expandNode->m_data->m_currentGamestate->m_isFirstMove )
+	{
+		TreeMapNode* newNode = new TreeMapNode();
+		newNode->m_parentNode = expandNode;
+		gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = new data_t( metaData_t(), newGameState );
+
+		expandNode->m_possibleOutcomes[input].push_back( newNode );
+
+		return newNode;
+	}
+
+	if( CanExpandUsingHeuristic( expandNode ) )
+	{
+		gamestate_t const& currentGameState = *expandNode->m_data->m_currentGamestate;
+		std::vector<inputMove_t> validMoves = GetMovesUsingAllHeuristics( currentGameState );
+
 		//Find first inputMove that hasn't been created and add it
 		for( size_t validMoveIndex = 0; validMoveIndex < validMoves.size(); validMoveIndex++ )
 		{
@@ -1104,7 +1239,24 @@ float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationP
 
 bool MonteCarlo::CanExpand( TreeMapNode const* node )
 {
- 	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+	m_expansionStrategyLock.lock();
+	EXPANSIONSTRATEGY strategy = m_expansionStrategy;
+	m_expansionStrategyLock.unlock();
+
+	switch( strategy )
+	{
+	case EXPANSIONSTRATEGY::ALLMOVES: return CanExpandUsingMoves( node );
+		break;
+	case EXPANSIONSTRATEGY::HEURISTICS: return CanExpandUsingHeuristic( node );
+		break;
+	default: return CanExpandUsingMoves( nullptr );
+		break;
+	}
+}
+
+bool MonteCarlo::CanExpandUsingMoves( TreeMapNode const* node )
+{
+	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
 
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	if( isGameOver != GAMENOTOVER )
@@ -1123,6 +1275,23 @@ bool MonteCarlo::CanExpand( TreeMapNode const* node )
 	{
 		return false;
 	}
+}
+
+bool MonteCarlo::CanExpandUsingHeuristic( TreeMapNode const* node )
+{
+	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+	std::vector<inputMove_t> moves = GetMovesUsingAllHeuristics( currentGameState );
+
+	for( inputMove_t const& move : moves )
+	{
+		auto nodeIter = node->m_possibleOutcomes.find( move );
+		if( nodeIter == node->m_possibleOutcomes.end() )
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 inputMove_t MonteCarlo::GetBestMove()

@@ -13,6 +13,7 @@ public:
 
 
 public:
+	//Don't do pointer
 	data_t* m_data = nullptr;
 
 	TreeMapNode* m_parentNode = nullptr;

@@ -1356,29 +1356,26 @@ void Game::AutoPlayGame()
 			if( m_player1Strategy == AIStrategy::MCTS )
 			{
 				m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
-				if( m_simCount < 500 )
+				if( m_timer.CheckAndDecrementAll() )
 				{
-					if( m_timer.CheckAndDecrement() )
+					m_mcts->AddSimulations( 5000 );
+
+					//inputMove_t move = m_mc->GetBestMove();
+					inputMove_t move = m_mcts->GetBestMove();
+					if( move.m_moveType == INVALID_MOVE )
 					{
-						m_mcts->AddSimulations( 1000 );
 
-						//inputMove_t move = m_mc->GetBestMove();
-						inputMove_t move = m_mcts->GetBestMove();
-						if( move.m_moveType == INVALID_MOVE )
-						{
-
-						}
-						else
-						{
-							PlayMoveIfValid( move );
-						}
-
-						DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 					}
 					else
 					{
-
+						PlayMoveIfValid( move );
 					}
+
+					DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+				}
+				else
+				{
+
 				}
 			}
 			else
@@ -2291,6 +2288,54 @@ inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
 	else
 	{
 		return randomMove;
+	}
+}
+
+inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
+{
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	PlayerBoard const& currentPlayerBoard = currentGameState.m_playerBoards[whoseMove];
+
+	eGamePhase currentPhase = currentGameState.m_currentPhase;
+
+	if( currentPhase == eGamePhase::ACTION_PHASE )
+	{
+		return GetRandomMoveAtGameState( currentGameState );
+	}
+	else
+	{
+		int currentMoney = currentPlayerBoard.GetCurrentMoney();
+		int currentBuys = currentPlayerBoard.m_numberOfBuysAvailable;
+
+		inputMove_t move;
+		move.m_whoseMoveIsIt = whoseMove;
+
+		if( currentBuys > 0 )
+		{
+			move.m_moveType = BUY_MOVE;
+			if( currentMoney >= 8 )
+			{
+				move.m_cardIndexToBuy = PROVINCE;
+			}
+			else if( currentMoney >= 5 )
+			{
+				move.m_cardIndexToBuy = DUCHY;
+			}
+			else if( currentMoney >= 2 )
+			{
+				move.m_cardIndexToBuy = ESTATE;
+			}
+			else
+			{
+				move.m_moveType = END_PHASE;
+			}
+		}
+		else
+		{
+			move.m_moveType = END_PHASE;
+		}
+
+		return move;
 	}
 }
 

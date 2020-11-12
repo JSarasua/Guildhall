@@ -137,7 +137,7 @@ struct metaData_t
 public:
 	float GetWinRate() { return m_numberOfWins / (float)m_numberOfSimulations; }
 
-	float m_numberOfWins = 0;
+	float m_numberOfWins = 0.f;
 	int m_numberOfSimulations = 0;
 };
 
@@ -252,6 +252,7 @@ struct data_t
 	{	}
 
 	metaData_t m_metaData;
+	//Don't do pointer
 	gamestate_t* m_currentGamestate = nullptr;
 };
 
@@ -283,6 +284,7 @@ public:
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );
 

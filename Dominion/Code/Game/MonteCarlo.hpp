@@ -46,6 +46,12 @@ enum class SCORESTRATEGY
 	MCDOM
 };
 
+enum class EXPANSIONSTRATEGY
+{
+	ALLMOVES,
+	HEURISTICS
+};
+
 class MonteCarlo
 {
 	friend class SimulationJob;
@@ -76,6 +82,8 @@ protected:
 	bool UpdateGameIfChanged();
 	expand_t GetBestNodeToSelect( TreeMapNode* currentNode ); //Returns null if all nodes have been explored
 	TreeMapNode* ExpandNode( expand_t expandData ); //Returns null if can't expand
+	TreeMapNode* ExpandNodeUsingAllMoves( expand_t expandData );
+	TreeMapNode* ExpandNodeUsingHeuristics( expand_t expandData );
 	int RunSimulationOnNode( TreeMapNode* node ); //Returns result of simulation
 	void BackPropagateResult( int whoWon, TreeMapNode* node );
 
@@ -83,20 +91,21 @@ protected:
 	inputMove_t GetMostPlayedMove( TreeMapNode* currentNode ); 
 	inputMove_t GetBestWinRateMove( TreeMapNode* currentNode ); //Best average winrate
 	inputMove_t GetBestMoveToDepth( int depth, TreeMapNode* currentNode );
-	inputMove_t GetBestMoveNegaMax( TreeMapNode const* currentNode );
-	float GetBestWinRateForPlayer( TreeMapNode const* currentNode, int playerToCheck, bool hasTurnFlipped );
 	playerWinRate_t GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
 	int GetWhoseMoveAtDepth( int depth, TreeMapNode const* node );
 // 	inputMove_t GetBestMoveSafe();
 // 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 
 	inputMove_t GetMoveForSimsUsingHeuristic( gamestate_t const& gameState );
+	std::vector<inputMove_t> GetMovesUsingAllHeuristics( gamestate_t const& gameState );
 
 
 	//Helper Methods
 	float GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter = SQRT_2 );
 	float GetUCBValueAtNode( TreeMapNode const* node, float explorationParameter = SQRT_2 );
 	bool CanExpand( TreeMapNode const* node );
+	bool CanExpandUsingMoves( TreeMapNode const* node );
+	bool CanExpandUsingHeuristic( TreeMapNode const* node );
 	//bestNode_t GetHighestWinRateChildNode( TreeMapNode const* node );
 	//inputMove_t GetBestInputChoiceFromChildren( TreeMapNode* node );
 
@@ -135,6 +144,9 @@ public:
 
 	std::mutex m_scoreStrategyLock;
 	SCORESTRATEGY m_scoreStrategy = SCORESTRATEGY::MCDOM;
+
+	std::mutex m_expansionStrategyLock;
+	EXPANSIONSTRATEGY m_expansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
 
 	std::atomic<bool> m_isQuitting = false;
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;
