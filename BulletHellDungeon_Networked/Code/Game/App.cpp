@@ -258,10 +258,10 @@ bool App::ConnectToMultiplayerServer( EventArgs const& args )
 	g_theServer = new RemoteServer( game );
 	g_theClient = new PlayerClient();
 
+	g_theServer->m_TCPGameConnection = m_TCPConnection;
 	g_theServer->Startup();
 	g_theClient->Startup();
 
-	g_theServer->m_TCPGameConnection = m_TCPConnection;
 
 	return true;
 }

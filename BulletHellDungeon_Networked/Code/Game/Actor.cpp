@@ -131,8 +131,8 @@ void Actor::Update( float deltaSeconds )
 		{
 			m_didJustTookDamage = false;
 		}
-		UpdateFromJoystick();
-		UpdateFromKeyboard();
+		//UpdateFromJoystick();
+		//UpdateFromKeyboard();
 		m_position = TransformPosition2D(m_position, 1.f, 0.f, m_velocity * deltaSeconds);
 	}
 	else if( m_name == "Boss" )

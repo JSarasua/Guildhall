@@ -6,6 +6,9 @@
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/Game.hpp"
+#include "Game/RemoteClient.hpp"
+#include "Game/UDPGameConnection.hpp"
+#include "Game/Client.hpp"
 
 AuthServer::AuthServer( Game* game ) : Server( game )
 {
@@ -20,6 +23,11 @@ AuthServer::~AuthServer()
 void AuthServer::Startup()
 {
 	g_theGame->Startup();
+
+	g_theEventSystem->SubscribeMethodToEvent( "TCPMessageReceived", NOCONSOLECOMMAND, this, &AuthServer::HandleReceiveTCPMessage );
+
+	m_clients.reserve(4);
+	m_clients.push_back( nullptr );
 }
 
 void AuthServer::Shutdown()
@@ -105,5 +113,44 @@ std::vector<Entity*> const& AuthServer::GetEntitiesToRender()
 eGameState AuthServer::GetCurrentGameState()
 {
 	return g_theGame->m_gameState;
+}
+
+bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
+{
+	std::string data = args.GetValue("data", std::string() );
+	int length = args.GetValue("length", 0 );
+
+	if( data.size() == 0 )
+	{
+		return true;
+	}
+
+	Header header = *(Header*)data.c_str();
+	
+	if( header.m_id == ADDPLAYER )
+	{
+		int playerCount = (int)m_clients.size() + 1;
+		int playerSlot = playerCount - 1;
+		if( playerCount < 4 )
+		{
+			std::string host = "127.0.0.1";
+			int port = 48010 + playerCount - 1;
+			UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
+			Client* newRemoteClient = new RemoteClient( newUDPConnection );
+			m_clients.push_back( nullptr );
+
+			if( g_theGame->m_gameState != ATTRACT )
+			{
+				g_theGame->AddPlayer( playerSlot );
+			}
+		}
+	}
+
+
+
+
+
+
+	return true;
 }
 
