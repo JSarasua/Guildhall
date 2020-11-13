@@ -1436,6 +1436,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 	{
 		PlayerBoard* playerDeck = nullptr;
 		int nextPlayersTurn = 0;
+		int whoseMoveBase1 = moveToPlay.m_whoseMoveIsIt + 1;
 		if( moveToPlay.m_whoseMoveIsIt == PLAYER_1 )
 		{
 			playerDeck = &m_currentGameState->m_playerBoards[0];
@@ -1455,6 +1456,10 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 				playerDeck->m_numberOfActionsAvailable--;
 				int handIndex = moveToPlay.m_cardHandIndexToPlay;
 				playerDeck->PlayCard( handIndex, m_currentGameState );
+
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
+				std::string playStr = Stringf( "Player %i played %s", whoseMoveBase1, card->GetCardName().c_str() );
+				g_theConsole->PrintString( Rgba8::CYAN, playStr );
 			}
 		}
 		else if( moveToPlay.m_moveType == BUY_MOVE )
@@ -1468,6 +1473,10 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			playerDeck->DecrementCoins( cardCost );
 			playerDeck->AddCardToDiscardPile( pileIndex );
 			playerDeck->m_numberOfBuysAvailable--;
+
+			CardDefinition const* card = pileData.m_card;
+			std::string playStr = Stringf( "Player %i bought %s", whoseMoveBase1, card->GetCardName().c_str() );
+			g_theConsole->PrintString( Rgba8::CYAN, playStr );
 		}
 		else if( moveToPlay.m_moveType == END_PHASE )
 		{
@@ -1490,6 +1499,27 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 				playerDeck->m_numberOfBuysAvailable = 1;
 				playerDeck->m_currentCoins = 0;
 			}
+
+
+			std::string playStr = Stringf( "Player %i ended phase", whoseMoveBase1 );
+			g_theConsole->PrintString( Rgba8::CYAN, playStr );
+
+			std::string phaseStr;
+			if( m_currentGameState->m_currentPhase == BUY_PHASE )
+			{
+				phaseStr = "Buy Phase";
+			}
+			else
+			{
+				phaseStr = "Action Phase";
+			}
+			if( m_currentGameState->m_currentPhase == nextPlayersTurn )
+			{
+				std::string startTurnStr = Stringf( "Beginning player %i's turn", nextPlayersTurn + 1 );
+				g_theConsole->PrintString( Rgba8::RED, startTurnStr );
+			}
+			std::string currentPhaseStr = Stringf( "Current phase: %s", phaseStr.c_str() );
+			g_theConsole->PrintString( Rgba8::GREEN, currentPhaseStr );
 		}
 		else
 		{
