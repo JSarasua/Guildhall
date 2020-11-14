@@ -25,9 +25,9 @@ void AuthServer::Startup()
 	g_theGame->Startup();
 
 	g_theEventSystem->SubscribeMethodToEvent( "TCPMessageReceived", NOCONSOLECOMMAND, this, &AuthServer::HandleReceiveTCPMessage );
+	g_theEventSystem->SubscribeMethodToEvent( "UpdateInput", NOCONSOLECOMMAND, this, &AuthServer::HandleInput );
 
 	m_clients.reserve(4);
-	m_clients.push_back( nullptr );
 }
 
 void AuthServer::Shutdown()
@@ -37,7 +37,10 @@ void AuthServer::Shutdown()
 
 void AuthServer::BeginFrame()
 {
-
+	for( size_t clientIndex = 0; clientIndex< m_clients.size(); clientIndex++ )
+	{
+		m_clients[clientIndex]->BeginFrame();
+	}
 }
 
 void AuthServer::EndFrame()
@@ -78,6 +81,11 @@ void AuthServer::UnpauseGame()
 void AuthServer::Update( float deltaSeconds )
 {
 	g_theGame->Update( deltaSeconds );
+
+	for( size_t clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
+	{
+		m_clients[clientIndex]->Update( deltaSeconds );
+	}
 }
 
 void AuthServer::UpdateGameState( eGameState newGamestate )
@@ -118,31 +126,45 @@ eGameState AuthServer::GetCurrentGameState()
 bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 {
 	std::string data = args.GetValue("data", std::string() );
-	int length = args.GetValue("length", 0 );
+	//int length = args.GetValue("length", 0 );
 
 	if( data.size() == 0 )
 	{
 		return true;
 	}
-
-	Header header = *(Header*)data.c_str();
+	TCPMessage message = *(TCPMessage*)data.c_str();
 	
-	if( header.m_id == ADDPLAYER )
+	if( message.m_id == ADDPLAYER )
 	{
 		int playerCount = (int)m_clients.size() + 1;
-		int playerSlot = playerCount - 1;
+		int playerSlot = playerCount;
 		if( playerCount < 4 )
 		{
 			std::string host = "127.0.0.1";
 			int port = 48010 + playerCount - 1;
 			UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
+			newUDPConnection->Bind( port );
 			Client* newRemoteClient = new RemoteClient( newUDPConnection );
-			m_clients.push_back( nullptr );
+			m_clients.push_back( newRemoteClient );
 
 			if( g_theGame->m_gameState != ATTRACT )
 			{
 				g_theGame->AddPlayer( playerSlot );
 			}
+
+			newRemoteClient->SetPlayerID( playerSlot );
+			uint16_t playerID = (uint16_t)playerSlot;
+
+			TCPMessage connectMessage;
+			connectMessage.m_id = ADDPLAYER;
+			connectMessage.m_playerID = playerID;
+			connectMessage.m_port = (uint16_t)port;
+
+			char const* messageStr = (char const*)&connectMessage;
+
+			m_TCPGameConnection->SendMessageToClient( messageStr, sizeof( connectMessage ) );
+			//Send Message of UDP connection
+			//m_TCPGameConnection->SendMessageToClient()
 		}
 	}
 
@@ -150,6 +172,13 @@ bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 
 
 
+
+	return true;
+}
+
+bool AuthServer::HandleInput( EventArgs const& args )
+{
+	g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
 
 	return true;
 }

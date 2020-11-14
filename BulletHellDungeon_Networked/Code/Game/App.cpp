@@ -246,7 +246,7 @@ bool App::ConnectToMultiplayerServer( EventArgs const& args )
 	m_TCPConnection->TCPClientConnect( args );
 
 	std::string ip = args.GetValue( "ip", "127.0.0.1" );
-	int portNumber = args.GetValue( "port", 48001 );
+	int portNumber = args.GetValue( "port", 48000 );
 	UNUSED( ip );
 	UNUSED( portNumber );
 

@@ -36,6 +36,7 @@ public:
 	virtual eGameState GetCurrentGameState() override;
 
 	bool HandleReceiveTCPMessage( EventArgs const& args );
+	bool HandleInput( EventArgs const& args );
 
 public:
 	std::vector<Client*> m_clients;
