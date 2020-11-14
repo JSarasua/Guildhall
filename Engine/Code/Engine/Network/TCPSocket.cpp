@@ -84,6 +84,17 @@ void TCPSocket::Send( std::string dataToSend, size_t length )
 	}
 }
 
+void TCPSocket::Send( char const* dataToSend, size_t length )
+{
+	int iResult = send( m_socket, dataToSend, (int)length, 0 );
+	g_theConsole->GuaranteeOrError( iResult != SOCKET_ERROR, Stringf( "Call to send failed %i", WSAGetLastError() ) );
+
+	if( iResult == SOCKET_ERROR )
+	{
+		Close();
+	}
+}
+
 TCPData TCPSocket::Receive()
 {
 	int iResult = ::recv( m_socket, m_bufferPtr, (int)m_bufferSize - 1, 0 );

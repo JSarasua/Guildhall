@@ -30,6 +30,7 @@ public:
 	std::string GetAddress();
 
 	void Send( std::string dataToSend, size_t length ); //Might not need length
+	void Send( char const* dataToSend, size_t length );
 	TCPData Receive();
 	bool IsDataAvailable();
 	void Shutdown();
