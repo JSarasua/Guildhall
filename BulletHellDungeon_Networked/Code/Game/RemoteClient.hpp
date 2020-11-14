@@ -102,5 +102,4 @@ public:
 	//Get and receive messages from Player Client
 private:
 	UDPGameConnection* m_UDPConnection = nullptr;
-	int m_playerID = -1;
 };

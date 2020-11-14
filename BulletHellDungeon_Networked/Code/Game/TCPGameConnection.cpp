@@ -60,12 +60,12 @@ void TCPGameConnection::BeginFrame()
 			*m_TCPServerToClientSocket = m_TCPServer->Accept();
 			if( m_TCPServerToClientSocket->IsSocketValid() )
 			{
-				ServerListeningMessage listeningMessage;
-				listeningMessage.m_gameName= "BulletHellDungeon";
-				listeningMessage.m_header.m_size = (uint16_t)listeningMessage.m_gameName.size();
-				std::string listeningMessageStr = listeningMessage.ToString();
-
-				m_TCPServerToClientSocket->Send( listeningMessageStr, listeningMessageStr.size() );
+// 				ServerListeningMessage listeningMessage;
+// 				listeningMessage.m_gameName= "BulletHellDungeon";
+// 				listeningMessage.m_header.m_size = (uint16_t)listeningMessage.m_gameName.size();
+// 				std::string listeningMessageStr = listeningMessage.ToString();
+// 
+// 				m_TCPServerToClientSocket->Send( listeningMessageStr, listeningMessageStr.size() );
 
 			}
 		}
@@ -78,28 +78,17 @@ void TCPGameConnection::BeginFrame()
 				// 				{
 				//const char* dataArray = data.GetData();
 				int dataLength = (int)data.GetLength();
-				std::string dataStr;
-				dataStr.resize(dataLength);
-				memcpy( &dataStr[0], data.GetData(), dataLength );
+				if( dataLength > 0 )
+				{
+					std::string dataStr;
+					dataStr.resize( dataLength );
+					memcpy( &dataStr[0], data.GetData(), dataLength );
 
-				EventArgs args;
-				args.SetValue( "data", dataStr );
-				args.SetValue( "length", dataLength );
-				g_theEventSystem->FireEvent("TCPMessageReceived", NOCONSOLECOMMAND, &args );
-// 
-// 				MessageHeader* messageHeader = (MessageHeader*)dataStr.c_str();
-// 				if( messageHeader->m_id == CLIENTDISCONNECT )
-// 				{
-// 					g_theConsole->PrintString( Rgba8::GREEN, "Client is disconnecting" );
-// 					m_TCPServerToClientSocket->Close();
-// 				}
-// 				else if( messageHeader->m_id == TEXTMESSAGE )
-// 				{
-// 					std::string dataStr = dataArray + 4;
-// 					//std::string dataStr = std::string( data.GetData(), data.GetLength() );
-// 					g_theConsole->PrintString( Rgba8::GREEN, "Message received from client" );
-// 					g_theConsole->PrintString( Rgba8::WHITE, dataStr );
-// 				}
+					EventArgs args;
+					args.SetValue( "data", dataStr );
+					args.SetValue( "length", dataLength );
+					g_theEventSystem->FireEvent( "TCPMessageReceived", NOCONSOLECOMMAND, &args );
+				}
 			}
 		}
 	}
@@ -109,23 +98,19 @@ void TCPGameConnection::BeginFrame()
 		if( m_TCPClientToServerSocket->IsSocketValid() && m_TCPClientToServerSocket->IsDataAvailable() )
 		{
 			TCPData data = m_TCPClientToServerSocket->Receive();
-			const char* dataArray = data.GetData();
 
-			MessageHeader* messageHeader = (MessageHeader*)dataArray;
-			if( messageHeader->m_id == SERVERLISTENING )
+			int dataLength = (int)data.GetLength();
+			if( dataLength > 0 )
 			{
-				g_theConsole->PrintString( Rgba8::GREEN, "Server is listening for game:" );
-				std::string dataStr = dataArray + 4;
-				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
-			}
-			else
-			{
-				std::string dataStr = dataArray + 4;
-				g_theConsole->PrintString( Rgba8::GREEN, "Message received from server" );
-				g_theConsole->PrintString( Rgba8::WHITE, dataStr );
-			}
+				std::string dataStr;
+				dataStr.resize( dataLength );
+				memcpy( &dataStr[0], data.GetData(), dataLength );
 
-
+				EventArgs args;
+				args.SetValue( "data", dataStr );
+				args.SetValue( "length", dataLength );
+				g_theEventSystem->FireEvent( "TCPMessageReceived", NOCONSOLECOMMAND, &args );
+			}
 		}
 	}
 
@@ -168,6 +153,19 @@ bool TCPGameConnection::SendMessageToClient( EventArgs const& args )
 	return true;
 }
 
+bool TCPGameConnection::SendMessageToClient( char const* message, int size )
+{
+	if( m_TCPServerToClientSocket->IsSocketValid() )
+	{
+		m_TCPServerToClientSocket->Send( message, size );
+	}
+	else
+	{
+		g_theConsole->ErrorString( "Can't call send message to client when not connected to client" );
+	}
+	return true;
+}
+
 bool TCPGameConnection::StopTCPServer( EventArgs const& args )
 {
 	UNUSED( args );
@@ -195,6 +193,19 @@ bool TCPGameConnection::SendMessageToServer( EventArgs const& args )
 	{
 		std::string message = args.GetValue( "msg", "Invalid message" );
 		size_t size = args.GetValue( "size", 0 );
+		m_TCPClientToServerSocket->Send( message, size );
+	}
+	else
+	{
+		g_theConsole->ErrorString( "Can't call send message to server when not connected to server" );
+	}
+	return true;
+}
+
+bool TCPGameConnection::SendMessageToServer( char const* message, int size )
+{
+	if( m_TCPClientToServerSocket->IsSocketValid() )
+	{
 		m_TCPClientToServerSocket->Send( message, size );
 	}
 	else

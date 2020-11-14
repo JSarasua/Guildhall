@@ -5,6 +5,7 @@
 class Entity;
 class SpriteDefinition;
 class Game;
+class UDPGameConnection;
 
 struct Vertex_PCU;
 
@@ -34,4 +35,11 @@ public:
 	virtual std::vector<Vertex_PCU> const& GetTileVertsToRender() override;
 	virtual std::vector<Entity*> const& GetEntitiesToRender() override;
 	virtual eGameState GetCurrentGameState() override;
+
+	bool HandleReceiveTCPMessage( EventArgs const& args );
+	bool HandleInput( EventArgs const& args );
+
+
+public:
+	UDPGameConnection* m_UDPGameConnection = nullptr;
 };

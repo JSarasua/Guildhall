@@ -1,6 +1,7 @@
 #pragma once
-#include <string>
 #include "Engine/Math/vec2.hpp"
+#include <string>
+#include <vector>
 
 struct Rgba8;
 struct IntVec2;
@@ -67,6 +68,19 @@ struct Header
 {
 	uint16_t m_id = 0;
 	uint16_t m_size = 0;
+};
+
+struct TCPMessage
+{
+	uint16_t m_id = 0;
+	uint16_t m_port = 0;
+	uint16_t m_playerID = 0;
+
+	static TCPMessage ToMessage( char const* messageStr )
+	{
+		TCPMessage message = *(TCPMessage*)messageStr;
+		return message;
+	}
 };
 
 struct InputMessage

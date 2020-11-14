@@ -99,5 +99,4 @@ public:
 
 private:
 	UDPGameConnection* m_UDPConnection = nullptr;
-	int m_playerID = 0;
 };

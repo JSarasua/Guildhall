@@ -6,6 +6,7 @@
 #include "Engine/Renderer/SpriteDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/Game.hpp"
+#include "Game/UDPGameConnection.hpp"
 
 RemoteServer::RemoteServer( Game* game ): Server( game )
 {
@@ -21,20 +22,29 @@ void RemoteServer::Startup()
 {
 	g_theGame->Startup();
 
+	g_theEventSystem->SubscribeMethodToEvent( "TCPMessageReceived", NOCONSOLECOMMAND, this, &RemoteServer::HandleReceiveTCPMessage );
+	g_theEventSystem->SubscribeMethodToEvent( "UpdateInput", NOCONSOLECOMMAND, this, &RemoteServer::HandleInput );
+
 	if( m_TCPGameConnection )
 	{
-		EventArgs args;
-		AddPlayerMessage message;
-		AddPlayerPacket packet;
-		packet.header.m_id = ADDPLAYER;
+		//EventArgs args;
+		TCPMessage message;
+		message.m_id = ADDPLAYER;
+		message.m_port = 48200;
+		char const* messageStr = (char const*)&message;
+		int messageSize = sizeof( message );
+// 		AddPlayerMessage message;
+// 		AddPlayerPacket packet;
+// 		packet.header.m_id = ADDPLAYER;
 		
-		std::string addPlayerStr = packet.ToString();
-		int messageSize = (int)addPlayerStr.size();
-		args.SetValue( "msg", addPlayerStr );
-		args.SetValue( "size", messageSize );
+// 		std::string addPlayerStr = packet.ToString();
+// 		int messageSize = (int)addPlayerStr.size();
+// 		args.SetValue( "msg", addPlayerStr );
+// 		args.SetValue( "size", messageSize );
 
 
-		m_TCPGameConnection->SendMessageToServer( args );
+		//m_TCPGameConnection->SendMessageToServer( args );
+		m_TCPGameConnection->SendMessageToServer( messageStr, messageSize );
 	}
 }
 
@@ -121,5 +131,66 @@ std::vector<Entity*> const& RemoteServer::GetEntitiesToRender()
 eGameState RemoteServer::GetCurrentGameState()
 {
 	return g_theGame->m_gameState;
+}
+
+bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
+{
+	std::string data = args.GetValue( "data", std::string() );
+	//int length = args.GetValue( "length", 0 );
+
+	if( data.size() == 0 )
+	{
+		return true;
+	}
+	TCPMessage message = *(TCPMessage*)data.c_str();
+
+	if( message.m_id == ADDPLAYER )
+	{
+		g_theClient->SetPlayerID( message.m_playerID );
+		int port = message.m_port;
+		std::string host = "127.0.0.1";
+		UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
+		newUDPConnection->Bind( 48200 );
+
+		if( m_UDPGameConnection )
+		{
+			delete m_UDPGameConnection;
+			m_UDPGameConnection = newUDPConnection;
+		}
+		else
+		{
+			m_UDPGameConnection = newUDPConnection;
+		}
+	}
+
+	return true;
+}
+
+bool RemoteServer::HandleInput( EventArgs const& args )
+{
+	if( m_UDPGameConnection )
+	{
+		int changeWeapons = args.GetValue( "changeWeapons", 0 );
+		bool isDodging = args.GetValue( "isDodging", false );
+		bool isShooting = args.GetValue( "isShooting", false );
+		Vec2 mousePos = args.GetValue( "mousePos", Vec2() );
+		Vec2 moveVec = args.GetValue( "moveVec", Vec2() );
+
+		InputMessage message;
+		message.changeWeapons = changeWeapons;
+		message.isDodging = isDodging;
+		message.isShooting = isShooting;
+		message.mousePos = mousePos;
+		message.moveVec = moveVec;
+		InputPacket packet;
+		packet.message = message;
+		
+		std::string messageStr = packet.ToString();
+		m_UDPGameConnection->SendUDPMessage( messageStr );
+		
+
+	}
+
+	return true;
 }
 

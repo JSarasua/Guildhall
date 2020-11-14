@@ -785,10 +785,6 @@ void PlayerClient::CheckButtonPresses()
 		float deltaMouseScroll = g_theInput->GetDeltaMouseWheelScroll();
 
 		Vec2 moveVec;
-		if( eKey.IsPressed() )
-		{
-			g_theConsole->PrintString( Rgba8::WHITE, "E" );
-		}
 		float upDir    = (float)eKey.IsPressed();
 		float leftDir  = (float)sKey.IsPressed();
 		float downDir  = (float)dKey.IsPressed();
@@ -797,7 +793,7 @@ void PlayerClient::CheckButtonPresses()
 		moveVec.y = upDir - downDir;
 
 		Vec2 mousePos = m_mousePositionOnMainCamera;
-		bool shooting = leftMouseButton.IsPressed();
+		bool isShooting = leftMouseButton.IsPressed();
 		int changeWeapons = 0;
 		changeWeapons = (int)rKey.WasJustPressed() - (int)wKey.WasJustPressed();
 		changeWeapons += (int)(deltaMouseScroll > 0);
@@ -805,31 +801,31 @@ void PlayerClient::CheckButtonPresses()
 
 		bool isDodging = spaceKey.IsPressed() || rightMouseButton.IsPressed();
 
-		if( m_UDPConnection )
-		{
-			InputMessage message;
-			message.changeWeapons = changeWeapons;
-			message.isDodging = isDodging;
-			message.isShooting = shooting;
-			message.mousePos = mousePos;
-			message.moveVec = moveVec;
-			InputPacket packet;
-			packet.message = message;
-			
-			std::string messageStr = packet.ToString();
-			m_UDPConnection->SendUDPMessage( messageStr );
-		}
-		else
-		{
+// 		if( m_UDPConnection )
+// 		{
+// 			InputMessage message;
+// 			message.changeWeapons = changeWeapons;
+// 			message.isDodging = isDodging;
+// 			message.isShooting = shooting;
+// 			message.mousePos = mousePos;
+// 			message.moveVec = moveVec;
+// 			InputPacket packet;
+// 			packet.message = message;
+// 			
+// 			std::string messageStr = packet.ToString();
+// 			m_UDPConnection->SendUDPMessage( messageStr );
+// 		}
+// 		else
+// 		{
 			EventArgs args;
 			args.SetValue( "mousePos", mousePos );
-			args.SetValue( "isShooting", shooting );
+			args.SetValue( "isShooting", isShooting );
 			args.SetValue( "changeWeapons", changeWeapons );
 			args.SetValue( "moveVec", moveVec );
 			args.SetValue( "isDodging", isDodging );
 			args.SetValue( "actorID", m_playerID );
-			g_theEventSystem->FireEvent( "Input", NOCONSOLECOMMAND, &args );
-		}
+			g_theEventSystem->FireEvent( "UpdateInput", NOCONSOLECOMMAND, &args );
+/*		}*/
 
 
 		// 		if( f6Key.WasJustPressed() )

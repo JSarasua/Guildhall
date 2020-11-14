@@ -4,6 +4,9 @@
 UDPGameConnection::UDPGameConnection( std::string const& host, int port )
 {
 	m_UDPSocket = new UDPSocket( host, port );
+
+	m_UDPReaderThread = new std::thread( &UDPGameConnection::ReaderThread, this );
+	m_UDPWriterThread = new std::thread( &UDPGameConnection::WriterThread, this );
 }
 
 UDPGameConnection::~UDPGameConnection()
@@ -13,6 +16,13 @@ UDPGameConnection::~UDPGameConnection()
 		delete m_UDPSocket;
 		m_UDPSocket = nullptr;
 	}
+
+	m_isQuitting = true;
+	m_UDPReaderThread->join();
+	m_UDPWriterThread->join();
+
+	delete m_UDPReaderThread;
+	delete m_UDPWriterThread;
 
 }
 
@@ -97,6 +107,7 @@ void UDPGameConnection::ReaderThread()
 				std::string message = std::string( &buffer[0], length );
 
 				AddressedInputPacket UDPPacket;
+				UDPPacket.isValid = true;
 				UDPPacket.packet = InputPacket::ToPacket( message.c_str() );
 				UDPPacket.IPAddress = m_UDPSocket->GetLastReceiveAddress();
 
@@ -116,7 +127,8 @@ void UDPGameConnection::WriterThread()
 		{
 			std::string message = m_writerQueue.pop();
 			UDPSocket::Buffer& buffer = m_UDPSocket->SendBuffer();
-			strcpy_s( &buffer[0], UDPSocket::BufferSize, message.c_str() );
+			memcpy( &buffer, message.c_str(), message.size() );
+			//strcpy_s( &buffer[0], UDPSocket::BufferSize, message.c_str() );
 
 			m_UDPSocket->Send( (int)message.size() );
 		}
