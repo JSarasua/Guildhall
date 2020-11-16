@@ -1,6 +1,6 @@
 #include "Game/World.hpp"
 #include "Game/Game.hpp"
-
+#include "Game/EntityFactory.hpp"
 
 
 World::World( Game* game ) :
@@ -107,6 +107,30 @@ int World::GetBossHealth() const
 void World::AddNewPlayer( int playerSlot )
 {
 	m_currentMap->AddPlayer( nullptr, playerSlot );
+}
+
+void World::CreateEntity( CreateEntityMessage const& createMessage )
+{
+	if( createMessage.entityType == ID_PLAYER )
+	{
+		AddNewPlayer( createMessage.entityID );
+	}
+	else
+	{
+		Entity* entity = EntityFactory::CreateEntity( createMessage );
+		m_currentMap->SpawnEntity( entity );
+	}
+
+}
+
+void World::UpdateEntity( UpdateEntityMessage const& updateMessage )
+{
+	m_currentMap->UpdateEntity( updateMessage );
+}
+
+void World::DeleteEntity( DeleteEntityMessage const& deleteMessage )
+{
+	m_currentMap->DeleteEntity( deleteMessage );
 }
 
 IntVec2 World::GetCurrentMapBounds() const

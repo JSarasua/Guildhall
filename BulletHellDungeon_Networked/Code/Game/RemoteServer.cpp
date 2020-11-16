@@ -33,17 +33,7 @@ void RemoteServer::Startup()
 		message.m_port = 48200;
 		char const* messageStr = (char const*)&message;
 		int messageSize = sizeof( message );
-// 		AddPlayerMessage message;
-// 		AddPlayerPacket packet;
-// 		packet.header.m_id = ADDPLAYER;
-		
-// 		std::string addPlayerStr = packet.ToString();
-// 		int messageSize = (int)addPlayerStr.size();
-// 		args.SetValue( "msg", addPlayerStr );
-// 		args.SetValue( "size", messageSize );
 
-
-		//m_TCPGameConnection->SendMessageToServer( args );
 		m_TCPGameConnection->SendMessageToServer( messageStr, messageSize );
 	}
 }
@@ -95,7 +85,8 @@ void RemoteServer::UnpauseGame()
 
 void RemoteServer::Update( float deltaSeconds )
 {
-	g_theGame->Update( deltaSeconds );
+	g_theGame->UpdateRemote( m_UDPGameConnection, deltaSeconds );
+	//g_theGame->Update( deltaSeconds );
 }
 
 void RemoteServer::UpdateGameState( eGameState newGamestate )

@@ -48,7 +48,7 @@ Map::~Map()
 	{
 		if( m_entities[entityIndex] )
 		{
-			delete m_entities[entityIndex];
+			EntityFactory::DeleteEntity( m_entities[entityIndex] );
 			m_entities[entityIndex] = nullptr;
 		}
 	}
@@ -189,6 +189,18 @@ void Map::UpdateEntities( float deltaSeconds )
 		if( !m_entities[entityIndex]->IsGarbage() )
 		{
 			m_entities[entityIndex]->Update(deltaSeconds);
+			Entity const& entity = *m_entities[entityIndex];
+			EventArgs args;
+			args.SetValue( "position", entity.m_position );
+			args.SetValue( "velocity", entity.m_velocity );
+			args.SetValue( "orientationDegrees", entity.m_orientationDegrees );
+			args.SetValue( "weaponOrientationDegrees", entity.m_weaponOrientationDegrees );
+			args.SetValue( "angularVelocity", entity.m_angularVelocity );
+			args.SetValue( "health", entity.m_health );
+			args.SetValue( "isDead", entity.m_isDead );
+			args.SetValue( "entityID", entity.m_entityID );
+
+			g_theEventSystem->FireEvent( "UpdateEntity", NOCONSOLECOMMAND, &args );
 		}
 	}
 
@@ -660,7 +672,7 @@ void Map::GarbageCollectEntities()
 					m_entities.push_back( loot );
 				}
 
-				delete m_entities[entityIndex];
+				EntityFactory::DeleteEntity( m_entities[entityIndex] );
 				m_entities[entityIndex] = nullptr;
 			}
 			else
@@ -669,7 +681,7 @@ void Map::GarbageCollectEntities()
 				bool isValidPosition = IsValidTileCoordinates( entityTileCoords );
 				if( !isValidPosition )
 				{
-					delete m_entities[entityIndex];
+					EntityFactory::DeleteEntity( m_entities[entityIndex] );
 					m_entities[entityIndex] = nullptr;
 				}
 			}
@@ -686,7 +698,8 @@ void Map::AddPlayer( Actor* player, int playerSlot )
 	{
 		if( m_entities[playerSlot] )
 		{
-			delete m_entities[playerSlot];
+			EntityFactory::DeleteEntity( m_entities[playerSlot] );
+			//delete m_entities[playerSlot];
 			m_entities[playerSlot] = nullptr;
 		}
 
@@ -726,7 +739,8 @@ void Map::DeletePlayer()
 {
 	if( m_entities[0] )
 	{
-		delete m_entities[0];
+		EntityFactory::DeleteEntity( m_entities[0] );
+		//delete m_entities[0];
 		m_entities[0] = nullptr;
 	}
 
@@ -992,6 +1006,48 @@ void Map::AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags )
 void Map::SpawnEntity( Entity* entityToSpawn )
 {
 	m_entities.push_back( entityToSpawn );
+}
+
+void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
+{
+	Vec2 position = updateMessage.position;
+	Vec2 velocity = updateMessage.velocity;
+	float orientation = updateMessage.orientationDegrees;
+	float weaponOrientation = updateMessage.weaponOrientationDegrees;
+	bool isDead = updateMessage.isDead;
+	int entityID = updateMessage.entityID;
+
+	for( Entity* entity : m_entities )
+	{
+		if( entity )
+		{
+			if( entity->m_entityID == entityID )
+			{
+				entity->m_position = position;
+				entity->m_velocity = velocity;
+				entity->m_orientationDegrees = orientation;
+				entity->m_weaponOrientationDegrees = weaponOrientation;
+				entity->m_isDead = isDead;
+
+				break;
+			}
+		}
+	}
+}
+
+void Map::DeleteEntity( DeleteEntityMessage const& deleteMessage )
+{
+	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	{
+		if( m_entities[entityIndex] )
+		{
+			if( m_entities[entityIndex]->m_entityID == deleteMessage.entityID )
+			{
+				EntityFactory::DeleteEntity( m_entities[entityIndex] );
+				m_entities[entityIndex] = nullptr;
+			}
+		}
+	}
 }
 
 Tile* Map::GetTileAtPosition( const IntVec2& tileCoords )

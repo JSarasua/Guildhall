@@ -3,6 +3,7 @@
 #include "Engine/Math/vec2.hpp"
 #include <vector>
 #include <string>
+#include "Game/GameCommon.hpp"
 
 struct TileMetaData;
 struct Tags;
@@ -53,6 +54,8 @@ public:
 	void AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags);
 
 	void SpawnEntity( Entity* entityToSpawn );
+	void UpdateEntity( UpdateEntityMessage const& updateMessage );
+	void DeleteEntity( DeleteEntityMessage const& deleteMessage );
 	void AddPlayer( Actor* player, int playerSlot = 0 );
 	void DeletePlayer();
 

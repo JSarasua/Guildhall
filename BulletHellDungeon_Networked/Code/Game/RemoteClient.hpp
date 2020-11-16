@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/Client.hpp"
+#include "Engine/Core/EventSystem.hpp"
 
 class UDPGameConnection;
 
@@ -55,6 +56,10 @@ public:
 
 public:
 	void SetUDPSocket( UDPGameConnection* newUDPConnection );
+
+	bool HandleCreateEntity( EventArgs const& args );
+	bool HandleUpdateEntity( EventArgs const& args );
+	bool HandleDeleteEntity( EventArgs const& args );
 
 public:
 	Camera* m_camera = nullptr;

@@ -24,7 +24,7 @@
 #include "Game/WeaponDefinition.hpp"
 #include "Game/BulletDefinition.hpp"
 #include "Game/AudioDefinition.hpp"
-
+#include "Game/UDPGameConnection.hpp"
 
 
 Game::Game() : m_imageTest(IMAGETESTPATH)
@@ -126,35 +126,37 @@ void Game::Update( float deltaSeconds )
 			}
 		}
 	}
+}
 
+void Game::UpdateRemote( UDPGameConnection* udpConnection, float deltaSeconds )
+{
+	if( !g_theConsole->IsOpen() )
+	{
+		CheckButtonPresses( 0 );
+	}
 
-	//UpdateCameras();
-// 	UpdateConsoleTest( deltaSeconds );
-// 	UpdateAlignedTextTest( deltaSeconds );
-// 	UpdateImageTest(deltaSeconds);
-// 	UpdateBlackboardTest(deltaSeconds);
-
+	switch( m_gameState )
+	{
+	case LOADING: UpdateLoading( 0 );
+		break;
+	case ATTRACT: UpdateAttract( 0 );
+		break;
+	case PLAYING: UpdatePlayingNetworked( deltaSeconds, udpConnection );
+		break;
+	case PAUSED: UpdatePaused( 0 );
+		break;
+	case DEATH: //UpdateDeath( 0 );
+		break;
+	case VICTORY: //UpdateVictory( 0 );
+		break;
+	default: ERROR_AND_DIE( "Invalid Game State" );
+		break;
+	}
 }
 
 void Game::Render()
 {
-// 	switch( m_gameState )
-// 	{
-// 	case LOADING: RenderLoading();
-// 		break;
-// 	case ATTRACT: RenderAttract();
-// 		break;
-//  	case DEATH: RenderDeath();
-//  		break;
-//  	case VICTORY: RenderVictory();
-//  		break;
-//  	case PAUSED: RenderPaused();
-//  		break;
-// 	case PLAYING: RenderPlaying();
-// 		break;
-// 	default: ERROR_AND_DIE( "Invalid Game State" );
-// 		break;
-// 	}
+
 }
 
 
@@ -999,9 +1001,37 @@ void Game::UpdatePlaying( float deltaSeconds )
 }
 
 
+void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpConnection )
+{
+	AddressedUDPPacket packet = udpConnection->PopFirstReceivedPacket();
+	bool isValid = packet.isValid;
+	while( isValid )
+	{
+		UDPPacket const& udpPacket = packet.packet;
+		int id = udpPacket.header.m_id;
 
+		if( id == ADDENTITY )
+		{
+			CreateEntityMessage createMessage = *(CreateEntityMessage*)udpPacket.message;
+			m_world->CreateEntity( createMessage );
+		}
+		else if( id == UPDATEENTITY )
+		{
+			UpdateEntityMessage updateMessage = *(UpdateEntityMessage*)udpPacket.message;
+			m_world->UpdateEntity( updateMessage );
+		}
+		else if( id == DELETEENTITY )
+		{
+			DeleteEntityMessage deleteMessage = *(DeleteEntityMessage*)udpPacket.message;
+			m_world->DeleteEntity( deleteMessage );
+		}
 
-
+		packet = udpConnection->PopFirstReceivedPacket();
+		isValid = packet.isValid;
+	}
+	UpdateCamera( deltaSeconds );
+	UpdateDebugMouse();
+}
 
 void Game::RenderVictory()
 {

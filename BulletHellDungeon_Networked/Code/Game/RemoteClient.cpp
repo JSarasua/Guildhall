@@ -21,7 +21,9 @@ RemoteClient::RemoteClient()
 RemoteClient::RemoteClient( UDPGameConnection* newUDPConnection ) :
 	m_UDPConnection( newUDPConnection )
 {
-
+	g_theEventSystem->SubscribeMethodToEvent( "CreateEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleCreateEntity );
+	g_theEventSystem->SubscribeMethodToEvent( "UpdateEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleUpdateEntity );
+	g_theEventSystem->SubscribeMethodToEvent( "DeleteEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleDeleteEntity );
 }
 
 RemoteClient::~RemoteClient()
@@ -46,7 +48,9 @@ void RemoteClient::EndFrame()
 {}
 
 void RemoteClient::Update( float deltaSeconds )
-{}
+{
+	UNUSED( deltaSeconds );
+}
 
 void RemoteClient::UpdateCamera()
 {}
@@ -197,5 +201,78 @@ void RemoteClient::SetUDPSocket( UDPGameConnection* newUDPConnection )
 	}
 
 	m_UDPConnection = newUDPConnection;
+}
+
+bool RemoteClient::HandleCreateEntity( EventArgs const& args )
+{
+	CreateEntityMessage message;
+
+	message.initialPosition = args.GetValue( "position", Vec2() );
+	message.initialVelocity = args.GetValue( "velocity", Vec2() );
+	message.initialOrientationDegrees = args.GetValue( "orientation", 0.f );
+	message.speedMultiplier = args.GetValue( "speedMultiplier", 1.f );
+	message.entityType = args.GetValue( "entityType", -1 );
+	message.defIndex = args.GetValue( "defIndex", 0 );
+	message.entityID = args.GetValue( "entityID", -1 );
+
+	int messageSize = sizeof( message );
+	UDPPacket packet;
+	packet.header.m_id = ADDENTITY;
+	packet.header.m_size = (uint16_t)messageSize;
+	
+	char const* messageStr = (char const*)&message;
+	packet.SetMessage( messageStr, messageSize );
+
+	std::string createEntityMessage = packet.ToString();
+
+	m_UDPConnection->SendUDPMessage( createEntityMessage );
+	return false;
+}
+
+bool RemoteClient::HandleUpdateEntity( EventArgs const& args )
+{
+	UpdateEntityMessage message;
+	message.position = args.GetValue("position", Vec2() );
+	message.velocity = args.GetValue("velocity", Vec2() );
+	message.orientationDegrees = args.GetValue( "orientationDegrees", 0.f );
+	message.weaponOrientationDegrees = args.GetValue( "weaponOrientationDegrees", 0.f );
+	message.angularVelocity = args.GetValue( "angularVelocity", 0.f );
+	message.health = args.GetValue( "health", 0 );
+	message.isDead = args.GetValue( "isDead", false );
+	message.entityID = args.GetValue( "entityID", -1 );
+
+	int messageSize = sizeof( message );
+	UDPPacket packet;
+	packet.header.m_id = UPDATEENTITY;
+	packet.header.m_size = (uint16_t)messageSize;
+
+	char const* messageStr = (char const*)&message;
+	packet.SetMessage( messageStr, messageSize );
+
+	std::string createEntityMessage = packet.ToString();
+
+	m_UDPConnection->SendUDPMessage( createEntityMessage );
+
+	return false;
+}
+
+bool RemoteClient::HandleDeleteEntity( EventArgs const& args )
+{
+	DeleteEntityMessage message;
+	message.entityID = args.GetValue( "entityID", -1 );
+
+	int messageSize = sizeof( message );
+	UDPPacket packet;
+	packet.header.m_id = DELETEENTITY;
+	packet.header.m_size = (uint16_t)messageSize;
+
+	char const* messageStr = (char const*)&message;
+	packet.SetMessage( messageStr, messageSize );
+
+	std::string createEntityMessage = packet.ToString();
+
+	m_UDPConnection->SendUDPMessage( createEntityMessage );
+
+	return false;
 }
 

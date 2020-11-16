@@ -25,6 +25,7 @@ enum eGameState
 
 class Actor;
 class World;
+class UDPGameConnection;
 
 struct Vertex_PCU;
 
@@ -46,6 +47,7 @@ public:
 	void RunFrame();
 
 	void Update(float deltaSeconds);
+	void UpdateRemote( UDPGameConnection* udpConnection, float deltaSeconds );
 	void Render();
 
 	Vec2	GetMousePositionOnMainCamera();
@@ -71,7 +73,7 @@ private:
 	void UpdateVictory( float deltaSeconds );
 	void UpdatePaused( float deltaSeconds );
 	void UpdatePlaying( float deltaSeconds );
-
+	void UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpConnection );
 	//RenderState
 // 	void RenderLoading();
 // 	void RenderAttract();

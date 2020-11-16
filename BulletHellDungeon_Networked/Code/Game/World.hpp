@@ -1,12 +1,8 @@
 #pragma once
 #include "Game/Map.hpp"
-
+#include "Game/GameCommon.hpp"
 
 class Game;
-
-
-
-
 
 
 class World
@@ -34,6 +30,10 @@ public:
 	int GetBossHealth() const;
 
 	void AddNewPlayer( int playerSlot );
+
+	void CreateEntity( CreateEntityMessage const& createMessage );
+	void UpdateEntity( UpdateEntityMessage const& updateMessage );
+	void DeleteEntity( DeleteEntityMessage const& deleteMessage );
 
 public:
 	Map* m_currentMap = nullptr;
