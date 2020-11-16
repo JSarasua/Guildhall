@@ -29,13 +29,13 @@ TCPGameConnection::~TCPGameConnection()
 
 void TCPGameConnection::Startup()
 {
-	g_theEventSystem->SubscribeMethodToEvent( "StartTCPServer", CONSOLECOMMAND, this, &TCPGameConnection::StartTCPServer );
-	g_theEventSystem->SubscribeMethodToEvent( "SendMessageToClient", CONSOLECOMMAND, this, &TCPGameConnection::SendMessageToClient );
-	g_theEventSystem->SubscribeMethodToEvent( "StopTCPServer", CONSOLECOMMAND, this, &TCPGameConnection::StopTCPServer );
-
-	g_theEventSystem->SubscribeMethodToEvent( "TCPClientConnect", CONSOLECOMMAND, this, &TCPGameConnection::TCPClientConnect );
-	g_theEventSystem->SubscribeMethodToEvent( "SendMessageToServer", CONSOLECOMMAND, this, &TCPGameConnection::SendMessageToServer );
-	g_theEventSystem->SubscribeMethodToEvent( "DisconnectClient", CONSOLECOMMAND, this, &TCPGameConnection::DisconnectClient );
+// 	g_theEventSystem->SubscribeMethodToEvent( "StartTCPServer", CONSOLECOMMAND, this, &TCPGameConnection::StartTCPServer );
+// 	g_theEventSystem->SubscribeMethodToEvent( "SendMessageToClient", CONSOLECOMMAND, this, &TCPGameConnection::SendMessageToClient );
+// 	g_theEventSystem->SubscribeMethodToEvent( "StopTCPServer", CONSOLECOMMAND, this, &TCPGameConnection::StopTCPServer );
+// 
+// 	g_theEventSystem->SubscribeMethodToEvent( "TCPClientConnect", CONSOLECOMMAND, this, &TCPGameConnection::TCPClientConnect );
+// 	g_theEventSystem->SubscribeMethodToEvent( "SendMessageToServer", CONSOLECOMMAND, this, &TCPGameConnection::SendMessageToServer );
+// 	g_theEventSystem->SubscribeMethodToEvent( "DisconnectClient", CONSOLECOMMAND, this, &TCPGameConnection::DisconnectClient );
 
 	WSADATA wsaData;
 	WORD wVersion MAKEWORD( 2, 2 );

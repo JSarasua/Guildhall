@@ -7,6 +7,7 @@
 #include "Game/WeaponDefinition.hpp"
 #include "Game/Game.hpp"
 #include "Game/UDPGameConnection.hpp"
+#include "Engine/Core/Time.hpp"
 
 RemoteServer::RemoteServer( Game* game ): Server( game )
 {
@@ -25,6 +26,8 @@ void RemoteServer::Startup()
 	g_theEventSystem->SubscribeMethodToEvent( "TCPMessageReceived", NOCONSOLECOMMAND, this, &RemoteServer::HandleReceiveTCPMessage );
 	g_theEventSystem->SubscribeMethodToEvent( "UpdateInput", NOCONSOLECOMMAND, this, &RemoteServer::HandleInput );
 
+	double time = GetCurrentTimeSeconds();
+	g_theGame->m_rand.Reset( (unsigned int)time );
 	m_port = g_theGame->m_rand.RollRandomIntInRange( 48500, 48550 );
 	if( m_TCPGameConnection )
 	{
