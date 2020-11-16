@@ -183,6 +183,7 @@ bool RemoteServer::HandleInput( EventArgs const& args )
 		message.mousePos = mousePos;
 		message.moveVec = moveVec;
 		InputPacket packet;
+		packet.header.m_id = UPDATEPLAYER;
 		packet.message = message;
 		
 		std::string messageStr = packet.ToString();

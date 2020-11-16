@@ -156,25 +156,35 @@ void RemoteClient::RenderConsole()
 
 void RemoteClient::CheckButtonPresses()
 {
-	AddressedInputPacket inputPacket = m_UDPConnection->PopFirstReceivedPacket();
-	if( inputPacket.isValid )
+	AddressedUDPPacket udpPacket = m_UDPConnection->PopFirstReceivedPacket();
+	if( udpPacket.isValid )
 	{
-		InputMessage const& input = inputPacket.packet.message;
-		int changeWeapons = input.changeWeapons;
-		bool isDodging = input.isDodging;
-		bool isShooting = input.isShooting;
-		Vec2 mousePos = input.mousePos;
-		Vec2 moveVec = input.moveVec;
+		int packetID = udpPacket.packet.header.m_id;
+
+		if( packetID == UPDATEPLAYER )
+		{
+			InputMessage input = *(InputMessage*)udpPacket.packet.message;
+
+			//InputMessage const& input = udpPacket.packet.message;
+			int changeWeapons = input.changeWeapons;
+			bool isDodging = input.isDodging;
+			bool isShooting = input.isShooting;
+			Vec2 mousePos = input.mousePos;
+			Vec2 moveVec = input.moveVec;
 
 
-		EventArgs args;
-		args.SetValue( "changeWeapons", changeWeapons );
-		args.SetValue( "isDodging", isDodging );
-		args.SetValue( "isShooting", isShooting );
-		args.SetValue( "mousePos", mousePos );
-		args.SetValue( "moveVec", moveVec );
-		args.SetValue( "actorID", m_playerID );
-		g_theEventSystem->FireEvent( "UpdateInput", NOCONSOLECOMMAND, &args );
+			EventArgs args;
+			args.SetValue( "changeWeapons", changeWeapons );
+			args.SetValue( "isDodging", isDodging );
+			args.SetValue( "isShooting", isShooting );
+			args.SetValue( "mousePos", mousePos );
+			args.SetValue( "moveVec", moveVec );
+			args.SetValue( "actorID", m_playerID );
+			g_theEventSystem->FireEvent( "UpdateInput", NOCONSOLECOMMAND, &args );
+		}
+
+
+
 	}
 }
 

@@ -2,6 +2,7 @@
 #include "Engine/Math/vec2.hpp"
 #include <string>
 #include <vector>
+#include "Engine/Math/MathUtils.hpp"
 
 struct Rgba8;
 struct IntVec2;
@@ -63,6 +64,7 @@ extern SpriteSheet* g_bulletsSpriteSheet;
 constexpr uint16_t ADDPLAYER = 4;
 constexpr uint16_t ADDENTITY = 5;
 constexpr uint16_t UPDATEPLAYER = 6;
+constexpr int MAXUDPMESSAGESIZE = 200;
 
 struct Header
 {
@@ -81,6 +83,36 @@ struct TCPMessage
 		TCPMessage message = *(TCPMessage*)messageStr;
 		return message;
 	}
+};
+
+struct UDPPacket
+{
+
+	Header header;
+	char message[MAXUDPMESSAGESIZE]{};
+
+
+	static UDPPacket ToPacket( char const* packetStr, int size )
+	{
+		Header* newHeader = (Header*)packetStr;
+		char const* newMessage = packetStr + 4;
+
+		UDPPacket newPacket;
+		newPacket.header = *newHeader;
+
+		memset( &newPacket.message[0], 0, MAXUDPMESSAGESIZE );
+		
+		int messageSize = ClampInt( size - 4, 0, MAXUDPMESSAGESIZE );
+		memcpy( &newPacket.message[0], newMessage, messageSize );
+		return newPacket;
+	}
+};
+
+struct AddressedUDPPacket
+{
+	bool isValid = false;
+	std::string IPAddress;
+	UDPPacket packet;
 };
 
 struct InputMessage
@@ -124,6 +156,18 @@ struct AddressedInputPacket
 	bool isValid = false;
 	std::string IPAddress;
 	InputPacket packet;
+};
+
+struct CreateEntityMessage
+{
+	Vec2 initialPosition;
+	Vec2 initialVelocity;
+	float initialOrientationDegrees;
+	float speedMultiplier;
+	int entityType;
+	int entityFaction;
+	int actorDefID = -1;
+	int entityID = -1;
 };
 
 

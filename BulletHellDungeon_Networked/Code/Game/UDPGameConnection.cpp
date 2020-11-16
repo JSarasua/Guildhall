@@ -85,9 +85,9 @@ std::string UDPGameConnection::GetLastReceiveAddress()
 	return m_UDPSocket->GetLastReceiveAddress();
 }
 
-AddressedInputPacket UDPGameConnection::PopFirstReceivedPacket()
+AddressedUDPPacket UDPGameConnection::PopFirstReceivedPacket()
 {
-	AddressedInputPacket packet = m_readerQueue.pop();
+	AddressedUDPPacket packet = m_readerQueue.pop();
 	return packet;
 }
 
@@ -106,9 +106,9 @@ void UDPGameConnection::ReaderThread()
 				UDPSocket::Buffer& buffer = m_UDPSocket->ReceiveBuffer();
 				std::string message = std::string( &buffer[0], length );
 
-				AddressedInputPacket UDPPacket;
+				AddressedUDPPacket UDPPacket;
 				UDPPacket.isValid = true;
-				UDPPacket.packet = InputPacket::ToPacket( message.c_str() );
+				UDPPacket.packet = UDPPacket::ToPacket( message.c_str(), (int)message.size() );
 				UDPPacket.IPAddress = m_UDPSocket->GetLastReceiveAddress();
 
 				m_readerQueue.push( UDPPacket );

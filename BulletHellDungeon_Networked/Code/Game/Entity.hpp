@@ -74,7 +74,7 @@ public:
 	int GetHealth() const { return m_health; };
 
 
-
+	int m_entityID = -1;
 protected:
 	Vec2 m_position = Vec2(0.f,0.f);
 	Vec2 m_velocity = Vec2(0.f,0.f);

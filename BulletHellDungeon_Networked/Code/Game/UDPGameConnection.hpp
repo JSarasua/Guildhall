@@ -36,7 +36,7 @@ public:
 
 	std::string GetLastReceiveAddress();
 
-	AddressedInputPacket PopFirstReceivedPacket();
+	AddressedUDPPacket PopFirstReceivedPacket();
 
 private:
 	void ReaderThread();
@@ -44,7 +44,7 @@ private:
 
 private:
 	BlockingQueue<std::string> m_writerQueue;
-	SynchronizedLockFreeQueue<AddressedInputPacket> m_readerQueue;
+	SynchronizedLockFreeQueue<AddressedUDPPacket> m_readerQueue;
 
 	std::thread* m_UDPReaderThread = nullptr;
 	std::thread* m_UDPWriterThread = nullptr;
