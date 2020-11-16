@@ -15,6 +15,8 @@ public:
 
 	static void InitializeBulletDefinitions( XmlElement const& rootBulletDefinitionElement );
 	static std::map< std::string, BulletDefinition*> s_definitions;
+	static int GetBulletDefIndex( BulletDefinition const* bulletDef );
+	static BulletDefinition const* GetBulletDefFromIndex( int bulletIndex );
 
 	float GetBulletSpeed() const;
 	float GetPhysicsRadius() const;

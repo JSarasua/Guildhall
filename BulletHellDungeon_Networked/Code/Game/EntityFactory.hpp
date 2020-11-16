@@ -4,9 +4,13 @@
 #include "Game/Bullet.hpp"
 #include "Game/Loot.hpp"
 
+struct CreateEntityMessage;
+
 class EntityFactory
 {
 public:
+	static Entity* CreateEntity( CreateEntityMessage const& createMessage );
+
 	static Actor* CreateActor( std::string actorDefStr, Vec2 initialPosition = Vec2(), Vec2 initialVelocity = Vec2(), float initialOrientationDegrees = 0.f, float initialAngularVelocity = 0.f, int entityID = -1 );
 	static Actor* CreateActor( ActorDefinition const* actorDef, Vec2 initialPosition = Vec2(), Vec2 initialVelocity = Vec2(), float initialOrientationDegrees = 0.f, float initialAngularVelocity = 0.f, int entityID = -1 );
 	static Actor* CreatePlayer( ActorDefinition const* actorDef, Vec2 initialPosition = Vec2(), Vec2 initialVelocity = Vec2(), float initialOrientationDegrees = 0.f, float initialAngularVelocity = 0.f, PlayerController playerController = Player_1, int entityID = -1 );

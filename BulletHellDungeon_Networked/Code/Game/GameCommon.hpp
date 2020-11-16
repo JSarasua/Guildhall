@@ -64,7 +64,15 @@ extern SpriteSheet* g_bulletsSpriteSheet;
 constexpr uint16_t ADDPLAYER = 4;
 constexpr uint16_t ADDENTITY = 5;
 constexpr uint16_t UPDATEPLAYER = 6;
+constexpr uint16_t UPDATEENTITY = 7;
+constexpr uint16_t DELETEENTITY = 8;
 constexpr int MAXUDPMESSAGESIZE = 200;
+
+constexpr int ID_PLAYER = 10;
+constexpr int ID_ACTOR = 11;
+constexpr int ID_GOOD_BULLET = 12;
+constexpr int ID_EVIL_BULLET = 13;
+constexpr int ID_LOOT = 14;
 
 struct Header
 {
@@ -91,6 +99,11 @@ struct UDPPacket
 	Header header;
 	char message[MAXUDPMESSAGESIZE]{};
 
+	void SetMessage( char const* messageStr, int size )
+	{
+		memset(message, 0, MAXUDPMESSAGESIZE );
+		memcpy( message, messageStr, size );
+	}
 
 	static UDPPacket ToPacket( char const* packetStr, int size )
 	{
@@ -105,6 +118,17 @@ struct UDPPacket
 		int messageSize = ClampInt( size - 4, 0, MAXUDPMESSAGESIZE );
 		memcpy( &newPacket.message[0], newMessage, messageSize );
 		return newPacket;
+	}
+
+	std::string ToString()
+	{
+		int size = header.m_size;
+		size = ClampInt( size, 0, MAXUDPMESSAGESIZE );
+
+		std::string packetStr;
+		packetStr.append( (char*)&header, 4 );
+		packetStr.append( (char*)&message, size );
+		return packetStr;
 	}
 };
 
@@ -165,8 +189,7 @@ struct CreateEntityMessage
 	float initialOrientationDegrees;
 	float speedMultiplier;
 	int entityType;
-	int entityFaction;
-	int actorDefID = -1;
+	int defIndex = -1;
 	int entityID = -1;
 };
 
@@ -180,7 +203,12 @@ struct UpdateEntityMessage
 	float angularVelocity;
 	int health;
 	bool isDead;
+	int entityID = -1;
+};
 
+struct DeleteEntityMessage
+{
+	int entityID = -1;
 };
 
 struct AddPlayerMessage

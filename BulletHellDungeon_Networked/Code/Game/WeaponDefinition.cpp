@@ -8,6 +8,38 @@
 std::map< std::string, WeaponDefinition*> WeaponDefinition::s_definitions;
 
 
+int WeaponDefinition::GetWeaponDefIndex( WeaponDefinition const* weaponDef )
+{
+	int index = 0;
+	for( auto weaponDefIter : s_definitions )
+	{
+		if( weaponDefIter.second == weaponDef )
+		{
+			break;
+		}
+		index++;
+	}
+
+	return index;
+}
+
+WeaponDefinition const* WeaponDefinition::GetWeaponDefFromIndex( int weaponIndex )
+{
+	WeaponDefinition const* weaponDef = nullptr;
+	int currentIndex = 0;
+	for( auto weaponDefIter : s_definitions )
+	{
+		if( currentIndex == weaponIndex )
+		{
+			weaponDef = weaponDefIter.second;
+			break;
+		}
+		currentIndex++;
+	}
+
+	return weaponDef;
+}
+
 AABB2 const& WeaponDefinition::GetWeaponDrawBounds() const
 {
 	return m_drawBounds;

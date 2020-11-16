@@ -4,6 +4,38 @@
 std::map< std::string, BulletDefinition*> BulletDefinition::s_definitions;
 
 
+int BulletDefinition::GetBulletDefIndex( BulletDefinition const* bulletDef )
+{
+	int index = 0;
+	for( auto bulletDefIter : s_definitions )
+	{
+		if( bulletDefIter.second == bulletDef )
+		{
+			break;
+		}
+		index++;
+	}
+
+	return index;
+}
+
+BulletDefinition const* BulletDefinition::GetBulletDefFromIndex( int bulletIndex )
+{
+	BulletDefinition const* bulletDef = nullptr;
+	int currentIndex = 0;
+	for( auto bulletDefIter : s_definitions )
+	{
+		if( currentIndex == bulletIndex )
+		{
+			bulletDef = bulletDefIter.second;
+			break;
+		}
+		currentIndex++;
+	}
+
+	return bulletDef;
+}
+
 float BulletDefinition::GetBulletSpeed() const
 {
 	return m_bulletSpeed;

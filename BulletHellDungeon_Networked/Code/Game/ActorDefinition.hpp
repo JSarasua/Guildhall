@@ -22,6 +22,8 @@ public:
 	static void InitializeActorDefinitions( const XmlElement& rootActorDefElement );
 
 	static std::map< std::string, ActorDefinition*> s_definitions;
+	static int GetActorDefIndex( ActorDefinition const* actorDef );
+	static ActorDefinition const* GetActorDefFromIndex( int index );
 
 protected:
 	//std::string m_name;

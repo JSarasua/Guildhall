@@ -4,6 +4,38 @@
 
 std::map< std::string, ActorDefinition*> ActorDefinition::s_definitions;
 
+int ActorDefinition::GetActorDefIndex( ActorDefinition const* actorDef )
+{
+	int index = 0;
+	for( auto actorDefIter : s_definitions )
+	{
+		if( actorDefIter.second == actorDef )
+		{
+			break;
+		}
+		index++;
+	}
+
+	return index;
+}
+
+ActorDefinition const* ActorDefinition::GetActorDefFromIndex( int index )
+{
+	ActorDefinition const* actorDef = nullptr;
+	int currentIndex = 0;
+	for( auto actorDefIter : s_definitions )
+	{
+		if( currentIndex == index )
+		{
+			actorDef = actorDefIter.second;
+			break;
+		}
+		currentIndex++;
+	}
+
+	return actorDef;
+}
+
 ActorDefinition::ActorDefinition( const XmlElement& element ) : EntityDefinition(element)
 {
 	IntVec2 spriteCoords		= ParseXMLAttribute( element, "spriteCoords", IntVec2( 0, 0 ) );

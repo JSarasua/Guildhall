@@ -18,6 +18,8 @@ public:
 	static void InitializeWeaponDefinitions( XmlElement const& rootWeaponDefinitionElement );
 	static WeaponDefinition const* GetRandomWeapon( RandomNumberGenerator& rng );
 	static std::map< std::string, WeaponDefinition*> s_definitions;
+	static int GetWeaponDefIndex( WeaponDefinition const* weaponDef );
+	static WeaponDefinition const* GetWeaponDefFromIndex( int weaponIndex );
 
 	AABB2 const& GetWeaponDrawBounds() const;
 	Rgba8 const& GetWeaponTint() const;
