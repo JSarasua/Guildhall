@@ -136,13 +136,14 @@ bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 	
 	if( message.m_id == ADDPLAYER )
 	{
+		int sendToPort = message.m_port;
 		int playerCount = (int)m_clients.size() + 1;
 		int playerSlot = playerCount;
 		if( playerCount < 4 )
 		{
 			std::string host = "127.0.0.1";
 			int port = 48010 + playerCount - 1;
-			UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
+			UDPGameConnection* newUDPConnection = new UDPGameConnection( host, sendToPort );
 			newUDPConnection->Bind( port );
 			Client* newRemoteClient = new RemoteClient( newUDPConnection );
 			m_clients.push_back( newRemoteClient );
@@ -163,9 +164,29 @@ bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 			char const* messageStr = (char const*)&connectMessage;
 
 			m_TCPGameConnection->SendMessageToClient( messageStr, sizeof( connectMessage ) );
+
+			std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+
+
+			for( size_t clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
+			{
+				EventArgs createArgs;
+				createArgs.SetValue( "position", Vec2() );
+				createArgs.SetValue( "velocity", Vec2() );
+				createArgs.SetValue( "orientation", 0.f );
+				createArgs.SetValue( "speedMultiplier", 1.f );
+				createArgs.SetValue( "entityType", ID_PLAYER );
+				createArgs.SetValue( "defIndex", 0 );
+				createArgs.SetValue( "entityID", (int)clientIndex + 1 );
+				((RemoteClient*)newRemoteClient)->HandleCreateEntity( createArgs );
+			}
 			//Send Message of UDP connection
 			//m_TCPGameConnection->SendMessageToClient()
 		}
+		EventArgs tcpArgs;
+		tcpArgs.SetValue( "port", m_port );
+		m_TCPGameConnection->StopTCPServer( tcpArgs );
+		m_TCPGameConnection->StartTCPServer( tcpArgs );
 	}
 
 

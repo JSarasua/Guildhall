@@ -40,4 +40,5 @@ public:
 
 public:
 	std::vector<Client*> m_clients;
+	int m_port = 48000;
 };

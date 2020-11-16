@@ -25,12 +25,13 @@ void RemoteServer::Startup()
 	g_theEventSystem->SubscribeMethodToEvent( "TCPMessageReceived", NOCONSOLECOMMAND, this, &RemoteServer::HandleReceiveTCPMessage );
 	g_theEventSystem->SubscribeMethodToEvent( "UpdateInput", NOCONSOLECOMMAND, this, &RemoteServer::HandleInput );
 
+	m_port = g_theGame->m_rand.RollRandomIntInRange( 48500, 48550 );
 	if( m_TCPGameConnection )
 	{
 		//EventArgs args;
 		TCPMessage message;
 		message.m_id = ADDPLAYER;
-		message.m_port = 48200;
+		message.m_port = (uint16_t)m_port;
 		char const* messageStr = (char const*)&message;
 		int messageSize = sizeof( message );
 
@@ -126,6 +127,9 @@ eGameState RemoteServer::GetCurrentGameState()
 
 bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 {
+	EventArgs dcArgs;
+	m_TCPGameConnection->DisconnectClient( dcArgs );
+
 	std::string data = args.GetValue( "data", std::string() );
 	//int length = args.GetValue( "length", 0 );
 
@@ -141,7 +145,7 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 		int port = message.m_port;
 		std::string host = "127.0.0.1";
 		UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
-		newUDPConnection->Bind( 48200 );
+		newUDPConnection->Bind( m_port );
 
 		if( m_UDPGameConnection )
 		{

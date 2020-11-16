@@ -42,4 +42,5 @@ public:
 
 public:
 	UDPGameConnection* m_UDPGameConnection = nullptr;
+	int m_port = -1;
 };

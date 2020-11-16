@@ -25,6 +25,7 @@
 #include "Game/BulletDefinition.hpp"
 #include "Game/AudioDefinition.hpp"
 #include "Game/UDPGameConnection.hpp"
+#include "Game/Client.hpp"
 
 
 Game::Game() : m_imageTest(IMAGETESTPATH)
@@ -159,6 +160,16 @@ void Game::Render()
 
 }
 
+
+void Game::SetPlayerToFollow( int playerID )
+{
+	std::vector<Actor*> players;
+	m_world->GetPlayers( players );
+	if( playerID < players.size() )
+	{
+		m_player = players[playerID];
+	}
+}
 
 Vec2 Game::GetMousePositionOnMainCamera()
 {
@@ -1003,32 +1014,44 @@ void Game::UpdatePlaying( float deltaSeconds )
 
 void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpConnection )
 {
-	AddressedUDPPacket packet = udpConnection->PopFirstReceivedPacket();
-	bool isValid = packet.isValid;
-	while( isValid )
+	if( udpConnection )
 	{
-		UDPPacket const& udpPacket = packet.packet;
-		int id = udpPacket.header.m_id;
+		AddressedUDPPacket packet = udpConnection->PopFirstReceivedPacket();
+		bool isValid = packet.isValid;
+		while( isValid )
+		{
+			UDPPacket const& udpPacket = packet.packet;
+			int id = udpPacket.header.m_id;
 
-		if( id == ADDENTITY )
-		{
-			CreateEntityMessage createMessage = *(CreateEntityMessage*)udpPacket.message;
-			m_world->CreateEntity( createMessage );
-		}
-		else if( id == UPDATEENTITY )
-		{
-			UpdateEntityMessage updateMessage = *(UpdateEntityMessage*)udpPacket.message;
-			m_world->UpdateEntity( updateMessage );
-		}
-		else if( id == DELETEENTITY )
-		{
-			DeleteEntityMessage deleteMessage = *(DeleteEntityMessage*)udpPacket.message;
-			m_world->DeleteEntity( deleteMessage );
-		}
+			if( id == ADDENTITY )
+			{
+				CreateEntityMessage createMessage = *(CreateEntityMessage*)udpPacket.message;
+				m_world->CreateEntity( createMessage );
 
-		packet = udpConnection->PopFirstReceivedPacket();
-		isValid = packet.isValid;
+				if( createMessage.entityType == ID_PLAYER )
+				{
+					if( createMessage.entityID == g_theClient->m_playerID )
+					{
+						SetPlayerToFollow( createMessage.entityID );
+					}
+				}
+			}
+			else if( id == UPDATEENTITY )
+			{
+				UpdateEntityMessage updateMessage = *(UpdateEntityMessage*)udpPacket.message;
+				m_world->UpdateEntity( updateMessage );
+			}
+			else if( id == DELETEENTITY )
+			{
+				DeleteEntityMessage deleteMessage = *(DeleteEntityMessage*)udpPacket.message;
+				m_world->DeleteEntity( deleteMessage );
+			}
+
+			packet = udpConnection->PopFirstReceivedPacket();
+			isValid = packet.isValid;
+		}
 	}
+
 	UpdateCamera( deltaSeconds );
 	UpdateDebugMouse();
 }

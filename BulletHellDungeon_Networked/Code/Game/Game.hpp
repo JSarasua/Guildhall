@@ -50,6 +50,8 @@ public:
 	void UpdateRemote( UDPGameConnection* udpConnection, float deltaSeconds );
 	void Render();
 
+	void SetPlayerToFollow( int playerID );
+
 	Vec2	GetMousePositionOnMainCamera();
 	AABB2	GetUICamera() const;
 	AABB2	GetCamera() const;

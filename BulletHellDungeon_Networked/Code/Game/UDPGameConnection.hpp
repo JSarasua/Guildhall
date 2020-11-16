@@ -44,7 +44,7 @@ private:
 
 private:
 	BlockingQueue<std::string> m_writerQueue;
-	SynchronizedLockFreeQueue<AddressedUDPPacket> m_readerQueue;
+	BlockingQueue<AddressedUDPPacket> m_readerQueue;
 
 	std::thread* m_UDPReaderThread = nullptr;
 	std::thread* m_UDPWriterThread = nullptr;

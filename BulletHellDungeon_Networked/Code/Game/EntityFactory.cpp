@@ -5,6 +5,7 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Game/Game.hpp"
 
 int EntityFactory::currentEntityID = 4;
 
@@ -24,6 +25,10 @@ Entity* EntityFactory::CreateEntity( CreateEntityMessage const& createMessage )
 	{
 		ActorDefinition const* actorDef = ActorDefinition::GetActorDefFromIndex( defIndex );
 		entity = EntityFactory::CreateActor( actorDef, position, velocity, orientation, 0.f, entityID );
+
+		//This is a hack until weapons can be networked
+		WeaponDefinition const* weaponDef = WeaponDefinition::GetRandomWeapon( g_theGame->m_rand );
+		((Actor*)entity)->AddWeapon( weaponDef );
 	}
 	else if( entityType == ID_PLAYER )
 	{

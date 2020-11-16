@@ -126,11 +126,15 @@ void UDPGameConnection::WriterThread()
 		if( m_UDPSocket && m_UDPSocket->IsSocketValid() )
 		{
 			std::string message = m_writerQueue.pop();
-			UDPSocket::Buffer& buffer = m_UDPSocket->SendBuffer();
-			memcpy( &buffer, message.c_str(), message.size() );
-			//strcpy_s( &buffer[0], UDPSocket::BufferSize, message.c_str() );
+			if( message.size() != 0 )
+			{
+				UDPSocket::Buffer& buffer = m_UDPSocket->SendBuffer();
+				memcpy( &buffer, message.c_str(), message.size() );
+				//strcpy_s( &buffer[0], UDPSocket::BufferSize, message.c_str() );
 
-			m_UDPSocket->Send( (int)message.size() );
+				m_UDPSocket->Send( (int)message.size() );
+			}
+
 		}
 	}
 }

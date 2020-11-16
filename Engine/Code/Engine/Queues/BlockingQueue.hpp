@@ -41,9 +41,11 @@ private:
 template<typename T>
 void BlockingQueue<T>::push( value_type const& value )
 {
-	std::lock_guard<std::mutex> guard( m_lock ); //takes the place of doing m_lock.lock(); and m_lock.unlock();
+	//std::lock_guard<std::mutex> guard( m_lock ); //takes the place of doing m_lock.lock(); and m_lock.unlock();
+	m_lock.lock();
 	base::push( value );
-	m_condition.notify_all();
+	m_lock.unlock();
+	//m_condition.notify_all();
 	//lock_guard gives up lock when going out of scope
 }
 
@@ -52,18 +54,25 @@ typename BlockingQueue<T>::value_type BlockingQueue<T>::pop()
 {
 	value_type value = value_type();
 
-	std::unique_lock<std::mutex> uniqueLock( m_lock ); //works like lock_guard
+	//std::unique_lock<std::mutex> uniqueLock( m_lock ); //works like lock_guard
+	m_lock.lock();
 	if( base::empty() )
 	{
-		m_condition.wait( uniqueLock );
+		//m_condition.wait( uniqueLock );
 		//m_condition.wait_until( uniqueLock, )
 	}
-
-	if( !base::empty() )
+	else
 	{
 		value = base::front();
 		base::pop();
 	}
+	m_lock.unlock();
+
+// 	if( !base::empty() )
+// 	{
+// 		value = base::front();
+// 		base::pop();
+// 	}
 
 
 	return value;

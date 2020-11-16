@@ -61,6 +61,9 @@ extern SpriteSheet* g_bulletsSpriteSheet;
 //constexpr uint16_t SERVERLISTENING = 1;
 //constexpr uint16_t TEXTMESSAGE = 2;
 //constexpr uint16_t CLIENTDISCONNECT = 3;
+constexpr uint32_t UDPIDENTIFIER = 5678;
+constexpr uint32_t TCPIDENTIFIER = 1234;
+
 constexpr uint16_t ADDPLAYER = 4;
 constexpr uint16_t ADDENTITY = 5;
 constexpr uint16_t UPDATEPLAYER = 6;
@@ -85,6 +88,7 @@ struct TCPMessage
 	uint16_t m_id = 0;
 	uint16_t m_port = 0;
 	uint16_t m_playerID = 0;
+	uint32_t m_gameID = TCPIDENTIFIER;
 
 	static TCPMessage ToMessage( char const* messageStr )
 	{
@@ -97,6 +101,7 @@ struct UDPPacket
 {
 
 	Header header;
+	uint32_t m_gameID = UDPIDENTIFIER;
 	char message[MAXUDPMESSAGESIZE]{};
 
 	void SetMessage( char const* messageStr, int size )
@@ -108,14 +113,16 @@ struct UDPPacket
 	static UDPPacket ToPacket( char const* packetStr, int size )
 	{
 		Header* newHeader = (Header*)packetStr;
-		char const* newMessage = packetStr + 4;
+		uint32_t* newID = (uint32_t*)(packetStr + sizeof(header));
+		char const* newMessage = packetStr + sizeof(header) + sizeof(uint32_t);
 
 		UDPPacket newPacket;
 		newPacket.header = *newHeader;
+		newPacket.m_gameID = *newID;
 
 		memset( &newPacket.message[0], 0, MAXUDPMESSAGESIZE );
 		
-		int messageSize = ClampInt( size - 4, 0, MAXUDPMESSAGESIZE );
+		int messageSize = ClampInt( size - (sizeof(header) + sizeof(uint32_t)), 0, MAXUDPMESSAGESIZE );
 		memcpy( &newPacket.message[0], newMessage, messageSize );
 		return newPacket;
 	}
@@ -126,7 +133,8 @@ struct UDPPacket
 		size = ClampInt( size, 0, MAXUDPMESSAGESIZE );
 
 		std::string packetStr;
-		packetStr.append( (char*)&header, 4 );
+		packetStr.append( (char*)&header, sizeof(header) );
+		packetStr.append( (char*)&m_gameID, sizeof(m_gameID) );
 		packetStr.append( (char*)&message, size );
 		return packetStr;
 	}
@@ -151,15 +159,18 @@ struct InputMessage
 struct InputPacket
 {
 	Header header;
+	uint32_t m_gameID = UDPIDENTIFIER;
 	InputMessage message;
 
 	static InputPacket ToPacket( char const* packetStr )
 	{
 		Header* newHeader = (Header*)packetStr;
-		InputMessage* newMessage = (InputMessage*)(packetStr + 4);
+		uint32_t* newID = (uint32_t*)(packetStr + sizeof(header));
+		InputMessage* newMessage = (InputMessage*)(packetStr + sizeof(header) + sizeof(m_gameID));
 		
 		InputPacket newPacket;
 		newPacket.header = *newHeader;
+		newPacket.m_gameID = *newID;
 		newPacket.message = *newMessage;
 		return newPacket;
 	}
@@ -169,6 +180,7 @@ public:
 	{
 		std::string inputPacketStr;
 		inputPacketStr.append( (char*)&header, 4 );
+		inputPacketStr.append( (char*)&m_gameID, 4 );
 		inputPacketStr.append( (char*)&message, 22 );
 
 		return inputPacketStr;

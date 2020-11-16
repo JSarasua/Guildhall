@@ -237,6 +237,7 @@ bool App::StartMultiplayerServer( EventArgs const& args )
 	g_theClient->Startup();
 
 	g_theServer->m_TCPGameConnection = m_TCPConnection;
+	((AuthServer*)g_theServer)->m_port = portNumber;
 
 	return true;
 }

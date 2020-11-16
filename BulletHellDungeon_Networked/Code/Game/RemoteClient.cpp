@@ -161,6 +161,17 @@ void RemoteClient::RenderConsole()
 void RemoteClient::CheckButtonPresses()
 {
 	AddressedUDPPacket udpPacket = m_UDPConnection->PopFirstReceivedPacket();
+	bool isValid = udpPacket.isValid;
+	while( isValid )
+	{
+		AddressedUDPPacket udpPacketTemp = m_UDPConnection->PopFirstReceivedPacket();
+
+		if( udpPacketTemp.isValid )
+		{
+			udpPacket = udpPacketTemp;
+		}
+		isValid = udpPacketTemp.isValid;
+	}
 	if( udpPacket.isValid )
 	{
 		int packetID = udpPacket.packet.header.m_id;
