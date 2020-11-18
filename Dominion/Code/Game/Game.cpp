@@ -68,6 +68,10 @@ void Game::Startup()
 	m_mc = new MonteCarloNoTree();
 	m_mcts = new MonteCarlo();
 	m_mcts->SetSimMethod( m_mctsSimMethod );
+	m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
+	m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
+	m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
+	m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
 
 	CardDefinition::InitializeCards();
 	InitializeGameState();
@@ -338,16 +342,16 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 	//const KeyButtonState& yKey = g_theInput->GetKeyStates( 'Y' );
 // 	const KeyButtonState& vKey = g_theInput->GetKeyStates( 'V' );
 // 	const KeyButtonState& bKey = g_theInput->GetKeyStates( 'B' );
-// 	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
-// 	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
+	const KeyButtonState& nKey = g_theInput->GetKeyStates( 'N' );
+	const KeyButtonState& mKey = g_theInput->GetKeyStates( 'M' );
 // 	const KeyButtonState& jKey = g_theInput->GetKeyStates( 'J' );
 // 	const KeyButtonState& kKey = g_theInput->GetKeyStates( 'K' );
-// 	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
-// 	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
-// 	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
-// 	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
-// 	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
-// 	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
+	const KeyButtonState& zKey = g_theInput->GetKeyStates( 'Z' );
+	const KeyButtonState& xKey = g_theInput->GetKeyStates( 'X' );
+	const KeyButtonState& plusKey = g_theInput->GetKeyStates( PLUS_KEY );
+	const KeyButtonState& minusKey = g_theInput->GetKeyStates( MINUS_KEY );
+	const KeyButtonState& semiColonKey = g_theInput->GetKeyStates( SEMICOLON_KEY );
+	const KeyButtonState& singleQuoteKey = g_theInput->GetKeyStates( SINGLEQUOTE_KEY );
 	const KeyButtonState& commaKey = g_theInput->GetKeyStates( COMMA_KEY );
 	const KeyButtonState& periodKey = g_theInput->GetKeyStates( PERIOD_KEY );
 	const KeyButtonState& enterKey = g_theInput->GetKeyStates( ENTER_KEY );
@@ -371,6 +375,88 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
 		}
+	}
+	if( semiColonKey.WasJustPressed() )
+	{
+		switch( m_mctsRolloutMethod )
+		{
+		case ROLLOUTMETHOD::RANDOM: m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+			break;
+		case ROLLOUTMETHOD::HEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::RANDOM;
+			break;
+		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+			break;
+		default: ERROR_AND_DIE( "Invalid rollout method" );
+			break;
+		}
+
+		m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+	}
+	if( singleQuoteKey.WasJustPressed() )
+	{
+		switch( m_mctsRolloutMethod )
+		{
+		case ROLLOUTMETHOD::RANDOM: m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+			break;
+		case ROLLOUTMETHOD::HEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+			break;
+		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::RANDOM;
+			break;
+		default: ERROR_AND_DIE( "Invalid rollout method" );
+			break;
+		}
+	}
+	if( plusKey.WasJustPressed() )
+	{
+		switch( m_mctsExpansionStrategy )
+		{
+		case EXPANSIONSTRATEGY::ALLMOVES: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+			break;
+		case EXPANSIONSTRATEGY::HEURISTICS: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+			break;
+		default: ERROR_AND_DIE( "Invalid expansion strategy" );
+			break;
+		}
+	}
+	if( minusKey.WasJustPressed() )
+	{
+		switch( m_mctsExpansionStrategy )
+		{
+		case EXPANSIONSTRATEGY::ALLMOVES: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+			break;
+		case EXPANSIONSTRATEGY::HEURISTICS: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+			break;
+		default: ERROR_AND_DIE( "Invalid expansion strategy" );
+			break;
+		}
+	}
+	if( zKey.IsPressed() )
+	{
+		m_mctsExplorationParameter -= deltaSeconds;
+		m_mctsExplorationParameter = Max( 0.f, m_mctsExplorationParameter );
+
+		m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
+	}
+	if( xKey.IsPressed() )
+	{
+		m_mctsExplorationParameter += deltaSeconds;
+		m_mctsExplorationParameter = Clampf( m_mctsExplorationParameter, 0.f, 30.f );
+
+		m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
+	}
+	if( nKey.IsPressed() )
+	{
+		m_mctsEpsilon -= 0.5f * deltaSeconds;
+		m_mctsEpsilon = Clampf( m_mctsEpsilon, 0.f, 1.f );
+
+		m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
+	}
+	if( mKey.IsPressed() )
+	{
+		m_mctsEpsilon += 0.5f * deltaSeconds;
+		m_mctsEpsilon = Clampf( m_mctsEpsilon, 0.f, 1.f );
+
+		m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
 	}
 	if( rBracketKey.WasJustPressed() )
 	{
@@ -836,6 +922,10 @@ void Game::DebugDrawGame()
 
 	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
 	Vec2 simMethodPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.93f ) );
+	Vec2 expansionPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.8f ) );
+	Vec2 rolloutPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.77f ) );
+	Vec2 ucbPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.74f ) );
+	Vec2 epsilonPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.71f ) );
 	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
 	Vec2 turnPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.85f ) );
 	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
@@ -876,24 +966,53 @@ void Game::DebugDrawGame()
 	std::string player2ActionPhaseStr = "Player 2: Action Phase";
 	std::string player2BuyPhaseStr = "Player 2: Buy Phase";
 	std::string simMethodStr;
+	std::string expansionStrategyStr;
+	std::string rolloutStr;
+	std::string epsilonStr;
+	std::string ucbStr;
 
 	switch( m_mctsSimMethod )
 	{
-	case SIMMETHOD::RANDOM: simMethodStr = "Rollout Method: RANDOM";
+	case SIMMETHOD::RANDOM: simMethodStr = "Larrow, Rarrow | Rollout Method: RANDOM";
 		break;
-	case SIMMETHOD::BIGMONEY: simMethodStr = "Rollout Method: BIG MONEY";
+	case SIMMETHOD::BIGMONEY: simMethodStr = "Larrow, Rarrow | Rollout Method: BIG MONEY";
 		break;
-	case SIMMETHOD::SINGLEWITCH: simMethodStr = "Rollout Method: SINGLE Witch";
+	case SIMMETHOD::SINGLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: SINGLE Witch";
 		break;
-	case SIMMETHOD::GREEDY: simMethodStr = "Rollout Method: GREEDY";
+	case SIMMETHOD::GREEDY: simMethodStr = "Larrow, Rarrow | Rollout Method: GREEDY";
 		break;
-	case SIMMETHOD::SARASUA1: simMethodStr = "Rollout Method: SARASUA1";
+	case SIMMETHOD::SARASUA1: simMethodStr = "Larrow, Rarrow | Rollout Method: SARASUA1";
 		break;
-	case SIMMETHOD::DOUBLEWITCH: simMethodStr = "Rollout Method: DOUBLE Witch";
+	case SIMMETHOD::DOUBLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: DOUBLE Witch";
 		break;
-	default: simMethodStr = "Rollout Method: DEFAULT";
+	default: simMethodStr = "Larrow, Rarrow | Rollout Method: DEFAULT";
 		break;
 	}
+
+	switch( m_mctsExpansionStrategy )
+	{
+	case EXPANSIONSTRATEGY::ALLMOVES: expansionStrategyStr = "-,+ | Expansion: All Moves";
+		break;
+	case EXPANSIONSTRATEGY::HEURISTICS: expansionStrategyStr = "-,+ | Expansion: Heuristics";
+		break;
+	default:
+		break;
+	}
+
+	switch( m_mctsRolloutMethod )
+	{
+	case ROLLOUTMETHOD::RANDOM: rolloutStr = ";,' | Rollout: Random";
+		break;
+	case ROLLOUTMETHOD::HEURISTIC: rolloutStr = ";,' | Rollout: Heuristic";
+		break;
+	case ROLLOUTMETHOD::EPSILONHEURISTIC: rolloutStr = ";,' | Rollout: Epsilon Heuristic";
+		break;
+	default:
+		break;
+	}
+
+	ucbStr = Stringf( "Z,X | UCB Score: %f", m_mctsExplorationParameter );
+	epsilonStr = Stringf( "N,M | Epsilon: %f", m_mctsEpsilon );
 	
 	if( whoseTurn == PLAYER_1 )
 	{
@@ -949,6 +1068,12 @@ void Game::DebugDrawGame()
 	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
 	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
+
+	DebugAddScreenText( Vec4( Vec2(), expansionPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, expansionStrategyStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), rolloutPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, rolloutStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), ucbPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, ucbStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), epsilonPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, epsilonStr.c_str() );
+
 
 	AABB2 carvingBoard = gameBoard;
 

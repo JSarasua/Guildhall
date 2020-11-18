@@ -215,8 +215,7 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 	while( isGameOver == GAMENOTOVER )
 	{
 		double randomMoveStart = GetCurrentTimeSeconds();
-		//move = g_theGame->GetRandomMoveAtGameState( currentGameState );
-		move = GetMoveForSimsUsingHeuristic( currentGameState );
+		move = GetMoveUsingCurrentRolloutMethod( currentGameState );
 		double randomMoveEnd = GetCurrentTimeSeconds();
 		randomMoveTime += randomMoveEnd - randomMoveStart;
 
@@ -234,82 +233,6 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 
 	return isGameOver;
 }
-
-// TreeMapNode* MonteCarlo::GetBestNodeToSelectAndExpand( TreeMapNode* currentNode )
-// {
-// 	gamestate_t currentGameState = *m_currentHeadNode->m_data->m_currentGamestate;
-// 
-// 	if( g_theGame->IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
-// 	{
-// 		return nullptr;
-// 	}
-// 
-// 	if( currentGameState.m_isFirstMove )
-// 	{
-// 		currentGameState.ResetDecks();
-// 
-// 		inputMove_t defaultInputMove = inputMove_t();
-// 		auto currentIter = m_currentHeadNode->m_possibleOutcomes.find( defaultInputMove );
-// 		std::vector<TreeMapNode*> possibleOutcomes = currentIter->second;
-// 
-// 		for( size_t possibleOutcomesIndex = 0; possibleOutcomesIndex < possibleOutcomes.size(); possibleOutcomesIndex++ )
-// 		{
-// 			TreeMapNode* outcome = possibleOutcomes[possibleOutcomesIndex];
-// 			gamestate_t const& outcomeGamestate = *outcome->m_data->m_currentGamestate;
-// 
-// 			if( currentGameState.UnordereredEqualsOnlyCurrentPlayer( outcomeGamestate ) )
-// 			{
-// 				return GetBestNodeToSelectAndExpand( outcome );
-// 			}
-// 		}
-// 
-// 		TreeMapNode* newNode = new TreeMapNode();
-// 		newNode->m_parentNode = currentNode;
-// 		gamestate_t* newGameState = new gamestate_t( currentGameState );
-// 		newNode->m_data = new data_t( metaData_t(), defaultInputMove, newGameState );
-// 		return newNode;
-// 	}
-// 	else
-// 	{
-// 		currentGameState.ShuffleDecks();
-// 
-// 		if( CanExpand( currentNode ) )
-// 		{
-// 			//Expand node and return it
-// 		}
-// 		else
-// 		{
-// 			//inputMove_t bestInputMove = GetBestInputChoiceFromChildren( currentNode );
-// 			//UpdateGame( bestInputMove, currentGameState );
-// 
-// 			/*
-// 			//TreeMapNode* childNode = GetChildAfterMoveFromChildren( bestInputMove, currentGameState )
-// 			//if( childNode )
-// 			{
-// 				return GetBestNodeToSelectAndExpand( childNode );
-// 			}
-// 			else
-// 			{
-// 				TreeMapNode* newNode = MakeNewNode
-// 				return newNode;
-// 			}
-// 			*/
-// 			//TreeMapNode* bestChildNode = //GetBestNodeFromChildren(currentNode)
-// 		}
-// 
-// 		float highestUCB = -1.f;
-// 		for( auto outcome : m_currentHeadNode->m_possibleOutcomes )
-// 		{
-// 			//GetAverage UCB and compare against highest UCB
-// 			float averageUCB = 0;
-// 		}
-// 	}
-// 
-// 	
-// 
-// 
-// 
-// }
 
 inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode )
 {
@@ -520,6 +443,25 @@ int MonteCarlo::GetWhoseMoveAtDepth( int depth, TreeMapNode const* node )
 	}
 }
 
+inputMove_t MonteCarlo::GetMoveUsingCurrentRolloutMethod( gamestate_t const& gameState )
+{
+	m_rolloutStrategyLock.lock();
+	ROLLOUTMETHOD rolloutMethod = m_rolloutMethod;
+	m_rolloutStrategyLock.unlock();
+
+	switch( rolloutMethod )
+	{
+	case ROLLOUTMETHOD::RANDOM: return g_theGame->GetRandomMoveAtGameState( gameState );
+		break;
+	case ROLLOUTMETHOD::HEURISTIC: return GetMoveForSimsUsingHeuristic( gameState );
+		break;
+	case ROLLOUTMETHOD::EPSILONHEURISTIC: return GetMoveForSimsUsingEpsilonHeuristic( gameState );
+		break;
+	default: ERROR_AND_DIE( "Invalid rollout method" );
+		break;
+	}
+}
+
 inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameState )
 {
 	m_simMethodLock.lock();
@@ -546,6 +488,21 @@ inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameSta
 
 }
 
+inputMove_t MonteCarlo::GetMoveForSimsUsingEpsilonHeuristic( gamestate_t const& gameState )
+{
+	RandomNumberGenerator& rng = g_theGame->m_rand;
+	bool playheuristicMove = rng.RollPercentChance( 1.f - m_epsilon );
+
+	if( playheuristicMove )
+	{
+		return GetMoveForSimsUsingHeuristic( gameState );
+	}
+	else
+	{
+		return g_theGame->GetRandomMoveAtGameState( gameState );
+	}
+}
+
 std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t const& gameState )
 {
 	std::vector<inputMove_t> allMoves;
@@ -560,22 +517,52 @@ std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t con
 	inputMove_t sarasua1Move = g_theGame->GetMoveUsingSarasua1( gameState );
 	inputMove_t highestVPMove = g_theGame->GetMoveUsingHighestVP( gameState );
 
-	allMoves.push_back( bigMoneyMove );
-	allMoves.push_back( singleWitchMove );
-	allMoves.push_back( doubleWitchMove );
-	allMoves.push_back( sarasua1Move );
-	allMoves.push_back( highestVPMove );
+	if( bigMoneyMove.m_moveType != INVALID_MOVE )
+	{
+		allMoves.push_back( bigMoneyMove );
+	}
+	if( singleWitchMove.m_moveType != INVALID_MOVE )
+	{
+		allMoves.push_back( singleWitchMove );
+	}
+	if( doubleWitchMove.m_moveType != INVALID_MOVE )
+	{
+		allMoves.push_back( doubleWitchMove );
+	}
+	if( sarasua1Move.m_moveType != INVALID_MOVE )
+	{
+		allMoves.push_back( sarasua1Move );
+	}
+	if( highestVPMove.m_moveType != INVALID_MOVE )
+	{
+		allMoves.push_back( highestVPMove );
+	}
+
+
+
+
+
 
 	for( inputMove_t const& move : allMoves )
 	{
 		bool isMoveInList = false;
 		for( inputMove_t const& noDupMove : moves )
 		{
+			if( move.m_moveType == INVALID_MOVE )
+			{
+				break;
+			}
+
 			if( move == noDupMove )
 			{
 				isMoveInList = true;
 				break;
 			}
+		}
+
+		if( move.m_moveType == INVALID_MOVE )
+		{
+			break;
 		}
 
 		if( !isMoveInList )
@@ -587,22 +574,40 @@ std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t con
 	return moves;
 }
 
+void MonteCarlo::SetExpansionStrategy( EXPANSIONSTRATEGY expansionStrategy )
+{
+	m_expansionStrategyLock.lock();
+	m_expansionStrategy = expansionStrategy;
+	m_expansionStrategyLock.unlock();
+}
+
+void MonteCarlo::SetRolloutMethod( ROLLOUTMETHOD rolloutMethod )
+{
+	m_rolloutStrategyLock.lock();
+	m_rolloutMethod = rolloutMethod;
+	m_rolloutStrategyLock.unlock();
+}
+
+void MonteCarlo::SetUCBValue( float ucbValue )
+{
+	m_ucbLock.lock();
+	m_ucbValue = ucbValue;
+	m_ucbLock.unlock();
+}
+
+void MonteCarlo::SetEpsilonValueZeroToOne( float epsilonValue )
+{
+	m_epsilonLock.lock();
+	m_epsilon = epsilonValue;
+	m_epsilonLock.unlock();
+}
+
 void MonteCarlo::SetSimMethod( SIMMETHOD simMethod )
 {
 	m_simMethodLock.lock();
 	m_simMethod = simMethod;
 	m_simMethodLock.unlock();
 }
-
-// inputMove_t MonteCarlo::GetBestInputChoiceFromChildren( TreeMapNode* node )
-// {
-// 	for( auto moveOutcomes: node->m_possibleOutcomes )
-// 	{
-// 		std::vector<TreeMapNode*>& outcomes = moveOutcomes.second;
-// 
-// 	}
-// }
-
 
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
 {
@@ -663,11 +668,8 @@ void MonteCarlo::WorkerMain()
 
 void MonteCarlo::UpdateBestMove()
 {
-	//inputMove_t bestMove = GetBestMoveToDepth( 5, m_currentHeadNode );
-	//inputMove_t bestMove = GetBestWinRateMove( m_currentHeadNode );
 	inputMove_t bestMove = GetMostPlayedMove( m_currentHeadNode );
 
-	//Think about getting worst opponentNode
 	m_bestMoveLock.lock();
 	m_bestMove = bestMove;
 	m_bestMoveLock.unlock();
@@ -789,6 +791,9 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		return result;
 	}
 
+	m_ucbLock.lock();
+	float ucbValue = m_ucbValue;
+	m_ucbLock.unlock();
 
 	while( !CanExpand( nodeToCheck ) )
 	{
@@ -798,10 +803,10 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		for( auto outcomesAfterMove : nodeToCheck->m_possibleOutcomes )
 		{
 			std::vector<TreeMapNode*> const& childNodesForMove = outcomesAfterMove.second;
-			float ucbValue = GetAverageUCBValue( childNodesForMove, m_ucbValue );
-			if( ucbValue > highestUCBValue )
+			float averageUCBValue = GetAverageUCBValue( childNodesForMove, ucbValue );
+			if( averageUCBValue > highestUCBValue )
 			{
-				highestUCBValue = ucbValue;
+				highestUCBValue = averageUCBValue;
 				moveToMake = outcomesAfterMove.first;
 			}
 		}
@@ -1000,6 +1005,10 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 			auto outcome = expandNode->m_possibleOutcomes.find( currentMove );
 			if( outcome == expandNode->m_possibleOutcomes.end() )
 			{
+				if( currentMove.m_moveType == INVALID_MOVE )
+				{
+					break;
+				}
 				expandNode->m_possibleOutcomes[currentMove] = std::vector<TreeMapNode*>();
 				std::vector<TreeMapNode*>& newVectorOfOutComes = expandNode->m_possibleOutcomes[currentMove];
 
@@ -1025,6 +1034,11 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 		newNode->m_parentNode = expandNode;
 		gamestate_t* newGameState = new gamestate_t( gameState );
 		newNode->m_data = new data_t( metaData_t(), newGameState );
+
+		if( input.m_moveType == INVALID_MOVE )
+		{
+			return nullptr;
+		}
 
 		expandNode->m_possibleOutcomes[input].push_back( newNode );
 
@@ -1284,6 +1298,11 @@ bool MonteCarlo::CanExpandUsingHeuristic( TreeMapNode const* node )
 
 	for( inputMove_t const& move : moves )
 	{
+		if( move.m_moveType == INVALID_MOVE )
+		{
+			break;
+		}
+
 		auto nodeIter = node->m_possibleOutcomes.find( move );
 		if( nodeIter == node->m_possibleOutcomes.end() )
 		{
@@ -1383,44 +1402,6 @@ void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& n
 	m_moveToMake = movePlayed;
 	m_newGameState = newGameState;
 	m_gameStateChangeLock.unlock();
-
-// 	std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
-// 	auto outcomeIter = possibleOutcomes.find( movePlayed );
-// 
-// 	if( outcomeIter != possibleOutcomes.end() )
-// 	{
-// 		std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
-// 		for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
-// 		{
-// 			gamestate_t const& outcomeState = *outcomesFromMove[outcomesIndex]->m_data->m_currentGamestate;
-// 			if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
-// 			{
-// 				m_currentHeadNode = outcomesFromMove[outcomesIndex];
-// 				return;
-// 			}
-// 		}
-// 
-// 		//outcome doesn't exist for gamestate
-// 		TreeMapNode* newTreeNode = new TreeMapNode();
-// 		newTreeNode->m_parentNode = m_currentHeadNode;
-// 		gamestate_t* gameState = new gamestate_t( newGameState );
-// 		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
-// 		outcomesFromMove.push_back( newTreeNode );
-// 
-// 		m_currentHeadNode = newTreeNode;
-// 	}
-// 	else
-// 	{
-// 		//input doesn't exist
-// 		possibleOutcomes[movePlayed] = std::vector<TreeMapNode*>();
-// 		TreeMapNode* newTreeNode = new TreeMapNode();
-// 		newTreeNode->m_parentNode = m_currentHeadNode;
-// 		gamestate_t* gameState = new gamestate_t( newGameState );
-// 		newTreeNode->m_data = new data_t( metaData_t(), movePlayed, gameState );
-// 		possibleOutcomes[movePlayed].push_back( newTreeNode );
-// 
-// 		m_currentHeadNode = newTreeNode;
-// 	}
 }
 
 void MonteCarlo::AddSimulations( int simulationsToAdd )

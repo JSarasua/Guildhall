@@ -40,6 +40,19 @@ enum class SIMMETHOD
 	DOUBLEWITCH
 };
 
+enum class ROLLOUTMETHOD
+{
+	RANDOM,
+	HEURISTIC,
+	EPSILONHEURISTIC
+};
+
+enum class EXPANSIONSTRATEGY
+{
+	ALLMOVES,
+	HEURISTICS
+};
+
 enum class AIStrategy
 {
 	RANDOM,
@@ -337,5 +350,9 @@ private:
 	SIMMETHOD m_mctsSimMethod = SIMMETHOD::RANDOM; 
 	AIStrategy m_player1Strategy = AIStrategy::MCTS;
 	AIStrategy m_player2Strategy = AIStrategy::SINGLEWITCH;
+	ROLLOUTMETHOD m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+	EXPANSIONSTRATEGY m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	float m_mctsExplorationParameter = 0.5f;
+	float m_mctsEpsilon = 0.15f;
 
 };

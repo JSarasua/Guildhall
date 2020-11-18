@@ -46,12 +46,6 @@ enum class SCORESTRATEGY
 	MCDOM
 };
 
-enum class EXPANSIONSTRATEGY
-{
-	ALLMOVES,
-	HEURISTICS
-};
-
 class MonteCarlo
 {
 	friend class SimulationJob;
@@ -72,6 +66,11 @@ public:
 	int GetNumberOfSimulationsRun() const { return m_totalNumberOfSimulationsRun; }
 	int GetCurrentNumberOfSimulationsLeft() const { return m_numberOfSimulationsToRun; }
 
+	//Setting methods
+	void SetExpansionStrategy( EXPANSIONSTRATEGY expansionStrategy );
+	void SetRolloutMethod( ROLLOUTMETHOD rolloutMethod );
+	void SetUCBValue( float ucbValue );
+	void SetEpsilonValueZeroToOne( float epsilonValue );
 	void SetSimMethod( SIMMETHOD simMethod );
 protected:
 	//Thread
@@ -93,12 +92,13 @@ protected:
 	inputMove_t GetBestMoveToDepth( int depth, TreeMapNode* currentNode );
 	playerWinRate_t GetBestWinRateAtDepth( int depth, TreeMapNode const* node );
 	int GetWhoseMoveAtDepth( int depth, TreeMapNode const* node );
-// 	inputMove_t GetBestMoveSafe();
-// 	void UpdateGameSafe( inputMove_t const& movePlayed, gamestate_t const& newGameState );
 
+	inputMove_t GetMoveUsingCurrentRolloutMethod( gamestate_t const& gameState );
 	inputMove_t GetMoveForSimsUsingHeuristic( gamestate_t const& gameState );
-	std::vector<inputMove_t> GetMovesUsingAllHeuristics( gamestate_t const& gameState );
+	inputMove_t GetMoveForSimsUsingEpsilonHeuristic( gamestate_t const& gameState );
 
+	//Heuristic Expansion strategy
+	std::vector<inputMove_t> GetMovesUsingAllHeuristics( gamestate_t const& gameState );
 
 	//Helper Methods
 	float GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter = SQRT_2 );
@@ -106,11 +106,11 @@ protected:
 	bool CanExpand( TreeMapNode const* node );
 	bool CanExpandUsingMoves( TreeMapNode const* node );
 	bool CanExpandUsingHeuristic( TreeMapNode const* node );
-	//bestNode_t GetHighestWinRateChildNode( TreeMapNode const* node );
-	//inputMove_t GetBestInputChoiceFromChildren( TreeMapNode* node );
 
-	//void ResetGame();
 	TreeMapNode const* GetCurrentHeadNode();
+
+
+
 public:
 
 	TreeMapNode* m_headNode = nullptr;
@@ -126,8 +126,11 @@ public:
 	double m_simTime = 0;
 	double m_backpropagationTime = 0;
 
-	float m_ucbValue = 5.f;
+	std::mutex m_ucbLock;
+	float m_ucbValue = 0.5f;
 
+	std::mutex m_epsilonLock;
+	float m_epsilon = 0.15f;
 
 	//lock
 	std::mutex m_gameStateChangeLock;
@@ -147,6 +150,9 @@ public:
 
 	std::mutex m_expansionStrategyLock;
 	EXPANSIONSTRATEGY m_expansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+
+	std::mutex m_rolloutStrategyLock;
+	ROLLOUTMETHOD m_rolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
 
 	std::atomic<bool> m_isQuitting = false;
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;

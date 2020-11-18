@@ -15,8 +15,13 @@ F7: Auto play game
 F8: Restart game
 
 Left,Right Arrows: Change Rollout strategy
+;,': Change rollout method (Random, Heuristic, Epsilon Heuristic) The heuristic is set by the rollout strategy
+z,x: Change UCB value
+n,m: Change Epsilon value if doing epsilon heuristic
 <,>: Change Player 1 AI Strategy
 [,]: Change Player 2 AI Strategy
+
+
 
 Play the Game:
 Currently the controls pass between both players
