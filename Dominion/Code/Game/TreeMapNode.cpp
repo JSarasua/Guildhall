@@ -2,8 +2,8 @@
 
 TreeMapNode::~TreeMapNode()
 {
-	delete m_data;
-	m_data = nullptr;
+// 	delete m_data;
+// 	m_data = nullptr;
 	m_parentNode = nullptr;
 
 	//auto childIter = m_possibleOutcomes.begin();

@@ -14,7 +14,8 @@ public:
 
 public:
 	//Don't do pointer
-	data_t* m_data = nullptr;
+	//data_t* m_data = nullptr;
+	data_t m_data;
 
 	TreeMapNode* m_parentNode = nullptr;
 

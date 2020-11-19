@@ -52,9 +52,9 @@ void MonteCarlo::Startup()
 	if( !m_headNode )
 	{
 		m_headNode = new TreeMapNode();
-		m_headNode->m_data = new data_t();
-		m_headNode->m_data->m_currentGamestate = new gamestate_t();
-		m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
+		//m_headNode->m_data = new data_t();
+		//m_headNode->m_data->m_currentGamestate = new gamestate_t();
+		m_headNode->m_data.m_currentGamestate.m_isFirstMove = true;
 		m_currentHeadNode = m_headNode;
 
 		m_mcJobSystem = new JobSystem();
@@ -160,7 +160,7 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			break;
 		}
 
-		if( m_headNode->m_data->m_metaData.m_numberOfSimulations > 100 )
+		if( m_headNode->m_data.m_metaData.m_numberOfSimulations > 100 )
 		{
 			SimulationJob* simJob = new SimulationJob( this, expandedNode );
 			m_mcJobSystem->PostJob( simJob );
@@ -201,7 +201,7 @@ int MonteCarlo::RunSimulationOnNode( TreeMapNode* node )
 	double updateGameStateTime = 0;
 	double isGameOverTime = 0;
 
-	gamestate_t currentGameState = *node->m_data->m_currentGamestate;
+	gamestate_t currentGameState = node->m_data.m_currentGamestate;
 	currentGameState.ShuffleDecks();
 
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
@@ -246,7 +246,7 @@ inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode 
 	bool hasFirstMoveBeenCheck = false;
 	inputMove_t bestMove;
 
-	int whoseMove = currentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+	int whoseMove = currentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
 	int whoseMoveAtDepth = GetWhoseMoveAtDepth( depth, currentNode );
 
 	for( auto move : currentNode->m_possibleOutcomes )
@@ -256,7 +256,7 @@ inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode 
 		float averageWinRate = 0.f;
 		for( TreeMapNode const* outcome : outcomes )
 		{
-			totalSims += (float)outcome->m_data->m_metaData.m_numberOfSimulations;
+			totalSims += (float)outcome->m_data.m_metaData.m_numberOfSimulations;
 		}
 
 		if( totalSims == 0.f )
@@ -269,11 +269,11 @@ inputMove_t MonteCarlo::GetBestMoveToDepth( int depth, TreeMapNode* currentNode 
 			playerWinRate_t currentWinRateResult = GetBestWinRateAtDepth( depth - 1, outcome );
 			float currentWinRate = currentWinRateResult.winRate;
 			int whoseTurn = currentWinRateResult.whoseMove;
-			if( whoseTurn != currentNode->m_data->m_currentGamestate->m_whoseMoveIsIt )
+			if( whoseTurn != currentNode->m_data.m_currentGamestate.m_whoseMoveIsIt )
 			{
 				currentWinRate = 1.f - currentWinRate;
 			}
-			float currentSims = (float)outcome->m_data->m_metaData.m_numberOfSimulations;
+			float currentSims = (float)outcome->m_data.m_metaData.m_numberOfSimulations;
 			averageWinRate += currentWinRate * ( currentSims / totalSims );
 		}
 
@@ -362,13 +362,13 @@ playerWinRate_t MonteCarlo::GetBestWinRateAtDepth( int depth, TreeMapNode const*
 	if( moveCount == 0 || depth == 0 )
 	{
 		playerWinRate_t playerWinRate;
-		playerWinRate.winRate = node->m_data->m_metaData.GetWinRate();
-		playerWinRate.whoseMove = node->m_data->m_currentGamestate->m_whoseMoveIsIt;
+		playerWinRate.winRate = node->m_data.m_metaData.GetWinRate();
+		playerWinRate.whoseMove = node->m_data.m_currentGamestate.m_whoseMoveIsIt;
 		return playerWinRate;
 	}
 
 	float bestWinRate = -9999999.f;
-	int whoseMove = node->m_data->m_currentGamestate->m_whoseMoveIsIt;
+	int whoseMove = node->m_data.m_currentGamestate.m_whoseMoveIsIt;
 	for( auto move : node->m_possibleOutcomes )
 	{
 
@@ -377,7 +377,7 @@ playerWinRate_t MonteCarlo::GetBestWinRateAtDepth( int depth, TreeMapNode const*
 		float currentAverageWinRate = 0.f;
 		for( auto outcome : outcomesFromMove )
 		{
-			sims += outcome->m_data->m_metaData.m_numberOfSimulations;
+			sims += outcome->m_data.m_metaData.m_numberOfSimulations;
 		}
 
 		for( auto outcome : outcomesFromMove )
@@ -390,7 +390,7 @@ playerWinRate_t MonteCarlo::GetBestWinRateAtDepth( int depth, TreeMapNode const*
 			{
 				currentWinRate = 1.f - currentWinRate;
 			}
-			float currentSims = (float)childNode->m_data->m_metaData.m_numberOfSimulations;
+			float currentSims = (float)childNode->m_data.m_metaData.m_numberOfSimulations;
 			currentAverageWinRate += currentWinRate * ( currentSims / sims );
 		}
 
@@ -434,7 +434,7 @@ int MonteCarlo::GetWhoseMoveAtDepth( int depth, TreeMapNode const* node )
 			depth--;
 		}
 
-		return currentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+		return currentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
 	}
 	else
 	{
@@ -615,7 +615,7 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 	float averageUCBValue = 0.f;
 	for( size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++ )
 	{
-		totalSimulations += nodes[nodeIndex]->m_data->m_metaData.m_numberOfSimulations;
+		totalSimulations += nodes[nodeIndex]->m_data.m_metaData.m_numberOfSimulations;
 	}
 
 	if( totalSimulations == 0.f )
@@ -626,7 +626,7 @@ float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, fl
 	for( size_t nodeIndex = 0; nodeIndex < nodes.size(); nodeIndex++ )
 	{
 		TreeMapNode const* currentNode = nodes[nodeIndex];
-		float currentNumberOfSims = (float)nodes[nodeIndex]->m_data->m_metaData.m_numberOfSimulations;
+		float currentNumberOfSims = (float)nodes[nodeIndex]->m_data.m_metaData.m_numberOfSimulations;
 		float weight = currentNumberOfSims / totalSimulations;
 		float currentUCBValue = GetUCBValueAtNode( currentNode, explorationParameter );
 
@@ -698,7 +698,7 @@ bool MonteCarlo::UpdateGameIfChanged()
 			std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
 			for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
 			{
-				gamestate_t const& outcomeState = *outcomesFromMove[outcomesIndex]->m_data->m_currentGamestate;
+				gamestate_t const& outcomeState = outcomesFromMove[outcomesIndex]->m_data.m_currentGamestate;
 				if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
 				{
 					m_currentHeadNode = outcomesFromMove[outcomesIndex];
@@ -709,8 +709,8 @@ bool MonteCarlo::UpdateGameIfChanged()
 			//outcome doesn't exist for gamestate
 			TreeMapNode* newTreeNode = new TreeMapNode();
 			newTreeNode->m_parentNode = m_currentHeadNode;
-			gamestate_t* gameState = new gamestate_t( newGameState );
-			newTreeNode->m_data = new data_t( metaData_t(), gameState );
+			//gamestate_t* gameState = new gamestate_t( newGameState );
+			newTreeNode->m_data = data_t( metaData_t(), newGameState );
 			outcomesFromMove.push_back( newTreeNode );
 
 			m_currentHeadNode = newTreeNode;
@@ -721,8 +721,8 @@ bool MonteCarlo::UpdateGameIfChanged()
 			possibleOutcomes[newInputMove] = std::vector<TreeMapNode*>();
 			TreeMapNode* newTreeNode = new TreeMapNode();
 			newTreeNode->m_parentNode = m_currentHeadNode;
-			gamestate_t* gameState = new gamestate_t( newGameState );
-			newTreeNode->m_data = new data_t( metaData_t(), gameState );
+			//gamestate_t* gameState = new gamestate_t( newGameState );
+			newTreeNode->m_data = data_t( metaData_t(), newGameState );
 			possibleOutcomes[newInputMove].push_back( newTreeNode );
 
 			m_currentHeadNode = newTreeNode;
@@ -738,7 +738,7 @@ bool MonteCarlo::UpdateGameIfChanged()
 expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 {
 	TreeMapNode* nodeToCheck = currentNode;
-	gamestate_t currentGameState = *nodeToCheck->m_data->m_currentGamestate;
+	gamestate_t currentGameState = nodeToCheck->m_data.m_currentGamestate;
 	
 	if( currentGameState.m_isFirstMove && CanExpand( nodeToCheck ) )
 	{
@@ -761,7 +761,7 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		bool isGameStateInVector = false;
 		for( size_t childNodeIndex = 0; childNodeIndex < childNodesForMove.size(); childNodeIndex++ )
 		{
-			gamestate_t const& childGameState = *childNodesForMove[childNodeIndex]->m_data->m_currentGamestate;
+			gamestate_t const& childGameState = childNodesForMove[childNodeIndex]->m_data.m_currentGamestate;
 			if( childGameState.UnordereredEqualsOnlyCurrentPlayer( currentGameState ) )
 			{
 				nodeToCheck = childNodesForMove[childNodeIndex];
@@ -827,7 +827,7 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		bool isGameStateInVector = false;
 		for( size_t childNodeIndex = 0; childNodeIndex < childNodesForMove.size(); childNodeIndex++ )
 		{
-			gamestate_t const& childGameState = *childNodesForMove[childNodeIndex]->m_data->m_currentGamestate;
+			gamestate_t const& childGameState = childNodesForMove[childNodeIndex]->m_data.m_currentGamestate;
 			if( childGameState.UnordereredEqualsOnlyCurrentPlayer( currentGameState ) )
 			{
 				nodeToCheck = childNodesForMove[childNodeIndex];
@@ -847,7 +847,7 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 		}
 
 		//We can't go any farther
-		if( g_theGame->IsGameOverForGameState( *currentNode->m_data->m_currentGamestate ) != GAMENOTOVER )
+		if( g_theGame->IsGameOverForGameState( currentNode->m_data.m_currentGamestate ) != GAMENOTOVER )
 		{
 			break;
 		}
@@ -905,12 +905,12 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingAllMoves( expand_t expandData )
 			ERROR_AND_DIE( "expand and select node null" );
 		}
 	}
-	if( expandNode->m_data->m_currentGamestate->m_isFirstMove )
+	if( expandNode->m_data.m_currentGamestate.m_isFirstMove )
 	{
 		TreeMapNode* newNode = new TreeMapNode();
 		newNode->m_parentNode = expandNode;
-		gamestate_t* newGameState = new gamestate_t( gameState );
-		newNode->m_data = new data_t( metaData_t(), newGameState );
+		//gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = data_t( metaData_t(), gameState );
 
 		expandNode->m_possibleOutcomes[input].push_back( newNode );
 
@@ -919,7 +919,7 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingAllMoves( expand_t expandData )
 
 	if( CanExpand( expandNode ) )
 	{
-		gamestate_t const& currentGameState = *expandNode->m_data->m_currentGamestate;
+		gamestate_t const& currentGameState = expandNode->m_data.m_currentGamestate;
 		std::vector<inputMove_t> validMoves = g_theGame->GetValidMovesAtGameState( currentGameState );
 
 		//Find first inputMove that hasn't been created and add it
@@ -934,8 +934,8 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingAllMoves( expand_t expandData )
 
 				TreeMapNode* newNode = new TreeMapNode();
 				newNode->m_parentNode = expandNode;
-				gamestate_t* newGameState = new gamestate_t( g_theGame->GetGameStateAfterMove( currentGameState, currentMove ) );
-				newNode->m_data = new data_t( metaData_t(), newGameState );
+				gamestate_t newGameState = gamestate_t( g_theGame->GetGameStateAfterMove( currentGameState, currentMove ) );
+				newNode->m_data = data_t( metaData_t(), newGameState );
 				newVectorOfOutComes.push_back( newNode );
 
 				return newNode;
@@ -952,8 +952,8 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingAllMoves( expand_t expandData )
 		//This must be a move that already exists but a new gamestate
 		TreeMapNode* newNode = new TreeMapNode();
 		newNode->m_parentNode = expandNode;
-		gamestate_t* newGameState = new gamestate_t( gameState );
-		newNode->m_data = new data_t( metaData_t(), newGameState );
+		//gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = data_t( metaData_t(), gameState );
 
 		expandNode->m_possibleOutcomes[input].push_back( newNode );
 
@@ -981,12 +981,12 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 			ERROR_AND_DIE( "expand and select node null" );
 		}
 	}
-	if( expandNode->m_data->m_currentGamestate->m_isFirstMove )
+	if( expandNode->m_data.m_currentGamestate.m_isFirstMove )
 	{
 		TreeMapNode* newNode = new TreeMapNode();
 		newNode->m_parentNode = expandNode;
-		gamestate_t* newGameState = new gamestate_t( gameState );
-		newNode->m_data = new data_t( metaData_t(), newGameState );
+		//gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = data_t( metaData_t(), gameState );
 
 		expandNode->m_possibleOutcomes[input].push_back( newNode );
 
@@ -995,7 +995,7 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 
 	if( CanExpandUsingHeuristic( expandNode ) )
 	{
-		gamestate_t const& currentGameState = *expandNode->m_data->m_currentGamestate;
+		gamestate_t const& currentGameState = expandNode->m_data.m_currentGamestate;
 		std::vector<inputMove_t> validMoves = GetMovesUsingAllHeuristics( currentGameState );
 
 		//Find first inputMove that hasn't been created and add it
@@ -1014,8 +1014,8 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 
 				TreeMapNode* newNode = new TreeMapNode();
 				newNode->m_parentNode = expandNode;
-				gamestate_t* newGameState = new gamestate_t( g_theGame->GetGameStateAfterMove( currentGameState, currentMove ) );
-				newNode->m_data = new data_t( metaData_t(), newGameState );
+				gamestate_t newGameState = g_theGame->GetGameStateAfterMove( currentGameState, currentMove );
+				newNode->m_data = data_t( metaData_t(), newGameState );
 				newVectorOfOutComes.push_back( newNode );
 
 				return newNode;
@@ -1032,8 +1032,8 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 		//This must be a move that already exists but a new gamestate
 		TreeMapNode* newNode = new TreeMapNode();
 		newNode->m_parentNode = expandNode;
-		gamestate_t* newGameState = new gamestate_t( gameState );
-		newNode->m_data = new data_t( metaData_t(), newGameState );
+		//gamestate_t* newGameState = new gamestate_t( gameState );
+		newNode->m_data = data_t( metaData_t(), gameState );
 
 		if( input.m_moveType == INVALID_MOVE )
 		{
@@ -1054,13 +1054,13 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 	int whoJustMoved = -1;
 	if( node->m_parentNode )
 	{
-		if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
+		if( node->m_parentNode->m_data.m_currentGamestate.m_isFirstMove )
 		{
 			whoJustMoved = PLAYER_1;
 		}
 		else
 		{
-			whoJustMoved = node->m_parentNode->m_data->m_currentGamestate->m_whoseMoveIsIt;
+			whoJustMoved = node->m_parentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
 		}
 	}
 	else
@@ -1076,7 +1076,7 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 // 		whoJustMoved = PLAYER_1;
 // 	}
 
-	metaData_t& metaData = node->m_data->m_metaData;
+	metaData_t& metaData = node->m_data.m_metaData;
 	if( whoJustMoved == whoWon )
 	{
 		metaData.m_numberOfWins++;
@@ -1114,8 +1114,8 @@ inputMove_t MonteCarlo::GetMostPlayedMove( TreeMapNode* currentNode )
 		float currentWins = 0.f;
 		for( TreeMapNode const* outcome : outcomesFromMove )
 		{
-			currentSims += outcome->m_data->m_metaData.m_numberOfSimulations;
-			currentWins += outcome->m_data->m_metaData.m_numberOfWins;
+			currentSims += outcome->m_data.m_metaData.m_numberOfSimulations;
+			currentWins += outcome->m_data.m_metaData.m_numberOfWins;
 		}
 
 		float currentWinRate = currentWins / (float)currentSims;
@@ -1123,7 +1123,7 @@ inputMove_t MonteCarlo::GetMostPlayedMove( TreeMapNode* currentNode )
 		if( currentSims > mostSims )
 		{
 			//If the move ends the turn, then end phase will have a larger number of possible outcomes than other moves.
-			if( move.first.m_moveType == END_PHASE && currentNode->m_data->m_currentGamestate->m_currentPhase == BUY_PHASE )
+			if( move.first.m_moveType == END_PHASE && currentNode->m_data.m_currentGamestate.m_currentPhase == BUY_PHASE )
 			{
 				if( currentWinRate > bestWinRate )
 				{
@@ -1168,7 +1168,7 @@ inputMove_t MonteCarlo::GetBestWinRateMove( TreeMapNode* currentNode )
 
 		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
 		{
-			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
+			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data.m_metaData;
 			float wins = (float)metaData.m_numberOfWins;
 			float sims = (float)metaData.m_numberOfSimulations;
 
@@ -1195,7 +1195,7 @@ inputMove_t MonteCarlo::GetBestWinRateMove( TreeMapNode* currentNode )
 
 float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationParameter )
 {
-	metaData_t const& metaData = node->m_data->m_metaData;
+	metaData_t const& metaData = node->m_data.m_metaData;
 	TreeMapNode* parentNode = node->m_parentNode;
 	float numberOfSimulations = (float)metaData.m_numberOfSimulations;
 	float numberOfWins = (float)metaData.m_numberOfWins;
@@ -1203,7 +1203,7 @@ float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationP
 
 	if( parentNode )
 	{
-		metaData_t const& parentMetaData = parentNode->m_data->m_metaData;
+		metaData_t const& parentMetaData = parentNode->m_data.m_metaData;
 		numberOfSimulationsAtParent = (float)parentMetaData.m_numberOfSimulations;
 	}
 
@@ -1235,7 +1235,7 @@ float MonteCarlo::GetUCBValueAtNode( TreeMapNode const* node, float explorationP
 		//MCDOM = Winpoint + Diff/100
 	case SCORESTRATEGY::MCDOM:
 	{
-		gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+		gamestate_t const& currentGameState = node->m_data.m_currentGamestate;
 		int myVPs = g_theGame->GetCurrentPlayersScore( currentGameState );
 		int theirVPs = g_theGame->GetOpponentsScore( currentGameState );
 		int diffVPs = myVPs - theirVPs;
@@ -1270,7 +1270,7 @@ bool MonteCarlo::CanExpand( TreeMapNode const* node )
 
 bool MonteCarlo::CanExpandUsingMoves( TreeMapNode const* node )
 {
-	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+	gamestate_t const& currentGameState = node->m_data.m_currentGamestate;
 
 	int isGameOver = g_theGame->IsGameOverForGameState( currentGameState );
 	if( isGameOver != GAMENOTOVER )
@@ -1293,7 +1293,7 @@ bool MonteCarlo::CanExpandUsingMoves( TreeMapNode const* node )
 
 bool MonteCarlo::CanExpandUsingHeuristic( TreeMapNode const* node )
 {
-	gamestate_t const& currentGameState = *node->m_data->m_currentGamestate;
+	gamestate_t const& currentGameState = node->m_data.m_currentGamestate;
 	std::vector<inputMove_t> moves = GetMovesUsingAllHeuristics( currentGameState );
 
 	for( inputMove_t const& move : moves )

@@ -148,7 +148,7 @@ public:
 struct metaData_t
 {
 public:
-	float GetWinRate() { return m_numberOfWins / (float)m_numberOfSimulations; }
+	float GetWinRate() const { return m_numberOfWins / (float)m_numberOfSimulations; }
 
 	float m_numberOfWins = 0.f;
 	int m_numberOfSimulations = 0;
@@ -259,14 +259,15 @@ public:
 struct data_t
 {
 	data_t() = default;
-	data_t( metaData_t const& metaData, gamestate_t* gameState ) :
+	data_t( metaData_t const& metaData, gamestate_t gameState ) :
 		m_metaData( metaData ),
 		m_currentGamestate( gameState )
 	{	}
 
 	metaData_t m_metaData;
 	//Don't do pointer
-	gamestate_t* m_currentGamestate = nullptr;
+	//gamestate_t* m_currentGamestate = nullptr;
+	gamestate_t m_currentGamestate;
 };
 
 class Game
