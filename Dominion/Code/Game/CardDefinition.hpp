@@ -52,7 +52,8 @@ public:
 
 	static void InitializeCards();
 	static CardDefinition const* GetCardDefinitionByType( eCards cardType );
-	static std::map< eCards, CardDefinition* > s_definitions;
+	//static std::map< eCards, CardDefinition* > s_definitions;
+	static std::vector<CardDefinition*> s_definitions;
 
 	static bool UnorderedCompare( std::vector<CardDefinition const*> const& first, std::vector<CardDefinition const*> const& second );
 

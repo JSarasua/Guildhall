@@ -1214,7 +1214,8 @@ void Game::DebugDrawGame()
 			}
 		}
 
-		CardDefinition const* card = piles[pilesIndex].m_card;
+		int cardIndex = piles[pilesIndex].m_cardIndex;
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
 		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
 		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
 		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
@@ -1314,7 +1315,8 @@ void Game::DebugDrawGame()
 
 			if( currentBestMove.m_moveType == BUY_MOVE )
 			{
-				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_card;
+				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
 				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
@@ -1366,7 +1368,8 @@ void Game::DebugDrawGame()
 			std::string moveStr;
 			if( currentBestMove.m_moveType == BUY_MOVE )
 			{
-				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_card;
+				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
 				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
@@ -1395,7 +1398,8 @@ void Game::DebugDrawGame()
 		std::string randomMoveStr;
 		if( m_randomMove.m_moveType == BUY_MOVE )
 		{
-			CardDefinition const* card = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndex].m_card;
+			eCards cardIndex = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndex].m_cardIndex;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
 			randomMoveStr = Stringf( "Random Move: Buy %s", card->GetCardName().c_str() );
 		}
 		else if( m_randomMove.m_moveType == PLAY_CARD )
@@ -1592,14 +1596,14 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			int pileIndex = moveToPlay.m_cardIndex;
 			pileData_t& pileData = m_currentGameState->m_cardPiles[pileIndex];
 			pileData.m_pileSize -= 1;
-			int cardCost = pileData.m_card->GetCardCost();
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( pileData.m_cardIndex );
+			int cardCost = card->GetCardCost();
 			//Decrement coins
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
 			playerDeck->AddCardToDiscardPile( pileIndex );
 			playerDeck->m_numberOfBuysAvailable--;
 
-			CardDefinition const* card = pileData.m_card;
 			std::string playStr = Stringf( "Player %i bought %s", whoseMoveBase1, card->GetCardName().c_str() );
 			g_theConsole->PrintString( Rgba8::CYAN, playStr );
 		}
@@ -1700,9 +1704,10 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 			if( cardIndex >= 0 && cardIndex < NUMBEROFPILES )
 			{
 				pileData_t const& pileData = gameState.m_cardPiles[cardIndex];
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( pileData.m_cardIndex );
 				if( pileData.m_pileSize > 0 )
 				{
-					if( pileData.m_card->GetCardCost() <= playerDeck->GetCurrentMoney() )
+					if( card->GetCardCost() <= playerDeck->GetCurrentMoney() )
 					{
 						return true;
 					}
@@ -1742,7 +1747,8 @@ int Game::IsGameOverForGameState( gamestate_t const& gameState )
 		for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
 		{
 			pileData_t const& pileData = gameState.m_cardPiles[pileIndex];
-			if( pileData.m_card && pileData.m_pileSize <= 0 )
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( pileData.m_cardIndex );
+			if( card && pileData.m_pileSize <= 0 )
 			{
 				emptyPileCount++;
 			}
@@ -1845,7 +1851,8 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 
 			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
 			{
-				CardDefinition const* card = piles[pileIndex].m_card;
+				eCards cardIndex = piles[pileIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
 				int pileSize = piles[pileIndex].m_pileSize;
 				int cardCost = card->GetCardCost();
 
@@ -1915,7 +1922,8 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 
 			for( size_t pileIndex = 0; pileIndex < NUMBEROFPILES; pileIndex++ )
 			{
-				CardDefinition const* card = piles[pileIndex].m_card;
+				eCards cardIndex = piles[pileIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
 				int pileSize = piles[pileIndex].m_pileSize;
 				int cardCost = card->GetCardCost();
 
@@ -1989,7 +1997,9 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			int pileIndex = move.m_cardIndex;
 			pileData_t& pileData = newGameState.m_cardPiles[pileIndex];
 			pileData.m_pileSize -= 1;
-			int cardCost = pileData.m_card->GetCardCost();
+			eCards cardIndex = pileData.m_cardIndex;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
+			int cardCost = card->GetCardCost();
 			//Decrement coins
 			//Put card in discard pile
 			playerDeck->DecrementCoins( cardCost );
@@ -2496,24 +2506,24 @@ inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
 
 gamestate_t Game::GetRandomInitialGameState()
 {
-	PlayerBoard starterDeck = PlayerBoard( &m_rand );
+	PlayerBoard starterDeck = PlayerBoard();
 	std::vector<CardData_t> starterCards;
 	starterCards.reserve( 10 );
 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
-	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
-	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
-	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
-	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
-	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
-	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
-
-	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
-	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
-	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
-	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
-	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
-	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
-	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
+//	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
+// 	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
+ 	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
+// 	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
+// 	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
+// 	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
+// 
+// 	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
+// 	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
+// 	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
+// 	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
+// 	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
+// 	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
+// 	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
 
 	CardData_t copperData( copper, (int)COPPER );
 	CardData_t estateData( estate, (int)ESTATE );
@@ -2545,33 +2555,33 @@ gamestate_t Game::GetRandomInitialGameState()
 	newGameState.m_currentPhase = ACTION_PHASE;
 
 	pileData_t* cardPiles = &newGameState.m_cardPiles[0];
-	cardPiles[(int)eCards::COPPER].m_card = copper;
+	cardPiles[(int)eCards::COPPER].m_cardIndex = eCards::COPPER;
 	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::SILVER].m_card = silver;
+	cardPiles[(int)eCards::SILVER].m_cardIndex = eCards::SILVER;
 	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::GOLD].m_card = gold;
+	cardPiles[(int)eCards::GOLD].m_cardIndex = eCards::GOLD;
 	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
-	cardPiles[(int)eCards::ESTATE].m_card = estate;
+	cardPiles[(int)eCards::ESTATE].m_cardIndex = eCards::ESTATE;
 	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::DUCHY].m_card = duchy;
+	cardPiles[(int)eCards::DUCHY].m_cardIndex = eCards::DUCHY;
 	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::PROVINCE].m_card = province;
+	cardPiles[(int)eCards::PROVINCE].m_cardIndex = eCards::PROVINCE;
 	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
-	cardPiles[(int)eCards::CURSE].m_card = curse;
+	cardPiles[(int)eCards::CURSE].m_cardIndex = eCards::CURSE;
 	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
-	cardPiles[(int)eCards::Village].m_card = village;
+	cardPiles[(int)eCards::Village].m_cardIndex = eCards::Village;
 	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Smithy].m_card = smithy;
+	cardPiles[(int)eCards::Smithy].m_cardIndex = eCards::Smithy;
 	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Festival].m_card = festival;
+	cardPiles[(int)eCards::Festival].m_cardIndex = eCards::Festival;
 	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
+	cardPiles[(int)eCards::Laboratory].m_cardIndex = eCards::Laboratory;
 	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Market].m_card = market;
+	cardPiles[(int)eCards::Market].m_cardIndex = eCards::Market;
 	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
+	cardPiles[(int)eCards::CouncilRoom].m_cardIndex = eCards::CouncilRoom;
 	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
-	cardPiles[(int)eCards::Witch].m_card = witch;
+	cardPiles[(int)eCards::Witch].m_cardIndex = eCards::Witch;
 	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
 
 

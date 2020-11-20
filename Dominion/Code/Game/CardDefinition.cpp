@@ -3,7 +3,7 @@
 #include <algorithm>
 //#include "Engine/Core/StringUtils.hpp"
 
-std::map< eCards, CardDefinition* > CardDefinition::s_definitions;
+std::vector<CardDefinition*> CardDefinition::s_definitions;
 
 bool CardDefinition::UnorderedCompare( std::vector<CardDefinition const*> const& first, std::vector<CardDefinition const*> const& second )
 {
@@ -48,14 +48,8 @@ void CardDefinition::InitializeCards()
 
 	councilRoomCard->m_OpponentsDrawCard = true;
 	witchCard->m_OpponentsGetCurse = true;
-// 	Village,
-// 		Smithy,
-// 		CouncilRoom,
-// 		Festival,
-// 		Laboratory,
-// 		Market,
-// 		Witch,
 
+	s_definitions.resize( eCards::NUM_CARDS );
 	s_definitions[eCards::COPPER]		= copperCard;
 	s_definitions[eCards::SILVER]		= silverCard;
 	s_definitions[eCards::GOLD]			= goldCard;
@@ -75,15 +69,24 @@ void CardDefinition::InitializeCards()
 //STATIC
 CardDefinition const* CardDefinition::GetCardDefinitionByType( eCards cardType )
 {
-	auto cardIter = s_definitions.find( cardType );
-	if( cardIter != s_definitions.end() )
+	if( cardType < eCards::NUM_CARDS )
 	{
-		return cardIter->second;
+		return s_definitions[cardType];
 	}
 	else
 	{
-		g_theConsole->ErrorString( Stringf( "Eror: Could not find card type with index: %i", (int)cardType ) );
+		g_theConsole->ErrorString( Stringf( "Error: Could not find card type with index: %i", (int)cardType ) );
 		return nullptr;
 	}
+// 	auto cardIter = s_definitions.find( cardType );
+// 	if( cardIter != s_definitions.end() )
+// 	{
+// 		return cardIter->second;
+// 	}
+// 	else
+// 	{
+// 		g_theConsole->ErrorString( Stringf( "Eror: Could not find card type with index: %i", (int)cardType ) );
+// 		return nullptr;
+// 	}
 }
 

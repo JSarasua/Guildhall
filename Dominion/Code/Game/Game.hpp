@@ -146,15 +146,15 @@ public:
 struct pileData_t
 {
 public:
-
 	bool operator==( pileData_t const& compare ) const
 	{
 		return m_pileSize == compare.m_pileSize &&
-			m_card == compare.m_card;
+			m_cardIndex == compare.m_cardIndex;
 	}
 
 	int m_pileSize = -1;
-	CardDefinition const* m_card = nullptr;
+	eCards m_cardIndex = eCards::INVALID_CARD;
+	//CardDefinition const* m_card = nullptr;
 };
 
 struct gamestate_t
@@ -235,7 +235,6 @@ public:
 
 public:
 	//Card Piles depicting what cards are in the game and how many are in that pile
-//	pileData_t m_cardPiles[NUMBEROFPILES] {};
 	std::array< pileData_t, NUMBEROFPILES > m_cardPiles {};
 
 	PlayerBoard m_playerBoards[2];
