@@ -3,13 +3,6 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/Game.hpp"
 
-PlayerBoard::PlayerBoard( RandomNumberGenerator* rand )
-{
-	m_rand = rand;
-
-	m_deck.reserve( 30 );
-}
-
 PlayerBoard::PlayerBoard()
 {
 
@@ -33,11 +26,6 @@ void PlayerBoard::ResetBoard()
 	AddDiscardPileToDeck();
 	ShuffleDeck();
 	Draw5();
-}
-
-void PlayerBoard::InitializeRand( RandomNumberGenerator* rand )
-{
-	m_rand = rand;
 }
 
 void PlayerBoard::AddCardToDiscardPile( int cardIndex )
@@ -103,11 +91,13 @@ void PlayerBoard::ShuffleDeck()
 	{
 		return;
 	}
+	
+	RandomNumberGenerator& rng = g_theGame->m_rand;
 
 	int deckSize = (int)m_deck.size();
 	for( int deckIndex = 0; deckIndex < deckSize; deckIndex++ )
 	{
-		int indexToSwapWith = m_rand->RollRandomIntInRange( deckIndex, deckSize - 1 );
+		int indexToSwapWith = rng.RollRandomIntInRange( deckIndex, deckSize - 1 );
 		CardData_t firstCard = m_deck[deckIndex];
 		CardData_t secondCard = m_deck[indexToSwapWith];
 

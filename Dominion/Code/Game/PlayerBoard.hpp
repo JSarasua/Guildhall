@@ -40,12 +40,10 @@ class PlayerBoard
 {
 public:
 	PlayerBoard();
-	PlayerBoard( RandomNumberGenerator* rand);
 	~PlayerBoard() = default;
 
 	void InitializeDeck( std::vector<CardData_t>& deck );
 	void ResetBoard();
-	void InitializeRand( RandomNumberGenerator* rand );
 	void AddCardToDiscardPile( int cardIndex );
 
 	CardPile const& GetHand() const;
@@ -89,6 +87,4 @@ public:
 	int m_numberOfBuysAvailable = 1;
 private:
 	std::vector<CardData_t> m_deck;
-	RandomNumberGenerator* m_rand = nullptr;
-
 };
