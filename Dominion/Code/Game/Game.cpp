@@ -660,7 +660,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 0;
+			move.m_cardIndex = 0;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -668,7 +668,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 0 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 0 );
 			PlayMoveIfValid( move );
 		}
 
@@ -680,7 +680,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 1;
+			move.m_cardIndex = 1;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -688,7 +688,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 1 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 1 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -699,7 +699,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 2;
+			move.m_cardIndex = 2;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -707,7 +707,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 2 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 2 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -718,7 +718,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 3;
+			move.m_cardIndex = 3;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -726,7 +726,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 3 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 3 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -737,7 +737,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 4;
+			move.m_cardIndex = 4;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -745,7 +745,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 4 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 4 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -757,7 +757,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 5;
+			move.m_cardIndex = 5;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -765,7 +765,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 5 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 5 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -777,7 +777,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 6;
+			move.m_cardIndex = 6;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -785,7 +785,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 6 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 6 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -796,7 +796,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 7;
+			move.m_cardIndex = 7;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -804,7 +804,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 7 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 7 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -815,7 +815,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = BUY_MOVE;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardIndexToBuy = 8;
+			move.m_cardIndex = 8;
 			PlayMoveIfValid( move );
 		}
 		else if( m_currentGameState->m_currentPhase == ACTION_PHASE )
@@ -823,7 +823,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			inputMove_t move;
 			move.m_moveType = PLAY_CARD;
 			move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-			move.m_cardHandIndexToPlay = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 8 );
+			move.m_cardIndex = m_currentGameState->m_playerBoards[move.m_whoseMoveIsIt].GetCardIndexFromHandIndex( 8 );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -832,7 +832,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 8;
+		move.m_cardIndex = 8;
 		PlayMoveIfValid( move );
 	}
 	if( wKey.WasJustPressed() )
@@ -840,7 +840,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 9;
+		move.m_cardIndex = 9;
 		PlayMoveIfValid( move );
 	}
 	if( eKey.WasJustPressed() )
@@ -848,7 +848,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 10;
+		move.m_cardIndex = 10;
 		PlayMoveIfValid( move );
 	}
 	if( rKey.WasJustPressed() )
@@ -856,7 +856,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 11;
+		move.m_cardIndex = 11;
 		PlayMoveIfValid( move );
 	}
 	if( tKey.WasJustPressed() )
@@ -864,7 +864,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 12;
+		move.m_cardIndex = 12;
 		PlayMoveIfValid( move );
 	}
 	if( yKey.WasJustPressed() )
@@ -872,7 +872,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 13;
+		move.m_cardIndex = 13;
 		PlayMoveIfValid( move );
 	}
 	if( uKey.WasJustPressed() )
@@ -880,7 +880,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 14;
+		move.m_cardIndex = 14;
 		PlayMoveIfValid( move );
 	}
 	if( iKey.WasJustPressed() )
@@ -888,7 +888,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		inputMove_t move;
 		move.m_moveType = BUY_MOVE;
 		move.m_whoseMoveIsIt = m_currentGameState->m_whoseMoveIsIt;
-		move.m_cardIndexToBuy = 15;
+		move.m_cardIndex = 15;
 		PlayMoveIfValid( move );
 	}
 }
@@ -1314,12 +1314,12 @@ void Game::DebugDrawGame()
 
 			if( currentBestMove.m_moveType == BUY_MOVE )
 			{
-				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_card;
 				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
 			{
-				int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
+				int cardHandIndex = currentBestMove.m_cardIndex;
 				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
 				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
@@ -1366,12 +1366,12 @@ void Game::DebugDrawGame()
 			std::string moveStr;
 			if( currentBestMove.m_moveType == BUY_MOVE )
 			{
-				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndexToBuy].m_card;
+				CardDefinition const* card = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_card;
 				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
 			else if( currentBestMove.m_moveType == PLAY_CARD )
 			{
-				int cardHandIndex = currentBestMove.m_cardHandIndexToPlay;
+				int cardHandIndex = currentBestMove.m_cardIndex;
 				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
 				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
 			}
@@ -1395,12 +1395,12 @@ void Game::DebugDrawGame()
 		std::string randomMoveStr;
 		if( m_randomMove.m_moveType == BUY_MOVE )
 		{
-			CardDefinition const* card = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndexToBuy].m_card;
+			CardDefinition const* card = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndex].m_card;
 			randomMoveStr = Stringf( "Random Move: Buy %s", card->GetCardName().c_str() );
 		}
 		else if( m_randomMove.m_moveType == PLAY_CARD )
 		{
-			int cardHandIndex = m_randomMove.m_cardHandIndexToPlay;
+			int cardHandIndex = m_randomMove.m_cardIndex;
 			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
 			randomMoveStr = Stringf( "Random Move: Play %s", card->GetCardName().c_str() );
 		}
@@ -1579,7 +1579,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			if( playerDeck->m_numberOfActionsAvailable > 0 )
 			{
 				playerDeck->m_numberOfActionsAvailable--;
-				int handIndex = moveToPlay.m_cardHandIndexToPlay;
+				int handIndex = moveToPlay.m_cardIndex;
 				playerDeck->PlayCard( handIndex, m_currentGameState );
 
 				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
@@ -1589,7 +1589,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 		}
 		else if( moveToPlay.m_moveType == BUY_MOVE )
 		{
-			int pileIndex = moveToPlay.m_cardIndexToBuy;
+			int pileIndex = moveToPlay.m_cardIndex;
 			pileData_t& pileData = m_currentGameState->m_cardPiles[pileIndex];
 			pileData.m_pileSize -= 1;
 			int cardCost = pileData.m_card->GetCardCost();
@@ -1696,7 +1696,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 	{
 		if( playerDeck->m_numberOfBuysAvailable > 0 )
 		{
-			int cardIndex = moveToPlay.m_cardIndexToBuy;
+			int cardIndex = moveToPlay.m_cardIndex;
 			if( cardIndex >= 0 && cardIndex < NUMBEROFPILES )
 			{
 				pileData_t const& pileData = gameState.m_cardPiles[cardIndex];
@@ -1714,7 +1714,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 	}
 	else if( moveType == PLAY_CARD )
 	{
-		return playerDeck->CanPlayCard( moveToPlay.m_cardHandIndexToPlay, &gameState );
+		return playerDeck->CanPlayCard( moveToPlay.m_cardIndex, &gameState );
 	}
 	else if( moveType == END_PHASE )
 	{
@@ -1829,7 +1829,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 				{
 					inputMove_t newMove = move;
 					newMove.m_moveType = PLAY_CARD;
-					newMove.m_cardHandIndexToPlay = cardIndex;
+					newMove.m_cardIndex = cardIndex;
 					validMoves.push_back( newMove );
 				}
 			}
@@ -1853,7 +1853,7 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 				{
 					inputMove_t newMove = move;
 					newMove.m_moveType = BUY_MOVE;
-					newMove.m_cardIndexToBuy = (int)pileIndex;
+					newMove.m_cardIndex = (int)pileIndex;
 					validMoves.push_back( newMove );
 				}
 			}
@@ -1975,7 +1975,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 			if( playerDeck->m_numberOfActionsAvailable > 0 )
 			{
 				playerDeck->m_numberOfActionsAvailable--;
-				int handIndex = move.m_cardHandIndexToPlay;
+				int handIndex = move.m_cardIndex;
 				playerDeck->PlayCard( handIndex, &newGameState );
 			}
 
@@ -1986,7 +1986,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 		}
 		else if( move.m_moveType == BUY_MOVE )
 		{
-			int pileIndex = move.m_cardIndexToBuy;
+			int pileIndex = move.m_cardIndex;
 			pileData_t& pileData = newGameState.m_cardPiles[pileIndex];
 			pileData.m_pileSize -= 1;
 			int cardCost = pileData.m_card->GetCardCost();
@@ -2117,15 +2117,15 @@ inputMove_t Game::GetMoveUsingBigMoney( gamestate_t const& currentGameState )
 		}
 		else if( currentMoney >= 8 )
 		{
-			newMove.m_cardIndexToBuy = (int)PROVINCE;
+			newMove.m_cardIndex = (int)PROVINCE;
 		}
 		else if( currentMoney >= 6 )
 		{
-			newMove.m_cardIndexToBuy = (int)GOLD;
+			newMove.m_cardIndex = (int)GOLD;
 		}
 		else if( currentMoney >= 3 )
 		{
-			newMove.m_cardIndexToBuy = (int)SILVER;
+			newMove.m_cardIndex = (int)SILVER;
 		}
 		else
 		{
@@ -2187,19 +2187,19 @@ inputMove_t Game::GetMoveUsingSingleWitch( gamestate_t const& currentGameState )
 		}
 		else if( !playerDeck->HasCard( Witch ) && currentMoney >= 5 )
 		{
-			newMove.m_cardIndexToBuy = (int)Witch;
+			newMove.m_cardIndex = (int)Witch;
 		}
 		else if( currentMoney >= 8 )
 		{
-			newMove.m_cardIndexToBuy = (int)PROVINCE;
+			newMove.m_cardIndex = (int)PROVINCE;
 		}
 		else if( currentMoney >= 6 )
 		{
-			newMove.m_cardIndexToBuy = (int)GOLD;
+			newMove.m_cardIndex = (int)GOLD;
 		}
 		else if( currentMoney >= 3 )
 		{
-			newMove.m_cardIndexToBuy = (int)SILVER;
+			newMove.m_cardIndex = (int)SILVER;
 		}
 		else
 		{
@@ -2262,19 +2262,19 @@ inputMove_t Game::GetMoveUsingDoubleWitch( gamestate_t const& currentGameState )
 		}
 		else if( witchCount < 2 && currentMoney >= 5 )
 		{
-			newMove.m_cardIndexToBuy = (int)Witch;
+			newMove.m_cardIndex = (int)Witch;
 		}
 		else if( currentMoney >= 8 )
 		{
-			newMove.m_cardIndexToBuy = (int)PROVINCE;
+			newMove.m_cardIndex = (int)PROVINCE;
 		}
 		else if( currentMoney >= 6 )
 		{
-			newMove.m_cardIndexToBuy = (int)GOLD;
+			newMove.m_cardIndex = (int)GOLD;
 		}
 		else if( currentMoney >= 3 )
 		{
-			newMove.m_cardIndexToBuy = (int)SILVER;
+			newMove.m_cardIndex = (int)SILVER;
 		}
 		else
 		{
@@ -2311,23 +2311,23 @@ inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
 			newMove.m_moveType = PLAY_CARD;
 			if( playerBoard.CanPlayCard( Village, &currentGameState ) )
 			{
-				newMove.m_cardHandIndexToPlay = Village;
+				newMove.m_cardIndex = Village;
 			}
 			else if( playerBoard.CanPlayCard( Festival, &currentGameState ) )
 			{
-				newMove.m_cardHandIndexToPlay = Festival;
+				newMove.m_cardIndex = Festival;
 			}
 			else if( playerBoard.CanPlayCard( Laboratory, &currentGameState ) )
 			{
-				newMove.m_cardHandIndexToPlay = Laboratory;
+				newMove.m_cardIndex = Laboratory;
 			}
 			else if( playerBoard.CanPlayCard( Market, &currentGameState ) )
 			{
-				newMove.m_cardHandIndexToPlay = Market;
+				newMove.m_cardIndex = Market;
 			}
 			else if( playerBoard.CanPlayCard( Witch, &currentGameState ) )
 			{
-				newMove.m_cardHandIndexToPlay = Witch;
+				newMove.m_cardIndex = Witch;
 			}
 			else
 			{
@@ -2356,68 +2356,68 @@ inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
 			{
 				if( witchCount < 2 )
 				{
-					newMove.m_cardIndexToBuy = eCards::Witch;
+					newMove.m_cardIndex = eCards::Witch;
 				}
 				else if( laboratoryCount < 1 )
 				{
-					newMove.m_cardIndexToBuy = eCards::Laboratory;
+					newMove.m_cardIndex = eCards::Laboratory;
 				}
 			}
 			else if( currentMoney >= 8 )
 			{
-				newMove.m_cardIndexToBuy = eCards::PROVINCE;
+				newMove.m_cardIndex = eCards::PROVINCE;
 			}
 			else if( currentMoney >= 6 )
 			{
 				if( provincesLeft < 3 )
 				{
-					newMove.m_cardIndexToBuy = eCards::DUCHY;
+					newMove.m_cardIndex = eCards::DUCHY;
 				}
 				else
 				{
-					newMove.m_cardIndexToBuy = eCards::GOLD;
+					newMove.m_cardIndex = eCards::GOLD;
 				}
 			}
 			else if( currentMoney >= 5 )
 			{
 				if( provincesLeft <= 5 )
 				{
-					newMove.m_cardIndexToBuy = eCards::DUCHY;
+					newMove.m_cardIndex = eCards::DUCHY;
 				}
 				else if( silverCount < 3 )
 				{
-					newMove.m_cardIndexToBuy = eCards::SILVER;
+					newMove.m_cardIndex = eCards::SILVER;
 				}
 				else if( laboratoryCount < 2 )
 				{
-					newMove.m_cardIndexToBuy = eCards::Laboratory;
+					newMove.m_cardIndex = eCards::Laboratory;
 				}
 				else if( villageCount < 1 )
 				{
-					newMove.m_cardIndexToBuy = eCards::Village;
+					newMove.m_cardIndex = eCards::Village;
 				}
 				else
 				{
-					newMove.m_cardIndexToBuy = eCards::SILVER;
+					newMove.m_cardIndex = eCards::SILVER;
 				}
 			}
 			else if( currentMoney >= 3 )
 			{
 				if( provincesLeft <= 2 )
 				{
-					newMove.m_cardIndexToBuy = eCards::ESTATE;
+					newMove.m_cardIndex = eCards::ESTATE;
 				}
 				else if( silverCount < 3 )
 				{
-					newMove.m_cardIndexToBuy = eCards::SILVER;
+					newMove.m_cardIndex = eCards::SILVER;
 				}
 				else if( villageCount < 1 )
 				{
-					newMove.m_cardIndexToBuy = eCards::Village;
+					newMove.m_cardIndex = eCards::Village;
 				}
 				else if( silverCount < 7 )
 				{
-					newMove.m_cardIndexToBuy = eCards::SILVER;
+					newMove.m_cardIndex = eCards::SILVER;
 				}
 				else
 				{
@@ -2470,15 +2470,15 @@ inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
 			move.m_moveType = BUY_MOVE;
 			if( currentMoney >= 8 )
 			{
-				move.m_cardIndexToBuy = PROVINCE;
+				move.m_cardIndex = PROVINCE;
 			}
 			else if( currentMoney >= 5 )
 			{
-				move.m_cardIndexToBuy = DUCHY;
+				move.m_cardIndex = DUCHY;
 			}
 			else if( currentMoney >= 2 )
 			{
-				move.m_cardIndexToBuy = ESTATE;
+				move.m_cardIndex = ESTATE;
 			}
 			else
 			{

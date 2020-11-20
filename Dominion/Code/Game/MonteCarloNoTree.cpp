@@ -158,7 +158,7 @@ std::vector<int> MonteCarloNoTree::GetCurrentBuyIndexes()
 		inputMove_t move = m_currentPossibleMoves[moveIndex].m_move;
 		if( move.m_moveType == BUY_MOVE )
 		{
-			buyIndexes.push_back( move.m_cardIndexToBuy );
+			buyIndexes.push_back( move.m_cardIndex );
 		}
 	}
 

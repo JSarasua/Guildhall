@@ -89,18 +89,16 @@ struct inputMove_t
 {
 public:
 	inputMove_t() = default;
-	inputMove_t( eMoveType const& moveType, int whoseMove, int cardIndexToBuy = -1, int cardHandIndexToPlay = -1 ) :
+	inputMove_t( eMoveType const& moveType, int whoseMove, int cardIndex = -1 ) :
 	m_moveType( moveType ),
 	m_whoseMoveIsIt( whoseMove ),
-	m_cardIndexToBuy( cardIndexToBuy ),
-	m_cardHandIndexToPlay( cardHandIndexToPlay )
+	m_cardIndex( cardIndex )
 	{}
 
 	bool operator==( inputMove_t const& compare ) const
 	{
 		return m_moveType == compare.m_moveType && 
-			m_cardIndexToBuy == compare.m_cardIndexToBuy && 
-			m_cardHandIndexToPlay == compare.m_cardHandIndexToPlay && 
+			m_cardIndex == compare.m_cardIndex && 
 			m_whoseMoveIsIt == compare.m_whoseMoveIsIt;
 	}
 
@@ -112,23 +110,13 @@ public:
 		}
 		else if( m_moveType == compare.m_moveType )
 		{
-			if( m_cardHandIndexToPlay < compare.m_cardHandIndexToPlay )
+			if( m_cardIndex < compare.m_cardIndex )
 			{
 				return true;
 			}
-			else if( m_cardHandIndexToPlay == compare.m_cardHandIndexToPlay )
+			else if( m_whoseMoveIsIt < compare.m_whoseMoveIsIt )
 			{
-				if( m_cardIndexToBuy < compare.m_cardIndexToBuy )
-				{
-					return true;
-				}
-				else if( m_cardIndexToBuy == compare.m_cardIndexToBuy )
-				{
-					if( m_whoseMoveIsIt < compare.m_whoseMoveIsIt )
-					{
-						return true;
-					}
-				}
+				return true;
 			}
 		}
 
@@ -137,8 +125,9 @@ public:
 
 public:
 	eMoveType m_moveType = INVALID_MOVE;
-	int m_cardIndexToBuy = -1;
-	int m_cardHandIndexToPlay = -1;
+	int m_cardIndex = -1;
+// 	int m_cardIndexToBuy = -1;
+// 	int m_cardHandIndexToPlay = -1;
 	int m_whoseMoveIsIt = -1;
 
 	//Non normal moves
