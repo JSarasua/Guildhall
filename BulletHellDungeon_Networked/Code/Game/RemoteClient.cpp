@@ -50,6 +50,13 @@ void RemoteClient::EndFrame()
 void RemoteClient::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+
+	for( auto& packetIter : m_unAckedPackets )
+	{
+		UDPPacket& packet = packetIter.second;
+		std::string packetStr = packet.ToString();
+		m_UDPConnection->SendUDPMessage( packetStr );
+	}
 }
 
 void RemoteClient::UpdateCamera()
@@ -168,7 +175,24 @@ void RemoteClient::CheckButtonPresses()
 
 		if( udpPacketTemp.isValid )
 		{
-			udpPacket = udpPacketTemp;
+			if( udpPacketTemp.packet.header.m_id == VERIFIEDPACKET )
+			{
+				uint16_t sequenceNoToErase = udpPacketTemp.packet.header.m_sequenceNo;
+				m_unAckedPackets.erase( sequenceNoToErase );
+			}
+			else
+			{
+				udpPacket = udpPacketTemp;
+
+				UDPPacket returnPacket;
+				returnPacket.header = udpPacketTemp.packet.header;
+				returnPacket.header.m_size = 0;
+				returnPacket.header.m_id = VERIFIEDPACKET;
+				returnPacket.SetMessage( "", 0 );
+
+				std::string returnMessage = returnPacket.ToString();
+				m_UDPConnection->SendUDPMessage( returnMessage );
+			}
 		}
 		isValid = udpPacketTemp.isValid;
 	}
@@ -230,6 +254,8 @@ bool RemoteClient::HandleCreateEntity( EventArgs const& args )
 	UDPPacket packet;
 	packet.header.m_id = ADDENTITY;
 	packet.header.m_size = (uint16_t)messageSize;
+	packet.header.m_sequenceNo = m_sequenceNo;
+	m_sequenceNo++;
 	
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );
@@ -256,6 +282,8 @@ bool RemoteClient::HandleUpdateEntity( EventArgs const& args )
 	UDPPacket packet;
 	packet.header.m_id = UPDATEENTITY;
 	packet.header.m_size = (uint16_t)messageSize;
+	packet.header.m_sequenceNo = m_sequenceNo;
+	m_sequenceNo++;
 
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );
@@ -276,6 +304,8 @@ bool RemoteClient::HandleDeleteEntity( EventArgs const& args )
 	UDPPacket packet;
 	packet.header.m_id = DELETEENTITY;
 	packet.header.m_size = (uint16_t)messageSize;
+	packet.header.m_sequenceNo = m_sequenceNo;
+	m_sequenceNo++;
 
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );

@@ -69,6 +69,8 @@ constexpr uint16_t ADDENTITY = 5;
 constexpr uint16_t UPDATEPLAYER = 6;
 constexpr uint16_t UPDATEENTITY = 7;
 constexpr uint16_t DELETEENTITY = 8;
+constexpr uint16_t VERIFIEDPACKET = 9;
+
 constexpr int MAXUDPMESSAGESIZE = 200;
 
 constexpr int ID_PLAYER = 10;
@@ -81,6 +83,7 @@ struct Header
 {
 	uint16_t m_id = 0;
 	uint16_t m_size = 0;
+	uint16_t m_sequenceNo = 0;
 };
 
 struct TCPMessage
@@ -179,8 +182,8 @@ public:
 	std::string ToString()
 	{
 		std::string inputPacketStr;
-		inputPacketStr.append( (char*)&header, 4 );
-		inputPacketStr.append( (char*)&m_gameID, 4 );
+		inputPacketStr.append( (char*)&header, sizeof(Header) );
+		inputPacketStr.append( (char*)&m_gameID, sizeof(uint32_t) );
 		inputPacketStr.append( (char*)&message, 22 );
 
 		return inputPacketStr;
@@ -238,7 +241,7 @@ struct AddPlayerPacket
 	static AddPlayerPacket ToPacket( char const* packetStr )
 	{
 		Header* newHeader = (Header*)packetStr;
-		AddPlayerMessage* newMessage = (AddPlayerMessage*)(packetStr + 4);
+		AddPlayerMessage* newMessage = (AddPlayerMessage*)(packetStr + sizeof(Header));
 
 		AddPlayerPacket newPacket;
 		newPacket.header = *newHeader;
@@ -249,7 +252,7 @@ struct AddPlayerPacket
 	std::string ToString()
 	{
 		std::string packetStr;
-		packetStr.append( (char*)&header, 4 );
+		packetStr.append( (char*)&header, sizeof(Header) );
 		packetStr.append( (char*)&message, 22 );
 
 		return packetStr;

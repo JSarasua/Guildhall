@@ -26,6 +26,7 @@
 #include "Game/AudioDefinition.hpp"
 #include "Game/UDPGameConnection.hpp"
 #include "Game/Client.hpp"
+#include "Game/RemoteServer.hpp"
 
 
 Game::Game() : m_imageTest(IMAGETESTPATH)
@@ -1045,6 +1046,11 @@ void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpCon
 			{
 				DeleteEntityMessage deleteMessage = *(DeleteEntityMessage*)udpPacket.message;
 				m_world->DeleteEntity( deleteMessage );
+			}
+			else if( id == VERIFIEDPACKET )
+			{
+				RemoteServer* remoteServer = (RemoteServer*)g_theServer;
+				remoteServer->ACKMessage( udpPacket.header.m_sequenceNo );
 			}
 
 			packet = udpConnection->PopFirstReceivedPacket();

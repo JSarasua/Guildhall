@@ -90,6 +90,8 @@ void RemoteServer::UnpauseGame()
 void RemoteServer::Update( float deltaSeconds )
 {
 	g_theGame->UpdateRemote( m_UDPGameConnection, deltaSeconds );
+	
+	SendUnACKedMessages();
 	//g_theGame->Update( deltaSeconds );
 }
 
@@ -126,6 +128,21 @@ std::vector<Entity*> const& RemoteServer::GetEntitiesToRender()
 eGameState RemoteServer::GetCurrentGameState()
 {
 	return g_theGame->m_gameState;
+}
+
+void RemoteServer::SendUnACKedMessages()
+{
+	for( auto& packetIter : m_UnACKedMessages )
+	{
+		InputPacket& packet = packetIter.second;
+		std::string packetStr = packet.ToString();
+		m_UDPGameConnection->SendUDPMessage( packetStr );
+	}
+}
+
+void RemoteServer::ACKMessage( uint16_t sequenceNo )
+{
+	m_UnACKedMessages.erase( sequenceNo );
 }
 
 bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
@@ -182,8 +199,13 @@ bool RemoteServer::HandleInput( EventArgs const& args )
 		message.moveVec = moveVec;
 		InputPacket packet;
 		packet.header.m_id = UPDATEPLAYER;
+		packet.header.m_sequenceNo = m_currentSequenceNo;
 		packet.message = message;
 		
+		m_UnACKedMessages.emplace( m_currentSequenceNo, packet );
+
+		m_currentSequenceNo++;
+
 		std::string messageStr = packet.ToString();
 		m_UDPGameConnection->SendUDPMessage( messageStr );
 		

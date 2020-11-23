@@ -8,6 +8,7 @@ class Game;
 class UDPGameConnection;
 
 struct Vertex_PCU;
+struct InputPacket;
 
 enum eGameState : int;
 
@@ -36,6 +37,9 @@ public:
 	virtual std::vector<Entity*> const& GetEntitiesToRender() override;
 	virtual eGameState GetCurrentGameState() override;
 
+	void SendUnACKedMessages();
+	void ACKMessage( uint16_t sequenceNo );
+
 	bool HandleReceiveTCPMessage( EventArgs const& args );
 	bool HandleInput( EventArgs const& args );
 
@@ -43,4 +47,6 @@ public:
 public:
 	UDPGameConnection* m_UDPGameConnection = nullptr;
 	int m_port = -1;
+	uint16_t m_currentSequenceNo = 0;
+	std::map< uint16_t, InputPacket > m_UnACKedMessages;
 };

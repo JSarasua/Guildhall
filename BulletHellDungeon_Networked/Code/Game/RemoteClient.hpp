@@ -4,6 +4,8 @@
 
 class UDPGameConnection;
 
+struct UDPPacket;
+
 class RemoteClient : public Client
 {
 public:
@@ -107,4 +109,7 @@ public:
 	//Get and receive messages from Player Client
 private:
 	UDPGameConnection* m_UDPConnection = nullptr;
+
+	uint16_t m_sequenceNo = 0;
+	std::map<uint16_t, UDPPacket> m_unAckedPackets;
 };
