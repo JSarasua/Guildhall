@@ -180,6 +180,7 @@ void Map::UpdateTiles( float deltaSeconds )
 
 void Map::UpdateEntities( float deltaSeconds )
 {
+	static int frameCounter = 0;
 	UpdateSpawners();
 
 	SpawnBullets();
@@ -190,19 +191,32 @@ void Map::UpdateEntities( float deltaSeconds )
 		{
 			m_entities[entityIndex]->Update(deltaSeconds);
 			Entity const& entity = *m_entities[entityIndex];
-			EventArgs args;
-			args.SetValue( "position", entity.m_position );
-			args.SetValue( "velocity", entity.m_velocity );
-			args.SetValue( "orientationDegrees", entity.m_orientationDegrees );
-			args.SetValue( "weaponOrientationDegrees", entity.m_weaponOrientationDegrees );
-			args.SetValue( "angularVelocity", entity.m_angularVelocity );
-			args.SetValue( "health", entity.m_health );
-			args.SetValue( "isDead", entity.m_isDead );
-			args.SetValue( "entityID", entity.m_entityID );
 
-			g_theEventSystem->FireEvent( "UpdateEntity", NOCONSOLECOMMAND, &args );
+			if( frameCounter == 0 )
+			{
+				if( entity.m_entityID > 4 )
+				{
+					std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entity.m_entityID, entity.m_position.x, entity.m_position.y );
+					g_theConsole->PrintString( Rgba8::GREEN, updateStr );
+				}
+				EventArgs args;
+				args.SetValue( "position", entity.m_position );
+				args.SetValue( "velocity", entity.m_velocity );
+				args.SetValue( "orientationDegrees", entity.m_orientationDegrees );
+				args.SetValue( "weaponOrientationDegrees", entity.m_weaponOrientationDegrees );
+				args.SetValue( "angularVelocity", entity.m_angularVelocity );
+				args.SetValue( "health", entity.m_health );
+				args.SetValue( "isDead", entity.m_isDead );
+				args.SetValue( "entityID", entity.m_entityID );
+
+				g_theEventSystem->FireEvent( "UpdateEntity", NOCONSOLECOMMAND, &args );
+			}
+
 		}
 	}
+
+	frameCounter++;
+	frameCounter %= 3;
 
 	if( !g_theApp->IsNoClipping() )
 	{
@@ -1010,12 +1024,19 @@ void Map::SpawnEntity( Entity* entityToSpawn )
 
 void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 {
+
 	Vec2 position = updateMessage.position;
 	Vec2 velocity = updateMessage.velocity;
 	float orientation = updateMessage.orientationDegrees;
 	float weaponOrientation = updateMessage.weaponOrientationDegrees;
 	bool isDead = updateMessage.isDead;
 	int entityID = updateMessage.entityID;
+
+	if( entityID > 4 )
+	{
+		std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entityID, position.x, position.y );
+		g_theConsole->PrintString( Rgba8::GREEN, updateStr );
+	}
 
 	for( Entity* entity : m_entities )
 	{
@@ -1037,6 +1058,13 @@ void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 
 void Map::DeleteEntity( DeleteEntityMessage const& deleteMessage )
 {
+	int entityID = deleteMessage.entityID;
+	if( entityID > 4 )
+	{
+		std::string updateStr = Stringf( "Delete Entity: %i", entityID );
+		g_theConsole->PrintString( Rgba8::Tan, updateStr );
+	}
+
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( m_entities[entityIndex] )

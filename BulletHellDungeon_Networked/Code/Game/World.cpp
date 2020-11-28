@@ -117,7 +117,21 @@ void World::CreateEntity( CreateEntityMessage const& createMessage )
 	}
 	else
 	{
+		int entityID = createMessage.entityID;
+		if( entityID > 4 )
+		{
+			std::string updateStr = Stringf( "Create Entity: %i", entityID );
+			g_theConsole->PrintString( Rgba8::GREY, updateStr );
+		}
+
 		Entity* entity = EntityFactory::CreateEntity( createMessage );
+
+		if( entityID > 4 )
+		{
+			std::string updateStr = Stringf( "Created Entity: %i", entity->m_entityID );
+			g_theConsole->PrintString( Rgba8::GREY, updateStr );
+		}
+
 		m_currentMap->SpawnEntity( entity );
 	}
 

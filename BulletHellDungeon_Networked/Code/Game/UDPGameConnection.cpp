@@ -7,6 +7,9 @@ UDPGameConnection::UDPGameConnection( std::string const& host, int port )
 
 	m_UDPReaderThread = new std::thread( &UDPGameConnection::ReaderThread, this );
 	m_UDPWriterThread = new std::thread( &UDPGameConnection::WriterThread, this );
+
+	std::string hostPortStr = Stringf("Host: %s | Port: %i", host.c_str(), port );
+	g_theConsole->PrintString( Rgba8::WHITE, hostPortStr );
 }
 
 UDPGameConnection::~UDPGameConnection()

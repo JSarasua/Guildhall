@@ -79,11 +79,13 @@ constexpr int ID_GOOD_BULLET = 12;
 constexpr int ID_EVIL_BULLET = 13;
 constexpr int ID_LOOT = 14;
 
+constexpr int FRAMESPERPACKET = 3;
+
 struct Header
 {
 	uint16_t m_id = 0;
 	uint16_t m_size = 0;
-	uint16_t m_sequenceNo = 0;
+	uint32_t m_sequenceNo = 0;
 };
 
 struct TCPMessage

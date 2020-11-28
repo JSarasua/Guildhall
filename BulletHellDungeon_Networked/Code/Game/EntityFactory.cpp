@@ -76,18 +76,18 @@ Actor* EntityFactory::CreateActor( std::string actorDefStr, Vec2 initialPosition
 		newActor->m_entityID = entityID;
 	}
 
-	int actorDefIndex = ActorDefinition::GetActorDefIndex( actorDef );
+//	int actorDefIndex = ActorDefinition::GetActorDefIndex( actorDef );
 
-	EventArgs args;
-	args.SetValue( "position", initialPosition );
-	args.SetValue( "velocity", initialVelocity );
-	args.SetValue( "orientation", initialOrientationDegrees );
-	args.SetValue( "speedMultiplier", 1.f );
-	args.SetValue( "entityType", ID_ACTOR );
-	args.SetValue( "defIndex", actorDefIndex );
-	args.SetValue( "entityID", entityID );
-
-	g_theEventSystem->FireEvent( "CreateEntity", NOCONSOLECOMMAND, &args );
+// 	EventArgs args;
+// 	args.SetValue( "position", initialPosition );
+// 	args.SetValue( "velocity", initialVelocity );
+// 	args.SetValue( "orientation", initialOrientationDegrees );
+// 	args.SetValue( "speedMultiplier", 1.f );
+// 	args.SetValue( "entityType", ID_ACTOR );
+// 	args.SetValue( "defIndex", actorDefIndex );
+// 	args.SetValue( "entityID", entityID );
+// 
+// 	g_theEventSystem->FireEvent( "CreateEntity", NOCONSOLECOMMAND, &args );
 
 	return newActor;
 }
@@ -115,7 +115,7 @@ Actor* EntityFactory::CreateActor( ActorDefinition const* actorDef, Vec2 initial
 	args.SetValue( "speedMultiplier", 1.f );
 	args.SetValue( "entityType", ID_ACTOR );
 	args.SetValue( "defIndex", actorDefIndex );
-	args.SetValue( "entityID", entityID );
+	args.SetValue( "entityID", newActor->m_entityID );
 
 	g_theEventSystem->FireEvent( "CreateEntity", NOCONSOLECOMMAND, &args );
 
@@ -182,7 +182,7 @@ Bullet* EntityFactory::CreateBullet( BulletDefinition const* bulletDef, Vec2 con
 	args.SetValue( "speedMultiplier", 1.f );
 	args.SetValue( "entityType", entityType );
 	args.SetValue( "defIndex", bulletDefIndex );
-	args.SetValue( "entityID", entityID );
+	args.SetValue( "entityID", newBullet->m_entityID );
 
 	g_theEventSystem->FireEvent( "CreateEntity", NOCONSOLECOMMAND, &args );
 
@@ -212,7 +212,7 @@ Loot* EntityFactory::CreateLoot( Vec2 const& initialPosition, WeaponDefinition c
 	args.SetValue( "speedMultiplier", 1.f );
 	args.SetValue( "entityType", ID_LOOT );
 	args.SetValue( "defIndex", weaponDefIndex );
-	args.SetValue( "entityID", entityID );
+	args.SetValue( "entityID", newLoot->m_entityID );
 
 	g_theEventSystem->FireEvent( "CreateEntity", NOCONSOLECOMMAND, &args );
 

@@ -51,6 +51,12 @@ void RemoteClient::Update( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
 
+	if( m_unAckedPackets.size() > 1000 )
+	{
+		std::string unackedCountStr = Stringf( "Unacked count: %i", (int)m_unAckedPackets.size() );
+		g_theConsole->PrintString( Rgba8::CYAN, unackedCountStr );
+	}
+
 	for( auto& packetIter : m_unAckedPackets )
 	{
 		UDPPacket& packet = packetIter.second;
@@ -177,7 +183,7 @@ void RemoteClient::CheckButtonPresses()
 		{
 			if( udpPacketTemp.packet.header.m_id == VERIFIEDPACKET )
 			{
-				uint16_t sequenceNoToErase = udpPacketTemp.packet.header.m_sequenceNo;
+				uint32_t sequenceNoToErase = udpPacketTemp.packet.header.m_sequenceNo;
 				m_unAckedPackets.erase( sequenceNoToErase );
 			}
 			else
@@ -249,6 +255,12 @@ bool RemoteClient::HandleCreateEntity( EventArgs const& args )
 	message.entityType = args.GetValue( "entityType", -1 );
 	message.defIndex = args.GetValue( "defIndex", 0 );
 	message.entityID = args.GetValue( "entityID", -1 );
+
+	if( message.entityID > 4 )
+	{
+		std::string updateStr = Stringf( "Create Entity: %i", message.entityID );
+		g_theConsole->PrintString( Rgba8::GREY, updateStr );
+	}
 
 	int messageSize = sizeof( message );
 	UDPPacket packet;

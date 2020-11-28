@@ -141,7 +141,7 @@ bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 		int playerSlot = playerCount;
 		if( playerCount < 4 )
 		{
-			std::string host = "127.0.0.1";
+			std::string host = args.GetValue("ip","127.0.0.1");
 			int port = 48010 + playerCount - 1;
 			UDPGameConnection* newUDPConnection = new UDPGameConnection( host, sendToPort );
 			newUDPConnection->Bind( port );

@@ -132,6 +132,11 @@ eGameState RemoteServer::GetCurrentGameState()
 
 void RemoteServer::SendUnACKedMessages()
 {
+	if( m_UnACKedMessages.size() > 1000 )
+	{
+		std::string unackedCountStr = Stringf( "Unacked count: %i", (int)m_UnACKedMessages.size() );
+		g_theConsole->PrintString( Rgba8::CYAN, unackedCountStr );
+	}
 	for( auto& packetIter : m_UnACKedMessages )
 	{
 		InputPacket& packet = packetIter.second;
@@ -140,7 +145,7 @@ void RemoteServer::SendUnACKedMessages()
 	}
 }
 
-void RemoteServer::ACKMessage( uint16_t sequenceNo )
+void RemoteServer::ACKMessage( uint32_t sequenceNo )
 {
 	m_UnACKedMessages.erase( sequenceNo );
 }
@@ -151,6 +156,7 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 	m_TCPGameConnection->DisconnectClient( dcArgs );
 
 	std::string data = args.GetValue( "data", std::string() );
+	std::string ip = args.GetValue( "ip", "127.0.0.1" );
 	//int length = args.GetValue( "length", 0 );
 
 	if( data.size() == 0 )
@@ -163,7 +169,7 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 	{
 		g_theClient->SetPlayerID( message.m_playerID );
 		int port = message.m_port;
-		std::string host = "127.0.0.1";
+		std::string host = ip;
 		UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
 		newUDPConnection->Bind( m_port );
 
@@ -183,6 +189,16 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 
 bool RemoteServer::HandleInput( EventArgs const& args )
 {
+	static int frameCount = 0;
+	frameCount++;
+	frameCount %= FRAMESPERPACKET;
+	
+	if( frameCount != 0 )
+	{
+		return true;
+	}
+
+
 	if( m_UDPGameConnection )
 	{
 		int changeWeapons = args.GetValue( "changeWeapons", 0 );

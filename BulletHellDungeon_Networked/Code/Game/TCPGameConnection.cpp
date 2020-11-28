@@ -84,9 +84,13 @@ void TCPGameConnection::BeginFrame()
 					dataStr.resize( dataLength );
 					memcpy( &dataStr[0], data.GetData(), dataLength );
 
+					std::string receiveAddress = m_TCPServerToClientSocket->GetAddress();
+					receiveAddress = SplitStringOnDelimeter( receiveAddress.c_str(), ':' )[0];
+
 					EventArgs args;
 					args.SetValue( "data", dataStr );
 					args.SetValue( "length", dataLength );
+					args.SetValue( "ip", receiveAddress );
 					g_theEventSystem->FireEvent( "TCPMessageReceived", NOCONSOLECOMMAND, &args );
 				}
 			}
@@ -106,9 +110,12 @@ void TCPGameConnection::BeginFrame()
 				dataStr.resize( dataLength );
 				memcpy( &dataStr[0], data.GetData(), dataLength );
 
+				std::string receiveAddress = m_TCPClientToServerSocket->GetAddress();
+				receiveAddress = SplitStringOnDelimeter( receiveAddress.c_str(), ':' )[0];
 				EventArgs args;
 				args.SetValue( "data", dataStr );
 				args.SetValue( "length", dataLength );
+				args.SetValue( "ip", receiveAddress );
 				g_theEventSystem->FireEvent( "TCPMessageReceived", NOCONSOLECOMMAND, &args );
 			}
 		}

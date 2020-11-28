@@ -110,6 +110,6 @@ public:
 private:
 	UDPGameConnection* m_UDPConnection = nullptr;
 
-	uint16_t m_sequenceNo = 0;
-	std::map<uint16_t, UDPPacket> m_unAckedPackets;
+	uint32_t m_sequenceNo = 0;
+	std::map<uint32_t, UDPPacket> m_unAckedPackets;
 };

@@ -38,7 +38,7 @@ public:
 	virtual eGameState GetCurrentGameState() override;
 
 	void SendUnACKedMessages();
-	void ACKMessage( uint16_t sequenceNo );
+	void ACKMessage( uint32_t sequenceNo );
 
 	bool HandleReceiveTCPMessage( EventArgs const& args );
 	bool HandleInput( EventArgs const& args );
@@ -47,6 +47,6 @@ public:
 public:
 	UDPGameConnection* m_UDPGameConnection = nullptr;
 	int m_port = -1;
-	uint16_t m_currentSequenceNo = 0;
-	std::map< uint16_t, InputPacket > m_UnACKedMessages;
+	uint32_t m_currentSequenceNo = 0;
+	std::map< uint32_t, InputPacket > m_UnACKedMessages;
 };
