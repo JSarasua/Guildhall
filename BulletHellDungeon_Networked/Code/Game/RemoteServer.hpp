@@ -38,7 +38,8 @@ public:
 	virtual eGameState GetCurrentGameState() override;
 
 	void SendUnACKedMessages();
-	void ACKMessage( uint32_t sequenceNo );
+	void ACKMessageServerSent( uint32_t sequenceNo );
+	void ACKReceivedMessage( uint32_t sequenceNo );
 
 	bool HandleReceiveTCPMessage( EventArgs const& args );
 	bool HandleInput( EventArgs const& args );

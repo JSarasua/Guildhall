@@ -140,14 +140,25 @@ void RemoteServer::SendUnACKedMessages()
 	for( auto& packetIter : m_UnACKedMessages )
 	{
 		InputPacket& packet = packetIter.second;
-		std::string packetStr = packet.ToString();
-		m_UDPGameConnection->SendUDPMessage( packetStr );
+		//std::string packetStr = packet.ToString();
+		ByteMessage byteMessage = packet.ToByteMessage();
+		m_UDPGameConnection->SendUDPMessage( byteMessage );
 	}
 }
 
-void RemoteServer::ACKMessage( uint32_t sequenceNo )
+void RemoteServer::ACKMessageServerSent( uint32_t sequenceNo )
 {
 	m_UnACKedMessages.erase( sequenceNo );
+}
+
+void RemoteServer::ACKReceivedMessage( uint32_t sequenceNo )
+{
+	UDPPacket packet;
+	packet.header.m_id = VERIFIEDPACKET;
+	packet.header.m_sequenceNo = sequenceNo;
+	packet.header.m_size = 0;
+	packet.SetMessage( nullptr, 0 );
+	m_UDPGameConnection->SendUDPMessage( packet.ToByteMessage() );
 }
 
 bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
@@ -218,12 +229,13 @@ bool RemoteServer::HandleInput( EventArgs const& args )
 		packet.header.m_sequenceNo = m_currentSequenceNo;
 		packet.message = message;
 		
-		m_UnACKedMessages.emplace( m_currentSequenceNo, packet );
+		//m_UnACKedMessages.emplace( m_currentSequenceNo, packet );
 
 		m_currentSequenceNo++;
 
-		std::string messageStr = packet.ToString();
-		m_UDPGameConnection->SendUDPMessage( messageStr );
+		//std::string messageStr = packet.ToString();
+		ByteMessage byteMessage = packet.ToByteMessage();
+		m_UDPGameConnection->SendUDPMessage( byteMessage );
 		
 
 	}
