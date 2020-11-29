@@ -81,6 +81,8 @@ constexpr int ID_LOOT = 14;
 
 constexpr int FRAMESPERPACKET = 3;
 
+struct ByteMessage;
+
 struct Header
 {
 	uint16_t m_id = 0;
@@ -101,6 +103,8 @@ struct TCPMessage
 		return message;
 	}
 };
+
+
 
 struct UDPPacket
 {
@@ -143,7 +147,28 @@ struct UDPPacket
 		packetStr.append( (char*)&message, size );
 		return packetStr;
 	}
+
+	ByteMessage ToByteMessage();
+// 	{
+// 		int size = header.m_size;
+// 		size = ClampInt( size, 0, MAXUDPMESSAGESIZE );
+// 		size += sizeof(header) + sizeof(m_gameID);
+// 
+// 		ByteMessage byteMessage;
+// 		byteMessage.size = size;
+// 		memcpy( byteMessage.message, this, size );
+// 
+// 		return byteMessage;
+// 	}
 };
+
+struct ByteMessage
+{
+	char message[sizeof(UDPPacket)]{};
+	int size = 0;
+};
+
+
 
 struct AddressedUDPPacket
 {
@@ -151,6 +176,8 @@ struct AddressedUDPPacket
 	std::string IPAddress;
 	UDPPacket packet;
 };
+
+
 
 struct InputMessage
 {
@@ -189,6 +216,19 @@ public:
 		inputPacketStr.append( (char*)&message, 22 );
 
 		return inputPacketStr;
+	}
+
+	ByteMessage ToByteMessage()
+	{
+		int size = sizeof(InputPacket);
+		size = ClampInt( size, 0, MAXUDPMESSAGESIZE );
+		//size += sizeof( header ) + sizeof( m_gameID );
+
+		ByteMessage byteMessage;
+		byteMessage.size = size;
+		memcpy( byteMessage.message, this, size );
+
+		return byteMessage;
 	}
 };
 

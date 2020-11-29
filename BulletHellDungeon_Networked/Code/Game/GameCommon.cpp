@@ -37,7 +37,18 @@ const IntVec2 STEP_SOUTHEAST = IntVec2( -1, 1 );
 const IntVec2 STEP_NORTHEAST = IntVec2( 1, 1 );
 
 
+ByteMessage UDPPacket::ToByteMessage()
+{
+	int size = header.m_size;
+	size = ClampInt( size, 0, MAXUDPMESSAGESIZE );
+	size += sizeof( header ) + sizeof( m_gameID );
 
+	ByteMessage byteMessage;
+	byteMessage.size = size;
+	memcpy( byteMessage.message, this, size );
+
+	return byteMessage;
+}
 
 
 
