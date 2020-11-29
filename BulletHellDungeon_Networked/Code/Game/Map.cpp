@@ -381,7 +381,7 @@ void Map::SpawnBullet( Entity* shooter )
 		bulletSpeedMultiplier = 0.5f;
 	}
 
-	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
+	for( size_t entityIndex = 4; entityIndex < m_entities.size(); entityIndex++ )
 	{
 		if( !m_entities[entityIndex] )
 		{
