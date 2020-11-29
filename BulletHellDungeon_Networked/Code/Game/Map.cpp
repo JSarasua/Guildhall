@@ -194,11 +194,11 @@ void Map::UpdateEntities( float deltaSeconds )
 
 			if( frameCounter == 0 )
 			{
-				if( entity.m_entityID > 4 )
-				{
-					std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entity.m_entityID, entity.m_position.x, entity.m_position.y );
-					g_theConsole->PrintString( Rgba8::GREEN, updateStr );
-				}
+// 				if( entity.m_entityID > 4 )
+// 				{
+// 					std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entity.m_entityID, entity.m_position.x, entity.m_position.y );
+// 					g_theConsole->PrintString( Rgba8::GREEN, updateStr );
+// 				}
 				EventArgs args;
 				args.SetValue( "position", entity.m_position );
 				args.SetValue( "velocity", entity.m_velocity );
@@ -1032,11 +1032,11 @@ void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 	bool isDead = updateMessage.isDead;
 	int entityID = updateMessage.entityID;
 
-	if( entityID > 4 )
-	{
-		std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entityID, position.x, position.y );
-		g_theConsole->PrintString( Rgba8::GREEN, updateStr );
-	}
+// 	if( entityID > 4 )
+// 	{
+// 		std::string updateStr = Stringf( "Update Entity: %i, pos: %f, %f", entityID, position.x, position.y );
+// 		g_theConsole->PrintString( Rgba8::GREEN, updateStr );
+// 	}
 
 	for( Entity* entity : m_entities )
 	{
@@ -1059,11 +1059,8 @@ void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 void Map::DeleteEntity( DeleteEntityMessage const& deleteMessage )
 {
 	int entityID = deleteMessage.entityID;
-	if( entityID > 4 )
-	{
-		std::string updateStr = Stringf( "Delete Entity: %i", entityID );
-		g_theConsole->PrintString( Rgba8::Tan, updateStr );
-	}
+	std::string updateStr = Stringf( "Delete Entity: %i", entityID );
+	g_theConsole->PrintString( Rgba8::Tan, updateStr );
 
 	for( size_t entityIndex = 0; entityIndex < m_entities.size(); entityIndex++ )
 	{
