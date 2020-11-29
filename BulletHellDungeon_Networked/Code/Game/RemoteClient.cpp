@@ -24,6 +24,7 @@ RemoteClient::RemoteClient( UDPGameConnection* newUDPConnection ) :
 	g_theEventSystem->SubscribeMethodToEvent( "CreateEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleCreateEntity );
 	g_theEventSystem->SubscribeMethodToEvent( "UpdateEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleUpdateEntity );
 	g_theEventSystem->SubscribeMethodToEvent( "DeleteEntity", NOCONSOLECOMMAND, this, &RemoteClient::HandleDeleteEntity );
+	g_theEventSystem->SubscribeMethodToEvent( "MoveToNextMap", NOCONSOLECOMMAND, this, &RemoteClient::HandleNextMap );
 }
 
 RemoteClient::~RemoteClient()
@@ -335,6 +336,26 @@ bool RemoteClient::HandleDeleteEntity( EventArgs const& args )
 	//std::string createEntityMessage = packet.ToString();
 	ByteMessage createEntityMessage = packet.ToByteMessage();
 	m_UDPConnection->SendUDPMessage( createEntityMessage );
+
+	return false;
+}
+
+bool RemoteClient::HandleNextMap( EventArgs const& args )
+{
+	UNUSED( args );
+
+	UDPPacket packet;
+	packet.header.m_id = NEXTMAP;
+	packet.header.m_size = 0;
+	packet.header.m_sequenceNo = m_sequenceNo;
+	packet.SetMessage( nullptr, 0 );
+
+	//m_unAckedPackets.emplace( m_sequenceNo, packet );
+
+	m_sequenceNo++;
+
+	ByteMessage nextMapMessage = packet.ToByteMessage();
+	m_UDPConnection->SendUDPMessage( nextMapMessage );
 
 	return false;
 }

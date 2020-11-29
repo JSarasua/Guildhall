@@ -24,6 +24,7 @@ public:
 	void Render();
 	void RenderDebug() const;
 	void MoveToNextMap();
+	void MoveToNextMapNetworked();
 
 	Actor* GetPlayer();
 	void GetPlayers(std::vector<Actor*>& players);

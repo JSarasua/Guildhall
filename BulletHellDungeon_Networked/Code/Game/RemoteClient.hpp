@@ -62,6 +62,7 @@ public:
 	bool HandleCreateEntity( EventArgs const& args );
 	bool HandleUpdateEntity( EventArgs const& args );
 	bool HandleDeleteEntity( EventArgs const& args );
+	bool HandleNextMap( EventArgs const& args );
 
 public:
 	Camera* m_camera = nullptr;

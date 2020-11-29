@@ -50,6 +50,7 @@ void World::Update( float deltaSeconds )
 
 	if( m_currentMap->IsBossDead() )
 	{
+		g_theEventSystem->FireEvent( "MoveToNextMap", NOCONSOLECOMMAND, nullptr );
 		MoveToNextMap();
 	}
 }
@@ -89,6 +90,20 @@ void World::MoveToNextMap()
 	}
 }
 
+void World::MoveToNextMapNetworked()
+{
+	int newMapIndex = m_currentMapIndex + 1;
+	if( newMapIndex >= m_maps.size() )
+	{
+		g_theGame->TriggerVictoryState();
+	}
+	else
+	{
+		m_currentMapIndex = newMapIndex;
+		m_currentMap = m_maps[m_currentMapIndex];
+	}
+}
+
 Actor* World::GetPlayer()
 {
 	return m_currentMap->GetPlayer();
@@ -111,13 +126,20 @@ void World::AddNewPlayer( int playerSlot )
 
 void World::CreateEntity( CreateEntityMessage const& createMessage )
 {
+	int entityID = createMessage.entityID;
+	Entity* entityWithID = m_currentMap->GetEntityWithID( entityID );
+	if( entityWithID )
+	{
+		return;
+	}
+
 	if( createMessage.entityType == ID_PLAYER )
 	{
 		AddNewPlayer( createMessage.entityID );
 	}
 	else
 	{
-		int entityID = createMessage.entityID;
+
 		if( entityID > 4 )
 		{
 			std::string updateStr = Stringf( "Create Entity: %i", entityID );
@@ -144,6 +166,13 @@ void World::UpdateEntity( UpdateEntityMessage const& updateMessage )
 
 void World::DeleteEntity( DeleteEntityMessage const& deleteMessage )
 {
+	int entityID = deleteMessage.entityID;
+	Entity* entityWithID = m_currentMap->GetEntityWithID( entityID );
+	if( !entityWithID )
+	{
+		return;
+	}
+
 	m_currentMap->DeleteEntity( deleteMessage );
 }
 
