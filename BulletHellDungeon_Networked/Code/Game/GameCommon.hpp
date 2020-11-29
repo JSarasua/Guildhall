@@ -70,6 +70,7 @@ constexpr uint16_t UPDATEPLAYER = 6;
 constexpr uint16_t UPDATEENTITY = 7;
 constexpr uint16_t DELETEENTITY = 8;
 constexpr uint16_t VERIFIEDPACKET = 9;
+constexpr uint16_t NEXTMAP = 10;
 
 constexpr int MAXUDPMESSAGESIZE = 200;
 
