@@ -1017,18 +1017,21 @@ void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpCon
 {
 	if( udpConnection )
 	{
+		RemoteServer* remoteServer = (RemoteServer*)g_theServer;
+
 		AddressedUDPPacket packet = udpConnection->PopFirstReceivedPacket();
 		bool isValid = packet.isValid;
 		while( isValid )
 		{
 			UDPPacket const& udpPacket = packet.packet;
+			int packetSequenceNo = udpPacket.header.m_sequenceNo;
 			int id = udpPacket.header.m_id;
 
 			if( id == ADDENTITY )
 			{
 				CreateEntityMessage createMessage = *(CreateEntityMessage*)udpPacket.message;
 				m_world->CreateEntity( createMessage );
-
+				remoteServer->ACKReceivedMessage( packetSequenceNo );
 				if( createMessage.entityType == ID_PLAYER )
 				{
 					if( createMessage.entityID == g_theClient->m_playerID )
@@ -1039,18 +1042,20 @@ void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpCon
 			}
 			else if( id == UPDATEENTITY )
 			{
+				//remoteServer->ACKReceivedMessage( packetSequenceNo );
 				UpdateEntityMessage updateMessage = *(UpdateEntityMessage*)udpPacket.message;
 				m_world->UpdateEntity( updateMessage );
 			}
 			else if( id == DELETEENTITY )
 			{
+				remoteServer->ACKReceivedMessage( packetSequenceNo );
 				DeleteEntityMessage deleteMessage = *(DeleteEntityMessage*)udpPacket.message;
+
 				m_world->DeleteEntity( deleteMessage );
 			}
 			else if( id == VERIFIEDPACKET )
 			{
-				RemoteServer* remoteServer = (RemoteServer*)g_theServer;
-				remoteServer->ACKMessage( udpPacket.header.m_sequenceNo );
+				remoteServer->ACKMessageServerSent( packetSequenceNo );
 			}
 
 			packet = udpConnection->PopFirstReceivedPacket();
