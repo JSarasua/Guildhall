@@ -31,7 +31,9 @@ public:
 	Buffer& SendBuffer();
 	Buffer& ReceiveBuffer();
 
-	void SendUDPMessage( std::string const& message );
+	//void SendUDPMessage( std::string const& message );
+	void SendUDPMessage( ByteMessage const& byteMessage );
+	void SendUDPMessage( unsigned char* message, int size );
 	BufferMessage ReceiveMessage();
 
 	std::string GetLastReceiveAddress();
@@ -43,7 +45,7 @@ private:
 	void WriterThread();
 
 private:
-	BlockingQueue<std::string> m_writerQueue;
+	BlockingQueue<ByteMessage> m_writerQueue;
 	BlockingQueue<AddressedUDPPacket> m_readerQueue;
 
 	std::thread* m_UDPReaderThread = nullptr;

@@ -71,9 +71,21 @@ UDPGameConnection::Buffer& UDPGameConnection::ReceiveBuffer()
 	return buffer;
 }
 
-void UDPGameConnection::SendUDPMessage( std::string const& message )
+// void UDPGameConnection::SendUDPMessage( std::string const& message )
+// {
+// 	m_writerQueue.push( message );
+// }
+
+void UDPGameConnection::SendUDPMessage( unsigned char* message, int size )
 {
-	m_writerQueue.push( message );
+	ByteMessage byteMessage;
+	memcpy( byteMessage.message, message, size );
+	m_writerQueue.push( byteMessage );
+}
+
+void UDPGameConnection::SendUDPMessage( ByteMessage const& byteMessage )
+{
+	m_writerQueue.push( byteMessage );
 }
 
 BufferMessage UDPGameConnection::ReceiveMessage()
@@ -128,14 +140,15 @@ void UDPGameConnection::WriterThread()
 	{
 		if( m_UDPSocket && m_UDPSocket->IsSocketValid() )
 		{
-			std::string message = m_writerQueue.pop();
-			if( message.size() != 0 )
+			//std::string message = m_writerQueue.pop();
+			ByteMessage byteMessage = m_writerQueue.pop();
+			if( byteMessage.size != 0 )
 			{
 				UDPSocket::Buffer& buffer = m_UDPSocket->SendBuffer();
-				memcpy( &buffer, message.c_str(), message.size() );
+				memcpy( &buffer, byteMessage.message, byteMessage.size );
 				//strcpy_s( &buffer[0], UDPSocket::BufferSize, message.c_str() );
 
-				m_UDPSocket->Send( (int)message.size() );
+				m_UDPSocket->Send( byteMessage.size );
 			}
 
 		}
