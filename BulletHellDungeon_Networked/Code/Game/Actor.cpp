@@ -201,6 +201,9 @@ void Actor::Render() const
 	{
 		RenderWeapon();
 	}
+
+	Vec2 headPosition = Vec2( m_position.x, actorBounds.maxs.y );
+	RenderHealth( headPosition );
 }
 
 void Actor::LoseHealth( int damage )
@@ -277,6 +280,21 @@ void Actor::RenderWeapon() const
 // 	g_theRenderer->DrawDisc( GetMuzzlePosition(), 0.02f, Rgba8::GREEN, Rgba8::RED, 0.02f );
 
 	//DebugAddWorldPoint( Vec3( pivotPoint ), Rgba8::RED, 0.f, DEBUG_RENDER_ALWAYS );
+}
+
+
+
+void Actor::RenderHealth( Vec2 const& playerHead ) const
+{
+	if( m_health > 0 )
+	{
+		std::string healthStr = Stringf( "%i", m_health );
+		AABB2 healthBounds = AABB2( -0.2f, 0.f, 0.2f, 0.2f );
+		healthBounds.Translate( playerHead );
+		g_theRenderer->DrawAlignedTextAtPosition( healthStr.c_str(), healthBounds, 0.1f, Vec2( 0.5f, 0.5f ), Rgba8::GREEN );
+		//g_theRenderer->DrawTextAtPosition( healthStr.c_str(), playerHead, 0.1f, Rgba8::GREEN );
+	}
+
 }
 
 void Actor::SetEnemy( Entity* enemy )

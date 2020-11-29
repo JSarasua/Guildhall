@@ -60,6 +60,7 @@ public:
 	virtual void LoseHealth( int damage ) override;
 
 	void RenderWeapon() const;
+	void RenderHealth( Vec2 const& playerHead ) const;
 
 	void SetEnemy( Entity* enemy );
 

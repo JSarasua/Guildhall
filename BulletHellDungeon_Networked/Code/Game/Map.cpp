@@ -1031,6 +1031,7 @@ void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 	float weaponOrientation = updateMessage.weaponOrientationDegrees;
 	bool isDead = updateMessage.isDead;
 	int entityID = updateMessage.entityID;
+	int health = updateMessage.health;
 
 // 	if( entityID > 4 )
 // 	{
@@ -1049,6 +1050,7 @@ void Map::UpdateEntity( UpdateEntityMessage const& updateMessage )
 				entity->m_orientationDegrees = orientation;
 				entity->m_weaponOrientationDegrees = weaponOrientation;
 				entity->m_isDead = isDead;
+				entity->m_health = health;
 
 				break;
 			}
