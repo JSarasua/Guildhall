@@ -60,8 +60,9 @@ void RemoteClient::Update( float deltaSeconds )
 	for( auto& packetIter : m_unAckedPackets )
 	{
 		UDPPacket& packet = packetIter.second;
-		std::string packetStr = packet.ToString();
-		m_UDPConnection->SendUDPMessage( packetStr );
+		//std::string packetStr = packet.ToString();
+		ByteMessage byteMessage = packet.ToByteMessage();
+		m_UDPConnection->SendUDPMessage( byteMessage );
 	}
 }
 
@@ -196,7 +197,8 @@ void RemoteClient::CheckButtonPresses()
 				returnPacket.header.m_id = VERIFIEDPACKET;
 				returnPacket.SetMessage( "", 0 );
 
-				std::string returnMessage = returnPacket.ToString();
+				//std::string returnMessage = returnPacket.ToString();
+				ByteMessage returnMessage = returnPacket.ToByteMessage();
 				m_UDPConnection->SendUDPMessage( returnMessage );
 			}
 		}
@@ -267,13 +269,17 @@ bool RemoteClient::HandleCreateEntity( EventArgs const& args )
 	packet.header.m_id = ADDENTITY;
 	packet.header.m_size = (uint16_t)messageSize;
 	packet.header.m_sequenceNo = m_sequenceNo;
+
+	m_unAckedPackets.emplace( m_sequenceNo, packet );
+
 	m_sequenceNo++;
 	
+
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );
 
-	std::string createEntityMessage = packet.ToString();
-
+	//std::string createEntityMessage = packet.ToString();
+	ByteMessage createEntityMessage = packet.ToByteMessage();
 	m_UDPConnection->SendUDPMessage( createEntityMessage );
 	return false;
 }
@@ -300,8 +306,8 @@ bool RemoteClient::HandleUpdateEntity( EventArgs const& args )
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );
 
-	std::string createEntityMessage = packet.ToString();
-
+	//std::string createEntityMessage = packet.ToString();
+	ByteMessage createEntityMessage = packet.ToByteMessage();
 	m_UDPConnection->SendUDPMessage( createEntityMessage );
 
 	return false;
@@ -317,13 +323,17 @@ bool RemoteClient::HandleDeleteEntity( EventArgs const& args )
 	packet.header.m_id = DELETEENTITY;
 	packet.header.m_size = (uint16_t)messageSize;
 	packet.header.m_sequenceNo = m_sequenceNo;
-	m_sequenceNo++;
+
 
 	char const* messageStr = (char const*)&message;
 	packet.SetMessage( messageStr, messageSize );
+	
+	m_unAckedPackets.emplace( m_sequenceNo, packet );
 
-	std::string createEntityMessage = packet.ToString();
-
+	m_sequenceNo++;
+	
+	//std::string createEntityMessage = packet.ToString();
+	ByteMessage createEntityMessage = packet.ToByteMessage();
 	m_UDPConnection->SendUDPMessage( createEntityMessage );
 
 	return false;
