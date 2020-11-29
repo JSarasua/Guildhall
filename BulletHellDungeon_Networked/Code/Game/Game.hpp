@@ -124,9 +124,9 @@ private:
 	IntVec2 GetCurrentMapBounds() const;
 	void	RebuildWorld();
 
-
-private:
+public:
 	World* m_world = nullptr;
+private:
 	Actor* m_player = nullptr;
 
 	int m_currentLevel = 0;

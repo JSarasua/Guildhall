@@ -8,6 +8,8 @@
 #include "Game/ActorDefinition.hpp"
 #include "Game/WeaponDefinition.hpp"
 #include "Game/EntityFactory.hpp"
+#include "Game/Game.hpp"
+#include "Game/World.hpp"
 
 EnemySpawner::EnemySpawner( Vec2 const& position, FloatRange const& spawnRadius, IntRange const& numberOfEnemiesToSpawn, float playerCheckRadius, Actor* player, Map* currentMap ) :
 	m_position(position),
@@ -38,11 +40,31 @@ void EnemySpawner::SetPlayer( Actor* player )
 
 void EnemySpawner::Update()
 {
+	std::vector<Actor*> enemies;
+	g_theGame->m_world->GetPlayers( enemies );
+
+	Vec2 closestEnemyPos;
+	float minimumDistance = 999999.f;
+	for( Actor* enemy : enemies )
+	{
+		if( enemy )
+		{
+			Vec2 const& enemyPos = enemy->GetPosition();
+			float distance = GetDistance2D( m_position, enemyPos );
+			if( distance < minimumDistance )
+			{
+				closestEnemyPos = enemyPos;
+				minimumDistance = distance;
+			}
+		}
+	}
+
+
 	if( !m_isSpawning )
 	{
 		if( m_player )
 		{
-			if( IsPointInsideDisc2D( m_player->GetPosition(), m_position, m_playerCheckRadius ) )
+			if( IsPointInsideDisc2D( closestEnemyPos, m_position, m_playerCheckRadius ) )
 			{
 				m_isSpawning = true;
 				m_spawnTimer.Reset();

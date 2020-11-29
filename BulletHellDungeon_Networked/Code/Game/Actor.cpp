@@ -13,6 +13,7 @@
 #include "Engine/Renderer/DebugRender.hpp"
 #include "Game/AudioDefinition.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Game/World.hpp"
 
 Actor::Actor( Vec2 initialPosition, Vec2 initialVelocity, float initialOrientationDegrees, float initialAngularVelocity, ActorDefinition const* actorDef ) :
 	m_actorDef(actorDef),
@@ -537,10 +538,30 @@ void Actor::UpdateNPC( float deltaSeconds )
 		return;
 	}
 
-	if( m_enemyActor )
+	std::vector<Actor*> enemies;
+	g_theGame->m_world->GetPlayers( enemies );
+
+	Vec2 closestEnemyPos;
+	float minimumDistance = 999999.f;
+	for( Actor* enemy : enemies )
 	{
-		m_goalPosition = m_enemyActor->GetPosition();
+		if( enemy )
+		{
+			Vec2 const& enemyPos = enemy->GetPosition();
+			float distance = GetDistance2D( m_position, enemyPos );
+			if( distance < minimumDistance )
+			{
+				closestEnemyPos = enemyPos;
+				minimumDistance = distance;
+			}
+		}
 	}
+	m_goalPosition = closestEnemyPos;
+
+// 	if( m_enemyActor )
+// 	{
+// 		m_goalPosition = m_enemyActor->GetPosition();
+// 	}
 	
 	float goalDistance = GetDistance2D( m_goalPosition, m_position );
 	if( goalDistance < 5.f && (bool)m_firingTimer.CheckAndDecrementAll() )
@@ -595,10 +616,48 @@ void Actor::UpdateNPC( float deltaSeconds )
 void Actor::UpdateBoss( float deltaSeconds )
 {
 	UNUSED( deltaSeconds );
+	std::vector<Actor*> enemies;
+	g_theGame->m_world->GetPlayers( enemies );
+
+	Vec2 closestEnemyPos;
+	float minimumDistance = 999999.f;
+	for( Actor* enemy : enemies )
+	{
+		if( enemy )
+		{
+			Vec2 const& enemyPos = enemy->GetPosition();
+			float distance = GetDistance2D( m_position, enemyPos );
+			if( distance < minimumDistance )
+			{
+				closestEnemyPos = enemyPos;
+				minimumDistance = distance;
+			}
+		}
+	}
+	m_goalPosition = closestEnemyPos;
 
 	if( m_currentBossState == Moving )
 	{
-		m_goalPosition = m_enemyActor->GetPosition();
+// 		std::vector<Actor*> enemies;
+// 		g_theGame->m_world->GetPlayers( enemies );
+// 
+// 		Vec2 closestEnemyPos;
+// 		float minimumDistance = 999999.f;
+// 		for( Actor* enemy : enemies )
+// 		{
+// 			if( enemy )
+// 			{
+// 				Vec2 const& enemyPos = enemy->GetPosition();
+// 				float distance = GetDistance2D( m_position, enemyPos );
+// 				if( distance < minimumDistance )
+// 				{
+// 					closestEnemyPos = enemyPos;
+// 					minimumDistance = distance;
+// 				}
+// 			}
+// 		}
+// 		m_goalPosition = closestEnemyPos;
+		//m_goalPosition = m_enemyActor->GetPosition();
 
 		Vec2 goalDirection = (m_goalPosition - m_position).GetNormalized();
 		m_orientationDegrees = goalDirection.GetAngleDegrees();
@@ -627,7 +686,7 @@ void Actor::UpdateBoss( float deltaSeconds )
 		}
 		else if( m_currentBossAttack == RandomFire )
 		{
-			m_goalPosition = m_enemyActor->GetPosition();
+			//m_goalPosition = m_enemyActor->GetPosition();
 
 			Vec2 goalDirection = (m_goalPosition - m_position).GetNormalized();
 			m_orientationDegrees = goalDirection.GetAngleDegrees();
