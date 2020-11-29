@@ -1053,6 +1053,11 @@ void Game::UpdatePlayingNetworked( float deltaSeconds, UDPGameConnection* udpCon
 
 				m_world->DeleteEntity( deleteMessage );
 			}
+			else if( id == NEXTMAP )
+			{
+				remoteServer->ACKReceivedMessage( packetSequenceNo );
+				m_world->MoveToNextMap();
+			}
 			else if( id == VERIFIEDPACKET )
 			{
 				remoteServer->ACKMessageServerSent( packetSequenceNo );

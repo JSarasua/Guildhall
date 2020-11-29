@@ -1017,6 +1017,25 @@ void Map::AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags )
 	m_tileMetaData[tagIndex].m_tags.AppendTags(tags);
 }
 
+Entity* Map::GetEntityWithID( int entityID ) const
+{
+	Entity* entityToReturn = nullptr;
+	for( Entity* entity : m_entities )
+	{
+		if( entity )
+		{
+			int currentEntityID = entity->m_entityID;
+			if( entityID == currentEntityID )
+			{
+				entityToReturn = entity;
+				break;
+			}
+		}
+	}
+
+	return entityToReturn;
+}
+
 void Map::SpawnEntity( Entity* entityToSpawn )
 {
 	m_entities.push_back( entityToSpawn );

@@ -53,6 +53,7 @@ public:
 
 	void AddTagsAtPosition( const IntVec2& tileCoords, const Tags& tags);
 
+	Entity* GetEntityWithID( int entityID ) const;
 	void SpawnEntity( Entity* entityToSpawn );
 	void UpdateEntity( UpdateEntityMessage const& updateMessage );
 	void DeleteEntity( DeleteEntityMessage const& deleteMessage );
