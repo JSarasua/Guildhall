@@ -1,6 +1,6 @@
 #include "Engine/Core/FileUtils.hpp"
 
-void* FileReadToNewBuffer( std::string const& filename, size_t* outSize )
+byte* FileReadToNewBuffer( std::string const& filename, size_t* outSize )
 {
 	FILE* fp = nullptr;
 	fopen_s( &fp, filename.c_str(), "r" );
@@ -29,4 +29,13 @@ void* FileReadToNewBuffer( std::string const& filename, size_t* outSize )
 
 	fclose( fp );
 	return buffer;
+}
+
+int ParseInt( byte*& buffer )
+{
+	int* intPtr = (int*)buffer;
+
+	buffer += sizeof(int);
+
+	return *intPtr;
 }

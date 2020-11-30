@@ -4,6 +4,7 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/JobSystem.hpp"
 #include "Engine/Core/Time.hpp"
+#include "Engine/Core/FileUtils.hpp"
 #include <thread>
 #include <chrono>
 
@@ -45,6 +46,19 @@ void SimulationJob::CallBackFunction()
 
 MonteCarlo::~MonteCarlo()
 {
+}
+
+void MonteCarlo::RestoreFromData()
+{
+	size_t fileSize = 0;
+	byte* buffer = FileReadToNewBuffer( "data/test.dmcts", &fileSize );
+
+// 	int fakeFileInts[2] = {1,2};
+// 	byte* buffer = (byte*)fakeFileInts;
+	m_totalNumberOfSimulationsRun = ParseInt( buffer );
+	m_numberOfSimulationsToRun = ParseInt( buffer );
+
+
 }
 
 void MonteCarlo::Startup()

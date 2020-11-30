@@ -63,10 +63,12 @@ void Game::Startup()
 
 	g_theRenderer->Setup( m_gameClock );
 
-	//m_mcts = new MonteCarlo();
-	//m_mcts->Startup( CIRCLEPLAYER );
 	m_mc = new MonteCarloNoTree();
 	m_mcts = new MonteCarlo();
+
+	//if reload
+	//m_mcts->RestoreFromData();
+
 	m_mcts->SetSimMethod( m_mctsSimMethod );
 	m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
 	m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );

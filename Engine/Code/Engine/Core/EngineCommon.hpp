@@ -3,6 +3,7 @@
 #include "Engine/Math/vec2.hpp"
 #include "Engine/Core/NamedStrings.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include <vector>
 
 /*#include "Engine/Input/InputSystem.hpp"*/
 
@@ -14,6 +15,7 @@ class NetworkSys;
 #define UNUSED(x) (void)(x);
 typedef unsigned int uint;
 typedef unsigned char byte;
+typedef std::vector<unsigned char> Buffer;
 
 const Vec2 ALIGN_BOTTOM_LEFT(0.f,0.f);
 const Vec2 ALIGN_BOTTOM_RIGHT(1.f,0.f);

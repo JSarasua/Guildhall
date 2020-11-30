@@ -53,6 +53,8 @@ public:
 	MonteCarlo() = default;
 	~MonteCarlo();
 
+	void RestoreFromData();
+
 	void Startup();
 	void Shutdown();
 	void SetInitialGameState( gamestate_t const& newGameState );
@@ -72,6 +74,8 @@ public:
 	void SetUCBValue( float ucbValue );
 	void SetEpsilonValueZeroToOne( float epsilonValue );
 	void SetSimMethod( SIMMETHOD simMethod );
+
+
 protected:
 	//Thread
 	void WorkerMain();
