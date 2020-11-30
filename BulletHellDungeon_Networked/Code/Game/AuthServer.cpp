@@ -165,21 +165,21 @@ bool AuthServer::HandleReceiveTCPMessage( EventArgs const& args )
 
 			m_TCPGameConnection->SendMessageToClient( messageStr, sizeof( connectMessage ) );
 
-			std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+			//std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 
 
-			for( size_t clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
-			{
-				EventArgs createArgs;
-				createArgs.SetValue( "position", Vec2() );
-				createArgs.SetValue( "velocity", Vec2() );
-				createArgs.SetValue( "orientation", 0.f );
-				createArgs.SetValue( "speedMultiplier", 1.f );
-				createArgs.SetValue( "entityType", ID_PLAYER );
-				createArgs.SetValue( "defIndex", 0 );
-				createArgs.SetValue( "entityID", (int)clientIndex + 1 );
-				((RemoteClient*)newRemoteClient)->HandleCreateEntity( createArgs );
-			}
+// 			for( size_t clientIndex = 0; clientIndex < m_clients.size(); clientIndex++ )
+// 			{
+// 				EventArgs createArgs;
+// 				createArgs.SetValue( "position", Vec2() );
+// 				createArgs.SetValue( "velocity", Vec2() );
+// 				createArgs.SetValue( "orientation", 0.f );
+// 				createArgs.SetValue( "speedMultiplier", 1.f );
+// 				createArgs.SetValue( "entityType", ID_PLAYER );
+// 				createArgs.SetValue( "defIndex", 0 );
+// 				createArgs.SetValue( "entityID", (int)clientIndex + 1 );
+// 				((RemoteClient*)newRemoteClient)->HandleCreateEntity( createArgs );
+// 			}
 			//Send Message of UDP connection
 			//m_TCPGameConnection->SendMessageToClient()
 		}

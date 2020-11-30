@@ -184,6 +184,8 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 		UDPGameConnection* newUDPConnection = new UDPGameConnection( host, port );
 		newUDPConnection->Bind( m_port );
 
+
+
 		if( m_UDPGameConnection )
 		{
 			delete m_UDPGameConnection;
@@ -193,6 +195,16 @@ bool RemoteServer::HandleReceiveTCPMessage( EventArgs const& args )
 		{
 			m_UDPGameConnection = newUDPConnection;
 		}
+
+		UDPPacket packet;
+		packet.header.m_id = UDPCONNECTED;
+		packet.header.m_sequenceNo = m_currentSequenceNo;
+		packet.header.m_size = 0;
+		packet.SetMessage( nullptr, 0 );
+		ByteMessage byteMessage;
+		byteMessage = packet.ToByteMessage();
+
+		m_UDPGameConnection->SendUDPMessage( byteMessage );
 	}
 
 	return true;

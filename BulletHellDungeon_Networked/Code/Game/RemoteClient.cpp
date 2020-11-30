@@ -1,4 +1,5 @@
 #include "Game/RemoteClient.hpp"
+#include "Game/AuthServer.hpp"
 #include "Game/Game.hpp"
 #include "Game/Server.hpp"
 #include "Game/Actor.hpp"
@@ -175,14 +176,32 @@ void RemoteClient::RenderConsole()
 
 void RemoteClient::CheckButtonPresses()
 {
-	AddressedUDPPacket udpPacket = m_UDPConnection->PopFirstReceivedPacket();
-	bool isValid = udpPacket.isValid;
+	AddressedUDPPacket udpPacket;
+	AddressedUDPPacket udpPacketTemp = m_UDPConnection->PopFirstReceivedPacket();
+	bool isValid = udpPacketTemp.isValid;
+
+
+
 	while( isValid )
 	{
-		AddressedUDPPacket udpPacketTemp = m_UDPConnection->PopFirstReceivedPacket();
-
 		if( udpPacketTemp.isValid )
 		{
+			if( udpPacketTemp.packet.header.m_id == UDPCONNECTED )
+			{
+				AuthServer* authServer = (AuthServer*)g_theServer;
+				for( size_t clientIndex = 0; clientIndex < authServer->m_clients.size(); clientIndex++ )
+				{
+					EventArgs createArgs;
+					createArgs.SetValue( "position", Vec2() );
+					createArgs.SetValue( "velocity", Vec2() );
+					createArgs.SetValue( "orientation", 0.f );
+					createArgs.SetValue( "speedMultiplier", 1.f );
+					createArgs.SetValue( "entityType", ID_PLAYER );
+					createArgs.SetValue( "defIndex", 0 );
+					createArgs.SetValue( "entityID", (int)clientIndex + 1 );
+					HandleCreateEntity( createArgs );
+				}
+			}
 			if( udpPacketTemp.packet.header.m_id == VERIFIEDPACKET )
 			{
 				uint32_t sequenceNoToErase = udpPacketTemp.packet.header.m_sequenceNo;
@@ -203,6 +222,8 @@ void RemoteClient::CheckButtonPresses()
 				m_UDPConnection->SendUDPMessage( returnMessage );
 			}
 		}
+
+		udpPacketTemp = m_UDPConnection->PopFirstReceivedPacket();
 		isValid = udpPacketTemp.isValid;
 	}
 	if( udpPacket.isValid )
