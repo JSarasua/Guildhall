@@ -280,11 +280,9 @@ bool RemoteClient::HandleCreateEntity( EventArgs const& args )
 	message.defIndex = args.GetValue( "defIndex", 0 );
 	message.entityID = args.GetValue( "entityID", -1 );
 
-	if( message.entityID > 4 )
-	{
-		std::string updateStr = Stringf( "Create Entity: %i", message.entityID );
-		g_theConsole->PrintString( Rgba8::GREY, updateStr );
-	}
+	std::string updateStr = Stringf( "Create Entity: %i", message.entityID );
+	g_theConsole->PrintString( Rgba8::GREY, updateStr );
+
 
 	int messageSize = sizeof( message );
 	UDPPacket packet;
