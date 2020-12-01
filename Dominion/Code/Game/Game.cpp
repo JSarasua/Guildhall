@@ -1644,7 +1644,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 			{
 				phaseStr = "Action Phase";
 			}
-			if( m_currentGameState->m_currentPhase == nextPlayersTurn )
+			if( m_currentGameState->m_whoseMoveIsIt == nextPlayersTurn )
 			{
 				std::string startTurnStr = Stringf( "Beginning player %i's turn", nextPlayersTurn + 1 );
 				g_theConsole->PrintString( Rgba8::RED, startTurnStr );
