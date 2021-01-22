@@ -2,6 +2,7 @@
 //#include "Game/CardDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Core/FileUtils.hpp"
 
 PlayerBoard::PlayerBoard()
 {
@@ -351,6 +352,24 @@ void PlayerBoard::RandomizeHandAndDeck()
 	AddHandToDeck();
 	ShuffleDeck();
 	Draw( handCount );
+}
+
+void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer )
+{
+	m_hand.ApppendCardPileToBuffer( buffer );
+	m_discardPile.ApppendCardPileToBuffer( buffer );
+	m_playArea.ApppendCardPileToBuffer( buffer );
+	m_sortedDeck.ApppendCardPileToBuffer( buffer );
+
+	AppendDataToBuffer( (byte*)&m_currentCoins, sizeof( int ), buffer );
+	AppendDataToBuffer( (byte*)&m_numberOfActionsAvailable, sizeof( int ), buffer );
+	AppendDataToBuffer( (byte*)&m_numberOfBuysAvailable, sizeof( int ), buffer );
+
+
+	for( size_t deckIndex = 0; deckIndex < m_deck.size(); deckIndex++ )
+	{
+		m_deck[deckIndex].AppendCardDataToBuffer( buffer );
+	}
 }
 
 void PlayerBoard::AddHandToDeck()

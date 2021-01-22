@@ -152,6 +152,12 @@ public:
 			m_cardIndex == compare.m_cardIndex;
 	}
 
+	void AppendPileDataToBuffer( std::vector<byte> buffer )
+	{
+		AppendDataToBuffer( (byte*)&m_pileSize, sizeof(m_pileSize), buffer );
+		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer );
+	}
+
 	int m_pileSize = -1;
 	eCards m_cardIndex = eCards::INVALID_CARD;
 	//CardDefinition const* m_card = nullptr;
@@ -231,6 +237,20 @@ public:
 	PlayerBoard const& GetCurrentPlayerBoard()
 	{
 		return m_playerBoards[m_whoseMoveIsIt];
+	}
+
+	void AppendGameStateToBuffer( std::vector<byte>& buffer )
+	{
+		for( pileData_t pileData : m_cardPiles )
+		{
+			pileData.AppendPileDataToBuffer( buffer );
+		}
+
+		m_playerBoards[0].AppendPlayerBoardToBuffer( buffer );
+		m_playerBoards[1].AppendPlayerBoardToBuffer( buffer );
+		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof(m_whoseMoveIsIt), buffer );
+		AppendDataToBuffer( (byte*)&m_currentPhase, sizeof(m_currentPhase), buffer );
+		AppendDataToBuffer( (byte*)&m_isFirstMove, sizeof(m_isFirstMove), buffer );
 	}
 
 public:

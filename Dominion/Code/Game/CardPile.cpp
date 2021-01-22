@@ -1,5 +1,6 @@
 #include "Game/CardPile.hpp"
 #include "Game/Game.hpp"
+#include "Engine/Core/FileUtils.hpp"
 
 bool CardPile::operator==( CardPile const& compare ) const
 {
@@ -111,5 +112,11 @@ int CardPile::GetCardIndexFromCountIndex( int countIndex )
 	}
 
 	return -1;
+}
+
+void CardPile::ApppendCardPileToBuffer( std::vector<byte>& buffer )
+{
+	size_t cardPileSize = sizeof(int) * m_cards.size();
+	AppendDataToBuffer( (byte*)&m_cards[0], cardPileSize, buffer );
 }
 

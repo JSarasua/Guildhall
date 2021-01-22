@@ -31,6 +31,35 @@ byte* FileReadToNewBuffer( std::string const& filename, size_t* outSize )
 	return buffer;
 }
 
+int AppendBufferToFile( std::string const& filename, size_t inSize, byte* bufferToWrite )
+{
+	FILE* fp = nullptr;
+	fopen_s( &fp, filename.c_str(), "ab" );
+	if( fp == nullptr )
+	{
+		return -1;
+	}
+
+	fwrite( bufferToWrite, sizeof(byte), inSize, fp );
+	fclose( fp );
+
+	return 0;
+}
+
+void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>& buffer )
+{
+	size_t capacity = buffer.capacity();
+	size_t bufferSize = buffer.size();
+	size_t requiredCapacity = bufferSize + byteCount;
+
+	if( capacity < requiredCapacity )
+	{
+		buffer.resize( requiredCapacity );
+	}
+
+	memcpy( &buffer[bufferSize], dataToWrite, byteCount );
+}
+
 int ParseInt( byte*& buffer )
 {
 	int* intPtr = (int*)buffer;

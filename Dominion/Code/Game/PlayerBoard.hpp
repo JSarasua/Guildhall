@@ -4,6 +4,7 @@
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Game/CardPile.hpp"
 #include "Game/CardDefinition.hpp"
+#include "Engine/Core/FileUtils.hpp"
 
 //class CardDefinition;
 
@@ -29,6 +30,16 @@ public:
 		{
 			return false;
 		}
+	}
+
+	void AppendCardDataToBuffer( std::vector<byte>& buffer )
+	{
+		AppendDataToBuffer( (byte*)&cardIndex, sizeof(int), buffer );
+	}
+	void ReadCardDataFromBuffer( byte*& buffer )
+	{
+		cardIndex = ParseInt( buffer );
+		card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
 	}
 
 public:
@@ -73,6 +84,8 @@ public:
 	int GetCountOfCard( int cardIndex ) const;
 
 	void RandomizeHandAndDeck();
+
+	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer );
 
 private:
 	void AddHandToDeck();
