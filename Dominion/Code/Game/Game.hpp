@@ -123,6 +123,25 @@ public:
 		return false;
 	}
 
+	static inputMove_t ParseInputFromBuffer( byte*& buffer )
+	{
+		inputMove_t move;
+		move.m_moveType = *(eMoveType*)buffer;
+		buffer += sizeof(m_moveType);
+
+		move.m_cardIndex = ParseInt( buffer );
+		move.m_whoseMoveIsIt = ParseInt( buffer );
+
+		return move;
+	}
+
+	void AppendInputToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
+	{
+		AppendDataToBuffer( (byte*)&m_moveType, sizeof( m_moveType ), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof( m_whoseMoveIsIt ), buffer, startIndex );
+	}
+
 public:
 	eMoveType m_moveType = INVALID_MOVE;
 	int m_cardIndex = -1;
@@ -144,9 +163,11 @@ public:
 		metaData_t metaData;
 		metaData.m_numberOfWins = ParseFloat( buffer );
 		metaData.m_numberOfSimulations = ParseInt( buffer );
+
+		return metaData;
 	}
 
-	void AppendMetaDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
+	void AppendMetaDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		AppendDataToBuffer( (byte*)&m_numberOfWins, sizeof( m_numberOfWins ), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_numberOfSimulations, sizeof( m_numberOfSimulations ), buffer, startIndex );
@@ -329,7 +350,7 @@ struct data_t
 		return data;
 	}
 
-	void AppendDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
+	void AppendDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		m_metaData.AppendMetaDataToBuffer( buffer, startIndex );
 		m_currentGamestate.AppendGameStateToBuffer( buffer, startIndex );

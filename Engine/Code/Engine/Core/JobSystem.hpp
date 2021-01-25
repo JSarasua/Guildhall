@@ -43,6 +43,7 @@ public:
 	~JobSystem();
 
 	void Shutdown();
+	void StopWorkerThreads();
 	void AddWorkerThread();
 	void AddWorkerThreads( int numberOfThreadsToAdd );
 	void ClaimAndDeleteCompletedJobs();

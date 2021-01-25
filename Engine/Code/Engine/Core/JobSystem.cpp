@@ -52,6 +52,21 @@ void JobSystem::Shutdown()
 	}
 }
 
+void JobSystem::StopWorkerThreads()
+{
+	g_isQuitting = true;
+
+	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
+	{
+		m_workerThreads[workerIndex]->m_workerThread->join();
+	}
+
+	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
+	{
+		delete m_workerThreads[workerIndex];
+	}
+}
+
 void JobSystem::AddWorkerThread()
 {
 	m_workerThreads.push_back( new WorkerThread( this ) );

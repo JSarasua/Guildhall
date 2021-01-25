@@ -566,23 +566,23 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f1Key.WasJustPressed() )
 	{
-		AppendGameStateToFile( *m_currentGameState, "test.mcts" );
-// 		//Save game state
-// 		std::vector<byte> buffer;
-// 		size_t startIndex = 0;
-// 		m_currentGameState->AppendGameStateToBuffer( buffer, startIndex );
-// 
-// 		AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
+		//AppendGameStateToFile( *m_currentGameState, "test.mcts" );
+
+		m_mcts->StopThreads();
+		m_mcts->SaveTree();
 
 	}
 	if( f2Key.WasJustPressed() )
 	{
-		//Load gamestate
-		size_t outSize;
-		byte* buffer = FileReadToNewBuffer( "test.mcts", &outSize );
-		gamestate_t gameState = gamestate_t::ParseGameStateFromBuffer( buffer );
+// 		//Load gamestate
+// 		size_t outSize;
+// 		byte* buffer = FileReadToNewBuffer( "test.mcts", &outSize );
+// 		gamestate_t gameState = gamestate_t::ParseGameStateFromBuffer( buffer );
+// 
+// 		*m_currentGameState = gameState;
 
-		*m_currentGameState = gameState;
+		m_mcts->StartThreads();
+		m_mcts->LoadTree();
 	}
 	if( f3Key.WasJustPressed() )
 	{

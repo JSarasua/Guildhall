@@ -12,7 +12,17 @@ public:
 	~TreeMapNode();
 
 	void AppendTreeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendStartInput( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendEndInput( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendStartInputChildren( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendEndInputChildren( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendInputSeparator( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendNodeSeparator( std::vector<byte>& buffer, size_t& startIndex ) const;
+
 	static TreeMapNode* ParseDataFromBuffer( byte*& buffer );
+
+	void AppendNodeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
+	static TreeMapNode* ParseNodeFromBuffer( byte*& buffer );
 public:
 	//Don't do pointer
 	//data_t* m_data = nullptr;

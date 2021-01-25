@@ -46,7 +46,7 @@ int AppendBufferToFile( std::string const& filename, size_t inSize, byte* buffer
 	return 0;
 }
 
-void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>& buffer, size_t& startIndex )
+void AppendDataToBuffer( byte const* dataToWrite, size_t byteCount, std::vector<byte>& buffer, size_t& startIndex )
 {
 	int bufferSize = (int)buffer.size();
 	int capacity = bufferSize - (int)startIndex;

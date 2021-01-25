@@ -75,6 +75,11 @@ public:
 	void SetEpsilonValueZeroToOne( float epsilonValue );
 	void SetSimMethod( SIMMETHOD simMethod );
 
+	void StopThreads();
+	void StartThreads();
+	void SaveTree();
+	void LoadTree();
+
 
 protected:
 	//Thread

@@ -623,6 +623,53 @@ void MonteCarlo::SetSimMethod( SIMMETHOD simMethod )
 	m_simMethodLock.unlock();
 }
 
+void MonteCarlo::StopThreads()
+{
+	if( m_mainThread )
+	{
+		m_isQuitting = true;
+		m_mainThread->join();
+		delete m_mainThread;
+		m_mainThread = nullptr;
+	}
+
+	if( m_mcJobSystem )
+	{
+		m_mcJobSystem->StopWorkerThreads();
+	}
+
+}
+
+void MonteCarlo::StartThreads()
+{
+	m_mcJobSystem->AddWorkerThreads( 5 );
+
+	m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
+}
+
+void MonteCarlo::SaveTree()
+{
+	std::vector<byte> buffer;
+	size_t startIndex = 0;
+	m_headNode->AppendTreeToBuffer( buffer, startIndex );
+	AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
+}
+
+void MonteCarlo::LoadTree()
+{
+	size_t bufferSize;
+	byte* buffer = FileReadToNewBuffer( "test.mcts", &bufferSize );
+	TreeMapNode* newHeadNode = TreeMapNode::ParseDataFromBuffer( buffer );
+
+	if( m_headNode )
+	{
+		delete m_headNode;
+	}
+
+	m_headNode = newHeadNode;
+	m_currentHeadNode = m_headNode;
+}
+
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
 {
 	float totalSimulations = 0.f;
