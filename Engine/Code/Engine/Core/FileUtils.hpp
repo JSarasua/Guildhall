@@ -7,5 +7,6 @@ int AppendBufferToFile( std::string const& filename, size_t inSize, byte* buffer
 
 void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>& buffer );
 
-float	ParseFloat( void*& buffer );
+float	ParseFloat( byte*& buffer );
 int		ParseInt( byte*& buffer );
+bool	ParseBool( byte*& buffer );

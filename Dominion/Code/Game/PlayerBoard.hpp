@@ -6,8 +6,7 @@
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/FileUtils.hpp"
 
-//class CardDefinition;
-
+constexpr byte endDeckBytes[2] = {'v','v'};
 struct gamestate_t;
 
 struct CardData_t
@@ -32,11 +31,11 @@ public:
 		}
 	}
 
-	void AppendCardDataToBuffer( std::vector<byte>& buffer )
+	void AppendCardDataToBuffer( std::vector<byte>& buffer ) const
 	{
 		AppendDataToBuffer( (byte*)&cardIndex, sizeof(int), buffer );
 	}
-	void ReadCardDataFromBuffer( byte*& buffer )
+	void ParseCardDataFromBuffer( byte*& buffer )
 	{
 		cardIndex = ParseInt( buffer );
 		card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
@@ -85,7 +84,10 @@ public:
 
 	void RandomizeHandAndDeck();
 
-	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer );
+	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer ) const;
+
+	void ParseFromBuffer( byte*& buffer );
+	static PlayerBoard ParsePlayerBoardFromBuffer( byte*& buffer );
 
 private:
 	void AddHandToDeck();

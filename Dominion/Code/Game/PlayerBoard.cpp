@@ -354,7 +354,7 @@ void PlayerBoard::RandomizeHandAndDeck()
 	Draw( handCount );
 }
 
-void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer )
+void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer ) const
 {
 	m_hand.ApppendCardPileToBuffer( buffer );
 	m_discardPile.ApppendCardPileToBuffer( buffer );
@@ -370,6 +370,47 @@ void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer )
 	{
 		m_deck[deckIndex].AppendCardDataToBuffer( buffer );
 	}
+
+	AppendDataToBuffer( (byte*)&endDeckBytes, 2, buffer );
+}
+
+void PlayerBoard::ParseFromBuffer( byte*& buffer )
+{
+	m_hand.ParseFromBuffer( buffer );
+	m_discardPile.ParseFromBuffer( buffer );
+	m_playArea.ParseFromBuffer( buffer );
+	m_sortedDeck.ParseFromBuffer( buffer );
+
+	m_currentCoins = ParseInt( buffer );
+	m_numberOfActionsAvailable = ParseInt( buffer );
+	m_numberOfBuysAvailable = ParseInt( buffer );
+
+	byte* endDeckCheck = buffer;
+	int breakCounter = 0;
+	int MaxCount = m_sortedDeck.TotalCount();
+	while( endDeckCheck[0] != endDeckBytes[0] && endDeckCheck[0] != endDeckBytes[1] )
+	{
+		breakCounter++;
+		if( breakCounter > MaxCount )
+		{
+			ERROR_AND_DIE( "Attempting to Parse player board passed count of sorted deck")
+		}
+		CardData_t cardData;
+		cardData.ParseCardDataFromBuffer( buffer );
+		m_deck.push_back( cardData );
+
+		endDeckCheck = buffer;
+	}
+
+	//Increment by EndDeckBytes
+	buffer += 2;
+}
+
+PlayerBoard PlayerBoard::ParsePlayerBoardFromBuffer( byte*& buffer )
+{
+	PlayerBoard playerBoard;
+	playerBoard.ParseFromBuffer( buffer );
+	return playerBoard;
 }
 
 void PlayerBoard::AddHandToDeck()

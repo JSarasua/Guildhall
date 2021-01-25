@@ -152,12 +152,24 @@ public:
 			m_cardIndex == compare.m_cardIndex;
 	}
 
+	static pileData_t ParsePileDataFromBuffer( byte*& buffer )
+	{
+		pileData_t pileData;
+		pileData.m_pileSize = ParseInt( buffer );
+
+		pileData.m_cardIndex = *(eCards*)buffer;
+		buffer += sizeof( pileData.m_cardIndex);
+
+		return pileData;
+	}
+
 	void AppendPileDataToBuffer( std::vector<byte> buffer )
 	{
 		AppendDataToBuffer( (byte*)&m_pileSize, sizeof(m_pileSize), buffer );
 		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer );
 	}
 
+public:
 	int m_pileSize = -1;
 	eCards m_cardIndex = eCards::INVALID_CARD;
 	//CardDefinition const* m_card = nullptr;
@@ -239,7 +251,29 @@ public:
 		return m_playerBoards[m_whoseMoveIsIt];
 	}
 
-	void AppendGameStateToBuffer( std::vector<byte>& buffer )
+	static gamestate_t ParseGameStateFromBuffer( byte*& buffer )
+	{
+		gamestate_t gameState;
+
+		for( pileData_t& pileData : gameState.m_cardPiles )
+		{
+			pileData = pileData_t::ParsePileDataFromBuffer( buffer );
+		}
+
+		gameState.m_playerBoards[0] = PlayerBoard::ParsePlayerBoardFromBuffer( buffer );
+		gameState.m_playerBoards[1] = PlayerBoard::ParsePlayerBoardFromBuffer( buffer );
+		
+		gameState.m_whoseMoveIsIt = ParseInt( buffer );
+		
+		gameState.m_currentPhase = *(eGamePhase*)buffer;
+		buffer += sizeof(gameState.m_currentPhase);
+
+		gameState.m_isFirstMove = ParseBool( buffer );
+
+		return gameState;
+	}
+
+	void AppendGameStateToBuffer( std::vector<byte>& buffer ) const
 	{
 		for( pileData_t pileData : m_cardPiles )
 		{
@@ -313,6 +347,10 @@ public:
 
 	int GetCurrentPlayersScore( gamestate_t const& currentGameState );
 	int GetOpponentsScore( gamestate_t const& currentGameState );
+
+	void AppendGameStateToFile( gamestate_t const& gameState, std::string const& filePath );
+	gamestate_t ParseGameStateFromBuffer( byte*& buffer );
+
 private:
 	void InitializeGameState();
 	void RestartGame();

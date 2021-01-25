@@ -2638,6 +2638,24 @@ int Game::GetOpponentsScore( gamestate_t const& currentGameState )
 	return playerScore;
 }
 
+void Game::AppendGameStateToFile( gamestate_t const& gameState, std::string const& filePath )
+{
+	std::vector<byte> buffer;
+	gameState.AppendGameStateToBuffer( buffer );
+
+	int errorCode = AppendBufferToFile( filePath, buffer.size(), &buffer[0] );
+
+	if( errorCode == -1 )
+	{
+		ERROR_AND_DIE( "Failed to write to file" );
+	}
+}
+
+gamestate_t Game::ParseGameStateFromBuffer( byte*& buffer )
+{
+	return gamestate_t::ParseGameStateFromBuffer( buffer );
+}
+
 void Game::RenderDevConsole()
 {
 	//g_theConsole->Render(*g_theRenderer, m_camera, 0.1f);

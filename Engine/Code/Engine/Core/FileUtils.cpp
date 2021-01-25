@@ -60,6 +60,13 @@ void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>&
 	memcpy( &buffer[bufferSize], dataToWrite, byteCount );
 }
 
+float ParseFloat( byte*& buffer )
+{
+	float* floatPtr = (float*)buffer;
+	buffer += sizeof(float);
+	return *floatPtr;
+}
+
 int ParseInt( byte*& buffer )
 {
 	int* intPtr = (int*)buffer;
@@ -67,4 +74,11 @@ int ParseInt( byte*& buffer )
 	buffer += sizeof(int);
 
 	return *intPtr;
+}
+
+bool ParseBool( byte*& buffer )
+{
+	bool* boolPtr = (bool*)buffer;
+	buffer += sizeof(bool);
+	return *boolPtr;
 }

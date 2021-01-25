@@ -26,7 +26,11 @@ public:
 	int GetNumberOfUniqueActions() const;
 	int GetCardIndexFromCountIndex( int countIndex ); //The count index is if you had a hand of cards, what is the third card
 
-	void ApppendCardPileToBuffer( std::vector<byte>& buffer );
+	void ApppendCardPileToBuffer( std::vector<byte>& buffer ) const;
+
+	void ParseFromBuffer( byte*& buffer );
+
+	static CardPile ParseCardPileFromBuffer( byte*& buffer );
 
 private:
 	static const int m_numberOfPossibleUniqueCards = NUMBEROFPILES;
