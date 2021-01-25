@@ -46,18 +46,24 @@ int AppendBufferToFile( std::string const& filename, size_t inSize, byte* buffer
 	return 0;
 }
 
-void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>& buffer )
+void AppendDataToBuffer( byte* dataToWrite, size_t byteCount, std::vector<byte>& buffer, size_t& startIndex )
 {
-	size_t capacity = buffer.capacity();
-	size_t bufferSize = buffer.size();
-	size_t requiredCapacity = bufferSize + byteCount;
+	int bufferSize = (int)buffer.size();
+	int capacity = bufferSize - (int)startIndex;
 
-	if( capacity < requiredCapacity )
+	if( capacity < 0 )
 	{
-		buffer.resize( requiredCapacity );
+		ERROR_AND_DIE( "startIndex is after current last element" );
+	}
+
+	if( capacity < byteCount )
+	{
+		buffer.resize( bufferSize + byteCount );
 	}
 
 	memcpy( &buffer[bufferSize], dataToWrite, byteCount );
+
+	startIndex += byteCount;
 }
 
 float ParseFloat( byte*& buffer )

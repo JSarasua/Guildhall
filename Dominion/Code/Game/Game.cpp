@@ -566,21 +566,23 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f1Key.WasJustPressed() )
 	{
-		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mcts->AddSimulations( 1 );
-		//m_mc->RunSimulations( 400 );
-/*		m_mcts->RunSimulations( 1000 );*/
+		AppendGameStateToFile( *m_currentGameState, "test.mcts" );
+// 		//Save game state
+// 		std::vector<byte> buffer;
+// 		size_t startIndex = 0;
+// 		m_currentGameState->AppendGameStateToBuffer( buffer, startIndex );
+// 
+// 		AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
 
 	}
 	if( f2Key.WasJustPressed() )
 	{
-		//DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mcts->AddSimulations( 1000 );
-		//inputMove_t move = m_mc->GetBestMove();
-		//PlayMoveIfValid( move );
-		//inputMove_t move = m_mcts->GetBestMove();
+		//Load gamestate
+		size_t outSize;
+		byte* buffer = FileReadToNewBuffer( "test.mcts", &outSize );
+		gamestate_t gameState = gamestate_t::ParseGameStateFromBuffer( buffer );
 
-/*		PlayMoveIfValid( move.m_move );*/
+		*m_currentGameState = gameState;
 	}
 	if( f3Key.WasJustPressed() )
 	{
@@ -1171,7 +1173,7 @@ void Game::DebugDrawGame()
 		}
 	}
 
-	std::vector<int> aiValidMoves = m_mc->GetCurrentBuyIndexes();
+	std::vector<int> aiValidMoves = GetCurrentBuyIndexes();
 	AABB2 bottomPilesArea;
 	bool isTwoRows = false;
 	int cardsPerRow = 8;
@@ -1735,7 +1737,7 @@ bool Game::IsMoveValidForGameState( inputMove_t const& moveToPlay, gamestate_t c
 
 }
 
-int Game::IsGameOverForGameState( gamestate_t const& gameState )
+int Game::IsGameOverForGameState( gamestate_t const& gameState ) const
 {
 	bool isGameOver = false;
 	pileData_t const& provinceData = gameState.m_cardPiles[(int)eCards::PROVINCE];
@@ -1796,7 +1798,7 @@ int Game::IsGameOver()
 
 
 
-std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& gameState )
+std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& gameState ) const
 {
 	std::vector<inputMove_t> validMoves;
 
@@ -2638,10 +2640,28 @@ int Game::GetOpponentsScore( gamestate_t const& currentGameState )
 	return playerScore;
 }
 
+std::vector<int> Game::GetCurrentBuyIndexes() const
+{
+	std::vector<int> buyIndexes;
+	
+	std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( *m_currentGameState );
+	for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+	{
+		inputMove_t const& move = validMoves[moveIndex];
+		if( move.m_moveType == BUY_MOVE )
+		{
+			buyIndexes.push_back( move.m_cardIndex );
+		}
+	}
+
+	return buyIndexes;
+}
+
 void Game::AppendGameStateToFile( gamestate_t const& gameState, std::string const& filePath )
 {
 	std::vector<byte> buffer;
-	gameState.AppendGameStateToBuffer( buffer );
+	size_t startIndex = 0;
+	gameState.AppendGameStateToBuffer( buffer, startIndex );
 
 	int errorCode = AppendBufferToFile( filePath, buffer.size(), &buffer[0] );
 

@@ -31,9 +31,9 @@ public:
 		}
 	}
 
-	void AppendCardDataToBuffer( std::vector<byte>& buffer ) const
+	void AppendCardDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
-		AppendDataToBuffer( (byte*)&cardIndex, sizeof(int), buffer );
+		AppendDataToBuffer( (byte*)&cardIndex, sizeof(int), buffer, startIndex );
 	}
 	void ParseCardDataFromBuffer( byte*& buffer )
 	{
@@ -84,7 +84,7 @@ public:
 
 	void RandomizeHandAndDeck();
 
-	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer ) const;
+	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
 
 	void ParseFromBuffer( byte*& buffer );
 	static PlayerBoard ParsePlayerBoardFromBuffer( byte*& buffer );

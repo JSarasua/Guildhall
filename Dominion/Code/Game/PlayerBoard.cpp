@@ -354,24 +354,24 @@ void PlayerBoard::RandomizeHandAndDeck()
 	Draw( handCount );
 }
 
-void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer ) const
+void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 {
-	m_hand.ApppendCardPileToBuffer( buffer );
-	m_discardPile.ApppendCardPileToBuffer( buffer );
-	m_playArea.ApppendCardPileToBuffer( buffer );
-	m_sortedDeck.ApppendCardPileToBuffer( buffer );
+	m_hand.ApppendCardPileToBuffer( buffer, startIndex );
+	m_discardPile.ApppendCardPileToBuffer( buffer, startIndex );
+	m_playArea.ApppendCardPileToBuffer( buffer, startIndex );
+	m_sortedDeck.ApppendCardPileToBuffer( buffer, startIndex );
 
-	AppendDataToBuffer( (byte*)&m_currentCoins, sizeof( int ), buffer );
-	AppendDataToBuffer( (byte*)&m_numberOfActionsAvailable, sizeof( int ), buffer );
-	AppendDataToBuffer( (byte*)&m_numberOfBuysAvailable, sizeof( int ), buffer );
+	AppendDataToBuffer( (byte*)&m_currentCoins, sizeof( int ), buffer, startIndex );
+	AppendDataToBuffer( (byte*)&m_numberOfActionsAvailable, sizeof( int ), buffer, startIndex );
+	AppendDataToBuffer( (byte*)&m_numberOfBuysAvailable, sizeof( int ), buffer, startIndex );
 
 
 	for( size_t deckIndex = 0; deckIndex < m_deck.size(); deckIndex++ )
 	{
-		m_deck[deckIndex].AppendCardDataToBuffer( buffer );
+		m_deck[deckIndex].AppendCardDataToBuffer( buffer, startIndex );
 	}
 
-	AppendDataToBuffer( (byte*)&endDeckBytes, 2, buffer );
+	AppendDataToBuffer( (byte*)&endDeckBytes, 2, buffer, startIndex );
 }
 
 void PlayerBoard::ParseFromBuffer( byte*& buffer )

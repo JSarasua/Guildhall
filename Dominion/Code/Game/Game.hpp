@@ -163,10 +163,10 @@ public:
 		return pileData;
 	}
 
-	void AppendPileDataToBuffer( std::vector<byte> buffer )
+	void AppendPileDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
 	{
-		AppendDataToBuffer( (byte*)&m_pileSize, sizeof(m_pileSize), buffer );
-		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer );
+		AppendDataToBuffer( (byte*)&m_pileSize, sizeof(m_pileSize), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer, startIndex );
 	}
 
 public:
@@ -273,18 +273,18 @@ public:
 		return gameState;
 	}
 
-	void AppendGameStateToBuffer( std::vector<byte>& buffer ) const
+	void AppendGameStateToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		for( pileData_t pileData : m_cardPiles )
 		{
-			pileData.AppendPileDataToBuffer( buffer );
+			pileData.AppendPileDataToBuffer( buffer, startIndex );
 		}
 
-		m_playerBoards[0].AppendPlayerBoardToBuffer( buffer );
-		m_playerBoards[1].AppendPlayerBoardToBuffer( buffer );
-		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof(m_whoseMoveIsIt), buffer );
-		AppendDataToBuffer( (byte*)&m_currentPhase, sizeof(m_currentPhase), buffer );
-		AppendDataToBuffer( (byte*)&m_isFirstMove, sizeof(m_isFirstMove), buffer );
+		m_playerBoards[0].AppendPlayerBoardToBuffer( buffer, startIndex );
+		m_playerBoards[1].AppendPlayerBoardToBuffer( buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof(m_whoseMoveIsIt), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_currentPhase, sizeof(m_currentPhase), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_isFirstMove, sizeof(m_isFirstMove), buffer, startIndex );
 	}
 
 public:
@@ -327,11 +327,11 @@ public:
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
 	bool IsMoveValidForGameState( inputMove_t const&, gamestate_t const& gameState ) const;
-	int IsGameOverForGameState( gamestate_t const& gameState );
+	int IsGameOverForGameState( gamestate_t const& gameState ) const;
 	int IsGameOver();
 
 
-	std::vector<inputMove_t> GetValidMovesAtGameState( gamestate_t const& gameState );
+	std::vector<inputMove_t> GetValidMovesAtGameState( gamestate_t const& gameState ) const;
 	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
 	inputMove_t GetBestMoveUsingAIStrategy( AIStrategy aiStrategy );
@@ -347,6 +347,8 @@ public:
 
 	int GetCurrentPlayersScore( gamestate_t const& currentGameState );
 	int GetOpponentsScore( gamestate_t const& currentGameState );
+
+	std::vector<int> GetCurrentBuyIndexes() const;
 
 	void AppendGameStateToFile( gamestate_t const& gameState, std::string const& filePath );
 	gamestate_t ParseGameStateFromBuffer( byte*& buffer );

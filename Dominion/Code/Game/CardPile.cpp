@@ -114,10 +114,10 @@ int CardPile::GetCardIndexFromCountIndex( int countIndex )
 	return -1;
 }
 
-void CardPile::ApppendCardPileToBuffer( std::vector<byte>& buffer ) const
+void CardPile::ApppendCardPileToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 {
 	size_t cardPileSize = sizeof(int) * m_cards.size();
-	AppendDataToBuffer( (byte*)&m_cards[0], cardPileSize, buffer );
+	AppendDataToBuffer( (byte*)&m_cards[0], cardPileSize, buffer, startIndex );
 }
 
 void CardPile::ParseFromBuffer( byte*& buffer )
