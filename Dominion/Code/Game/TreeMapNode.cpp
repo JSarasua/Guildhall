@@ -18,3 +18,20 @@ TreeMapNode::~TreeMapNode()
 	}
 }
 
+void TreeMapNode::AppendTreeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
+{
+	//Map Data
+
+	//For loop on children
+		//Call AppendTree on child
+}
+
+TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
+{
+	return nullptr;
+	//Parse data
+
+	//For loop on children
+		//ParseData on child
+}
+

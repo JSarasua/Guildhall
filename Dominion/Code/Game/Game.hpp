@@ -139,6 +139,20 @@ struct metaData_t
 public:
 	float GetWinRate() const { return m_numberOfWins / (float)m_numberOfSimulations; }
 
+	static metaData_t ParseMetaDataFromBuffer( byte*& buffer )
+	{
+		metaData_t metaData;
+		metaData.m_numberOfWins = ParseFloat( buffer );
+		metaData.m_numberOfSimulations = ParseInt( buffer );
+	}
+
+	void AppendMetaDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
+	{
+		AppendDataToBuffer( (byte*)&m_numberOfWins, sizeof( m_numberOfWins ), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_numberOfSimulations, sizeof( m_numberOfSimulations ), buffer, startIndex );
+	}
+
+
 	float m_numberOfWins = 0.f;
 	int m_numberOfSimulations = 0;
 };
@@ -306,9 +320,22 @@ struct data_t
 		m_currentGamestate( gameState )
 	{	}
 
+	static data_t ParseDataFromBuffer( byte*& buffer )
+	{
+		data_t data;
+		data.m_metaData = metaData_t::ParseMetaDataFromBuffer( buffer );
+		data.m_currentGamestate = gamestate_t::ParseGameStateFromBuffer( buffer );
+
+		return data;
+	}
+
+	void AppendDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
+	{
+		m_metaData.AppendMetaDataToBuffer( buffer, startIndex );
+		m_currentGamestate.AppendGameStateToBuffer( buffer, startIndex );
+	}
+
 	metaData_t m_metaData;
-	//Don't do pointer
-	//gamestate_t* m_currentGamestate = nullptr;
 	gamestate_t m_currentGamestate;
 };
 

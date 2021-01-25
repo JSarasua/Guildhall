@@ -11,7 +11,8 @@ public:
 	TreeMapNode() = default;
 	~TreeMapNode();
 
-
+	void AppendTreeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
+	static TreeMapNode* ParseDataFromBuffer( byte*& buffer );
 public:
 	//Don't do pointer
 	//data_t* m_data = nullptr;
