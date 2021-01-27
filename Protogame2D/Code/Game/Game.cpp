@@ -234,7 +234,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		float balance = m_rand.RollRandomFloatInRange( -1.f, 1.f );
 		float speed = m_rand.RollRandomFloatInRange( 0.5f, 2.f );
 
-		g_theAudio->PlaySound( soundID, false, volume, balance, speed );
+		g_theAudio->PlayGameSound( soundID, false, volume, balance, speed );
 	}
 
 	if( f11Key.WasJustPressed() )
