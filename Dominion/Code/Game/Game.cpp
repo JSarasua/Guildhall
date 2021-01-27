@@ -591,8 +591,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f4Key.WasJustPressed() )
 	{
-		inputMove_t move = m_mcts->GetBestMove();
-		PlayMoveIfValid( move );
+		m_mcts->AddSimulations( 1 );
 	}
 	if( f5Key.WasJustPressed() )
 	{

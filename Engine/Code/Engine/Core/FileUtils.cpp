@@ -46,8 +46,15 @@ int AppendBufferToFile( std::string const& filename, size_t inSize, byte* buffer
 	return 0;
 }
 
+void DeleteFile( std::string const& filename )
+{
+	remove( filename.c_str() );
+}
+
 void AppendDataToBuffer( byte const* dataToWrite, size_t byteCount, std::vector<byte>& buffer, size_t& startIndex )
 {
+	//if buffer is null, then just return size
+	//Would run through twice
 	int bufferSize = (int)buffer.size();
 	int capacity = bufferSize - (int)startIndex;
 
@@ -61,7 +68,10 @@ void AppendDataToBuffer( byte const* dataToWrite, size_t byteCount, std::vector<
 		buffer.resize( bufferSize + byteCount );
 	}
 
-	memcpy( &buffer[bufferSize], dataToWrite, byteCount );
+	//Could just call resize without checking
+	//buffer.data()[startIndex]
+
+	memcpy( &buffer[startIndex], dataToWrite, byteCount );
 
 	startIndex += byteCount;
 }

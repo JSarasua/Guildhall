@@ -6,7 +6,8 @@
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/FileUtils.hpp"
 
-constexpr byte endDeckBytes[2] = {'v','v'};
+constexpr size_t CHECKSIZE = 2;
+constexpr byte ENDDECKBYTES[CHECKSIZE] = {'v','v'};
 struct gamestate_t;
 
 struct CardData_t

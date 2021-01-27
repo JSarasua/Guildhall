@@ -649,8 +649,11 @@ void MonteCarlo::StartThreads()
 
 void MonteCarlo::SaveTree()
 {
+	DeleteFile( "test.mcts" );
+
 	std::vector<byte> buffer;
 	size_t startIndex = 0;
+	//Resize first doing a first pass to find datasize
 	m_headNode->AppendTreeToBuffer( buffer, startIndex );
 	AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
 }

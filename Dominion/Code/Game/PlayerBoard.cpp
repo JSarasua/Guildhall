@@ -371,7 +371,7 @@ void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& 
 		m_deck[deckIndex].AppendCardDataToBuffer( buffer, startIndex );
 	}
 
-	AppendDataToBuffer( (byte*)&endDeckBytes, 2, buffer, startIndex );
+	AppendDataToBuffer( (byte*)&ENDDECKBYTES, 2, buffer, startIndex );
 }
 
 void PlayerBoard::ParseFromBuffer( byte*& buffer )
@@ -388,7 +388,8 @@ void PlayerBoard::ParseFromBuffer( byte*& buffer )
 	byte* endDeckCheck = buffer;
 	int breakCounter = 0;
 	int MaxCount = m_sortedDeck.TotalCount();
-	while( endDeckCheck[0] != endDeckBytes[0] && endDeckCheck[0] != endDeckBytes[1] )
+
+	while( memcmp( endDeckCheck, ENDDECKBYTES, CHECKSIZE ) != 0 )
 	{
 		breakCounter++;
 		if( breakCounter > MaxCount )
@@ -402,8 +403,7 @@ void PlayerBoard::ParseFromBuffer( byte*& buffer )
 		endDeckCheck = buffer;
 	}
 
-	//Increment by EndDeckBytes
-	buffer += 2;
+	buffer += CHECKSIZE;
 }
 
 PlayerBoard PlayerBoard::ParsePlayerBoardFromBuffer( byte*& buffer )

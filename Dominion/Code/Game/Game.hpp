@@ -356,6 +356,7 @@ struct data_t
 		m_currentGamestate.AppendGameStateToBuffer( buffer, startIndex );
 	}
 
+public:
 	metaData_t m_metaData;
 	gamestate_t m_currentGamestate;
 };

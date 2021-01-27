@@ -113,6 +113,8 @@ TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 
 				if( *buffer == startChildNodes )
 				{
+					buffer += sizeof( startChildNodes );
+
 					while( true )
 					{
 						if( *buffer == endChildNodes )
@@ -142,9 +144,3 @@ TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 	//For loop on children
 		//ParseData on child
 }
-
-void TreeMapNode::AppendNodeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
-{
-
-}
-
