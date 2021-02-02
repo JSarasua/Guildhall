@@ -44,12 +44,14 @@ public:
 
 	void Shutdown();
 	void StopWorkerThreads();
+	void StartWorkerThreads();
 	void AddWorkerThread();
 	void AddWorkerThreads( int numberOfThreadsToAdd );
 	void ClaimAndDeleteCompletedJobs();
 	void PostJob( Job* job );
 	void PostPriorityJob( Job* job );
 	int GetNumberOfJobsQueued();
+	void ClearQueues();
 
 protected:
 	std::deque<Job*> m_priorityJobsQueued;

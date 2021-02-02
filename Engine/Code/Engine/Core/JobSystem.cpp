@@ -30,26 +30,7 @@ void JobSystem::Shutdown()
 		delete m_workerThreads[workerIndex];
 	}
 
-	while( m_jobsQueued.size() > 0 )
-	{
-		Job* currentJob = m_jobsQueued.front();
-		delete currentJob;
-		m_jobsQueued.pop_front();
-	}
-
-	while( m_jobsRunning.size() > 0 )
-	{
-		Job* currentJob = m_jobsRunning.front();
-		delete currentJob;
-		m_jobsRunning.pop_front();
-	}
-
-	while( m_jobsCompleted.size() > 0 )
-	{
-		Job* currentJob = m_jobsCompleted.front();
-		delete currentJob;
-		m_jobsCompleted.pop_front();
-	}
+	ClearQueues();
 }
 
 void JobSystem::StopWorkerThreads()
@@ -65,6 +46,13 @@ void JobSystem::StopWorkerThreads()
 	{
 		delete m_workerThreads[workerIndex];
 	}
+
+	m_workerThreads.clear();
+}
+
+void JobSystem::StartWorkerThreads()
+{
+	g_isQuitting = false;
 }
 
 void JobSystem::AddWorkerThread()
@@ -119,6 +107,30 @@ int JobSystem::GetNumberOfJobsQueued()
 	m_jobsQueuedLock.unlock();
 
 	return numberOfJobsQueued;
+}
+
+void JobSystem::ClearQueues()
+{
+	while( m_jobsQueued.size() > 0 )
+	{
+		Job* currentJob = m_jobsQueued.front();
+		delete currentJob;
+		m_jobsQueued.pop_front();
+	}
+
+	while( m_jobsRunning.size() > 0 )
+	{
+		Job* currentJob = m_jobsRunning.front();
+		delete currentJob;
+		m_jobsRunning.pop_front();
+	}
+
+	while( m_jobsCompleted.size() > 0 )
+	{
+		Job* currentJob = m_jobsCompleted.front();
+		delete currentJob;
+		m_jobsCompleted.pop_front();
+	}
 }
 
 WorkerThread::WorkerThread( JobSystem* owningJobSystem ) : m_owningJobSystem( owningJobSystem )
