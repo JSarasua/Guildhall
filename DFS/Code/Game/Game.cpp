@@ -129,6 +129,8 @@ void Game::Update( float deltaSeconds )
 
 void Game::Render()
 {
+	Rgba8 clearColor = Rgba8::BLACK;
+	m_camera.SetClearMode( CLEAR_COLOR_BIT | CLEAR_DEPTH_BIT, clearColor, 0.f, 0 );
 	switch( m_gameState )
 	{
 	case LOADING: RenderLoading();
@@ -199,7 +201,23 @@ void Game::UpdateCamera( float deltaSeconds )
 
 	if( g_theApp->GetDebugCameraMode() )
 	{
-		UNIMPLEMENTED();
+		if( currentMapBounds.x > currentMapBounds.y * CLIENT_ASPECT )
+		{
+			Vec2 mapBounds = Vec2( (float)currentMapBounds.x, (float)currentMapBounds.x/CLIENT_ASPECT );
+			Vec2 zeroVec;
+			m_camera.SetOutputSize( mapBounds );
+			m_camera.SetPosition( 0.5f * mapBounds );
+			m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.f, 100.f );
+		}
+		else
+		{
+			Vec2 mapBounds = Vec2( (float)currentMapBounds.y * CLIENT_ASPECT, (float)currentMapBounds.y );
+			Vec2 zeroVec;
+			m_camera.SetOutputSize( mapBounds );
+			m_camera.SetPosition( 0.25f * mapBounds );
+			m_camera.SetProjectionOrthographic( m_camera.m_outputSize, 0.f, 100.f );
+		}
+
 // 		if( currentMapBounds.x > currentMapBounds.y * CLIENT_ASPECT )
 // 		{
 // 			m_camera.SetOrthoView( Vec2( 0.f, 0.f ), Vec2((float)currentMapBounds.x, (float)currentMapBounds.x/CLIENT_ASPECT ) );
@@ -819,7 +837,7 @@ void Game::UpdateLoading( float deltaSeconds )
 	else if( m_frameCounter == 0 )
 	{
 		SoundID loadingSound = g_theAudio->CreateOrGetSound( "Data/Audio/Anticipation.mp3" );
-		g_theAudio->PlaySound( loadingSound );
+		g_theAudio->PlayGameSound( loadingSound );
 	}
 
 	if( m_frameCounter == 2 )

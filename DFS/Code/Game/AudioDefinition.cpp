@@ -24,7 +24,7 @@ void AudioDefinition::PlaySound()
 	}
 
 	float currentVolume = s_masterVolume * bgMusicVolume * sfxVolume;
-	m_soundPlaybackID = g_theAudio->PlaySound( m_soundID, m_isLooped, currentVolume );
+	m_soundPlaybackID = g_theAudio->PlayGameSound( m_soundID, m_isLooped, currentVolume );
 	m_isPlaying = true;
 
 	
