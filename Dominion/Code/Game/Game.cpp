@@ -569,6 +569,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		//AppendGameStateToFile( *m_currentGameState, "test.mcts" );
 
 		m_mcts->StopThreads();
+		m_mcts->FlushJobSystemQueues();
 		m_mcts->SaveTree();
 
 	}
@@ -581,8 +582,8 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 
 // 		*m_currentGameState = gameState;
 
-		m_mcts->StartThreads();
 		m_mcts->LoadTree();
+		m_mcts->StartThreads();
 	}
 	if( f3Key.WasJustPressed() )
 	{

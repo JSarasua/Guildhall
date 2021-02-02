@@ -146,6 +146,11 @@ void MonteCarlo::SetInitialGameState( gamestate_t const& newGameState )
 
 }
 
+void MonteCarlo::FlushJobSystemQueues()
+{
+	m_mcJobSystem->ClearQueues();
+}
+
 void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
@@ -637,14 +642,18 @@ void MonteCarlo::StopThreads()
 	{
 		m_mcJobSystem->StopWorkerThreads();
 	}
-
 }
 
 void MonteCarlo::StartThreads()
 {
+	m_isQuitting = false;
+	m_mcJobSystem->StartWorkerThreads();
 	m_mcJobSystem->AddWorkerThreads( 5 );
 
-	m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
+	if( nullptr == m_mainThread )
+	{
+		m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
+	}
 }
 
 void MonteCarlo::SaveTree()

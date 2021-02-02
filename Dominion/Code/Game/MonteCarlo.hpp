@@ -59,6 +59,8 @@ public:
 	void Shutdown();
 	void SetInitialGameState( gamestate_t const& newGameState );
 
+	void FlushJobSystemQueues();
+
 	//Base MCTS methods
 	inputMove_t GetBestMove();
 	void UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState );
