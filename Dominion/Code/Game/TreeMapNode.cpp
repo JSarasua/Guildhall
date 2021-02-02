@@ -44,12 +44,12 @@ void TreeMapNode::AppendTreeToBuffer( std::vector<byte>& buffer, size_t& startIn
 		{
 			outcomeNode->AppendTreeToBuffer( buffer, startIndex );
 
-			AppendNodeSeparator( buffer, startIndex ); // ,
+			//AppendNodeSeparator( buffer, startIndex ); // ,
 		}
 
 		AppendEndInputChildren( buffer, startIndex ); // )
 
-		AppendInputSeparator( buffer, startIndex ); // ;
+		//AppendInputSeparator( buffer, startIndex ); // ;
 	}
 
 	AppendEndInput( buffer, startIndex ); // ]
@@ -101,10 +101,10 @@ TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 				buffer += sizeof( endChildInputs );
 				break;
 			}
-			else if( *buffer == inputSeparator )
-			{
-				buffer += sizeof( inputSeparator );
-			}
+// 			else if( *buffer == inputSeparator )
+// 			{
+// 				buffer += sizeof( inputSeparator );
+// 			}
 			else
 			{
 				inputMove_t inputMove = inputMove_t::ParseInputFromBuffer( buffer );
@@ -122,10 +122,10 @@ TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 							buffer += sizeof( endChildNodes );
 							break;
 						}
-						else if( *buffer == nodeSeparator )
-						{
-							buffer += sizeof( nodeSeparator );
-						}
+// 						else if( *buffer == nodeSeparator )
+// 						{
+// 							buffer += sizeof( nodeSeparator );
+// 						}
 						else
 						{
 							TreeMapNode* childNode = TreeMapNode::ParseDataFromBuffer( buffer );
