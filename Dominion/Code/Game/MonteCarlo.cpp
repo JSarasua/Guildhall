@@ -662,6 +662,8 @@ void MonteCarlo::SaveTree()
 
 	std::vector<byte> buffer;
 	size_t startIndex = 0;
+	AppendDataToBuffer( (byte*)&m_totalNumberOfSimulationsRun, sizeof( m_totalNumberOfSimulationsRun ), buffer, startIndex );
+	AppendDataToBuffer( (byte*)&m_numberOfSimulationsToRun, sizeof( m_numberOfSimulationsToRun ), buffer, startIndex );
 	//Resize first doing a first pass to find datasize
 	m_headNode->AppendTreeToBuffer( buffer, startIndex );
 	AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
@@ -671,6 +673,8 @@ void MonteCarlo::LoadTree()
 {
 	size_t bufferSize;
 	byte* buffer = FileReadToNewBuffer( "test.mcts", &bufferSize );
+	m_totalNumberOfSimulationsRun = ParseInt( buffer );
+	m_numberOfSimulationsToRun = ParseInt( buffer );
 	TreeMapNode* newHeadNode = TreeMapNode::ParseDataFromBuffer( buffer );
 
 	if( m_headNode )
