@@ -581,9 +581,11 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 		gamestate_t gameState = gamestate_t::ParseGameStateFromBuffer( buffer );
 // 
 // 		*m_currentGameState = gameState;
-
+		m_mcts->StopThreads();
+		m_mcts->FlushJobSystemQueues();
 		m_mcts->LoadTree();
 		m_mcts->StartThreads();
+		m_mcts->SetInitialGameState( *m_currentGameState );
 	}
 	if( f3Key.WasJustPressed() )
 	{
