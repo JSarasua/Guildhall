@@ -216,7 +216,8 @@ public:
 	gamestate_t() = default;
 	gamestate_t( gamestate_t const& copyGameState ) :
 		m_whoseMoveIsIt( copyGameState.m_whoseMoveIsIt ),
-		m_currentPhase( copyGameState.m_currentPhase )
+		m_currentPhase( copyGameState.m_currentPhase ),
+		m_isFirstMove( copyGameState.m_isFirstMove )
 	{
 		m_playerBoards[0] = copyGameState.m_playerBoards[0];
 		m_playerBoards[1] = copyGameState.m_playerBoards[1];
