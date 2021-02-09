@@ -9,6 +9,7 @@
 constexpr size_t CHECKSIZE = 2;
 constexpr byte ENDDECKBYTES[CHECKSIZE] = {'v','v'};
 struct gamestate_t;
+struct inputMove_t;
 
 struct CardData_t
 {
@@ -72,8 +73,8 @@ public:
 	void PlayTreasureCards();
 	void Draw( int numberToDraw = 1 );
 	void Draw5();
-	void PlayCard( size_t handIndex, gamestate_t* gameState );
-	bool CanPlayCard( int handIndex, gamestate_t const* gameState ) const;
+	void PlayCard( inputMove_t const& inputMove, gamestate_t* gameState );
+	bool CanPlayCard( inputMove_t const& inputMove, gamestate_t const* gameState ) const;
 
 	size_t GetDeckSize() { return m_deck.size(); }
 	size_t GetDiscardSize() { return (size_t)m_discardPile.TotalCount(); }

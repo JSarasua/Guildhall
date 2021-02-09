@@ -39,6 +39,7 @@ enum eCards
 	Laboratory,
 	Market,
 	Witch,
+	Remodel,
 
 	NUM_CARDS
 };
@@ -79,5 +80,6 @@ public:
 	bool m_OpponentsDrawCard = false;
 	bool m_trashUpToFourCards = false;
 	bool m_discardUptoHandSizeToDrawThatMany = false;
+	bool m_trashCardFromHandToGainCardOfValue2Higher = false;
 
 };

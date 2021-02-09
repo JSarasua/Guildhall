@@ -89,17 +89,21 @@ struct inputMove_t
 {
 public:
 	inputMove_t() = default;
-	inputMove_t( eMoveType const& moveType, int whoseMove, int cardIndex = -1 ) :
+	inputMove_t( eMoveType const& moveType, int whoseMove, int cardIndex = -1, int parameterCardIndex1 = -1, int parameterCardIndex2 = -1 ) :
 	m_moveType( moveType ),
 	m_whoseMoveIsIt( whoseMove ),
-	m_cardIndex( cardIndex )
+	m_cardIndex( cardIndex ),
+	m_parameterCardIndex1( parameterCardIndex1 ),
+	m_parameterCardIndex2( parameterCardIndex2 )
 	{}
 
 	bool operator==( inputMove_t const& compare ) const
 	{
 		return m_moveType == compare.m_moveType && 
 			m_cardIndex == compare.m_cardIndex && 
-			m_whoseMoveIsIt == compare.m_whoseMoveIsIt;
+			m_whoseMoveIsIt == compare.m_whoseMoveIsIt &&
+			m_parameterCardIndex1 == compare.m_parameterCardIndex1 &&
+			m_parameterCardIndex2 == compare.m_parameterCardIndex2;
 	}
 
 	bool operator<( inputMove_t const& compare ) const
@@ -114,12 +118,28 @@ public:
 			{
 				return true;
 			}
-			else if( m_whoseMoveIsIt < compare.m_whoseMoveIsIt )
+			else if( m_cardIndex == compare.m_cardIndex )
 			{
-				return true;
+				if( m_whoseMoveIsIt < compare.m_whoseMoveIsIt )
+				{
+					return true;
+				}
+				else if( m_whoseMoveIsIt == compare.m_whoseMoveIsIt )
+				{
+					if( m_parameterCardIndex1 < compare.m_parameterCardIndex1 )
+					{
+						return true;
+					}
+					else if( m_parameterCardIndex1 == compare.m_parameterCardIndex1 )
+					{
+						if( m_parameterCardIndex2 < compare.m_parameterCardIndex2 )
+						{
+							return true;
+						}
+					}
+				}
 			}
 		}
-
 		return false;
 	}
 
@@ -131,6 +151,8 @@ public:
 
 		move.m_cardIndex = ParseInt( buffer );
 		move.m_whoseMoveIsIt = ParseInt( buffer );
+		move.m_parameterCardIndex1 = ParseInt( buffer );
+		move.m_parameterCardIndex2 = ParseInt( buffer );
 
 		return move;
 	}
@@ -140,6 +162,8 @@ public:
 		AppendDataToBuffer( (byte*)&m_moveType, sizeof( m_moveType ), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof( m_whoseMoveIsIt ), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_parameterCardIndex1, sizeof( m_parameterCardIndex1 ), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&m_parameterCardIndex2, sizeof( m_parameterCardIndex2 ), buffer, startIndex );
 	}
 
 public:
@@ -148,6 +172,8 @@ public:
 // 	int m_cardIndexToBuy = -1;
 // 	int m_cardHandIndexToPlay = -1;
 	int m_whoseMoveIsIt = -1;
+	int m_parameterCardIndex1 = -1;
+	int m_parameterCardIndex2 = -1;
 
 	//Non normal moves
 	//std::vector<int> m_cardHandIndexesToDiscard;
@@ -427,6 +453,7 @@ private:
 
 public:
 	inputMove_t m_randomMove;
+	inputMove_t m_bufferedInputMove;
 
 
 	Rgba8 m_clearColor = Rgba8::BLACK;

@@ -45,9 +45,12 @@ void CardDefinition::InitializeCards()
 	CardDefinition* laboraryCard	= new CardDefinition( eCards::Laboratory,	eCardType::ACTION_TYPE, "Laboratory",	5,			0,		 0,		 1,		 2,		0 );
 	CardDefinition* marketCard		= new CardDefinition( eCards::Market,		eCardType::ACTION_TYPE, "Market",		5,			1,		 0,		 1,		 1,		1 );
 	CardDefinition* witchCard		= new CardDefinition( eCards::Witch,		eCardType::ACTION_TYPE, "Witch",		5,			0,		 0,		 0,		 2,		0 );
+	CardDefinition* remodelCard		= new CardDefinition( eCards::Remodel,		eCardType::ACTION_TYPE, "Remodel",		4,			0,		 0,		 0,		 0,		0 );
+
 
 	councilRoomCard->m_OpponentsDrawCard = true;
 	witchCard->m_OpponentsGetCurse = true;
+	remodelCard->m_trashCardFromHandToGainCardOfValue2Higher = true;
 
 	s_definitions.resize( eCards::NUM_CARDS );
 	s_definitions[eCards::COPPER]		= copperCard;
@@ -64,6 +67,7 @@ void CardDefinition::InitializeCards()
 	s_definitions[eCards::Market]		= marketCard;
 	s_definitions[eCards::CouncilRoom]	= councilRoomCard;
 	s_definitions[eCards::Witch]		= witchCard;
+	s_definitions[eCards::Remodel]		= remodelCard;
 }
 
 //STATIC
