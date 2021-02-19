@@ -2878,6 +2878,237 @@ inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
 	}
 }
 
+inputMove_t Game::GetMoveUsingSarasua2( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
+	{
+		return newMove;
+	}
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+	PlayerBoard const& playerBoard = currentGameState.m_playerBoards[whoseMove];
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+		if( validMoves.size() == 1 )
+		{
+			return validMoves[0];
+		}
+		else
+		{
+			newMove.m_moveType = PLAY_CARD;
+			if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Village ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Village;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Festival ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Festival;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Laboratory ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Laboratory;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Market ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Market;
+			}
+
+			inputMove_t remodelMove;
+			bool canGetRemodelMove = TryGetBestRemodelMove( validMoves, remodelMove );
+			if( canGetRemodelMove )
+			{
+				return remodelMove;
+			}
+
+			for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+			{
+				if( validMoves[moveIndex].m_moveType != END_PHASE )
+				{
+					return validMoves[moveIndex];
+				}
+			}
+
+			newMove.m_moveType = END_PHASE;
+			return newMove;
+		}
+
+	}
+	else
+	{
+
+		PlayerBoard const* playerDeck = &currentGameState.m_playerBoards[0];
+		if( currentGameState.m_whoseMoveIsIt == PLAYER_2 )
+		{
+			playerDeck = &currentGameState.m_playerBoards[1];
+		}
+
+		int currentMoney = playerDeck->GetCurrentMoney();
+		int witchCount = playerDeck->GetCountOfCard( eCards::Witch );
+		newMove.m_moveType = BUY_MOVE;
+		if( playerDeck->m_numberOfBuysAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else if( witchCount < 2 && currentMoney >= 5 )
+		{
+			newMove.m_cardIndex = (int)Witch;
+		}
+		else if( currentMoney >= 8 )
+		{
+			newMove.m_cardIndex = (int)PROVINCE;
+		}
+		else if( currentMoney >= 6 )
+		{
+			newMove.m_cardIndex = (int)GOLD;
+		}
+		else if( currentMoney >= 3 )
+		{
+			newMove.m_cardIndex = (int)SILVER;
+		}
+		else
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+
+		return newMove;
+	}
+}
+
+bool Game::TryGetBestRemodelMove( std::vector<inputMove_t> const& validMoves, inputMove_t& inputMoveToUpdate )
+{
+	std::vector<inputMove_t> remodelMoves;
+	for( inputMove_t const& validMove : validMoves )
+	{
+		if( validMove.m_cardIndex == eCards::Remodel )
+		{
+			remodelMoves.push_back( validMove );
+		}
+	}
+
+	if( remodelMoves.size() == 0 )
+	{
+		return false;
+	}
+
+	bool canDoCurseToEstate = false;
+	inputMove_t curseToEstate;
+	bool canDoEstateToSilver = false;
+	inputMove_t estateToSilver;
+	bool canDoRemodelToGold = false;
+	inputMove_t remodelToGold;
+
+	std::vector<inputMove_t> goldAcquireMoves;
+	std::vector<inputMove_t> fiveCostAcquireMoves;
+	std::vector<inputMove_t> fourCostAcquireMoves;
+	std::vector<inputMove_t> threeCostAcquireMoves;
+
+	for( inputMove_t const& remodelMove : remodelMoves )
+	{
+		eCards cardToTrash = (eCards)remodelMove.m_parameterCardIndex1;
+		eCards cardToAcquire = (eCards)remodelMove.m_parameterCardIndex2;
+
+		CardDefinition const* cardToAcquireDef = CardDefinition::GetCardDefinitionByType( cardToAcquire );
+		int costOfAcquireCard = cardToAcquireDef->GetCardCost();
+		
+		if( cardToTrash == eCards::GOLD && cardToAcquire == eCards::PROVINCE )
+		{
+			inputMoveToUpdate = remodelMove;
+			return true;
+		}
+
+		if( cardToTrash == eCards::CURSE && cardToAcquire == eCards::ESTATE )
+		{
+			curseToEstate = remodelMove;
+			canDoCurseToEstate = true;
+			//return true;
+		}		
+		
+		if( cardToTrash == eCards::ESTATE && cardToAcquire == eCards::SILVER )
+		{
+			estateToSilver = remodelMove;
+			canDoEstateToSilver = true;
+			//return true;
+		}
+
+		if( cardToTrash == eCards::Remodel && cardToAcquire == eCards::GOLD )
+		{
+			remodelToGold = remodelMove;
+			canDoRemodelToGold = true;
+			//return true;
+		}
+
+		if( cardToAcquire == eCards::GOLD )
+		{
+			goldAcquireMoves.push_back( remodelMove );
+		}
+		else if( costOfAcquireCard >= 5 )
+		{
+			fiveCostAcquireMoves.push_back( remodelMove );
+		}
+		else if( costOfAcquireCard == 4 )
+		{
+			fourCostAcquireMoves.push_back( remodelMove );
+		}
+		else if( costOfAcquireCard == 3 )
+		{
+			threeCostAcquireMoves.push_back( remodelMove );
+		}
+	}
+
+	if( canDoCurseToEstate )
+	{
+		inputMoveToUpdate = curseToEstate;
+	}
+	if( canDoRemodelToGold )
+	{
+		inputMoveToUpdate = remodelToGold;
+	}
+	if( canDoEstateToSilver )
+	{
+		inputMoveToUpdate = estateToSilver;
+	}
+
+	//Get random gold move
+	size_t goldAcquireCount = goldAcquireMoves.size();
+	if( goldAcquireCount > 0 )
+	{
+		int randGoldMove = m_rand.RollRandomIntInRange( 0, (int)goldAcquireCount - 1 );
+		inputMoveToUpdate = goldAcquireMoves[randGoldMove];
+		return true;
+	}
+	//Get random 5 cost move
+	size_t fiveAcquireCount = fiveCostAcquireMoves.size();
+	if( fiveAcquireCount > 0 )
+	{
+		int randFiveMove = m_rand.RollRandomIntInRange( 0, (int)fiveAcquireCount - 1 );
+		inputMoveToUpdate = fiveCostAcquireMoves[randFiveMove];
+		return true;
+	}
+	//Get random 4 cost move
+	size_t fourAcquireCount = fourCostAcquireMoves.size();
+	if( fourAcquireCount > 0 )
+	{
+		int randfourMove = m_rand.RollRandomIntInRange( 0, (int)fourAcquireCount - 1 );
+		inputMoveToUpdate = fourCostAcquireMoves[randfourMove];
+		return true;
+	}
+	//Get random 3 cost move
+	size_t threeAcquireCount = threeCostAcquireMoves.size();
+	if( threeAcquireCount > 0 )
+	{
+		int randThreeMove = m_rand.RollRandomIntInRange( 0, (int)threeAcquireCount - 1 );
+		inputMoveToUpdate = threeCostAcquireMoves[randThreeMove];
+		return true;
+	}
+
+	//Couldn't find a good move
+	return false;
+}
+
 inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
 {
 	int whoseMove = currentGameState.m_whoseMoveIsIt;

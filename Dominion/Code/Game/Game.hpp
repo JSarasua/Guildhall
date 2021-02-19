@@ -416,6 +416,8 @@ public:
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingSarasua2( gamestate_t const& currentGameState );
+	bool TryGetBestRemodelMove( std::vector<inputMove_t> const& validMoves, inputMove_t& inputMoveToUpdate );
 	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );
