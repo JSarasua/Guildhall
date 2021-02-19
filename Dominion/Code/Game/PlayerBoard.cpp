@@ -326,11 +326,11 @@ bool PlayerBoard::CanPlayCard( inputMove_t const& inputMove, gamestate_t const* 
 	return false;
 }
 
-int PlayerBoard::GetNumberOfValidActionsToPlay() const
+int PlayerBoard::GetNumberOfValidSimpleActionsToPlay() const
 {
 	if( m_numberOfActionsAvailable > 0 )
 	{
-		return m_hand.GetNumberOfUniqueActions();
+		return m_hand.GetNumberOfUniqueSimpleActions();
 	}
 
 	return 0;
