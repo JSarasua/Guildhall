@@ -23,7 +23,7 @@ public:
 	void AddCard( int cardIndex, int count = 1 );
 	void RemoveCard( int cardIndex, int count = 1);
 	void Clear();
-	int GetNumberOfUniqueActions() const;
+	int GetNumberOfUniqueSimpleActions() const; //Does not include Remodel
 	int GetCardIndexFromCountIndex( int countIndex ); //The count index is if you had a hand of cards, what is the third card
 
 	void ApppendCardPileToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;

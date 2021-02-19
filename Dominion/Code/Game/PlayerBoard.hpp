@@ -78,7 +78,7 @@ public:
 
 	size_t GetDeckSize() { return m_deck.size(); }
 	size_t GetDiscardSize() { return (size_t)m_discardPile.TotalCount(); }
-	int GetNumberOfValidActionsToPlay() const;
+	int GetNumberOfValidSimpleActionsToPlay() const;
 	bool UnorderedCompare( PlayerBoard const& compare ) const;
 	bool HasCard( int cardIndex ) const;
 	int GetCardIndexFromHandIndex( int handIndex );

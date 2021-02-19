@@ -378,6 +378,26 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			break;
 		}
 	}
+	if( rBracketKey.WasJustPressed() )
+	{
+		switch( m_player2Strategy )
+		{
+		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::BIGMONEY;
+			break;
+		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::SINGLEWITCH;
+			break;
+		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::SARASUA1;
+			break;
+		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::MCTS;
+			break;
+		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::DOUBLEWITCH;
+			break;
+		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::RANDOM;
+			break;
+		default: ERROR_AND_DIE( "Invalid AI strategy" );
+			break;
+		}
+	}
 	if( semiColonKey.WasJustPressed() )
 	{
 		switch( m_mctsRolloutMethod )
@@ -407,6 +427,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		default: ERROR_AND_DIE( "Invalid rollout method" );
 			break;
 		}
+		m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
 	}
 	if( plusKey.WasJustPressed() )
 	{
@@ -419,6 +440,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		default: ERROR_AND_DIE( "Invalid expansion strategy" );
 			break;
 		}
+		m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
 	}
 	if( minusKey.WasJustPressed() )
 	{
@@ -431,6 +453,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		default: ERROR_AND_DIE( "Invalid expansion strategy" );
 			break;
 		}
+		m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
 	}
 	if( zKey.IsPressed() )
 	{
@@ -459,26 +482,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		m_mctsEpsilon = Clampf( m_mctsEpsilon, 0.f, 1.f );
 
 		m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
-	}
-	if( rBracketKey.WasJustPressed() )
-	{
-		switch( m_player2Strategy )
-		{
-		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::BIGMONEY;
-			break;
-		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::SINGLEWITCH;
-			break;
-		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::SARASUA1;
-			break;
-		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::MCTS;
-			break;
-		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::DOUBLEWITCH;
-			break;
-		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::RANDOM;
-			break;
-		default: ERROR_AND_DIE("Invalid AI strategy");
-			break;
-		}
 	}
 	if( commaKey.WasJustPressed() )
 	{
@@ -1953,10 +1956,11 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 				eCards eCardToAcquire = (eCards)moveToPlay.m_parameterCardIndex2;
 
  				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
-				CardDefinition const* cardToTrash = CardDefinition::GetCardDefinitionByType( eCardToTrash );
-				CardDefinition const* cardToAcquire = CardDefinition::GetCardDefinitionByType( eCardToAcquire );
+
 				if( handIndex == eCards::Remodel )
 				{
+					CardDefinition const* cardToTrash = CardDefinition::GetCardDefinitionByType( eCardToTrash );
+					CardDefinition const* cardToAcquire = CardDefinition::GetCardDefinitionByType( eCardToAcquire );
 					std::string playStr = Stringf( "Player %i played %s, Trashing %s and Acquiring %s", whoseMoveBase1, card->GetCardName().c_str(), cardToTrash->GetCardName().c_str(), cardToAcquire->GetCardName().c_str() );
 					g_theConsole->PrintString( Rgba8::CYAN, playStr );
 				}
@@ -2210,10 +2214,39 @@ std::vector<inputMove_t> Game::GetValidMovesAtGameState( gamestate_t const& game
 			{
 				if( hand.CountOfCard( cardIndex ) > 0 )
 				{
-					inputMove_t newMove = move;
-					newMove.m_moveType = PLAY_CARD;
-					newMove.m_cardIndex = cardIndex;
-					validMoves.push_back( newMove );
+					if( cardIndex == eCards::Remodel )
+					{
+						for( int trashCardIndex = 0; trashCardIndex < eCards::NUM_CARDS; trashCardIndex++ )
+						{
+							if( trashCardIndex != eCards::Remodel || (trashCardIndex == eCards::Remodel && hand.CountOfCard( trashCardIndex ) > 1) )
+							{
+								CardDefinition const* trashCard = CardDefinition::GetCardDefinitionByType( (eCards)trashCardIndex );
+								int trashCardCost = trashCard->GetCardCost();
+								for( int acquireCardIndex = 0; acquireCardIndex < eCards::NUM_CARDS; acquireCardIndex++ )
+								{
+									CardDefinition const* acquireCard = CardDefinition::GetCardDefinitionByType( (eCards)acquireCardIndex );
+									int acquireCardPileSize = gameState.m_cardPiles[acquireCardIndex].m_pileSize;
+									int acquireCardCost = acquireCard->GetCardCost();
+									if( acquireCardCost <= trashCardCost + 2 && acquireCardPileSize > 0 )
+									{
+										inputMove_t newMove = move;
+										newMove.m_moveType = PLAY_CARD;
+										newMove.m_cardIndex = cardIndex;
+										newMove.m_parameterCardIndex1 = trashCardIndex;
+										newMove.m_parameterCardIndex2 = acquireCardIndex;
+										validMoves.push_back( newMove );
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						inputMove_t newMove = move;
+						newMove.m_moveType = PLAY_CARD;
+						newMove.m_cardIndex = cardIndex;
+						validMoves.push_back( newMove );
+					}
 				}
 			}
 		}
@@ -2274,20 +2307,32 @@ int Game::GetNumberOfValidMovesAtGameState( gamestate_t const& gameState )
 
 	if( currentPhase == ACTION_PHASE )
 	{
-		numberOfValidMoves += playerDeck->GetNumberOfValidActionsToPlay();
-// 		std::vector<CardDefinition const*> const& hand = playerDeck->GetHand();
-// 		int numberOfActionsAvailable = playerDeck->m_numberOfActionsAvailable;
-// 		if( numberOfActionsAvailable > 0 )
-// 		{
-// 			for( size_t handIndex = 0; handIndex < hand.size(); handIndex++ )
-// 			{
-// 				CardDefinition const* card = hand[handIndex];
-// 				if( card->GetCardType() == ACTION_TYPE )
-// 				{
-// 					numberOfValidMoves++;
-// 				}
-// 			}
-// 		}
+		numberOfValidMoves += playerDeck->GetNumberOfValidSimpleActionsToPlay();
+		CardPile const& hand = playerDeck->GetHand();
+		if( hand.CountOfCard( eCards::Remodel ) > 0 )
+		{
+			for( int trashCardIndex = 0; trashCardIndex < eCards::NUM_CARDS; trashCardIndex++ )
+			{
+				if( trashCardIndex != eCards::Remodel || (trashCardIndex == eCards::Remodel && hand.CountOfCard( trashCardIndex ) > 1) )
+				{
+					CardDefinition const* trashCard = CardDefinition::GetCardDefinitionByType( (eCards)trashCardIndex );
+					int trashCardCost = trashCard->GetCardCost();
+					for( int acquireCardIndex = 0; acquireCardIndex < eCards::NUM_CARDS; acquireCardIndex++ )
+					{
+						//Is there enough of the card to acquire and is its cost valid for remodel
+						CardDefinition const* acquireCard = CardDefinition::GetCardDefinitionByType( (eCards)acquireCardIndex );
+						int acquireCardPileSize = gameState.m_cardPiles[acquireCardIndex].m_pileSize;
+						int acquireCardCost = acquireCard->GetCardCost();
+						if( acquireCardCost <= trashCardCost + 2 && acquireCardPileSize > 0 )
+						{
+							numberOfValidMoves++;
+						}
+					}
+				}
+			}
+		}
+
+
 	}
 	else if( currentPhase == BUY_PHASE )
 	{

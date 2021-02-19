@@ -82,7 +82,7 @@ void CardPile::Clear()
 	}
 }
 
-int CardPile::GetNumberOfUniqueActions() const
+int CardPile::GetNumberOfUniqueSimpleActions() const
 {
 	int uniqueActionCount = 0;
 	uniqueActionCount += (bool)m_cards[Village];
