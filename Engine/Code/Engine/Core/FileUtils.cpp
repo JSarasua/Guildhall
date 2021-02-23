@@ -31,6 +31,44 @@ byte* FileReadToNewBuffer( std::string const& filename, size_t* outSize )
 	return buffer;
 }
 
+bool LoadBinaryFileToExistingBuffer( std::string const& fileName, std::vector<byte>& buffer )
+{
+	FILE* fp = nullptr;
+	fopen_s( &fp, fileName.c_str(), "rb" );
+	if( fp == nullptr )
+	{
+		return false;
+	}
+
+	fseek( fp, 0, SEEK_END );
+	long fileSize = ftell( fp );
+
+	buffer.resize( fileSize );
+
+	fseek( fp, 0, SEEK_SET );
+	/*size_t bytesRead = */fread( &buffer[0], 1, (size_t)fileSize, fp );
+	//buffer[bytesRead] = NULL;
+
+	fclose( fp );
+
+	return true;
+}
+
+bool SaveBinaryFileFromBuffer( std::string const& filePath, std::vector<byte> const& buffer )
+{
+	FILE* fp = nullptr;
+	fopen_s( &fp, filePath.c_str(), "wb" );
+	if( fp == nullptr )
+	{
+		return false;
+	}
+
+	fwrite( &buffer[0], sizeof( byte ), buffer.size(), fp );
+	fclose( fp );
+
+	return true;
+}
+
 int AppendBufferToFile( std::string const& filename, size_t inSize, byte* bufferToWrite )
 {
 	FILE* fp = nullptr;
