@@ -9,6 +9,8 @@
 #include "Engine/Time/Timer.hpp"
 #include "Game/PlayerBoard.hpp"
 #include "Game/CardDefinition.hpp"
+#include "Engine/Core/BufferParser.hpp"
+#include "Engine/Core/BufferWriter.hpp"
 #include <vector>
 #include <deque>
 #include <queue>
@@ -157,6 +159,18 @@ public:
 		return move;
 	}
 
+	static inputMove_t ParseInputFromBufferParser( BufferParser& bufferParser )
+	{
+		inputMove_t move;
+		move.m_moveType = (eMoveType)bufferParser.ParseInt32();
+		move.m_cardIndex = bufferParser.ParseInt32();
+		move.m_whoseMoveIsIt = bufferParser.ParseInt32();
+		move.m_parameterCardIndex1 = bufferParser.ParseInt32();
+		move.m_parameterCardIndex2 = bufferParser.ParseInt32();
+
+		return move;
+	}
+
 	void AppendInputToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		AppendDataToBuffer( (byte*)&m_moveType, sizeof( m_moveType ), buffer, startIndex );
@@ -164,6 +178,15 @@ public:
 		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof( m_whoseMoveIsIt ), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_parameterCardIndex1, sizeof( m_parameterCardIndex1 ), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_parameterCardIndex2, sizeof( m_parameterCardIndex2 ), buffer, startIndex );
+	}
+
+	void AppendInputToBufferWriter( BufferWriter& bufferWriter ) const
+	{
+		bufferWriter.AppendInt32( m_moveType );
+		bufferWriter.AppendInt32( m_cardIndex );
+		bufferWriter.AppendInt32( m_whoseMoveIsIt );
+		bufferWriter.AppendInt32( m_parameterCardIndex1 );
+		bufferWriter.AppendInt32( m_parameterCardIndex2 );
 	}
 
 public:
@@ -193,12 +216,26 @@ public:
 		return metaData;
 	}
 
+	static metaData_t ParseMetaDataFromBufferParser( BufferParser& bufferParser )
+	{
+		metaData_t metaData;
+		metaData.m_numberOfWins = bufferParser.ParseFloat();
+		metaData.m_numberOfSimulations = bufferParser.ParseInt32();
+
+		return metaData;
+	}
+
 	void AppendMetaDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		AppendDataToBuffer( (byte*)&m_numberOfWins, sizeof( m_numberOfWins ), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_numberOfSimulations, sizeof( m_numberOfSimulations ), buffer, startIndex );
 	}
 
+	void AppendMetaDataToBufferWriter( BufferWriter& bufferWriter ) const
+	{
+		bufferWriter.AppendFloat( m_numberOfWins );
+		bufferWriter.AppendInt32( m_numberOfSimulations );
+	}
 
 	float m_numberOfWins = 0.f;
 	int m_numberOfSimulations = 0;
@@ -224,10 +261,25 @@ public:
 		return pileData;
 	}
 
+	static pileData_t ParsePileDataFromBufferParser( BufferParser& bufferParser )
+	{
+		pileData_t pileData;
+		pileData.m_pileSize = bufferParser.ParseInt32();
+		pileData.m_cardIndex = (eCards)bufferParser.ParseInt32();
+
+		return pileData;
+	}
+
 	void AppendPileDataToBuffer( std::vector<byte>& buffer, size_t& startIndex )
 	{
 		AppendDataToBuffer( (byte*)&m_pileSize, sizeof(m_pileSize), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_cardIndex, sizeof(m_cardIndex), buffer, startIndex );
+	}
+
+	void AppendPileDataToBufferWriter( BufferWriter& bufferWriter )
+	{
+		bufferWriter.AppendInt32( m_pileSize );
+		bufferWriter.AppendInt32( m_cardIndex );
 	}
 
 public:
@@ -335,6 +387,26 @@ public:
 		return gameState;
 	}
 
+	static gamestate_t ParseGameStateFromBufferParser( BufferParser& bufferParser )
+	{
+		gamestate_t gameState;
+
+		for( pileData_t& pileData : gameState.m_cardPiles )
+		{
+			pileData = pileData_t::ParsePileDataFromBufferParser( bufferParser );
+		}
+
+		gameState.m_playerBoards[0] = PlayerBoard::ParsePlayerBoardFromBufferParser( bufferParser );
+		gameState.m_playerBoards[1] = PlayerBoard::ParsePlayerBoardFromBufferParser( bufferParser );
+
+		gameState.m_whoseMoveIsIt = bufferParser.ParseInt32();
+		gameState.m_currentPhase = (eGamePhase)bufferParser.ParseInt32();
+		gameState.m_isFirstMove = bufferParser.ParseBool();
+
+
+		return gameState;
+	}
+
 	void AppendGameStateToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		for( pileData_t pileData : m_cardPiles )
@@ -347,6 +419,20 @@ public:
 		AppendDataToBuffer( (byte*)&m_whoseMoveIsIt, sizeof(m_whoseMoveIsIt), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_currentPhase, sizeof(m_currentPhase), buffer, startIndex );
 		AppendDataToBuffer( (byte*)&m_isFirstMove, sizeof(m_isFirstMove), buffer, startIndex );
+	}
+
+	void AppendGameStateToBufferWriter( BufferWriter& bufferWriter ) const 
+	{
+		for( pileData_t pileData : m_cardPiles )
+		{
+			pileData.AppendPileDataToBufferWriter( bufferWriter );
+		}
+
+		m_playerBoards[0].AppendPlayerBoardToBufferWriter( bufferWriter );
+		m_playerBoards[1].AppendPlayerBoardToBufferWriter( bufferWriter );
+		bufferWriter.AppendInt32( m_whoseMoveIsIt );
+		bufferWriter.AppendInt32( m_currentPhase );
+		bufferWriter.AppendBool( m_isFirstMove );
 	}
 
 public:
@@ -377,10 +463,25 @@ struct data_t
 		return data;
 	}
 
+	static data_t ParseDataFromBufferParser( BufferParser& bufferParser )
+	{
+		data_t data;
+		data.m_metaData = metaData_t::ParseMetaDataFromBufferParser( bufferParser );
+		data.m_currentGamestate = gamestate_t::ParseGameStateFromBufferParser( bufferParser );
+
+		return data;
+	}
+
 	void AppendDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
 		m_metaData.AppendMetaDataToBuffer( buffer, startIndex );
 		m_currentGamestate.AppendGameStateToBuffer( buffer, startIndex );
+	}
+
+	void AppendDataToBufferWriter( BufferWriter& bufferWriter )
+	{
+		m_metaData.AppendMetaDataToBufferWriter( bufferWriter );
+		m_currentGamestate.AppendGameStateToBufferWriter( bufferWriter );
 	}
 
 public:

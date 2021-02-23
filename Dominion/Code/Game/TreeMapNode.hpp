@@ -5,6 +5,8 @@
 
 struct data_t;
 
+class BufferParser;
+
 class TreeMapNode
 {
 public:
@@ -19,10 +21,11 @@ public:
 	void AppendInputSeparator( std::vector<byte>& buffer, size_t& startIndex ) const;
 	void AppendNodeSeparator( std::vector<byte>& buffer, size_t& startIndex ) const;
 
-	static TreeMapNode* ParseDataFromBuffer( byte*& buffer );
+	void AppendTreeToBufferWriter( BufferWriter& bufferWriter );
 
-	void AppendNodeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
-	static TreeMapNode* ParseNodeFromBuffer( byte*& buffer );
+	static TreeMapNode* ParseDataFromBuffer( byte*& buffer );
+	static TreeMapNode* ParseDataFromBufferParser( BufferParser& buffer );
+
 public:
 	//Don't do pointer
 	//data_t* m_data = nullptr;

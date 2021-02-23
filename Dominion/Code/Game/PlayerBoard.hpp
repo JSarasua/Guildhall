@@ -5,6 +5,8 @@
 #include "Game/CardPile.hpp"
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/BufferParser.hpp"
+#include "Engine/Core/BufferWriter.hpp"
 
 constexpr size_t CHECKSIZE = 2;
 constexpr byte ENDDECKBYTES[CHECKSIZE] = {'v','v'};
@@ -35,11 +37,22 @@ public:
 
 	void AppendCardDataToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 	{
-		AppendDataToBuffer( (byte*)&cardIndex, sizeof(int), buffer, startIndex );
+		AppendDataToBuffer( (byte*)&cardIndex, sizeof(cardIndex), buffer, startIndex );
 	}
+	void AppendCardDataToBufferWriter( BufferWriter& bufferWriter ) const
+	{
+		bufferWriter.AppendInt32( cardIndex );
+	}
+
 	void ParseCardDataFromBuffer( byte*& buffer )
 	{
 		cardIndex = ParseInt( buffer );
+		card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+	}
+
+	void ParseCardDataFromBufferParser( BufferParser& bufferParser )
+	{
+		cardIndex = bufferParser.ParseInt32();
 		card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
 	}
 
@@ -87,9 +100,13 @@ public:
 	void RandomizeHandAndDeck();
 
 	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendPlayerBoardToBufferWriter( BufferWriter& bufferWriter ) const;
 
 	void ParseFromBuffer( byte*& buffer );
+	void ParseFromBufferParser( BufferParser& bufferParser );
+
 	static PlayerBoard ParsePlayerBoardFromBuffer( byte*& buffer );
+	static PlayerBoard ParsePlayerBoardFromBufferParser( BufferParser& bufferParser );
 
 private:
 	void AddHandToDeck();

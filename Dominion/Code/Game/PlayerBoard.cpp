@@ -3,6 +3,8 @@
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/BufferParser.hpp"
+#include "Engine/Core/BufferWriter.hpp"
 
 PlayerBoard::PlayerBoard()
 {
@@ -414,6 +416,25 @@ void PlayerBoard::AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& 
 	AppendDataToBuffer( (byte*)&ENDDECKBYTES, 2, buffer, startIndex );
 }
 
+void PlayerBoard::AppendPlayerBoardToBufferWriter( BufferWriter& bufferWriter ) const
+{
+	m_hand.AppendCardPileToBufferWriter( bufferWriter );
+	m_discardPile.AppendCardPileToBufferWriter( bufferWriter );
+	m_playArea.AppendCardPileToBufferWriter( bufferWriter );
+	m_sortedDeck.AppendCardPileToBufferWriter( bufferWriter );
+
+	bufferWriter.AppendInt32( m_currentCoins );
+	bufferWriter.AppendInt32( m_numberOfActionsAvailable );
+	bufferWriter.AppendInt32( m_numberOfBuysAvailable );
+
+
+	bufferWriter.AppendUShort( (uint16_t)m_deck.size() );
+	for( size_t deckIndex = 0; deckIndex < m_deck.size(); deckIndex++ )
+	{
+		m_deck[deckIndex].AppendCardDataToBufferWriter( bufferWriter );
+	}
+}
+
 void PlayerBoard::ParseFromBuffer( byte*& buffer )
 {
 	m_hand.ParseFromBuffer( buffer );
@@ -446,10 +467,41 @@ void PlayerBoard::ParseFromBuffer( byte*& buffer )
 	buffer += CHECKSIZE;
 }
 
+void PlayerBoard::ParseFromBufferParser( BufferParser& bufferParser )
+{
+	m_hand.ParseFromBufferParser( bufferParser );
+	m_discardPile.ParseFromBufferParser( bufferParser );
+	m_playArea.ParseFromBufferParser( bufferParser );
+	m_sortedDeck.ParseFromBufferParser( bufferParser );
+
+	m_currentCoins = bufferParser.ParseInt32();
+	m_numberOfActionsAvailable = bufferParser.ParseInt32();
+	m_numberOfBuysAvailable = bufferParser.ParseInt32();
+
+	uint16_t sortedDeckCount = bufferParser.ParseUShort();
+	uint16_t sortedDeckIndex = 0;
+
+	while( sortedDeckIndex < sortedDeckCount )
+	{
+		CardData_t cardData;
+		cardData.ParseCardDataFromBufferParser( bufferParser );
+		m_deck.push_back( cardData );
+
+		sortedDeckIndex++;
+	}
+}
+
 PlayerBoard PlayerBoard::ParsePlayerBoardFromBuffer( byte*& buffer )
 {
 	PlayerBoard playerBoard;
 	playerBoard.ParseFromBuffer( buffer );
+	return playerBoard;
+}
+
+PlayerBoard PlayerBoard::ParsePlayerBoardFromBufferParser( BufferParser& bufferParser )
+{
+	PlayerBoard playerBoard;
+	playerBoard.ParseFromBufferParser( bufferParser );
 	return playerBoard;
 }
 

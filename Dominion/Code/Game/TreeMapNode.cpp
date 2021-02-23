@@ -1,4 +1,5 @@
 #include "Game/TreeMapNode.hpp"
+#include "Engine/Core/BufferParser.hpp"
 
 constexpr byte startChildInputs = '[';
 constexpr byte endChildInputs = ']';
@@ -85,6 +86,30 @@ void TreeMapNode::AppendNodeSeparator( std::vector<byte>& buffer, size_t& startI
 	AppendDataToBuffer( &nodeSeparator, sizeof( nodeSeparator ), buffer, startIndex );
 }
 
+void TreeMapNode::AppendTreeToBufferWriter( BufferWriter& bufferWriter )
+{
+	//Map Data
+	m_data.AppendDataToBufferWriter( bufferWriter );
+
+	size_t childInputCount = m_possibleOutcomes.size();
+	bufferWriter.AppendUShort( (uint16_t)childInputCount );
+
+	for( auto outcomeIter : m_possibleOutcomes )
+	{
+		inputMove_t const& inputMove = outcomeIter.first;
+		inputMove.AppendInputToBufferWriter( bufferWriter );
+
+		std::vector<TreeMapNode*> const& outcomes = outcomeIter.second;
+		size_t childNodeCount = outcomes.size();
+		bufferWriter.AppendUShort( (uint16_t)childNodeCount );
+
+		for( auto outcomeNode : outcomes )
+		{
+			outcomeNode->AppendTreeToBufferWriter( bufferWriter );
+		}
+	}
+}
+
 TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 {
 	static byte* bufferPointerCheck = 0;
@@ -156,4 +181,36 @@ TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 
 	//For loop on children
 		//ParseData on child
+}
+
+TreeMapNode* TreeMapNode::ParseDataFromBufferParser( BufferParser& buffer )
+{
+	TreeMapNode* newNode = new TreeMapNode();
+	newNode->m_data = data_t::ParseDataFromBufferParser( buffer );
+
+	uint16_t childInputCount = buffer.ParseUShort();
+	uint16_t childInputIndex = 0;
+
+	while( childInputIndex < childInputCount )
+	{
+		inputMove_t inputMove = inputMove_t::ParseInputFromBufferParser( buffer );
+		newNode->m_possibleOutcomes[inputMove] = std::vector<TreeMapNode*>();
+		std::vector<TreeMapNode*>& newVectorOfOutComes = newNode->m_possibleOutcomes[inputMove];
+
+		uint16_t childNodeCount = buffer.ParseUShort();
+		uint16_t childNodeIndex = 0;
+
+		while( childNodeIndex < childNodeCount )
+		{
+			TreeMapNode* childNode = TreeMapNode::ParseDataFromBufferParser( buffer );
+			childNode->m_parentNode = newNode;
+			newVectorOfOutComes.push_back( childNode );
+
+			childNodeIndex++;
+		}
+
+		childInputIndex++;
+	}
+
+	return newNode;
 }

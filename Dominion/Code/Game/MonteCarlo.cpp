@@ -5,6 +5,8 @@
 #include "Engine/Core/JobSystem.hpp"
 #include "Engine/Core/Time.hpp"
 #include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/BufferParser.hpp"
+#include "Engine/Core/BufferWriter.hpp"
 #include <thread>
 #include <chrono>
 
@@ -661,26 +663,24 @@ void MonteCarlo::SaveTree()
 	DeleteFile( "test.mcts" );
 
 	std::vector<byte> buffer;
-	size_t startIndex = 0;
-	AppendDataToBuffer( (byte*)&m_totalNumberOfSimulationsRun, sizeof( m_totalNumberOfSimulationsRun ), buffer, startIndex );
-	AppendDataToBuffer( (byte*)&m_numberOfSimulationsToRun, sizeof( m_numberOfSimulationsToRun ), buffer, startIndex );
-	//Resize first doing a first pass to find datasize
-	m_headNode->AppendTreeToBuffer( buffer, startIndex );
-	AppendBufferToFile( "test.mcts", buffer.size(), &buffer[0] );
+	BufferWriter bufferWriter = BufferWriter( buffer );
+	bufferWriter.AppendInt32( m_totalNumberOfSimulationsRun );
+	bufferWriter.AppendInt32( m_numberOfSimulationsToRun );
+
+	m_headNode->AppendTreeToBufferWriter( bufferWriter );
+	
+	SaveBinaryFileFromBuffer( "test.mcts", bufferWriter.GetBuffer() );
 }
 
 void MonteCarlo::LoadTree()
 {
-	size_t bufferSize;
-	byte* buffer = FileReadToNewBuffer( "test.mcts", &bufferSize );
 	std::vector<byte> bufferVector;
-	bufferVector.resize( bufferSize );
-	memcpy( &bufferVector[0], buffer, bufferSize );
-	delete buffer;
-	buffer = &bufferVector[0];
-	m_totalNumberOfSimulationsRun = ParseInt( buffer );
-	m_numberOfSimulationsToRun = ParseInt( buffer );
-	TreeMapNode* newHeadNode = TreeMapNode::ParseDataFromBuffer( buffer );
+	LoadBinaryFileToExistingBuffer( "test.mcts", bufferVector );
+	BufferParser bufferParser = BufferParser( bufferVector );
+
+	m_totalNumberOfSimulationsRun = bufferParser.ParseInt32();
+	m_numberOfSimulationsToRun = bufferParser.ParseInt32();
+	TreeMapNode* newHeadNode = TreeMapNode::ParseDataFromBufferParser( bufferParser );
 
 	if( m_headNode )
 	{

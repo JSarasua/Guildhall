@@ -3,6 +3,8 @@
 #include <array>
 #include "Engine/Core/EngineCommon.hpp"
 
+class BufferParser;
+class BufferWriter;
 
 class CardPile
 {
@@ -27,10 +29,13 @@ public:
 	int GetCardIndexFromCountIndex( int countIndex ); //The count index is if you had a hand of cards, what is the third card
 
 	void ApppendCardPileToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
+	void AppendCardPileToBufferWriter( BufferWriter& bufferWriter ) const;
 
 	void ParseFromBuffer( byte*& buffer );
+	void ParseFromBufferParser( BufferParser& bufferParser );
 
 	static CardPile ParseCardPileFromBuffer( byte*& buffer );
+	static CardPile ParseCardPileFromBufferParser( BufferParser& bufferParser );
 
 private:
 	static const int m_numberOfPossibleUniqueCards = NUMBEROFPILES;

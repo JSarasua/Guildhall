@@ -1,6 +1,8 @@
 #include "Game/CardPile.hpp"
 #include "Game/Game.hpp"
 #include "Engine/Core/FileUtils.hpp"
+#include "Engine/Core/BufferParser.hpp"
+#include "Engine/Core/BufferWriter.hpp"
 
 bool CardPile::operator==( CardPile const& compare ) const
 {
@@ -120,6 +122,14 @@ void CardPile::ApppendCardPileToBuffer( std::vector<byte>& buffer, size_t& start
 	AppendDataToBuffer( (byte*)&m_cards[0], cardPileSize, buffer, startIndex );
 }
 
+void CardPile::AppendCardPileToBufferWriter( BufferWriter& bufferWriter ) const
+{
+	for( int const& cardCount : m_cards )
+	{
+		bufferWriter.AppendInt32( cardCount );
+	}
+}
+
 void CardPile::ParseFromBuffer( byte*& buffer )
 {
 	for( int& cardCount : m_cards )
@@ -128,10 +138,26 @@ void CardPile::ParseFromBuffer( byte*& buffer )
 	}
 }
 
+void CardPile::ParseFromBufferParser( BufferParser& bufferParser )
+{
+	for( int& cardCount : m_cards )
+	{
+		cardCount = bufferParser.ParseInt32();
+	}
+}
+
 CardPile CardPile::ParseCardPileFromBuffer( byte*& buffer )
 {
 	CardPile cardPile;
 	cardPile.ParseFromBuffer( buffer );
+
+	return cardPile;
+}
+
+CardPile CardPile::ParseCardPileFromBufferParser( BufferParser& bufferParser )
+{
+	CardPile cardPile;
+	cardPile.ParseFromBufferParser( bufferParser );
 
 	return cardPile;
 }
