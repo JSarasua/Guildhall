@@ -87,6 +87,19 @@ void TreeMapNode::AppendNodeSeparator( std::vector<byte>& buffer, size_t& startI
 
 TreeMapNode* TreeMapNode::ParseDataFromBuffer( byte*& buffer )
 {
+	static byte* bufferPointerCheck = 0;
+	static byte* buffer90kCheck = 0;
+	if( bufferPointerCheck == 0 )
+	{
+		bufferPointerCheck = buffer;
+		buffer90kCheck = buffer + 91500;
+	}
+	if( buffer > buffer90kCheck )
+	{
+		ERROR_AND_DIE("stop");
+	}
+
+
 	TreeMapNode* newNode = new TreeMapNode();
 	newNode->m_data = data_t::ParseDataFromBuffer( buffer );
 

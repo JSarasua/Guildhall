@@ -673,6 +673,11 @@ void MonteCarlo::LoadTree()
 {
 	size_t bufferSize;
 	byte* buffer = FileReadToNewBuffer( "test.mcts", &bufferSize );
+	std::vector<byte> bufferVector;
+	bufferVector.resize( bufferSize );
+	memcpy( &bufferVector[0], buffer, bufferSize );
+	delete buffer;
+	buffer = &bufferVector[0];
 	m_totalNumberOfSimulationsRun = ParseInt( buffer );
 	m_numberOfSimulationsToRun = ParseInt( buffer );
 	TreeMapNode* newHeadNode = TreeMapNode::ParseDataFromBuffer( buffer );
