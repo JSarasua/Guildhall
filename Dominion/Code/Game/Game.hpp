@@ -27,6 +27,8 @@ class World;
 //class MonteCarlo;
 class MonteCarloNoTree;
 class MonteCarlo;
+class Widget;
+class UIManager;
 
 struct light_t;
 struct Vertex_PCUTBN;
@@ -573,6 +575,24 @@ public:
 	Timer m_timer;
 	int m_simCount = 0;
 	int m_totalSimCount = 0;
+
+
+	//Widget data
+	//Player 1
+	Widget* m_player1DeckWidget = nullptr;
+	Widget* m_player1DiscardWidget = nullptr;
+	Widget* m_player1HandWidget = nullptr;
+	
+	//Piles
+	Widget* m_cardPilesWidget = nullptr;
+	Widget* m_playerNextPhaseWidget = nullptr;
+	
+	//Player 2
+	Widget* m_player2DeckWidget = nullptr;
+	Widget* m_player2DiscardWidget = nullptr;
+	Widget* m_player2HandWidget = nullptr;
+
+	bool m_isUIDirty = false;
 
 private:
 	void RenderDevConsole();

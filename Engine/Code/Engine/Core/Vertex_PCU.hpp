@@ -31,6 +31,7 @@ public: // NOTE: this is one of the few cases where we break both the "m_" namin
 	static void AppendVerts( std::vector<Vertex_PCU>& masterVertexList, std::vector<Vertex_PCU>& vertexesToAppend);
 	static void AppendVertsCapsule2D( std::vector<Vertex_PCU>& masterVertexList, const Capsule2& capsule, const Rgba8& color);
 	static void AppendVertsAABB2D( std::vector<Vertex_PCU>& masterVertexList, const AABB2& aabb, const Rgba8& color, const AABB2& uvs = AABB2() );
+	static void AppendIndexedVertsAABB2D( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, const AABB2& aabb, const Rgba8& color, const AABB2& uvs = AABB2() );
 	static void AppendVertsAABB2DBorder( std::vector<Vertex_PCU>& masterVertexList, AABB2 const& aabb, float thickness, Rgba8 const& color );
 	static void AppendVertsOBB2D( std::vector<Vertex_PCU>& masterVertexList, const OBB2& obb, const Rgba8& color, const AABB2& uvs = AABB2() );
 	static void AppendVertsLine2D( std::vector<Vertex_PCU>& masterVertexList, const LineSegment2& line, float thickness, const Rgba8& color );

@@ -87,6 +87,28 @@ void Vertex_PCU::AppendVertsAABB2D( std::vector<Vertex_PCU>& masterVertexList, c
 
 
 
+void Vertex_PCU::AppendIndexedVertsAABB2D( std::vector<Vertex_PCU>& masterVertexList, std::vector<uint>& masterIndexList, const AABB2& aabb, const Rgba8& color, const AABB2& uvs /*= AABB2() */ )
+{
+	uint currentIndex = (uint)masterIndexList.size();
+
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y, 0.f ), color, uvs.mins ) );
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.maxs.x, aabb.mins.y, 0.f ), color, Vec2( uvs.maxs.x, uvs.mins.y ) ) );
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.maxs.x, aabb.maxs.y, 0.f ), color, uvs.maxs ) );
+
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.mins.x, aabb.mins.y, 0.f ), color, uvs.mins ) );
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.maxs.x, aabb.maxs.y, 0.f ), color, uvs.maxs ) );
+	masterVertexList.push_back( Vertex_PCU( Vec3( aabb.mins.x, aabb.maxs.y, 0.f ), color, Vec2( uvs.mins.x, uvs.maxs.y ) ) );
+
+
+	masterIndexList.push_back( currentIndex );
+	masterIndexList.push_back( currentIndex + 1 );
+	masterIndexList.push_back( currentIndex + 2 );
+
+	masterIndexList.push_back( currentIndex + 3 );
+	masterIndexList.push_back( currentIndex + 4 );
+	masterIndexList.push_back( currentIndex + 5 );
+}
+
 void Vertex_PCU::AppendVertsAABB2DBorder( std::vector<Vertex_PCU>& masterVertexList, AABB2 const& aabb, float thickness, Rgba8 const& color )
 {
 	Vec2 bLeft = aabb.mins;

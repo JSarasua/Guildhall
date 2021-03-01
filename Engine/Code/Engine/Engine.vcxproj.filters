@@ -47,6 +47,9 @@
     <Filter Include="Queues">
       <UniqueIdentifier>{b8656c45-3b7e-4121-a42e-08bdddaba36e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{d2b7e7b8-4c88-478e-8bac-dd240bc14ba3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math\vec2.cpp">
@@ -297,6 +300,21 @@
     </ClCompile>
     <ClCompile Include="Math\Plane2.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIManager.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIState.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\Widget.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\WidgetHand.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\WidgetSlider.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -581,6 +599,21 @@
     </ClInclude>
     <ClInclude Include="Math\Plane2.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIManager.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIState.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\Widget.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WidgetHand.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WidgetSlider.hpp">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

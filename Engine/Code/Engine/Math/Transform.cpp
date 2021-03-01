@@ -58,6 +58,13 @@ void Transform::SetNonUniformScale( Vec3 const& scale )
 	m_scale = scale;
 }
 
+void Transform::TransformBy( Transform const& transform )
+{
+	SetNonUniformScale( m_scale * transform.m_scale );
+	RotatePitchRollYawDegrees( transform.m_rotationPitchRollYawDegrees );
+	Translate( transform.m_position );
+}
+
 Mat44 Transform::ToMatrix() const
 {
 	float yaw = m_rotationPitchRollYawDegrees.z;
@@ -82,6 +89,54 @@ Mat44 Transform::ToMatrix() const
 // 	mat.RotateYDegrees( m_rotationPitchRollYawDegrees.y );
 // 	mat.RotateXDegrees( m_rotationPitchRollYawDegrees.x );
 	mat.ScaleNonUniform3D( m_scale );
+	mat.TransformBy( lookAtDir );
+
+	return mat;
+}
+
+Mat44 Transform::ToMatrixNoTranslation() const
+{
+	float yaw = m_rotationPitchRollYawDegrees.z;
+	float pitch = m_rotationPitchRollYawDegrees.x;
+	float roll = m_rotationPitchRollYawDegrees.y;
+
+	Mat44 lookAtDir;
+	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+	{
+	}
+	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+	}
+
+	Mat44 mat;
+	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
+	mat.ScaleNonUniform3D( m_scale );
+	mat.TransformBy( lookAtDir );
+
+	return mat;
+}
+
+Mat44 Transform::ToMatrixNoScale() const
+{
+	float yaw = m_rotationPitchRollYawDegrees.z;
+	float pitch = m_rotationPitchRollYawDegrees.x;
+	float roll = m_rotationPitchRollYawDegrees.y;
+
+	Mat44 lookAtDir;
+	if( g_currentBases == eYawPitchRollRotationOrder::YXZ )
+	{
+		//lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ), Vec3( 0.f, 1.f, 0.f ) );
+	}
+	else if( g_currentBases == eYawPitchRollRotationOrder::ZYX )
+	{
+		lookAtDir = LookAt( Vec3( 0.f, 0.f, 0.f ), Vec3( 1.f, 0.f, 0.f ), Vec3( 0.f, 0.f, 1.f ) );
+	}
+	//MatrixInvertOrthoNormal( lookAtDir );
+
+	Mat44 mat;
+	mat.Translate3D( m_position );
+	mat.RotateYawPitchRollDegress( yaw, pitch, roll );
 	mat.TransformBy( lookAtDir );
 
 	return mat;
