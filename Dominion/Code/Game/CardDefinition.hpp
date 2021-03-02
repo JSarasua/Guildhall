@@ -44,11 +44,13 @@ enum eCards
 	NUM_CARDS
 };
 
+class Texture;
+
 class CardDefinition
 {
 public:
 	CardDefinition() = delete;
-	CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0, int plusBuys = 0 );
+	CardDefinition( int cardIndex, eCardType type, std::string cardName, Texture const* cardTexture = nullptr, int cost = 0, int coins = 0, int vp = 0, int plusActions = 0, int plusDraw = 0, int plusBuys = 0 );
 	~CardDefinition() {}
 
 	static void InitializeCards();
@@ -58,11 +60,13 @@ public:
 
 	static bool UnorderedCompare( std::vector<CardDefinition const*> const& first, std::vector<CardDefinition const*> const& second );
 
+	int GetCardIndex() const { return m_cardIndex; }
 	int GetCardCost() const { return m_cost; }
 	int GetCoins() const { return m_coins; }
 	eCardType GetCardType() const { return m_type; }
 	int GetCardVPs() const	{ return m_victoryPointValue; }
 	std::string const& GetCardName() const { return m_cardName; }
+	Texture const* GetCardTexture() const { return m_cardTexture; }
 
 public:
 	int m_cardIndex = -1;
@@ -74,6 +78,7 @@ public:
 	int m_actionsGained = 0;
 	int m_cardDraw = 0;
 	int m_buysGained = 0;
+	Texture const* m_cardTexture = nullptr;
 
 
 	bool m_OpponentsGetCurse = false;

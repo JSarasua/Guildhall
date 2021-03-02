@@ -43,6 +43,7 @@ public:
 	AABB2 GetBoxAtBottom(float FractionOfWidth, float additionalWidth = 0.f);
 
 	std::vector<AABB2> GetBoxAsRows( int numberOfRows );
+	std::vector<AABB2> GetBoxAsColumns( int numberOfColumns );
 
 
 	float GetOuterRadius() const;

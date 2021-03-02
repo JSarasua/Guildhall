@@ -2,12 +2,15 @@
 #include "Engine/Platform/Window.hpp"
 #include "Game/CardDefinition.hpp"
 
+class RenderContext;
+
 struct Vec2;
 struct Rgba8;
 
 class Game;
 
 extern Window* g_theWindow;
+extern RenderContext* g_theRenderer;
 extern Game* g_theGame;
 
 constexpr float SQRT_2 = 1.41421356237f;

@@ -206,6 +206,12 @@ float GetValueFromString( std::string const& stringValue, float const& defaultVa
 	return (float)atof( stringValue.c_str() );
 }
 
+std::uintptr_t GetValueFromString( std::string const& stringValue, std::uintptr_t const& defaultValue )
+{
+	UNUSED( defaultValue );
+	return (std::uintptr_t)atoi( stringValue.c_str() );
+}
+
 std::string ToString( Vec3 const& value )
 {
 	std::string vecStr = Stringf( "%f,%f,%f", value.x, value.y, value.z );
@@ -272,5 +278,11 @@ std::string ToString( float const& value )
 	std::string floatStr = Stringf( "%f", value );
 
 	return floatStr;
+}
+
+std::string ToString( std::uintptr_t const& value )
+{
+	std::string pointerStr = Stringf( "%ul", value );
+	return pointerStr;
 }
 

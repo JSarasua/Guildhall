@@ -116,6 +116,24 @@ int CardPile::GetCardIndexFromCountIndex( int countIndex )
 	return -1;
 }
 
+std::vector<eCards> CardPile::ToVector() const
+{
+	std::vector<eCards> cards;
+
+	for( size_t cardIndex = 0; cardIndex < m_cards.size(); cardIndex++ )
+	{
+		eCards card = (eCards)cardIndex;
+		size_t cardCount = m_cards[cardIndex];
+
+		for( cardCount; cardCount > 0; cardCount-- )
+		{
+			cards.push_back( card );
+		}
+	}
+
+	return cards;
+}
+
 void CardPile::ApppendCardPileToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 {
 	size_t cardPileSize = sizeof(int) * m_cards.size();

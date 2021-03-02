@@ -7,27 +7,29 @@
 #include "Game/Player.hpp"
 #include "Game/World.hpp"
 
-#include "Engine/Math/AABB2.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
-#include "Engine/Time/Clock.hpp"
-#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/UI/UIManager.hpp"
+#include "Engine/UI/Widget.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
-#include "Engine/Renderer/GPUMesh.hpp"
+#include "Engine/Core/Time.hpp"
+#include "Engine/Time/Clock.hpp"
 #include "Engine/Input/InputSystem.hpp"
-#include "Engine/Math/LineSegment3.hpp"
+#include "Engine/Input/XboxController.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
+#include "Engine/Renderer/DebugRender.hpp"
+#include "Engine/Renderer/GPUMesh.hpp"
 #include "Engine/Renderer/Material.hpp"
-#include "Engine/Math/MathUtils.hpp"
-#include "Engine/Math/MatrixUtils.hpp"
 #include "Engine/Renderer/MeshUtils.hpp"
 #include "Engine/Renderer/Sampler.hpp"
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/StringUtils.hpp"
-#include "Engine/Input/XboxController.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/MatrixUtils.hpp"
+#include "Engine/Math/AABB2.hpp"
+#include "Engine/Math/LineSegment3.hpp"
 #include "Engine/Math/Vec4.hpp"
-#include "Engine/Core/Time.hpp"
 
 extern App* g_theApp;
 extern RenderContext* g_theRenderer;
@@ -78,11 +80,25 @@ void Game::Startup()
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 
+	StartupUI();
+
 	m_timer.SetSeconds( 2 );
 }
 
 void Game::Shutdown()
 {
+	if( g_theUIManager )
+	{
+		delete g_theUIManager;
+		g_theUIManager = nullptr;
+	}
+
+	if( m_baseCardWidget )
+	{
+		delete m_baseCardWidget;
+		m_baseCardWidget = nullptr;
+	}
+
 	m_mcts->Shutdown();
 	delete m_mcts;
 	delete m_mc;
@@ -156,6 +172,105 @@ void Game::Render()
 
 	DebugRenderScreenTo( g_theRenderer->GetBackBuffer() );
 	DebugRenderEndFrame();
+
+	g_theUIManager->Render();
+}
+
+void Game::StartupUI()
+{
+	g_theUIManager = new UIManager( Vec2( 16.f, 9.f ), g_theRenderer );
+	g_theUIManager->Startup();
+
+	Widget* rootWidget = g_theUIManager->GetRootWidget();
+
+	Texture* cardBackTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Card_back.jpg" );
+
+	m_cyanTexture = g_theRenderer->CreateTextureFromColor( Rgba8::CYAN );
+	m_redTexture = g_theRenderer->CreateTextureFromColor( Rgba8::RED );
+	m_greenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::GREEN );
+
+	AABB2 screenBounds = g_theUIManager->GetScreenBounds();
+
+	//Base card
+	Vec3 baseCardScale = Vec3( 1.f, 1.5f, 1.f );
+	Transform baseTransform = Transform();
+	baseTransform.m_scale = baseCardScale;
+	m_baseCardWidget = new Widget( baseTransform );
+	m_baseCardWidget->SetCanDrag( true );
+
+	//Hand widget
+	Vec3 handScale = Vec3( 12.f, 3.f, 1.f );
+	Transform handTransform = Transform();
+	handTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
+	handTransform.m_scale = handScale;
+	m_player1HandWidget = new Widget( handTransform );
+	//m_handWidget->SetTexture( handTexture, nullptr, nullptr );
+	m_player1HandWidget->SetIsVisible( false );
+	rootWidget->AddChild( m_player1HandWidget );
+
+	Vec3 deckScale = Vec3( 1.f, 1.5f, 1.f );
+	Transform deckTransform = Transform();
+	deckTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.05f, 0.1f ) );
+	deckTransform.m_scale = deckScale;
+	Widget* deckWidget = new Widget( deckTransform );
+	deckWidget->SetTexture( cardBackTexture, m_cyanTexture, m_redTexture );
+	deckWidget->SetCanHover( true );
+	deckWidget->SetText( "Hello" );
+	deckWidget->SetTextSize( 0.1f );
+	rootWidget->AddChild( deckWidget );
+	m_player1DeckWidget = deckWidget;
+
+	Widget* discardWidget = new Widget( *deckWidget );
+	discardWidget->SetPosition( screenBounds.GetPointAtUV( Vec2( 0.95f, 0.1f ) ) );
+	rootWidget->AddChild( discardWidget );
+	m_player1DiscardWidget = discardWidget;
+
+	Transform endTurnTransform = Transform();
+	endTurnTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.95f, 0.25f ) );
+	endTurnTransform.m_scale = Vec3( 1.5f, 0.75f, 1.f );
+	m_playerNextPhaseWidget = new Widget( endTurnTransform );
+	m_playerNextPhaseWidget->SetCanSelect( true );
+	m_playerNextPhaseWidget->SetEventToFire( "endTurn" );
+	m_playerNextPhaseWidget->SetText( "End Turn" );
+	m_playerNextPhaseWidget->SetTextSize( 0.1f );
+	m_playerNextPhaseWidget->SetTexture( m_greenTexture, m_cyanTexture, m_redTexture );
+	rootWidget->AddChild( m_playerNextPhaseWidget );
+
+	MatchUIToGameState();
+}
+
+void Game::MatchUIToGameState()
+{
+	PlayerBoard const& playerBoard = m_currentGameState->m_playerBoards[0];
+	CardPile const& playerHand = playerBoard.GetHand();
+	
+	m_player1HandWidget->ClearChildren();
+
+	AABB2 handBounds = m_player1HandWidget->GetLocalAABB2();
+	int playerHandCount = playerHand.TotalCount();
+	std::vector<AABB2> cardSlots = handBounds.GetBoxAsColumns( playerHandCount );
+	std::vector<eCards> playerHandVector = playerHand.ToVector();
+	for( size_t handIndex = 0; handIndex < playerHandVector.size(); handIndex++ )
+	{
+		Vec2 slotCenter = cardSlots[handIndex].GetCenter();
+		Widget* cardWidget = new Widget( *m_baseCardWidget );
+		cardWidget->SetPosition( slotCenter );
+		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( (eCards)playerHandVector[handIndex] );
+		cardWidget->SetTexture( cardDef->GetCardTexture(), m_cyanTexture, m_redTexture );
+
+		EventArgs& releaseArgs = cardWidget->m_releaseArgs;
+		int cardIndex = cardDef->GetCardIndex();
+
+		releaseArgs.SetValue( "cardIndex", cardIndex );
+		releaseArgs.SetValue( "moveType", (int)cardDef->GetCardType() );
+		releaseArgs.SetValue( "whoseMove", m_currentGameState->m_whoseMoveIsIt );
+
+		releaseArgs.SetValue( "cardWidget", (std::uintptr_t)cardWidget );
+		Delegate<EventArgs const&>& releaseDelegate = cardWidget->m_releaseDelegate;
+		releaseDelegate.SubscribeMethod( this, &Game::PlayMoveIfValid );
+
+		m_player1HandWidget->AddChild( cardWidget );
+	}
 }
 
 void Game::InitializeGameState()
@@ -2044,6 +2159,20 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 	m_mcts->UpdateGame( moveToPlay, *m_currentGameState );
 	m_randomMove = inputMove_t();
+}
+
+bool Game::PlayMoveIfValid( EventArgs const& args )
+{
+	inputMove_t moveToPlay;
+	moveToPlay.m_cardIndex= args.GetValue( "cardIndex", -1 );
+	moveToPlay.m_moveType = (eMoveType)args.GetValue( "moveType", -1 );
+	moveToPlay.m_parameterCardIndex1 = args.GetValue( "parameterIndex1", -1 );
+	moveToPlay.m_parameterCardIndex2 = args.GetValue( "parameterIndex2", -1 );
+	moveToPlay.m_whoseMoveIsIt = args.GetValue( "whoseMove", -1 );
+
+	PlayMoveIfValid( moveToPlay );
+
+	return true;
 }
 
 bool Game::IsMoveValid( inputMove_t const& moveToPlay ) const

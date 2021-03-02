@@ -34,6 +34,7 @@ IntRange GetValueFromString( std::string const& stringValue, IntRange const& def
 FloatRange GetValueFromString( std::string const& stringValue, FloatRange const& defaultValue );
 Rgba8 GetValueFromString( std::string const& stringValue, Rgba8 const& defaultValue );
 std::string GetValueFromString( std::string const& stringValue, std::string const& );
+std::uintptr_t GetValueFromString( std::string const& stringValue, std::uintptr_t const& defaultValue );
 
 //ToString
 std::string ToString( bool const& value );
@@ -46,6 +47,8 @@ std::string ToString( IntRange const& value );
 std::string ToString( FloatRange const& value );
 std::string ToString( Rgba8 const& value );
 std::string ToString( std::string const& value );
+std::string ToString( std::uintptr_t const& value );
+
 
 
 

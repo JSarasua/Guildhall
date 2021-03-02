@@ -503,6 +503,8 @@ public:
 	void Update();
 	void Render();
 
+	bool PlayMoveIfValid( EventArgs const& args );
+
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
 	bool IsMoveValidForGameState( inputMove_t const&, gamestate_t const& gameState ) const;
@@ -535,6 +537,9 @@ public:
 	gamestate_t ParseGameStateFromBuffer( byte*& buffer );
 
 private:
+	void StartupUI();
+	void MatchUIToGameState();
+
 	void InitializeGameState();
 	void RestartGame();
 
@@ -576,8 +581,12 @@ public:
 	int m_simCount = 0;
 	int m_totalSimCount = 0;
 
+	Texture const* m_cyanTexture = nullptr;
+	Texture const* m_redTexture = nullptr;
+	Texture const* m_greenTexture = nullptr;
 
 	//Widget data
+	Widget* m_baseCardWidget = nullptr;
 	//Player 1
 	Widget* m_player1DeckWidget = nullptr;
 	Widget* m_player1DiscardWidget = nullptr;

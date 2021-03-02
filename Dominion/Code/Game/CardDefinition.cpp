@@ -1,5 +1,8 @@
 #include "Game/CardDefinition.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Renderer/Texture.hpp"
+#include "Game/GameCommon.hpp"
+#include "Engine/Renderer/RenderContext.hpp"
 #include <algorithm>
 //#include "Engine/Core/StringUtils.hpp"
 
@@ -16,36 +19,41 @@ bool CardDefinition::UnorderedCompare( std::vector<CardDefinition const*> const&
 	return firstCopy == secondCopy;
 }
 
-CardDefinition::CardDefinition( int cardIndex, eCardType type, std::string cardName, int cost, int coins, int vp, int plusActions, int plusDraw, int plusBuys ) :
-	m_cardIndex( cardIndex ), 
-	m_cost( cost ),
-	m_coins( coins ),
+CardDefinition::CardDefinition( int cardIndex, eCardType type, std::string cardName, Texture const* cardTexture /*= nullptr*/, int cost /*= 0*/, int coins /*= 0*/, int vp /*= 0*/, int plusActions /*= 0*/, int plusDraw /*= 0*/, int plusBuys /*= 0 */ ) :
+	m_cardIndex( cardIndex ),
 	m_type( type ),
 	m_cardName( cardName ),
+	m_cardTexture( cardTexture ),
+	m_cost( cost ),
+	m_coins( coins ),
 	m_actionsGained( plusActions ),
 	m_cardDraw( plusDraw ),
 	m_victoryPointValue( vp ),
 	m_buysGained( plusBuys )
-{}
+{
+
+}
 
 void CardDefinition::InitializeCards()
-{																													//Cost		Coins		VP		Actions	Draw	Buy
-	CardDefinition* copperCard		= new CardDefinition( eCards::COPPER,	eCardType::TREASURE_TYPE,	"Copper",		 0,			1,		 0,		 0,		0,		0 );
-	CardDefinition* silverCard		= new CardDefinition( eCards::SILVER,	eCardType::TREASURE_TYPE,	"Silver",		 3,			2,		 0,		 0,		0,		0 );
-	CardDefinition* goldCard		= new CardDefinition( eCards::GOLD,		eCardType::TREASURE_TYPE,	"Gold",			 6,			3,		 0,		 0,		0,		0 );
-	CardDefinition* estateCard		= new CardDefinition( eCards::ESTATE,	eCardType::VICTORY_TYPE,	"Estate",		 2,			0,		 1,		 0,		0,		0 );
-	CardDefinition* duchyCard		= new CardDefinition( eCards::DUCHY,	eCardType::VICTORY_TYPE,	"Duchy",		 5,			0,		 3,		 0,		0,		0 );
-	CardDefinition* provinceCard	= new CardDefinition( eCards::PROVINCE, eCardType::VICTORY_TYPE,	"Province",		 8,			0,		 6,		 0,		0,		0 );
-	CardDefinition* curseCard		= new CardDefinition( eCards::CURSE,	eCardType::CURSE_TYPE,		"Curse",		 0,			0,		 -1,	 0,		0,		0 );
+{
+	Texture const* backTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Card_back.jpg" );
+																																		//Cost		Coins		VP		Actions	Draw	Buy
+	CardDefinition* copperCard		= new CardDefinition( eCards::COPPER,	eCardType::TREASURE_TYPE,	"Copper",		backTexture,		0,			1,		 0,		 0,		0,		0 );
+	CardDefinition* silverCard		= new CardDefinition( eCards::SILVER,	eCardType::TREASURE_TYPE,	"Silver",		backTexture,		3,			2,		 0,		 0,		0,		0 );
+	CardDefinition* goldCard		= new CardDefinition( eCards::GOLD,		eCardType::TREASURE_TYPE,	"Gold",			backTexture,		6,			3,		 0,		 0,		0,		0 );
+	CardDefinition* estateCard		= new CardDefinition( eCards::ESTATE,	eCardType::VICTORY_TYPE,	"Estate",		backTexture,		2,			0,		 1,		 0,		0,		0 );
+	CardDefinition* duchyCard		= new CardDefinition( eCards::DUCHY,	eCardType::VICTORY_TYPE,	"Duchy",		backTexture,		5,			0,		 3,		 0,		0,		0 );
+	CardDefinition* provinceCard	= new CardDefinition( eCards::PROVINCE, eCardType::VICTORY_TYPE,	"Province",		backTexture,		8,			0,		 6,		 0,		0,		0 );
+	CardDefinition* curseCard		= new CardDefinition( eCards::CURSE,	eCardType::CURSE_TYPE,		"Curse",		backTexture,		0,			0,		 -1,	 0,		0,		0 );
 
-	CardDefinition* villageCard		= new CardDefinition( eCards::Village,		eCardType::ACTION_TYPE, "Village",		3,			0,		 0,		 2,		 1,		0 );
-	CardDefinition* smithyCard		= new CardDefinition( eCards::Smithy,		eCardType::ACTION_TYPE, "Smithy",		4,			0,		 0,		 0,		 3,		0 );
-	CardDefinition* councilRoomCard	= new CardDefinition( eCards::CouncilRoom,	eCardType::ACTION_TYPE, "Council Room", 5,			0,		 0,		 0,		 4,		1 );
-	CardDefinition* festivalCard	= new CardDefinition( eCards::Festival,		eCardType::ACTION_TYPE, "Festival",		5,			2,		 0,		 2,		 0,		1 );
-	CardDefinition* laboraryCard	= new CardDefinition( eCards::Laboratory,	eCardType::ACTION_TYPE, "Laboratory",	5,			0,		 0,		 1,		 2,		0 );
-	CardDefinition* marketCard		= new CardDefinition( eCards::Market,		eCardType::ACTION_TYPE, "Market",		5,			1,		 0,		 1,		 1,		1 );
-	CardDefinition* witchCard		= new CardDefinition( eCards::Witch,		eCardType::ACTION_TYPE, "Witch",		5,			0,		 0,		 0,		 2,		0 );
-	CardDefinition* remodelCard		= new CardDefinition( eCards::Remodel,		eCardType::ACTION_TYPE, "Remodel",		4,			0,		 0,		 0,		 0,		0 );
+	CardDefinition* villageCard		= new CardDefinition( eCards::Village,		eCardType::ACTION_TYPE, "Village",		backTexture,		3,			0,		 0,		 2,		 1,		0 );
+	CardDefinition* smithyCard		= new CardDefinition( eCards::Smithy,		eCardType::ACTION_TYPE, "Smithy",		backTexture,		4,			0,		 0,		 0,		 3,		0 );
+	CardDefinition* councilRoomCard	= new CardDefinition( eCards::CouncilRoom,	eCardType::ACTION_TYPE, "Council Room", backTexture,		5,			0,		 0,		 0,		 4,		1 );
+	CardDefinition* festivalCard	= new CardDefinition( eCards::Festival,		eCardType::ACTION_TYPE, "Festival",		backTexture,		5,			2,		 0,		 2,		 0,		1 );
+	CardDefinition* laboraryCard	= new CardDefinition( eCards::Laboratory,	eCardType::ACTION_TYPE, "Laboratory",	backTexture,		5,			0,		 0,		 1,		 2,		0 );
+	CardDefinition* marketCard		= new CardDefinition( eCards::Market,		eCardType::ACTION_TYPE, "Market",		backTexture,		5,			1,		 0,		 1,		 1,		1 );
+	CardDefinition* witchCard		= new CardDefinition( eCards::Witch,		eCardType::ACTION_TYPE, "Witch",		backTexture,		5,			0,		 0,		 0,		 2,		0 );
+	CardDefinition* remodelCard		= new CardDefinition( eCards::Remodel,		eCardType::ACTION_TYPE, "Remodel",		backTexture,		4,			0,		 0,		 0,		 0,		0 );
 
 
 	councilRoomCard->m_OpponentsDrawCard = true;

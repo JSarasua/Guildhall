@@ -269,6 +269,37 @@ std::vector<AABB2> AABB2::GetBoxAsRows( int numberOfRows )
 	return rows;
 }
 
+std::vector<AABB2> AABB2::GetBoxAsColumns( int numberOfColumns )
+{
+	std::vector<AABB2> columns;
+	if( numberOfColumns == 1 )
+	{
+		columns.push_back( *this );
+		return columns;
+	}
+
+	float minX = mins.x;
+	float maxX = maxs.x;
+	float width = (maxX - minX) / (float)numberOfColumns;
+	for( int columnIndex = 1; columnIndex < numberOfColumns; columnIndex++ )
+	{
+		float leftOfColumnX = minX + (width * (float)(columnIndex - 1));
+		float rightOfColumnX = minX + (width * (float)(columnIndex));
+		AABB2 column = AABB2( leftOfColumnX, mins.y, rightOfColumnX, maxs.y );
+		columns.push_back( column );
+
+		if( columnIndex + 1 == numberOfColumns )
+		{
+			leftOfColumnX = minX + (width * (float)(columnIndex));
+			rightOfColumnX = minX + (width * (float)(columnIndex + 1));
+			AABB2 lastColumn = AABB2( leftOfColumnX, mins.y, rightOfColumnX, maxs.y );
+			columns.push_back( lastColumn );
+		}
+	}
+
+	return columns;
+}
+
 float AABB2::GetOuterRadius() const
 {
 	float width = maxs.x - mins.x;

@@ -2,9 +2,9 @@
 #include "GameCommon.hpp"
 #include "App.hpp"
 
-extern RenderContext* g_theRenderer;
 Window* g_theWindow = nullptr;
 Game* g_theGame = nullptr;
+RenderContext* g_theRenderer = nullptr;
 
 void DrawLine( Vec2 startPoint, Vec2 endPoint, Rgba8 color, float thickness )
 {

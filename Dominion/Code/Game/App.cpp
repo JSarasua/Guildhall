@@ -8,7 +8,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 
 App* g_theApp = nullptr;
-RenderContext* g_theRenderer = nullptr;
+//RenderContext* g_theRenderer = nullptr;
 AudioSystem* g_theAudio = nullptr;
 //InputSystem* g_theInput = nullptr;
 
@@ -16,7 +16,7 @@ const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per
 
 App::App()
 {
-	g_currentBases = eYawPitchRollRotationOrder::ZYX;
+	//g_currentBases = eYawPitchRollRotationOrder::ZYX;
 	g_gameConfigBlackboard = new NamedStrings();
 	g_theAudio = new AudioSystem();
 	g_theInput = new InputSystem();
@@ -44,7 +44,7 @@ void App::Startup()
 	g_theWindow->SetEventSystem(g_theEventSystem);
 	
 	g_theInput->Startup( g_theWindow );
-	g_theInput->PushMouseOptions( MOUSE_MODE_RELATIVE, false, true );
+	g_theInput->PushMouseOptions( MOUSE_MODE_ABSOLUTE, true, false );
 
 	g_theRenderer = new RenderContext();
 	g_theRenderer->StartUp(g_theWindow);
