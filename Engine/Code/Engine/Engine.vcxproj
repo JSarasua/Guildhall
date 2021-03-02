@@ -245,6 +245,7 @@
     <ClCompile Include="UI\UIManager.cpp" />
     <ClCompile Include="UI\UIState.cpp" />
     <ClCompile Include="UI\Widget.cpp" />
+    <ClCompile Include="UI\WidgetGrid.cpp" />
     <ClCompile Include="UI\WidgetHand.cpp" />
     <ClCompile Include="UI\WidgetSlider.cpp" />
   </ItemGroup>
@@ -346,6 +347,7 @@
     <ClInclude Include="UI\UIManager.hpp" />
     <ClInclude Include="UI\UIState.hpp" />
     <ClInclude Include="UI\Widget.hpp" />
+    <ClInclude Include="UI\WidgetGrid.hpp" />
     <ClInclude Include="UI\WidgetHand.hpp" />
     <ClInclude Include="UI\WidgetSlider.hpp" />
   </ItemGroup>

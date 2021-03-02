@@ -45,6 +45,8 @@ public:
 	std::vector<AABB2> GetBoxAsRows( int numberOfRows );
 	std::vector<AABB2> GetBoxAsColumns( int numberOfColumns );
 
+	AABB2 GetGridBoxFromGridDimensions( IntVec2 const& gridDimensions, IntVec2 const& gridIndex );
+
 
 	float GetOuterRadius() const;
 	float GetInnerRadius() const;

@@ -300,6 +300,21 @@ std::vector<AABB2> AABB2::GetBoxAsColumns( int numberOfColumns )
 	return columns;
 }
 
+AABB2 AABB2::GetGridBoxFromGridDimensions( IntVec2 const& gridDimensions, IntVec2 const& gridIndex )
+{
+	std::vector<AABB2> columns = GetBoxAsColumns( gridDimensions.x );
+	std::vector<AABB2> rows = GetBoxAsRows( gridDimensions.y );
+
+	GUARANTEE_OR_DIE( columns.size() > gridIndex.x && rows.size() > gridIndex.y, "Grid indices don't match grid dimensions")
+
+	AABB2 column = columns[gridIndex.x];
+	AABB2 row = rows[gridIndex.y];
+
+	AABB2 gridBox = AABB2( column.mins.x, row.mins.y, column.maxs.x, row.maxs.y );
+
+	return gridBox;
+}
+
 float AABB2::GetOuterRadius() const
 {
 	float width = maxs.x - mins.x;

@@ -37,8 +37,8 @@ public:
 	virtual void Render();
 
 	//Mutators
+	virtual void AddChild( Widget* childWidget );
 	void TransformWidget( Transform const& transform );
-	void AddChild( Widget* childWidget );
 	void SetTexture( Texture const* texture, Texture const* highlightTexture, Texture const* selectTexture );
 	void SetEventToFire( std::string const& eventToFire ) { m_eventToFire = eventToFire; }
 	void SetCanDrag( bool canDrag ) { m_canDrag = canDrag; }
@@ -50,6 +50,7 @@ public:
 	void SetText( std::string const& text ) { m_text = text; }
 	void SetTextSize( float textSize ) { m_textSize = textSize; }
 	void ClearChildren();
+	void SetParent( Widget* parentWidget ) { m_parentWidget = parentWidget; }
 
 	//Accessors
 	Transform GetTransform() const { return m_widgetTransform; }

@@ -316,6 +316,9 @@
     <ClCompile Include="UI\WidgetSlider.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="UI\WidgetGrid.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -613,6 +616,9 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="UI\WidgetSlider.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WidgetGrid.hpp">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
