@@ -25,6 +25,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/ShaderState.hpp"
 #include "Engine/Core/StringUtils.hpp"
+#include "Engine/Core/Delegate.hpp"
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/MatrixUtils.hpp"
@@ -200,6 +201,15 @@ void Game::StartupUI()
 	baseTransform.m_scale = baseCardScale;
 	m_baseCardWidget = new Widget( baseTransform );
 	m_baseCardWidget->SetCanDrag( true );
+	
+// 	AABB2 baseCardBounds = m_baseCardWidget->GetLocalAABB2();
+// 	Vec3 baseCardCountPosition = baseCardBounds.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
+// 	Transform baseCardCountTransform = Transform();
+// 	baseCardCountTransform.m_position = baseCardCountPosition;
+// 	baseCardCountTransform.m_scale = Vec3( 0.2f, 0.2f, 1.f );
+// 	Widget* countWidget = new Widget( baseCardCountTransform );
+// 	countWidget->SetTexture( m_redTexture, nullptr, nullptr );
+// 	m_baseCardWidget->AddChild( countWidget );
 
 	//Hand widget
 	Vec3 handScale = Vec3( 10.f, 3.f, 1.f );
@@ -237,6 +247,13 @@ void Game::StartupUI()
 	m_playerNextPhaseWidget->SetText( "End Turn" );
 	m_playerNextPhaseWidget->SetTextSize( 0.1f );
 	m_playerNextPhaseWidget->SetTexture( m_greenTexture, m_cyanTexture, m_redTexture );
+	Delegate<EventArgs const&>& nextPhaseReleaseDelegate = m_playerNextPhaseWidget->m_releaseDelegate;
+	nextPhaseReleaseDelegate.SubscribeMethod( this, &Game::PlayMoveIfValid );
+	EventArgs& nextPhaseReleaseArgs = m_playerNextPhaseWidget->m_releaseArgs;
+	inputMove_t endMove;
+	endMove.m_moveType = END_PHASE;
+	endMove.m_whoseMoveIsIt = PLAYER_1;
+	nextPhaseReleaseArgs = endMove.ToEventArgs();
 	rootWidget->AddChild( m_playerNextPhaseWidget );
 
 
@@ -306,6 +323,16 @@ void Game::InitializeCardPilesWidgets()
 		Texture const* cardTexture = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex )->GetCardTexture();
 		cardPileWidget->SetTexture( cardTexture, nullptr, nullptr );
 		m_cardPilesWidget->AddChild( cardPileWidget );
+
+		Delegate<EventArgs const&>& cardPileReleaseDelegate = cardPileWidget->m_releaseDelegate;
+		cardPileReleaseDelegate.SubscribeMethod( this, &Game::PlayMoveIfValid );
+		EventArgs& cardPileReleaseArgs = cardPileWidget->m_releaseArgs;
+
+		inputMove_t cardToBuy;
+		cardToBuy.m_cardIndex = cardIndex;
+		cardToBuy.m_moveType = BUY_MOVE;
+		cardToBuy.m_whoseMoveIsIt = m_playerWidgetsToShow;
+		cardPileReleaseArgs = cardToBuy.ToEventArgs();
 	}
 }
 
@@ -2263,14 +2290,10 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 bool Game::PlayMoveIfValid( EventArgs const& args )
 {
-	inputMove_t moveToPlay;
-	moveToPlay.m_cardIndex= args.GetValue( "cardIndex", -1 );
-	moveToPlay.m_moveType = (eMoveType)args.GetValue( "moveType", -1 );
-	moveToPlay.m_parameterCardIndex1 = args.GetValue( "parameterIndex1", -1 );
-	moveToPlay.m_parameterCardIndex2 = args.GetValue( "parameterIndex2", -1 );
-	moveToPlay.m_whoseMoveIsIt = args.GetValue( "whoseMove", -1 );
-
+	inputMove_t moveToPlay = inputMove_t::CreateFromEventArgs( args );
 	PlayMoveIfValid( moveToPlay );
+
+	m_isUIDirty = true;
 
 	return true;
 }

@@ -147,6 +147,30 @@ public:
 		return false;
 	}
 
+	EventArgs ToEventArgs() const
+	{
+		EventArgs args;
+		args.SetValue( "cardIndex", m_cardIndex );
+		args.SetValue( "moveType", (int)m_moveType );
+		args.SetValue( "parameterIndex1", m_parameterCardIndex1 );
+		args.SetValue( "parameterIndex2", m_parameterCardIndex2 );
+		args.SetValue( "whoseMove", m_whoseMoveIsIt );
+
+		return args;
+	}
+
+	static inputMove_t CreateFromEventArgs( EventArgs const& eventArgs )
+	{
+		inputMove_t inputMove;
+		inputMove.m_cardIndex= eventArgs.GetValue( "cardIndex", -1 );
+		inputMove.m_moveType = (eMoveType)eventArgs.GetValue( "moveType", (int)INVALID_MOVE );
+		inputMove.m_parameterCardIndex1 = eventArgs.GetValue( "parameterIndex1", -1 );
+		inputMove.m_parameterCardIndex2 = eventArgs.GetValue( "parameterIndex2", -1 );
+		inputMove.m_whoseMoveIsIt = eventArgs.GetValue( "whoseMove", -1 );
+
+		return inputMove;
+	}
+
 	static inputMove_t ParseInputFromBuffer( byte*& buffer )
 	{
 		inputMove_t move;
@@ -616,7 +640,7 @@ public:
 	Widget* m_player2HandWidget = nullptr;
 
 	bool m_isUIDirty = false;
-
+	int m_playerWidgetsToShow = PLAYER_1;
 private:
 	void RenderDevConsole();
 	SIMMETHOD m_mctsSimMethod = SIMMETHOD::RANDOM; 

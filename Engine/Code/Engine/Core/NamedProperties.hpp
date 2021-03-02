@@ -47,9 +47,9 @@ class NamedProperties
 public:
 	~NamedProperties() 
 	{
-		for( auto iter : m_keyValuePairs ) {
-			delete iter.second;
-		}
+// 		for( auto iter : m_keyValuePairs ) {
+// 			delete iter.second;
+// 		}
 
 		m_keyValuePairs.clear();
 	}
