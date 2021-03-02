@@ -24,10 +24,10 @@ class Player;
 class Shader;
 class ShaderState;
 class World;
-//class MonteCarlo;
 class MonteCarloNoTree;
 class MonteCarlo;
 class Widget;
+class WidgetGrid;
 class UIManager;
 
 struct light_t;
@@ -538,7 +538,10 @@ public:
 
 private:
 	void StartupUI();
+	void InitializeCardPilesWidgets();
 	void MatchUIToGameState();
+	void UpdateUI();
+
 
 	void InitializeGameState();
 	void RestartGame();
@@ -593,7 +596,8 @@ public:
 	Widget* m_player1HandWidget = nullptr;
 	
 	//Piles
-	Widget* m_cardPilesWidget = nullptr;
+	IntVec2 m_cardPileDimensions = IntVec2( 8, 2 );
+	WidgetGrid* m_cardPilesWidget = nullptr;
 	Widget* m_playerNextPhaseWidget = nullptr;
 	
 	//Player 2

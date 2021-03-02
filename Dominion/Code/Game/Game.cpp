@@ -9,6 +9,7 @@
 
 #include "Engine/UI/UIManager.hpp"
 #include "Engine/UI/Widget.hpp"
+#include "Engine/UI/WidgetGrid.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Time.hpp"
@@ -136,6 +137,8 @@ void Game::Update()
 		AutoPlayGame();
 	}
 
+	UpdateUI();
+	g_theUIManager->Update( dt );
 
 }
 
@@ -192,16 +195,16 @@ void Game::StartupUI()
 	AABB2 screenBounds = g_theUIManager->GetScreenBounds();
 
 	//Base card
-	Vec3 baseCardScale = Vec3( 1.f, 1.5f, 1.f );
+	Vec3 baseCardScale = Vec3( 1.5f, 2.25f, 1.f );
 	Transform baseTransform = Transform();
 	baseTransform.m_scale = baseCardScale;
 	m_baseCardWidget = new Widget( baseTransform );
 	m_baseCardWidget->SetCanDrag( true );
 
 	//Hand widget
-	Vec3 handScale = Vec3( 12.f, 3.f, 1.f );
+	Vec3 handScale = Vec3( 10.f, 3.f, 1.f );
 	Transform handTransform = Transform();
-	handTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
+	handTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.15f ) );
 	handTransform.m_scale = handScale;
 	m_player1HandWidget = new Widget( handTransform );
 	//m_handWidget->SetTexture( handTexture, nullptr, nullptr );
@@ -236,7 +239,29 @@ void Game::StartupUI()
 	m_playerNextPhaseWidget->SetTexture( m_greenTexture, m_cyanTexture, m_redTexture );
 	rootWidget->AddChild( m_playerNextPhaseWidget );
 
+
+	Transform cardPilesTransform = Transform();
+	cardPilesTransform.m_position= screenBounds.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
+	cardPilesTransform.m_scale = Vec3( 12.f, 4.5f, 1.f );
+	
+	m_cardPilesWidget = new WidgetGrid( cardPilesTransform, m_cardPileDimensions, nullptr );
+	rootWidget->AddChild( m_cardPilesWidget );
+
+	InitializeCardPilesWidgets();
+
 	MatchUIToGameState();
+}
+
+void Game::InitializeCardPilesWidgets()
+{
+	for( int cardIndex = 0; cardIndex < (int)eCards::NUM_CARDS; cardIndex++ )
+	{
+		Widget* cardPileWidget = new Widget( *m_baseCardWidget );
+		cardPileWidget->SetCanDrag( false );
+		Texture const* cardTexture = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex )->GetCardTexture();
+		cardPileWidget->SetTexture( cardTexture, nullptr, nullptr );
+		m_cardPilesWidget->AddChild( cardPileWidget );
+	}
 }
 
 void Game::MatchUIToGameState()
@@ -271,6 +296,23 @@ void Game::MatchUIToGameState()
 
 		m_player1HandWidget->AddChild( cardWidget );
 	}
+}
+
+void Game::UpdateUI()
+{
+	if( m_isUIDirty )
+	{
+		m_isUIDirty = false;
+		MatchUIToGameState();
+	}
+	PlayerBoard const& playerBoard  = m_currentGameState->m_playerBoards[0];
+
+
+	int deckSize = playerBoard.m_sortedDeck.TotalCount();
+	m_player1DeckWidget->SetText( Stringf( "%i", deckSize ) );
+
+	int discardPileSize = playerBoard.m_discardPile.TotalCount();
+	m_player1DiscardWidget->SetText( Stringf( "%i", discardPileSize ) );
 }
 
 void Game::InitializeGameState()
