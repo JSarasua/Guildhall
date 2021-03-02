@@ -589,11 +589,21 @@ public:
 	Texture const* m_greenTexture = nullptr;
 
 	//Widget data
+	IntVec2 m_playAreaGridDimensions = IntVec2( 1, 12 );
 	Widget* m_baseCardWidget = nullptr;
+	IntVec2 m_gameStateGridDimensions = IntVec2( 1, 5 );
+	WidgetGrid* m_gameStateWidget = nullptr;
+	IntVec2 m_AIGridDimensions = IntVec2( 5, 2 );
+	WidgetGrid* m_AIWidget = nullptr;
+	IntVec2 m_playerScoreGridDimensions = IntVec2( 1, 2 );
+	WidgetGrid* m_playerScoreWidget = nullptr;
+	Widget* m_showAIInfoButtonWidget = nullptr;
 	//Player 1
 	Widget* m_player1DeckWidget = nullptr;
 	Widget* m_player1DiscardWidget = nullptr;
 	Widget* m_player1HandWidget = nullptr;
+	WidgetGrid* m_player1PlayAreaWidget = nullptr;
+
 	
 	//Piles
 	IntVec2 m_cardPileDimensions = IntVec2( 8, 2 );

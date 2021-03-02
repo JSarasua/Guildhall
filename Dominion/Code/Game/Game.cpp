@@ -247,6 +247,51 @@ void Game::StartupUI()
 	m_cardPilesWidget = new WidgetGrid( cardPilesTransform, m_cardPileDimensions, nullptr );
 	rootWidget->AddChild( m_cardPilesWidget );
 
+	Transform playAreaTransform = Transform();
+	playAreaTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.07f, 0.65f ) );
+	playAreaTransform.m_scale = Vec3( 1.5f, 6.f, 1.f );
+	m_player1PlayAreaWidget = new WidgetGrid( playAreaTransform, m_playAreaGridDimensions, nullptr );
+	m_player1PlayAreaWidget->SetText( "Play Area" );
+	m_player1PlayAreaWidget->SetTextSize( 0.1f );
+	m_player1PlayAreaWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	rootWidget->AddChild( m_player1PlayAreaWidget );
+
+	Transform gameStateTransform = Transform();
+	gameStateTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.93f, 0.6f ) );
+	gameStateTransform.m_scale = Vec3( 1.5f, 4.f, 1.f );
+	m_gameStateWidget = new WidgetGrid( gameStateTransform, m_gameStateGridDimensions, nullptr );
+	m_gameStateWidget->SetText( "Game state" );
+	m_gameStateWidget->SetTextSize( 0.1f );
+	m_gameStateWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	rootWidget->AddChild( m_gameStateWidget );
+
+	Transform AITransform = Transform();
+	AITransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.93f ) );
+	AITransform.m_scale = Vec3( 12.f, 1.f, 1.f );
+	m_AIWidget = new WidgetGrid( AITransform, m_AIGridDimensions );
+	m_AIWidget->SetText( "AI Info" );
+	m_AIWidget->SetTextSize( 0.1f );
+	m_AIWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	rootWidget->AddChild( m_AIWidget );
+
+	Transform moreAIInfoTransform = Transform();
+	moreAIInfoTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.88f ) );
+	moreAIInfoTransform.m_scale = Vec3( 0.75f, 0.5f, 1.f );
+	m_showAIInfoButtonWidget = new Widget( moreAIInfoTransform );
+	m_showAIInfoButtonWidget->SetText( "Edit AI" );
+	m_showAIInfoButtonWidget->SetTextSize( 0.1f );
+	m_showAIInfoButtonWidget->SetTexture( m_redTexture, nullptr, nullptr );
+	rootWidget->AddChild( m_showAIInfoButtonWidget );
+
+	Transform playerScoreTransform = Transform();
+	playerScoreTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.075f, 0.25f ) );
+	playerScoreTransform.m_scale = Vec3( 2.f, 1.f, 1.f );
+	m_playerScoreWidget = new WidgetGrid( playerScoreTransform, m_playerScoreGridDimensions );
+	m_playerScoreWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	m_playerScoreWidget->SetText( "Score Area" );
+	m_playerScoreWidget->SetTextSize( 0.1f );
+	rootWidget->AddChild( m_playerScoreWidget );
+
 	InitializeCardPilesWidgets();
 
 	MatchUIToGameState();
@@ -268,6 +313,7 @@ void Game::MatchUIToGameState()
 {
 	PlayerBoard const& playerBoard = m_currentGameState->m_playerBoards[0];
 	CardPile const& playerHand = playerBoard.GetHand();
+	CardPile const& playerPlayArea = playerBoard.GetPlayArea();
 	
 	m_player1HandWidget->ClearChildren();
 
@@ -295,6 +341,18 @@ void Game::MatchUIToGameState()
 		releaseDelegate.SubscribeMethod( this, &Game::PlayMoveIfValid );
 
 		m_player1HandWidget->AddChild( cardWidget );
+	}
+
+	m_player1PlayAreaWidget->ClearChildren();
+	std::vector<eCards> playAreaCards = playerPlayArea.ToVector();
+	
+	for( eCards const& card : playAreaCards )
+	{
+		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( card );
+		Widget* cardWidget = new Widget( *m_baseCardWidget );
+		cardWidget->SetTexture( cardDef->GetCardTexture(), m_cyanTexture, m_redTexture );
+
+		m_player1PlayAreaWidget->AddChild( cardWidget );
 	}
 }
 
