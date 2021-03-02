@@ -43,7 +43,7 @@ IntVec2 WidgetGrid::GetNextSlotIndex() const
 {
 	IntVec2 nextSlotIndex;
 
-	int nextSlotVectorIndex = (int)m_childWidgets.size() + 1;
+	int nextSlotVectorIndex = (int)m_childWidgets.size();
 
 	int nextSlotIndexX = 0;
 	int nextSlotIndexY = 0;
