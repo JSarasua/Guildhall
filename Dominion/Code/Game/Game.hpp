@@ -528,6 +528,7 @@ public:
 	void Render();
 
 	bool PlayMoveIfValid( EventArgs const& args );
+	bool ToggleWhoseViewedOnUI( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -563,6 +564,8 @@ public:
 private:
 	void StartupUI();
 	void InitializeCardPilesWidgets();
+	void AddCountToCardWidget( Widget* cardWidget, int cardCount );
+	void UpdateCardCountOnWidget( Widget* cardWidget, int cardCount );
 	void MatchUIToGameState();
 	void UpdateUI();
 
@@ -589,6 +592,8 @@ private:
 	Camera m_camera;
 
 public:
+	int m_whoseUIPlaying = PLAYER_1;
+
 	inputMove_t m_randomMove;
 	inputMove_t m_bufferedInputMove;
 
@@ -613,6 +618,7 @@ public:
 	Texture const* m_greenTexture = nullptr;
 
 	//Widget data
+	Widget* m_toggleCurrentViewedPlayer = nullptr;
 	IntVec2 m_playAreaGridDimensions = IntVec2( 1, 12 );
 	Widget* m_baseCardWidget = nullptr;
 	IntVec2 m_gameStateGridDimensions = IntVec2( 1, 5 );

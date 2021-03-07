@@ -83,7 +83,6 @@ private:
 
 protected:
 	Widget* m_parentWidget = nullptr;
-	std::vector<Widget*> m_childWidgets;
 
 	//Assume 1x1 Square
 	Transform m_widgetTransform;
@@ -112,6 +111,8 @@ protected:
 	std::map< std::string, UIState > m_states;
 
 public:
+	std::vector<Widget*> m_childWidgets;
+
 	EventArgs m_selectArgs;
 	EventArgs m_releaseArgs;
 	EventArgs m_hoverArgs;

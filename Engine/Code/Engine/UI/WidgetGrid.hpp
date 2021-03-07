@@ -14,6 +14,7 @@ public:
 	Vec2 GetSlotPosition( IntVec2 const& slotIndex ) const;
 	Vec2 GetNextSlotPosition() const;
 	IntVec2 GetNextSlotIndex() const;
+	Widget* GetChildWidgetAtIndex( int gridIndex ) const;
 
 private:
 	IntVec2 m_gridDimensions;

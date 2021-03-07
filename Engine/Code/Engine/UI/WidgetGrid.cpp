@@ -61,3 +61,17 @@ IntVec2 WidgetGrid::GetNextSlotIndex() const
 	return nextSlotIndex;
 }
 
+Widget* WidgetGrid::GetChildWidgetAtIndex( int gridIndex ) const
+{
+	int childWidgetSize = (int)m_childWidgets.size();
+
+	if( childWidgetSize > gridIndex )
+	{
+		return m_childWidgets[gridIndex];
+	}
+	else
+	{
+		ERROR_AND_DIE( "Tried to get a child widget past array bounds" );
+	}
+}
+

@@ -195,6 +195,22 @@ void Game::StartupUI()
 
 	AABB2 screenBounds = g_theUIManager->GetScreenBounds();
 
+	Vec3 togglePlayerScale = Vec3( 1.7f, 0.5f, 1.f );
+	Transform togglePlayerTransform;
+	togglePlayerTransform.m_scale = togglePlayerScale;
+	togglePlayerTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.14f, 0.13f ) );
+	m_toggleCurrentViewedPlayer = new Widget( togglePlayerTransform );
+	m_toggleCurrentViewedPlayer->SetTexture( m_greenTexture, m_cyanTexture, m_redTexture );
+	m_toggleCurrentViewedPlayer->SetCanDrag( false );
+	m_toggleCurrentViewedPlayer->SetCanHover( true );
+	m_toggleCurrentViewedPlayer->SetCanSelect( true );
+	m_toggleCurrentViewedPlayer->SetText( "Toggle Player" );
+	m_toggleCurrentViewedPlayer->SetTextSize( 0.07f );
+	
+	Delegate<EventArgs const&>& toggleReleaseDel = m_toggleCurrentViewedPlayer->m_releaseDelegate;
+	toggleReleaseDel.SubscribeMethod( this, &Game::ToggleWhoseViewedOnUI );
+	rootWidget->AddChild( m_toggleCurrentViewedPlayer );
+
 	//Base card
 	Vec3 baseCardScale = Vec3( 1.5f, 2.25f, 1.f );
 	Transform baseTransform = Transform();
@@ -202,24 +218,6 @@ void Game::StartupUI()
 	m_baseCardWidget = new Widget( baseTransform );
 	m_baseCardWidget->SetCanDrag( true );
 	
-// 	AABB2 baseCardBounds = m_baseCardWidget->GetLocalAABB2();
-// 	Vec3 baseCardCountPosition = baseCardBounds.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
-// 	Transform baseCardCountTransform = Transform();
-// 	baseCardCountTransform.m_position = baseCardCountPosition;
-// 	baseCardCountTransform.m_scale = Vec3( 0.2f, 0.2f, 1.f );
-// 	Widget* countWidget = new Widget( baseCardCountTransform );
-// 	countWidget->SetTexture( m_redTexture, nullptr, nullptr );
-// 	m_baseCardWidget->AddChild( countWidget );
-
-	//Hand widget
-	Vec3 handScale = Vec3( 10.f, 3.f, 1.f );
-	Transform handTransform = Transform();
-	handTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.15f ) );
-	handTransform.m_scale = handScale;
-	m_player1HandWidget = new Widget( handTransform );
-	//m_handWidget->SetTexture( handTexture, nullptr, nullptr );
-	m_player1HandWidget->SetIsVisible( false );
-	rootWidget->AddChild( m_player1HandWidget );
 
 	Vec3 deckScale = Vec3( 1.f, 1.5f, 1.f );
 	Transform deckTransform = Transform();
@@ -309,6 +307,16 @@ void Game::StartupUI()
 	m_playerScoreWidget->SetTextSize( 0.1f );
 	rootWidget->AddChild( m_playerScoreWidget );
 
+	//Hand widget
+	Vec3 handScale = Vec3( 10.f, 3.f, 1.f );
+	Transform handTransform = Transform();
+	handTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.15f ) );
+	handTransform.m_scale = handScale;
+	m_player1HandWidget = new Widget( handTransform );
+	//m_handWidget->SetTexture( handTexture, nullptr, nullptr );
+	m_player1HandWidget->SetIsVisible( false );
+	rootWidget->AddChild( m_player1HandWidget );
+
 	InitializeCardPilesWidgets();
 
 	MatchUIToGameState();
@@ -320,9 +328,12 @@ void Game::InitializeCardPilesWidgets()
 	{
 		Widget* cardPileWidget = new Widget( *m_baseCardWidget );
 		cardPileWidget->SetCanDrag( false );
-		Texture const* cardTexture = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex )->GetCardTexture();
+		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		Texture const* cardTexture = cardDef->GetCardTexture();
+		int cardCount = m_currentGameState->m_cardPiles[cardIndex].m_pileSize;
 		cardPileWidget->SetTexture( cardTexture, nullptr, nullptr );
 		m_cardPilesWidget->AddChild( cardPileWidget );
+		AddCountToCardWidget( cardPileWidget, cardCount);
 
 		Delegate<EventArgs const&>& cardPileReleaseDelegate = cardPileWidget->m_releaseDelegate;
 		cardPileReleaseDelegate.SubscribeMethod( this, &Game::PlayMoveIfValid );
@@ -338,7 +349,7 @@ void Game::InitializeCardPilesWidgets()
 
 void Game::MatchUIToGameState()
 {
-	PlayerBoard const& playerBoard = m_currentGameState->m_playerBoards[0];
+	PlayerBoard const& playerBoard = m_currentGameState->m_playerBoards[m_whoseUIPlaying];
 	CardPile const& playerHand = playerBoard.GetHand();
 	CardPile const& playerPlayArea = playerBoard.GetPlayArea();
 	
@@ -359,9 +370,16 @@ void Game::MatchUIToGameState()
 		EventArgs& releaseArgs = cardWidget->m_releaseArgs;
 		int cardIndex = cardDef->GetCardIndex();
 
-		releaseArgs.SetValue( "cardIndex", cardIndex );
-		releaseArgs.SetValue( "moveType", (int)cardDef->GetCardType() );
-		releaseArgs.SetValue( "whoseMove", m_currentGameState->m_whoseMoveIsIt );
+		inputMove_t playCardInHand;
+		playCardInHand.m_cardIndex = cardIndex;
+		playCardInHand.m_moveType = eMoveType::PLAY_CARD;
+		playCardInHand.m_whoseMoveIsIt = m_whoseUIPlaying;
+
+		releaseArgs = playCardInHand.ToEventArgs();
+
+// 		releaseArgs.SetValue( "cardIndex", cardIndex );
+// 		releaseArgs.SetValue( "moveType", (int)eCardType::ACTION_TYPE );
+// 		releaseArgs.SetValue( "whoseMove", m_currentGameState->m_whoseMoveIsIt );
 
 		releaseArgs.SetValue( "cardWidget", (std::uintptr_t)cardWidget );
 		Delegate<EventArgs const&>& releaseDelegate = cardWidget->m_releaseDelegate;
@@ -380,6 +398,14 @@ void Game::MatchUIToGameState()
 		cardWidget->SetTexture( cardDef->GetCardTexture(), m_cyanTexture, m_redTexture );
 
 		m_player1PlayAreaWidget->AddChild( cardWidget );
+	}
+
+	int cardPileMaxCount = eCards::NUM_CARDS;
+	for( int cardIndex = 0; cardIndex < cardPileMaxCount; cardIndex++ )
+	{
+		Widget *const cardPileWidget = m_cardPilesWidget->GetChildWidgetAtIndex( cardIndex );
+		int cardPileCount = m_currentGameState->m_cardPiles[cardIndex].m_pileSize;
+		UpdateCardCountOnWidget( cardPileWidget, cardPileCount );
 	}
 }
 
@@ -499,6 +525,34 @@ void Game::InitializeGameState()
  	m_mcts->Shutdown();
  	m_mcts->Startup();
 	m_mcts->SetInitialGameState( *m_currentGameState );
+}
+
+void Game::AddCountToCardWidget( Widget* cardWidget, int cardCount )
+{
+	AABB2 cardBounds = cardWidget->GetLocalAABB2();
+	Vec3 cardCountPosition = cardBounds.GetPointAtUV( Vec2( 0.1f, 0.93f ) );
+	Transform cardCountTransform = Transform();
+	cardCountTransform.m_position = cardCountPosition;
+	cardCountTransform.m_scale = Vec3( 0.2f, 0.2f, 1.f );
+	Widget* countWidget = new Widget( cardCountTransform );
+	countWidget->SetTexture( m_redTexture, nullptr, nullptr );
+	countWidget->SetText( Stringf( "%i", cardCount ) );
+	countWidget->SetTextSize( 0.5f );
+	cardWidget->AddChild( countWidget );
+}
+
+void Game::UpdateCardCountOnWidget( Widget* cardWidget, int cardCount )
+{
+	if( cardWidget->m_childWidgets.size() > 0 )
+	{
+		Widget* childWidget = cardWidget->m_childWidgets[0];
+		childWidget->SetText( Stringf( "%i", cardCount ) );
+	}
+	else
+	{
+		ERROR_AND_DIE( "Tried to update card count on a widget without card count" );
+	}
+
 }
 
 void Game::RestartGame()
@@ -2281,6 +2335,7 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 
 	}
 
+	m_isUIDirty = true;
 	m_mc->SetCurrentGameState( *m_currentGameState );
 	m_mc->ResetPossibleMoves();
 
@@ -2292,6 +2347,21 @@ bool Game::PlayMoveIfValid( EventArgs const& args )
 {
 	inputMove_t moveToPlay = inputMove_t::CreateFromEventArgs( args );
 	PlayMoveIfValid( moveToPlay );
+
+	//m_isUIDirty = true;
+
+	return true;
+}
+
+bool Game::ToggleWhoseViewedOnUI( EventArgs const& args )
+{
+	UNUSED( args );
+
+	m_whoseUIPlaying++;
+	if( m_whoseUIPlaying != PLAYER_2 )
+	{
+		m_whoseUIPlaying = PLAYER_1;
+	}
 
 	m_isUIDirty = true;
 
