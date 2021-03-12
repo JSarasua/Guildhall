@@ -7,6 +7,12 @@ WidgetGrid::WidgetGrid( Transform const& transform, IntVec2 const& gridDimension
 
 void WidgetGrid::AddChild( Widget* childWidget )
 {
+	if( !childWidget )
+	{
+		m_childWidgets.push_back( childWidget );
+		return;
+	}
+
 	int currentNumberOfChildren = (int)m_childWidgets.size();
 
 	int numberOfSlots = m_gridDimensions.x * m_gridDimensions.y;
