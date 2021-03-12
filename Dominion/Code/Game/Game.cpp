@@ -192,6 +192,8 @@ void Game::StartupUI()
 	m_cyanTexture = g_theRenderer->CreateTextureFromColor( Rgba8::CYAN );
 	m_redTexture = g_theRenderer->CreateTextureFromColor( Rgba8::RED );
 	m_greenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::GREEN );
+	m_darkRedTexture = g_theRenderer->CreateTextureFromColor( Rgba8::RedBrown );
+
 
 	AABB2 screenBounds = g_theUIManager->GetScreenBounds();
 
@@ -271,6 +273,7 @@ void Game::StartupUI()
 	m_player1PlayAreaWidget->SetTexture( m_greenTexture, nullptr, nullptr );
 	rootWidget->AddChild( m_player1PlayAreaWidget );
 
+	//Gamestate
 	Transform gameStateTransform = Transform();
 	gameStateTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.93f, 0.6f ) );
 	gameStateTransform.m_scale = Vec3( 1.5f, 4.f, 1.f );
@@ -279,6 +282,33 @@ void Game::StartupUI()
 	m_gameStateWidget->SetTextSize( 0.1f );
 	m_gameStateWidget->SetTexture( m_greenTexture, nullptr, nullptr );
 	rootWidget->AddChild( m_gameStateWidget );
+
+	Transform gameStateChildTransform;
+	gameStateChildTransform.m_scale = Vec3( 1.5f, 1.f, 1.f );
+	m_currentControlledPlayer = new Widget( gameStateChildTransform );
+	m_currentMoney = new Widget( gameStateChildTransform );
+	m_currentBuys = new Widget( gameStateChildTransform );
+	m_currentActions = new Widget( gameStateChildTransform );
+
+	m_currentControlledPlayer->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_currentMoney->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_currentBuys->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_currentActions->SetTexture( m_darkRedTexture, nullptr, nullptr );
+
+	m_currentControlledPlayer->SetText( Stringf( "Player: %i", m_whoseUIPlaying + 1 ) );
+	m_currentControlledPlayer->SetTextSize( 0.1f );	
+	m_currentMoney->SetText( Stringf( "Money: %i", 5 ) );
+	m_currentMoney->SetTextSize( 0.1f );
+	m_currentBuys->SetText( Stringf( "Buys: %i", 1 ) );
+	m_currentBuys->SetTextSize( 0.1f );
+	m_currentActions->SetText( Stringf( "Actions: %i", 1 ) );
+	m_currentActions->SetTextSize( 0.1f );
+
+	m_gameStateWidget->AddChild( m_currentControlledPlayer );
+	m_gameStateWidget->AddChild( m_currentMoney );
+	m_gameStateWidget->AddChild( m_currentBuys );
+	m_gameStateWidget->AddChild( m_currentActions );
+
 
 	Transform AITransform = Transform();
 	AITransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.93f ) );
@@ -318,8 +348,45 @@ void Game::StartupUI()
 	rootWidget->AddChild( m_player1HandWidget );
 
 	InitializeCardPilesWidgets();
-
+	InitializeAISmallPanelWidget();
+	InitializeAILargePanelWidget();
 	MatchUIToGameState();
+}
+
+void Game::InitializeAISmallPanelWidget()
+{
+	Transform aiInfoTransform;
+	aiInfoTransform.m_scale = Vec3( 2.f, 1.f, 1.f );
+	m_AIInfoWidget = new Widget( aiInfoTransform );
+	m_AIInfoWidget->SetText( "AI Controls: " );
+	m_AIInfoWidget->SetTextSize( 0.1f );
+	m_AIInfoWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+
+	m_playAIMoveWidget = new Widget( aiInfoTransform );
+	m_playAIMoveWidget->SetText( "Play Move" );
+	m_playAIMoveWidget->SetTextSize( 0.1f );
+	m_playAIMoveWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+
+	m_ToggleAutoPlayWidget = new Widget( aiInfoTransform );
+	m_ToggleAutoPlayWidget->SetText( "Auto Play: ON" );
+	m_ToggleAutoPlayWidget->SetTextSize( 0.1f );
+	m_ToggleAutoPlayWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+
+	m_CurrentAIBestMoveWidget = new Widget( aiInfoTransform );
+	m_CurrentAIBestMoveWidget->SetText( "MCTS best move: Play x card" );
+	m_CurrentAIBestMoveWidget->SetTextSize( 0.1f );
+	m_CurrentAIBestMoveWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+
+	m_AIWidget->AddChild( m_AIInfoWidget );
+	m_AIWidget->AddChild( m_playAIMoveWidget );
+	m_AIWidget->AddChild( m_ToggleAutoPlayWidget );
+	m_AIWidget->AddChild( nullptr );
+	m_AIWidget->AddChild( m_CurrentAIBestMoveWidget );
+}
+
+void Game::InitializeAILargePanelWidget()
+{
+
 }
 
 void Game::InitializeCardPilesWidgets()
@@ -407,6 +474,8 @@ void Game::MatchUIToGameState()
 		int cardPileCount = m_currentGameState->m_cardPiles[cardIndex].m_pileSize;
 		UpdateCardCountOnWidget( cardPileWidget, cardPileCount );
 	}
+
+	UpdateGameStateWidget();
 }
 
 void Game::UpdateUI()
@@ -424,6 +493,19 @@ void Game::UpdateUI()
 
 	int discardPileSize = playerBoard.m_discardPile.TotalCount();
 	m_player1DiscardWidget->SetText( Stringf( "%i", discardPileSize ) );
+}
+
+void Game::UpdateGameStateWidget()
+{
+	PlayerBoard const& currentPlayer = m_currentGameState->m_playerBoards[m_whoseUIPlaying];
+	int money = currentPlayer.m_currentCoins;
+	int buys = currentPlayer.m_numberOfBuysAvailable;
+	int actions = currentPlayer.m_numberOfActionsAvailable;
+
+	m_currentControlledPlayer->SetText( Stringf( "Player: %i", m_whoseUIPlaying + 1 ) );
+	m_currentMoney->SetText( Stringf( "Money: %i", money ) );
+	m_currentBuys->SetText( Stringf( "Buys: %i", buys ) );
+	m_currentActions->SetText( Stringf( "Actions: %i", actions ) );
 }
 
 void Game::InitializeGameState()

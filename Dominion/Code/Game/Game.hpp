@@ -563,11 +563,16 @@ public:
 
 private:
 	void StartupUI();
+	void InitializeAISmallPanelWidget();
+	void InitializeAILargePanelWidget();
 	void InitializeCardPilesWidgets();
 	void AddCountToCardWidget( Widget* cardWidget, int cardCount );
 	void UpdateCardCountOnWidget( Widget* cardWidget, int cardCount );
 	void MatchUIToGameState();
 	void UpdateUI();
+	void UpdateGameStateWidget();
+	void UpdateAISmallPanelWidget();
+	void UpdateAILargePanelWidget();
 
 
 	void InitializeGameState();
@@ -616,18 +621,61 @@ public:
 	Texture const* m_cyanTexture = nullptr;
 	Texture const* m_redTexture = nullptr;
 	Texture const* m_greenTexture = nullptr;
+	Texture const* m_darkRedTexture = nullptr;
+	
+	//Gamestate
+	IntVec2 m_gameStateGridDimensions = IntVec2( 1, 4 );
+	WidgetGrid* m_gameStateWidget = nullptr;
+	Widget* m_currentControlledPlayer = nullptr;
+	Widget* m_currentMoney = nullptr;
+	Widget* m_currentBuys = nullptr;
+	Widget* m_currentActions = nullptr;
+
+	//AI simple screen
+	IntVec2 m_AIGridDimensions = IntVec2( 5, 1 );
+	WidgetGrid* m_AIWidget = nullptr;
+	Widget* m_AIInfoWidget = nullptr;
+	Widget* m_playAIMoveWidget = nullptr;
+	Widget* m_ToggleAutoPlayWidget = nullptr;
+	Widget* m_CurrentAIBestMoveWidget = nullptr;
+	Widget* m_showAIInfoButtonWidget = nullptr;
+
+	//AI More Info screen
+	Widget* m_player1AITextWidget = nullptr;
+	Widget* m_player1AIpreviousAIWidget = nullptr;
+	Widget* m_player1AINextAIWidget = nullptr;
+	Widget* m_player2AITextWidget = nullptr;
+	Widget* m_player2AIpreviousAIWidget = nullptr;
+	Widget* m_player2AINextAIWidget = nullptr;
+
+	Widget* m_player1MCTSAIParametersWidget = nullptr;
+	Widget* m_player1SelectionTextWidget = nullptr;
+	Widget* m_player1UCTScoreChangerWidget = nullptr;
+	Widget* m_player1ExpansionTextWidget = nullptr;
+	Widget* m_player1ExpansionChangerWidget = nullptr;
+	Widget* m_player1SimulationTextWidget = nullptr;
+	Widget* m_player1SimulationChangerWidget = nullptr;
+	Widget* m_player1UseChaosChanceWidget = nullptr;
+	Widget* m_player1ChaosChanceChangerWidget = nullptr;
+
+	//player 2 AI
+// 	Widget* m_player2MCTSAIParametersWidget = nullptr;
+// 	Widget* m_player2SelectionTextWidget = nullptr;
+// 	Widget* m_player2UCTScoreChangerWidget = nullptr;
+// 	Widget* m_player2ExpansionTextWidget = nullptr;
+// 	Widget* m_player2ExpansionChangerWidget = nullptr;
+// 	Widget* m_player2SimulationTextWidget = nullptr;
+// 	Widget* m_player2SimulationChangerWidget = nullptr;
+// 	Widget* m_player2UseChaosChanceWidget = nullptr;
+// 	Widget* m_player2ChaosChanceChangerWidget = nullptr;
+
 
 	//Widget data
 	Widget* m_toggleCurrentViewedPlayer = nullptr;
 	IntVec2 m_playAreaGridDimensions = IntVec2( 1, 12 );
 	Widget* m_baseCardWidget = nullptr;
-	IntVec2 m_gameStateGridDimensions = IntVec2( 1, 5 );
-	WidgetGrid* m_gameStateWidget = nullptr;
-	IntVec2 m_AIGridDimensions = IntVec2( 5, 2 );
-	WidgetGrid* m_AIWidget = nullptr;
 	IntVec2 m_playerScoreGridDimensions = IntVec2( 1, 2 );
 	WidgetGrid* m_playerScoreWidget = nullptr;
-	Widget* m_showAIInfoButtonWidget = nullptr;
 	//Player 1
 	Widget* m_player1DeckWidget = nullptr;
 	Widget* m_player1DiscardWidget = nullptr;
