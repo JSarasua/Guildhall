@@ -117,6 +117,20 @@ Mat44 Widget::GetRelativeModelMatrixScaleOnlySelf() const
 	return parentRelativeMatrixNoScale;
 }
 
+Mat44 Widget::GetRelativeModelMatrixNoScale() const
+{
+	Mat44 parentRelativeMatrixNoScale;
+	if( m_parentWidget )
+	{
+		parentRelativeMatrixNoScale = m_parentWidget->GetParentRelativeModelMatrixNoScale();
+	}
+
+	Mat44 myLocalMatrix = m_widgetTransform.ToMatrixNoScale();
+
+	parentRelativeMatrixNoScale.TransformBy( myLocalMatrix );
+	return parentRelativeMatrixNoScale;
+}
+
 Mat44 Widget::GetInverseModelMatrixNoScale() const
 {
 	Mat44 parentInverseMatrixNoScale;
@@ -163,6 +177,8 @@ void Widget::Render()
 
 			if( m_text.size() > 0 )
 			{
+				Mat44 textModelMatrix = GetRelativeModelMatrixNoScale();
+				context->SetModelMatrix( textModelMatrix );
 				AABB2 textBox = AABB2( -0.5f, -0.5f, 0.5f, 0.5f );
 				context->DrawAlignedTextAtPosition( m_text.c_str(), textBox, m_textSize, Vec2( 0.5f, 0.5f ) );
 

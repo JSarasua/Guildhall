@@ -57,6 +57,7 @@ public:
 	Mat44 GetParentRelativeModelMatrixNoScale() const;
 	Mat44 GetParentInverseModelMatrixNoScale() const;
 	Mat44 GetRelativeModelMatrixScaleOnlySelf() const;
+	Mat44 GetRelativeModelMatrixNoScale() const;
 	Mat44 GetInverseModelMatrixNoScale() const;
 	Mat44 GetRelativeModelMatrix() const;
 	Mat44 GetInverseModelMatrix() const;

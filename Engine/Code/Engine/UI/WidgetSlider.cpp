@@ -36,6 +36,8 @@ void WidgetSlider::Render()
 			context->SetModelMatrix( modelMatrix );
 			if( m_text.size() > 0 )
 			{
+				Mat44 textModelMatrix = GetParentRelativeModelMatrixNoScale();
+				context->SetModelMatrix( textModelMatrix );
 				AABB2 textBox = AABB2( -0.5f, -0.5f, 0.5f, 0.5f );
 				context->DrawAlignedTextAtPosition( m_text.c_str(), textBox, m_textSize, Vec2( 0.5f, 0.5f ) );
 			}

@@ -619,7 +619,7 @@ void Game::AddCountToCardWidget( Widget* cardWidget, int cardCount )
 	Widget* countWidget = new Widget( cardCountTransform );
 	countWidget->SetTexture( m_redTexture, nullptr, nullptr );
 	countWidget->SetText( Stringf( "%i", cardCount ) );
-	countWidget->SetTextSize( 0.5f );
+	countWidget->SetTextSize( 0.1f );
 	cardWidget->AddChild( countWidget );
 }
 
