@@ -28,6 +28,7 @@ class MonteCarloNoTree;
 class MonteCarlo;
 class Widget;
 class WidgetGrid;
+class WidgetIncrementer;
 class UIManager;
 
 struct light_t;
@@ -529,6 +530,7 @@ public:
 
 	bool PlayMoveIfValid( EventArgs const& args );
 	bool ToggleWhoseViewedOnUI( EventArgs const& args );
+	bool ToggleAIScreen( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -641,13 +643,16 @@ public:
 	Widget* m_showAIInfoButtonWidget = nullptr;
 
 	//AI More Info screen
+	bool m_isAIMoreInfoScreenActive = false;
+	IntVec2 m_AIMoreInfoDimensions = IntVec2( 3, 1 );
+	WidgetGrid* m_AIMoreInfoWidget = nullptr;
+	IntVec2 m_playerAIChoosingColumnDimensions = IntVec2( 1, 4 );
+	WidgetGrid* m_playerAIChoosingColumnWidget = nullptr;
 	Widget* m_player1AITextWidget = nullptr;
-	Widget* m_player1AIpreviousAIWidget = nullptr;
-	Widget* m_player1AINextAIWidget = nullptr;
+	WidgetIncrementer* m_player1ChooseAIWidget = nullptr;
 	Widget* m_player2AITextWidget = nullptr;
-	Widget* m_player2AIpreviousAIWidget = nullptr;
-	Widget* m_player2AINextAIWidget = nullptr;
-
+	WidgetIncrementer* m_player2ChooseAIWidget = nullptr;
+\
 	Widget* m_player1MCTSAIParametersWidget = nullptr;
 	Widget* m_player1SelectionTextWidget = nullptr;
 	Widget* m_player1UCTScoreChangerWidget = nullptr;

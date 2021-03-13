@@ -10,6 +10,7 @@
 #include "Engine/UI/UIManager.hpp"
 #include "Engine/UI/Widget.hpp"
 #include "Engine/UI/WidgetGrid.hpp"
+#include "Engine/UI/WidgetIncrementer.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Time.hpp"
@@ -386,7 +387,48 @@ void Game::InitializeAISmallPanelWidget()
 
 void Game::InitializeAILargePanelWidget()
 {
+	Rgba8 black = Rgba8::BLACK;
+	Texture const* blackTexture = g_theRenderer->CreateTextureFromColor( black );
+	Widget* rootWidget = g_theUIManager->GetRootWidget();
 
+	Transform AIMoreInfoTransform;
+	AIMoreInfoTransform.m_scale = Vec3( 8.f, 5.f, 1.f );
+	m_AIMoreInfoWidget = new WidgetGrid( AIMoreInfoTransform, m_AIMoreInfoDimensions );
+	rootWidget->AddChild( m_AIMoreInfoWidget );
+	m_AIMoreInfoWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+
+	Transform chooseAIColumnTransform;
+	chooseAIColumnTransform.m_scale = Vec3( 8.f/3.f, 5.f, 1.f );
+	m_playerAIChoosingColumnWidget = new WidgetGrid( chooseAIColumnTransform, m_playerAIChoosingColumnDimensions );
+	m_AIMoreInfoWidget->AddChild( m_playerAIChoosingColumnWidget );
+	m_playerAIChoosingColumnWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+
+	Transform chooseAITransform;
+	chooseAITransform.m_scale = Vec3( 8.f/3.f, 5.f/4.f, 1.f );
+	std::vector<std::string> aiStrategies;
+	aiStrategies.push_back( "Random" );
+	aiStrategies.push_back( "Big Money" );
+	aiStrategies.push_back( "Single Witch" );
+	aiStrategies.push_back( "Double Witch" );
+	aiStrategies.push_back( "Sarasua1" );
+	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, chooseAITransform );
+	m_player2AITextWidget = new Widget( chooseAITransform );
+	m_player2AITextWidget->SetText( "Player 2" );
+	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, chooseAITransform );
+	m_player1AITextWidget = new Widget( chooseAITransform );
+	m_player1AITextWidget->SetText( "Player 1" );
+
+	m_player2ChooseAIWidget->SetTextures( blackTexture );
+	m_player2AITextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2AITextWidget->SetTextSize( 0.1f );
+	m_player1ChooseAIWidget->SetTextures( blackTexture );
+	m_player1AITextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1AITextWidget->SetTextSize( 0.1f );
+
+	m_playerAIChoosingColumnWidget->AddChild( m_player2ChooseAIWidget );
+	m_playerAIChoosingColumnWidget->AddChild( m_player2AITextWidget );
+	m_playerAIChoosingColumnWidget->AddChild( m_player1ChooseAIWidget );
+	m_playerAIChoosingColumnWidget->AddChild( m_player1AITextWidget );
 }
 
 void Game::InitializeCardPilesWidgets()
@@ -2447,6 +2489,21 @@ bool Game::ToggleWhoseViewedOnUI( EventArgs const& args )
 
 	m_isUIDirty = true;
 
+	return true;
+}
+
+bool Game::ToggleAIScreen( EventArgs const& args )
+{
+	m_isAIMoreInfoScreenActive = !m_isAIMoreInfoScreenActive;
+
+	if( m_isAIMoreInfoScreenActive )
+	{
+		
+	}
+	else
+	{
+
+	}
 	return true;
 }
 
