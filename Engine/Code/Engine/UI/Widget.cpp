@@ -149,6 +149,11 @@ Mat44 Widget::GetInverseModelMatrixNoScale() const
 
 void Widget::Render()
 {
+	if( !m_isEnabled )
+	{
+		return;
+	}
+
 	//Render Self
 	if( nullptr != m_mesh && m_isVisible )
 	{
@@ -256,6 +261,12 @@ bool Widget::IsPointInside( Vec2 const& point ) const
 
 bool Widget::UpdateHovered( Vec2 const& point )
 {
+	if( !m_isEnabled )
+	{
+		m_isHovered = false;
+		return false;
+	}
+
 	m_currentMousePosition = point;
 	m_isHovered = IsPointInside( point ) && m_canHover;
 	if( m_isHovered )
@@ -293,6 +304,11 @@ bool Widget::UpdateHovered( Vec2 const& point )
 
 void Widget::UpdateDrag()
 {
+	if( !m_isEnabled )
+	{
+		return;
+	}
+
 	if( m_isSelected && m_canDrag && m_mouseOffset != s_invalidMousePosition )
 	{
 		//The new position must be in parent's space without scale
@@ -313,6 +329,12 @@ void Widget::UpdateDrag()
 
 void Widget::CheckInput()
 {
+	if( !m_isEnabled )
+	{
+		m_isSelected = false;
+		m_wasSelected = false;
+		return;
+	}
 	m_wasSelected = m_isSelected;
 
 	KeyButtonState const& leftMouseButton = g_theInput->GetMouseButton(LeftMouseButton);

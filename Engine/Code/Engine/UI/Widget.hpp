@@ -44,6 +44,7 @@ public:
 	void SetCanDrag( bool canDrag ) { m_canDrag = canDrag; }
 	void SetCanHover( bool canHover ) { m_canHover = canHover; }
 	void SetCanSelect( bool canSelect ) { m_canSelect = canSelect; }
+	void SetIsEnabled( bool isEnabled ) { m_isEnabled = isEnabled; }
 	void SetIsVisible( bool isVisible ) { m_isVisible = isVisible; }
 	void RemoveHoverAndSelected();
 	void SetPosition( Vec2 const& position ) { m_widgetTransform.m_position = position; }
@@ -76,6 +77,7 @@ public:
 
 	bool GetIsHovered() const { return m_isHovered; }
 	bool GetIsSelected() const { return m_isSelected; }
+	bool GetIsEnabled() const { return m_isEnabled; }
 
 private:
 	void FireSelectEvents();
@@ -103,6 +105,7 @@ protected:
 	bool m_canDrag = false;
 	bool m_canSelect = true;
 	bool m_canHover= true;
+	bool m_isEnabled = true;
 	
 	Vec2 const s_invalidMousePosition = Vec2( -9999.f, -9999.f );
 	Vec2 m_mouseOffset = s_invalidMousePosition;

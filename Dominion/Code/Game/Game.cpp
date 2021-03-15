@@ -327,6 +327,10 @@ void Game::StartupUI()
 	m_showAIInfoButtonWidget->SetText( "Edit AI" );
 	m_showAIInfoButtonWidget->SetTextSize( 0.1f );
 	m_showAIInfoButtonWidget->SetTexture( m_redTexture, nullptr, nullptr );
+	m_showAIInfoButtonWidget->SetCanHover( true );
+	m_showAIInfoButtonWidget->SetCanSelect( true );
+	Delegate<EventArgs const&>& showAIDelegate = m_showAIInfoButtonWidget->m_releaseDelegate;
+	showAIDelegate.SubscribeMethod( this, &Game::ToggleAIScreen );
 	rootWidget->AddChild( m_showAIInfoButtonWidget );
 
 	Transform playerScoreTransform = Transform();
@@ -396,6 +400,7 @@ void Game::InitializeAILargePanelWidget()
 	m_AIMoreInfoWidget = new WidgetGrid( AIMoreInfoTransform, m_AIMoreInfoDimensions );
 	rootWidget->AddChild( m_AIMoreInfoWidget );
 	m_AIMoreInfoWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_AIMoreInfoWidget->SetIsEnabled( false );
 
 	Transform chooseAIColumnTransform;
 	chooseAIColumnTransform.m_scale = Vec3( 8.f/3.f, 5.f, 1.f );
@@ -2498,11 +2503,11 @@ bool Game::ToggleAIScreen( EventArgs const& args )
 
 	if( m_isAIMoreInfoScreenActive )
 	{
-		
+		m_AIMoreInfoWidget->SetIsEnabled( true );
 	}
 	else
 	{
-
+		m_AIMoreInfoWidget->SetIsEnabled( false );
 	}
 	return true;
 }

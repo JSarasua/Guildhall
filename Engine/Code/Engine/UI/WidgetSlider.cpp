@@ -9,6 +9,10 @@ WidgetSlider::WidgetSlider( Transform const& transform, Widget* parentWidget /*=
 
 void WidgetSlider::Render()
 {
+	if( !m_isEnabled )
+	{
+		return;
+	}
 	//Render Self
 	if( nullptr != m_mesh && m_isVisible )
 	{
