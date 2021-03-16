@@ -653,6 +653,7 @@ void Game::MatchUIToGameState()
 	CardPile const& playerHand = playerBoard.GetHand();
 	CardPile const& playerPlayArea = playerBoard.GetPlayArea();
 
+	UpdateScoreWidgets();
 	UpdateAISmallPanelWidget();
 
 	m_player1HandWidget->ClearChildren();
@@ -741,6 +742,15 @@ void Game::UpdateGameStateWidget()
 	m_currentMoney->SetText( Stringf( "Money: %i", money ) );
 	m_currentBuys->SetText( Stringf( "Buys: %i", buys ) );
 	m_currentActions->SetText( Stringf( "Actions: %i", actions ) );
+}
+
+void Game::UpdateScoreWidgets()
+{
+	int player1Score = m_currentGameState->m_playerBoards[PLAYER_1].GetCurrentVictoryPoints();
+	int player2Score = m_currentGameState->m_playerBoards[PLAYER_2].GetCurrentVictoryPoints();
+
+	m_player1ScoreWidget->SetText( Stringf( "Player 1: %i VP", player1Score ) );
+	m_player2ScoreWidget->SetText( Stringf( "Player 2: %i VP", player2Score ) );
 }
 
 void Game::UpdateAISmallPanelWidget()

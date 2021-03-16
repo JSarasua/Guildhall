@@ -575,6 +575,7 @@ private:
 	void MatchUIToGameState();
 	void UpdateUI();
 	void UpdateGameStateWidget();
+	void UpdateScoreWidgets();
 	void UpdateAISmallPanelWidget();
 	void UpdateAILargePanelWidget();
 
