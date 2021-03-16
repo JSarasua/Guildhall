@@ -413,13 +413,14 @@ void Game::InitializeAILargePanelWidget()
 	aiStrategies.push_back( "Sarasua1" );
 
 	AABB2 AIMoreInfoBounds = m_AIMoreInfoWidget->GetLocalAABB2();
-	AABB2 leftColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.333f );
-	AABB2 topLeftAIBounds = leftColumnAIBounds.CarveBoxOffTop( 0.5f );
+	AABB2 leftColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.2f );
+	leftColumnAIBounds = leftColumnAIBounds.GetBoxAtRight( 0.9f );
+	AABB2 topLeftAIBounds = leftColumnAIBounds.CarveBoxOffTop( 0.3f );
 	std::vector<AABB2> leftAIRows = topLeftAIBounds.GetBoxAsRows( 4 );
 	m_player1AITextWidget = new Widget( leftAIRows[3], m_AIMoreInfoWidget );
-	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[2], 0.2f, 0.1f, m_AIMoreInfoWidget );
+	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[2], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player2AITextWidget = new Widget( leftAIRows[1], m_AIMoreInfoWidget );
-	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[0], 0.2f, 0.1f, m_AIMoreInfoWidget );
+	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[0], 0.3f, 0.1f, m_AIMoreInfoWidget );
 
 	m_player1AITextWidget->SetIsVisible( true );
 	m_player2AITextWidget->SetIsVisible( true );
@@ -434,6 +435,141 @@ void Game::InitializeAILargePanelWidget()
 	m_player2ChooseAIWidget->SetTextures( blackTexture );
 	m_player1ChooseAIWidget->SetTextures( blackTexture );
 
+	//Player 1 MCTS AI Parameters
+	AABB2 middleColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.5f );
+	middleColumnAIBounds = middleColumnAIBounds.GetBoxAtTop( 0.5f );
+	std::vector<AABB2> middleAIRows = middleColumnAIBounds.GetBoxAsRows( 9 );
+	m_player1MCTSAIParametersWidget = new Widget( middleAIRows[8], m_AIMoreInfoWidget );
+	m_player1SelectionTextWidget = new Widget( middleAIRows[7], m_AIMoreInfoWidget );
+	m_player1UCTScoreChangerWidget = new Widget( middleAIRows[6], m_AIMoreInfoWidget );
+	m_player1ExpansionTextWidget = new Widget( middleAIRows[5], m_AIMoreInfoWidget );
+	m_player1ExpansionChangerWidget = new Widget( middleAIRows[4], m_AIMoreInfoWidget );
+	m_player1SimulationTextWidget = new Widget( middleAIRows[3], m_AIMoreInfoWidget );
+	m_player1SimulationChangerWidget = new Widget( middleAIRows[2], m_AIMoreInfoWidget );
+	m_player1UseChaosChanceWidget = new Widget( middleAIRows[1], m_AIMoreInfoWidget );
+	m_player1ChaosChanceChangerWidget = new Widget( middleAIRows[0], m_AIMoreInfoWidget );
+
+	m_player1MCTSAIParametersWidget->SetText( "Player 1 MCTS AI Parameters" );
+	m_player1MCTSAIParametersWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1MCTSAIParametersWidget->SetTextSize( 0.1f );
+	m_player1MCTSAIParametersWidget->SetIsVisible( true );
+	m_player1MCTSAIParametersWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player1SelectionTextWidget->SetText( "Selection" );
+	m_player1SelectionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1SelectionTextWidget->SetTextSize( 0.1f );
+	m_player1SelectionTextWidget->SetIsVisible( true );
+	m_player1SelectionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player1UCTScoreChangerWidget->SetText( "<< >> UCT Score: 0.5" );
+	m_player1UCTScoreChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1UCTScoreChangerWidget->SetTextSize( 0.1f );
+	m_player1UCTScoreChangerWidget->SetIsVisible( true );
+	m_player1UCTScoreChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player1ExpansionTextWidget->SetText( "Expansion" );
+	m_player1ExpansionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1ExpansionTextWidget->SetTextSize( 0.1f );
+	m_player1ExpansionTextWidget->SetIsVisible( true );
+	m_player1ExpansionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player1ExpansionChangerWidget->SetText( "<< >> Heuristics" );
+	m_player1ExpansionChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1ExpansionChangerWidget->SetTextSize( 0.1f );
+	m_player1ExpansionChangerWidget->SetIsVisible( true );
+	m_player1ExpansionChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player1SimulationTextWidget->SetText( "Simulation" );
+	m_player1SimulationTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1SimulationTextWidget->SetTextSize( 0.1f );
+	m_player1SimulationTextWidget->SetIsVisible( true );
+	m_player1SimulationTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player1SimulationChangerWidget->SetText( "<< >> Greedy" );
+	m_player1SimulationChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1SimulationChangerWidget->SetTextSize( 0.1f );
+	m_player1SimulationChangerWidget->SetIsVisible( true );
+	m_player1SimulationChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
+	m_player1UseChaosChanceWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1UseChaosChanceWidget->SetTextSize( 0.1f );
+	m_player1UseChaosChanceWidget->SetIsVisible( true );
+	m_player1UseChaosChanceWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player1ChaosChanceChangerWidget->SetText( "<< >> 0.15" );
+	m_player1ChaosChanceChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1ChaosChanceChangerWidget->SetTextSize( 0.1f );
+	m_player1ChaosChanceChangerWidget->SetIsVisible( true );
+	m_player1ChaosChanceChangerWidget->SetTextAlignment( ALIGN_CENTER_RIGHT );
+
+	//Player 2 MCTS AI Parameters
+	AABB2 rightColumnAIBounds = AIMoreInfoBounds;
+	rightColumnAIBounds = rightColumnAIBounds.GetBoxAtTop( 0.5f );
+	std::vector<AABB2> rightAIRows = rightColumnAIBounds.GetBoxAsRows( 9 );
+	m_player2MCTSAIParametersWidget = new Widget( rightAIRows[8], m_AIMoreInfoWidget );
+	m_player2SelectionTextWidget = new Widget( rightAIRows[7], m_AIMoreInfoWidget );
+	m_player2UCTScoreChangerWidget = new Widget( rightAIRows[6], m_AIMoreInfoWidget );
+	m_player2ExpansionTextWidget = new Widget( rightAIRows[5], m_AIMoreInfoWidget );
+	m_player2ExpansionChangerWidget = new Widget( rightAIRows[4], m_AIMoreInfoWidget );
+	m_player2SimulationTextWidget = new Widget( rightAIRows[3], m_AIMoreInfoWidget );
+	m_player2SimulationChangerWidget = new Widget( rightAIRows[2], m_AIMoreInfoWidget );
+	m_player2UseChaosChanceWidget = new Widget( rightAIRows[1], m_AIMoreInfoWidget );
+	m_player2ChaosChanceChangerWidget = new Widget( rightAIRows[0], m_AIMoreInfoWidget );
+
+	m_player2MCTSAIParametersWidget->SetText( "Player 2 MCTS AI Parameters" );
+	m_player2MCTSAIParametersWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2MCTSAIParametersWidget->SetTextSize( 0.1f );
+	m_player2MCTSAIParametersWidget->SetIsVisible( true );
+	m_player2MCTSAIParametersWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player2SelectionTextWidget->SetText( "Selection" );
+	m_player2SelectionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2SelectionTextWidget->SetTextSize( 0.1f );
+	m_player2SelectionTextWidget->SetIsVisible( true );
+	m_player2SelectionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player2UCTScoreChangerWidget->SetText( "<< >> UCT Score: 0.5" );
+	m_player2UCTScoreChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2UCTScoreChangerWidget->SetTextSize( 0.1f );
+	m_player2UCTScoreChangerWidget->SetIsVisible( true );
+	m_player2UCTScoreChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player2ExpansionTextWidget->SetText( "Expansion" );
+	m_player2ExpansionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2ExpansionTextWidget->SetTextSize( 0.1f );
+	m_player2ExpansionTextWidget->SetIsVisible( true );
+	m_player2ExpansionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player2ExpansionChangerWidget->SetText( "<< >> Heuristics" );
+	m_player2ExpansionChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2ExpansionChangerWidget->SetTextSize( 0.1f );
+	m_player2ExpansionChangerWidget->SetIsVisible( true );
+	m_player2ExpansionChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player2SimulationTextWidget->SetText( "Simulation" );
+	m_player2SimulationTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2SimulationTextWidget->SetTextSize( 0.1f );
+	m_player2SimulationTextWidget->SetIsVisible( true );
+	m_player2SimulationTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+
+	m_player2SimulationChangerWidget->SetText( "<< >> Greedy" );
+	m_player2SimulationChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2SimulationChangerWidget->SetTextSize( 0.1f );
+	m_player2SimulationChangerWidget->SetIsVisible( true );
+	m_player2SimulationChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player2UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
+	m_player2UseChaosChanceWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2UseChaosChanceWidget->SetTextSize( 0.1f );
+	m_player2UseChaosChanceWidget->SetIsVisible( true );
+	m_player2UseChaosChanceWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+
+	m_player2ChaosChanceChangerWidget->SetText( "<< >> 0.15" );
+	m_player2ChaosChanceChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2ChaosChanceChangerWidget->SetTextSize( 0.1f );
+	m_player2ChaosChanceChangerWidget->SetIsVisible( true );
+	m_player2ChaosChanceChangerWidget->SetTextAlignment( ALIGN_CENTER_RIGHT );
 }
 
 void Game::InitializeCardPilesWidgets()
