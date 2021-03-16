@@ -238,6 +238,42 @@ AABB2 AABB2::GetBoxAtBottom( float FractionOfWidth, float additionalWidth /*= 0.
 	return newAABB;
 }
 
+AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, Vec2 const& innerBoxPercentDimensions )
+{
+	Vec2 myDimensions = GetDimensions();
+
+	Vec2 dimensions = myDimensions * innerBoxPercentDimensions;
+	Vec2 halfDimensions = 0.5f * dimensions;
+
+	//Get pivot as a value from -1 to 1 then multiply with half dimension to get actual offset
+	Vec2 pivotOffset = 2.f * (pivot - Vec2( 0.5f, 0.5f )) * halfDimensions;
+
+	Vec2 newCenter = GetPointAtUV( uvPosition ) + offset;
+	newCenter -= pivotOffset;
+
+	AABB2 newInnerBox;
+	newInnerBox.SetDimensions( dimensions );
+	newInnerBox.SetCenter( newCenter );
+
+	return newInnerBox;
+}
+
+AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, AABB2 const& innerBox )
+{
+	Vec2 dimensions = innerBox.GetDimensions();
+	Vec2 innerCenter = innerBox.GetCenter();
+	Vec2 innerPivot = innerBox.GetPointAtUV( pivot );
+	Vec2 pivotOffset = innerPivot - innerCenter;
+
+	Vec2 newCenter = GetPointAtUV( uvPosition ) + offset;
+	newCenter -= pivotOffset;
+
+	AABB2 newInnerBox = innerBox;
+	newInnerBox.SetCenter( newCenter );
+
+	return newInnerBox;
+}
+
 std::vector<AABB2> AABB2::GetBoxAsRows( int numberOfRows )
 {
 	std::vector<AABB2> rows;
