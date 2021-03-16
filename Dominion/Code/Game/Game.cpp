@@ -397,16 +397,11 @@ void Game::InitializeAILargePanelWidget()
 
 	Transform AIMoreInfoTransform;
 	AIMoreInfoTransform.m_scale = Vec3( 8.f, 5.f, 1.f );
-	m_AIMoreInfoWidget = new WidgetGrid( AIMoreInfoTransform, m_AIMoreInfoDimensions );
+	m_AIMoreInfoWidget = new Widget( AIMoreInfoTransform );
 	rootWidget->AddChild( m_AIMoreInfoWidget );
 	m_AIMoreInfoWidget->SetTexture( blackTexture, blackTexture, blackTexture );
 	m_AIMoreInfoWidget->SetIsEnabled( false );
 
-	Transform chooseAIColumnTransform;
-	chooseAIColumnTransform.m_scale = Vec3( 8.f/3.f, 5.f, 1.f );
-	m_playerAIChoosingColumnWidget = new WidgetGrid( chooseAIColumnTransform, m_playerAIChoosingColumnDimensions );
-	m_AIMoreInfoWidget->AddChild( m_playerAIChoosingColumnWidget );
-	m_playerAIChoosingColumnWidget->SetTexture( blackTexture, blackTexture, blackTexture );
 
 	Transform chooseAITransform;
 	chooseAITransform.m_scale = Vec3( 8.f/3.f, 5.f/4.f, 1.f );
@@ -416,24 +411,29 @@ void Game::InitializeAILargePanelWidget()
 	aiStrategies.push_back( "Single Witch" );
 	aiStrategies.push_back( "Double Witch" );
 	aiStrategies.push_back( "Sarasua1" );
-	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, chooseAITransform );
-	m_player2AITextWidget = new Widget( chooseAITransform );
-	m_player2AITextWidget->SetText( "Player 2" );
-	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, chooseAITransform );
-	m_player1AITextWidget = new Widget( chooseAITransform );
-	m_player1AITextWidget->SetText( "Player 1" );
 
-	m_player2ChooseAIWidget->SetTextures( blackTexture );
+	AABB2 AIMoreInfoBounds = m_AIMoreInfoWidget->GetLocalAABB2();
+	AABB2 leftColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.333f );
+	AABB2 topLeftAIBounds = leftColumnAIBounds.CarveBoxOffTop( 0.5f );
+	std::vector<AABB2> leftAIRows = topLeftAIBounds.GetBoxAsRows( 4 );
+	m_player1AITextWidget = new Widget( leftAIRows[3], m_AIMoreInfoWidget );
+	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[2], 0.2f, 0.1f, m_AIMoreInfoWidget );
+	m_player2AITextWidget = new Widget( leftAIRows[1], m_AIMoreInfoWidget );
+	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[0], 0.2f, 0.1f, m_AIMoreInfoWidget );
+
+	m_player1AITextWidget->SetIsVisible( true );
+	m_player2AITextWidget->SetIsVisible( true );
+	m_player2AITextWidget->SetText( "Player 2" );
+	m_player1AITextWidget->SetText( "Player 1" );
+	m_player2AITextWidget->SetTextAlignment( Vec2( 0.1f, 0.5f ) );
+	m_player1AITextWidget->SetTextAlignment( Vec2( 0.1f, 0.5f ) );
 	m_player2AITextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
 	m_player2AITextWidget->SetTextSize( 0.1f );
-	m_player1ChooseAIWidget->SetTextures( blackTexture );
 	m_player1AITextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
 	m_player1AITextWidget->SetTextSize( 0.1f );
+	m_player2ChooseAIWidget->SetTextures( blackTexture );
+	m_player1ChooseAIWidget->SetTextures( blackTexture );
 
-	m_playerAIChoosingColumnWidget->AddChild( m_player2ChooseAIWidget );
-	m_playerAIChoosingColumnWidget->AddChild( m_player2AITextWidget );
-	m_playerAIChoosingColumnWidget->AddChild( m_player1ChooseAIWidget );
-	m_playerAIChoosingColumnWidget->AddChild( m_player1AITextWidget );
 }
 
 void Game::InitializeCardPilesWidgets()

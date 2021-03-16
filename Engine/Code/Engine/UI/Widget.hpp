@@ -31,7 +31,9 @@ class Widget
 public:
 	Widget();
 	Widget( AABB2 screenBounds ); //Root Parent Widget
+	Widget( AABB2 localBounds, Widget* parentWidget );
 	Widget( Transform const& transform, Widget* parentWidget = nullptr );
+	Widget( Vec2 const& parentUVs, Vec2 const& parentPercentDimension, Widget* parentWidget, Vec2 const& offset = Vec2(), Vec2 const& pivot = Vec2( 0.5f, 0.5f ) );
 	~Widget();
 
 	virtual void Render();
@@ -52,6 +54,7 @@ public:
 	void SetTextSize( float textSize ) { m_textSize = textSize; }
 	void ClearChildren();
 	void SetParent( Widget* parentWidget ) { m_parentWidget = parentWidget; }
+	void SetTextAlignment( Vec2 const& textAlignment ) { m_textAlignent = textAlignment; }
 
 	//Accessors
 	Transform GetTransform() const { return m_widgetTransform; }
@@ -97,6 +100,7 @@ protected:
 	std::string m_eventToFire;
 	//properties
 	std::string m_text;
+	Vec2 m_textAlignent = Vec2( 0.5f, 0.5f );
 	float m_textSize = 1.f;
 	bool m_isVisible = false;
 	bool m_isHovered = false;

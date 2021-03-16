@@ -644,10 +644,10 @@ public:
 
 	//AI More Info screen
 	bool m_isAIMoreInfoScreenActive = false;
-	IntVec2 m_AIMoreInfoDimensions = IntVec2( 3, 1 );
-	WidgetGrid* m_AIMoreInfoWidget = nullptr;
-	IntVec2 m_playerAIChoosingColumnDimensions = IntVec2( 1, 4 );
-	WidgetGrid* m_playerAIChoosingColumnWidget = nullptr;
+	//IntVec2 m_AIMoreInfoDimensions = IntVec2( 3, 1 );
+	Widget* m_AIMoreInfoWidget = nullptr;
+// 	IntVec2 m_playerAIChoosingColumnDimensions = IntVec2( 1, 4 );
+// 	WidgetGrid* m_playerAIChoosingColumnWidget = nullptr;
 	Widget* m_player1AITextWidget = nullptr;
 	WidgetIncrementer* m_player1ChooseAIWidget = nullptr;
 	Widget* m_player2AITextWidget = nullptr;

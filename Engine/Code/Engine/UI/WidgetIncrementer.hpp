@@ -1,12 +1,14 @@
 #pragma once
 #include "Engine/UI/Widget.hpp"
-#include "Engine/UI/WidgetGrid.hpp"
+#include <vector>
+#include <string>
 
+struct AABB2;
 
-class WidgetIncrementer : public WidgetGrid
+class WidgetIncrementer : public Widget
 {
 public:
-	WidgetIncrementer( std::vector<std::string> const& choices, Transform const& widgetTransform );
+	WidgetIncrementer( std::vector<std::string> const& choices, AABB2 const& localAABB2, float incrementerXPercentSplit, float textSize = 0.5f, Widget* parentWidget = nullptr );
 
 	//virtual void AddChild(  Widget* childWidget ) override;
 	void SetTextures( Texture const* backgroundTexture );

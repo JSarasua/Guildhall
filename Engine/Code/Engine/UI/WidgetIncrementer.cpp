@@ -1,32 +1,49 @@
 #include "Engine/UI/WidgetIncrementer.hpp"
+#include "Engine/Math/AABB2.hpp"
 
-WidgetIncrementer::WidgetIncrementer( std::vector<std::string> const& choices, Transform const& widgetTransform ):
-	WidgetGrid( widgetTransform, IntVec2( 3, 1 ) ),
+WidgetIncrementer::WidgetIncrementer( std::vector<std::string> const& choices, AABB2 const& localAABB2, float incrementerXPercentSplit, float textSize, Widget* parentWidget  ) :
+	Widget( localAABB2, parentWidget ),
 	m_stringValues( choices )
 {
-	Transform gridElementTranform;
-	gridElementTranform.m_scale = widgetTransform.m_scale;
-	gridElementTranform.m_scale.x /= 3;
+	//Place child widgets
+	AABB2 myAABB2 = GetLocalAABB2();
+	AABB2 incrementerBounds =  myAABB2.CarveBoxOffLeft( incrementerXPercentSplit );
+	AABB2 downIncrementerBounds = incrementerBounds.CarveBoxOffLeft( 0.5f );
+	AABB2 upIncrementerBounds = incrementerBounds;
+	AABB2 stringTextBounds = myAABB2;
 
-	m_downIncrementWidget = new Widget( gridElementTranform );
-	m_valueWidget = new Widget( gridElementTranform );
-	m_upIncrementWidget = new Widget( gridElementTranform );
-	WidgetGrid::AddChild( m_downIncrementWidget );
-	WidgetGrid::AddChild( m_upIncrementWidget );
-	WidgetGrid::AddChild( m_valueWidget );
+	Transform downIncrementerTransform;
+	downIncrementerTransform.m_position = downIncrementerBounds.GetCenter();
+	downIncrementerTransform.m_scale = Vec3( downIncrementerBounds.GetDimensions(), 1.f );
+	m_downIncrementWidget = new Widget( downIncrementerTransform );
+
+	Transform upIncrementerTransform;
+	upIncrementerTransform.m_position = upIncrementerBounds.GetCenter();
+	upIncrementerTransform.m_scale = Vec3( upIncrementerBounds.GetDimensions(), 1.f );
+	m_upIncrementWidget = new Widget( upIncrementerTransform );
+
+	Transform stringTextTransform;
+	stringTextTransform.m_position = stringTextBounds.GetCenter();
+	stringTextTransform.m_scale = Vec3( stringTextBounds.GetDimensions(), 1.f );
+	m_valueWidget = new Widget( stringTextTransform );
+
+	m_downIncrementWidget->SetTextSize( textSize );
 	m_downIncrementWidget->SetText( "<<" );
+	m_upIncrementWidget->SetTextSize( textSize );
 	m_upIncrementWidget->SetText( ">>" );
-	m_downIncrementWidget->SetTextSize( 0.1f );
-	m_upIncrementWidget->SetTextSize( 0.1f );
-	m_valueWidget->SetTextSize( 0.1f );
+	m_valueWidget->SetTextSize( textSize );
+	m_valueWidget->SetTextAlignment( Vec2( 0.1f, 0.5f ) );
+	AddChild( m_downIncrementWidget );
+	AddChild( m_upIncrementWidget );
+	AddChild( m_valueWidget );
 
+	//Set up initial values
 	if( m_stringValues.size() > 0 )
 	{
 		m_valueWidget->SetText( m_stringValues[0] );
 	}
 
-
-
+	//Activate buttons
 	m_downIncrementWidget->m_selectDelegate.SubscribeMethod( this, &WidgetIncrementer::DecrementValue );
 	m_upIncrementWidget->m_selectDelegate.SubscribeMethod( this, &WidgetIncrementer::IncrementValue );
 }
