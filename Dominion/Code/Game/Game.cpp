@@ -515,6 +515,7 @@ void Game::InitializeAILargePanelWidget()
 	Transform chooseAITransform;
 	chooseAITransform.m_scale = Vec3( 8.f/3.f, 5.f/4.f, 1.f );
 	std::vector<std::string> aiStrategies;
+	aiStrategies.push_back( "MCTS" );
 	aiStrategies.push_back( "Random" );
 	aiStrategies.push_back( "Big Money" );
 	aiStrategies.push_back( "Single Witch" );
@@ -530,6 +531,9 @@ void Game::InitializeAILargePanelWidget()
 	m_player1ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[2], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player2AITextWidget = new Widget( leftAIRows[1], m_AIMoreInfoWidget );
 	m_player2ChooseAIWidget = new WidgetIncrementer( aiStrategies, leftAIRows[0], 0.3f, 0.1f, m_AIMoreInfoWidget );
+
+	m_player1ChooseAIWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1Strategy );
+	m_player2ChooseAIWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer2Strategy );
 
 	m_player1AITextWidget->SetIsVisible( true );
 	m_player2AITextWidget->SetIsVisible( true );
@@ -2749,6 +2753,38 @@ void Game::AutoPlayGame()
 
 }
 
+AIStrategy Game::StringToAIStrategy( std::string const& strategyStr ) const
+{
+	if( strategyStr == "Random" )
+	{
+		return AIStrategy::RANDOM;
+	}
+	else if( strategyStr == "Big Money" )
+	{
+		return AIStrategy::BIGMONEY;
+	}
+	else if( strategyStr == "Single Witch" )
+	{
+		return AIStrategy::SINGLEWITCH;
+	}
+	else if( strategyStr == "Sarasua1" )
+	{
+		return AIStrategy::SARASUA1;
+	}
+	else if( strategyStr == "MCTS" )
+	{
+		return AIStrategy::MCTS;
+	}
+	else if( strategyStr == "Double Witch" )
+	{
+		return AIStrategy::DOUBLEWITCH;
+	}
+	else
+	{
+		ERROR_AND_DIE( "String invalid" );
+	}
+}
+
 void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 {
 	if( IsGameOver() != GAMENOTOVER )
@@ -2967,6 +3003,24 @@ bool Game::AddSimsForPlayer2( EventArgs const& args )
 	UNUSED( args );
 	m_mcts->AddSimulations( 1'000'000 );
 	m_isUIDirty = true;
+
+	return true;
+}
+
+bool Game::ChangePlayer1Strategy( EventArgs const& args )
+{
+	std::string value = args.GetValue( "value", "Invalid" );
+	AIStrategy strategy = StringToAIStrategy( value );
+	m_player1Strategy = strategy;
+
+	return true;
+}
+
+bool Game::ChangePlayer2Strategy( EventArgs const& args )
+{
+	std::string value = args.GetValue( "value", "Invalid" );
+	AIStrategy strategy = StringToAIStrategy( value );
+	m_player2Strategy = strategy;
 
 	return true;
 }

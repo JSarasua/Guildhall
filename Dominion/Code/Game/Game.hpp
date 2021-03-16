@@ -535,6 +535,8 @@ public:
 	bool ToggleAutoPlay( EventArgs const& args );
 	bool AddSimsForPlayer1( EventArgs const& args );
 	bool AddSimsForPlayer2( EventArgs const& args );
+	bool ChangePlayer1Strategy( EventArgs const& args );
+	bool ChangePlayer2Strategy( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -597,6 +599,8 @@ private:
 	void DebugDrawGame();
 	void DebugDrawGameStateInfo();
 	void AutoPlayGame();
+
+	AIStrategy StringToAIStrategy( std::string const& strategyStr ) const;
 
 private:
 	Clock* m_gameClock = nullptr;
