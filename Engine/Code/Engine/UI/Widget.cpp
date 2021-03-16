@@ -90,6 +90,14 @@ void Widget::RemoveHoverAndSelected()
 {
 	m_isHovered = false;
 	m_isSelected = false;
+
+	for( Widget* childWidget : m_childWidgets )
+	{
+		if( childWidget )
+		{
+			childWidget->RemoveHoverAndSelected();
+		}
+	}
 }
 
 void Widget::ClearChildren()
