@@ -69,6 +69,7 @@ public:
 
 	int GetNumberOfSimulationsRun() const { return m_totalNumberOfSimulationsRun; }
 	int GetCurrentNumberOfSimulationsLeft() const { return m_numberOfSimulationsToRun; }
+	int GetNumberOfVisitsAtCurrentNode() const { return m_numberOfVisitsAtCurrentNode; }
 
 	//Setting methods
 	void SetExpansionStrategy( EXPANSIONSTRATEGY expansionStrategy );
@@ -168,6 +169,7 @@ public:
 	std::atomic<bool> m_isQuitting = false;
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;
 	std::atomic<int> m_numberOfSimulationsToRun = 0;
+	std::atomic<int> m_numberOfVisitsAtCurrentNode = 0;
 };
 
 

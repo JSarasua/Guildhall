@@ -157,6 +157,8 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
 	{
+		m_numberOfVisitsAtCurrentNode = m_currentHeadNode->m_data.m_metaData.m_numberOfSimulations;
+
 		double startSelectTime = GetCurrentTimeSeconds();
 		expand_t expandResult = GetBestNodeToSelect( m_currentHeadNode );
 		double endSelectTime = GetCurrentTimeSeconds();
