@@ -687,8 +687,10 @@ public:
 	Widget* m_toggleCurrentViewedPlayer = nullptr;
 	IntVec2 m_playAreaGridDimensions = IntVec2( 1, 12 );
 	Widget* m_baseCardWidget = nullptr;
-	IntVec2 m_playerScoreGridDimensions = IntVec2( 1, 2 );
+	IntVec2 m_playerScoreGridDimensions = IntVec2( 1, 3 );
 	WidgetGrid* m_playerScoreWidget = nullptr;
+	Widget* m_player1ScoreWidget = nullptr;
+	Widget* m_player2ScoreWidget = nullptr;
 	//Player 1
 	Widget* m_player1DeckWidget = nullptr;
 	Widget* m_player1DiscardWidget = nullptr;

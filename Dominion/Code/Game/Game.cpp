@@ -351,6 +351,31 @@ void Game::StartupUI()
 	m_playerScoreWidget->SetTextSize( 0.1f );
 	rootWidget->AddChild( m_playerScoreWidget );
 
+	AABB2 playerScoreAABB = m_playerScoreWidget->GetLocalAABB2();
+	AABB2 player1ScoreAABB = playerScoreAABB.CarveBoxOffTop( 0.333f );
+	AABB2 player2ScoreAABB = player1ScoreAABB;
+	m_player2ScoreWidget = new Widget( player2ScoreAABB, m_playerScoreWidget );
+	m_player1ScoreWidget = new Widget( player1ScoreAABB, m_playerScoreWidget );
+	Widget* playerScoreTextWidget = new Widget( player1ScoreAABB, m_playerScoreWidget );
+
+	playerScoreTextWidget->SetIsVisible( true );
+	playerScoreTextWidget->SetCanHover( false );
+	playerScoreTextWidget->SetTextSize( 0.1f );
+	playerScoreTextWidget->SetTexture( m_forestGreenTexture, m_forestGreenTexture, m_forestGreenTexture );
+	playerScoreTextWidget->SetText( "Player Scores" );
+	m_player1ScoreWidget->SetIsVisible( true );
+	m_player2ScoreWidget->SetIsVisible( true );
+	m_player1ScoreWidget->SetCanHover( false );
+	m_player2ScoreWidget->SetCanHover( false );
+	m_player1ScoreWidget->SetTextSize( 0.1f );
+	m_player2ScoreWidget->SetTextSize( 0.1f );
+	m_player1ScoreWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_player2ScoreWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_player1ScoreWidget->SetText( "Player 1: 3 VP" );
+	m_player2ScoreWidget->SetText( "Player 2: 3 VP" );
+
+
+
 	//Hand widget
 	Vec3 handScale = Vec3( 10.f, 3.f, 1.f );
 	Transform handTransform = Transform();
