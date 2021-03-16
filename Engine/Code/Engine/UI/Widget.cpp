@@ -203,9 +203,11 @@ void Widget::Render()
 				context->BindTexture( m_highlightTexture );
 				context->DrawMesh( m_mesh );
 			}
-
-			context->BindTexture( m_texture );
-			context->DrawMesh( m_mesh );
+			else
+			{
+				context->BindTexture( m_texture );
+				context->DrawMesh( m_mesh );
+			}
 
 			if( m_text.size() > 0 )
 			{
