@@ -188,14 +188,21 @@ void Game::StartupUI()
 
 	Widget* rootWidget = g_theUIManager->GetRootWidget();
 
+
 	Texture* cardBackTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Card_back.jpg" );
 
-	m_cyanTexture = g_theRenderer->CreateTextureFromColor( Rgba8::CYAN );
-	m_redTexture = g_theRenderer->CreateTextureFromColor( Rgba8::RED );
-	m_greenTexture = g_theRenderer->CreateTextureFromColor( Rgba8::GREEN );
-	m_darkRedTexture = g_theRenderer->CreateTextureFromColor( Rgba8::RedBrown );
+	m_cyanTexture				= g_theRenderer->CreateTextureFromColor( Rgba8::CYAN );
+	m_redTexture				= g_theRenderer->CreateTextureFromColor( Rgba8::RED );
+	m_greenTexture				= g_theRenderer->CreateTextureFromColor( Rgba8::GREEN );
+	m_darkRedTexture			= g_theRenderer->CreateTextureFromColor( Rgba8::RedBrown );
+	m_artichokeGreenTexture		= g_theRenderer->CreateTextureFromColor( Rgba8::ArtichokeGreen );
+	m_forestGreenTexture		= g_theRenderer->CreateTextureFromColor( Rgba8::ForestGreen );
+	m_darkDarkGreenTexture		= g_theRenderer->CreateTextureFromColor( Rgba8::DarkDarkGreen );
+	m_greyGreenTexture			= g_theRenderer->CreateTextureFromColor( Rgba8::GreyGreen );
+	m_darkForestGreenTexture	= g_theRenderer->CreateTextureFromColor( Rgba8::DarkForestGreen );
 
-
+	rootWidget->SetTexture( m_darkDarkGreenTexture, m_darkDarkGreenTexture, m_darkDarkGreenTexture );
+	rootWidget->SetIsVisible( true );
 	AABB2 screenBounds = g_theUIManager->GetScreenBounds();
 
 	Vec3 togglePlayerScale = Vec3( 1.7f, 0.5f, 1.f );
@@ -227,7 +234,7 @@ void Game::StartupUI()
 	deckTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.05f, 0.1f ) );
 	deckTransform.m_scale = deckScale;
 	Widget* deckWidget = new Widget( deckTransform );
-	deckWidget->SetTexture( cardBackTexture, m_cyanTexture, m_redTexture );
+	deckWidget->SetTexture( cardBackTexture, cardBackTexture, cardBackTexture );
 	deckWidget->SetCanHover( true );
 	deckWidget->SetText( "Hello" );
 	deckWidget->SetTextSize( 0.1f );
@@ -267,11 +274,13 @@ void Game::StartupUI()
 
 	Transform playAreaTransform = Transform();
 	playAreaTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.07f, 0.65f ) );
-	playAreaTransform.m_scale = Vec3( 1.5f, 6.f, 1.f );
+	playAreaTransform.m_scale = Vec3( 1.5f, 5.f, 1.f );
 	m_player1PlayAreaWidget = new WidgetGrid( playAreaTransform, m_playAreaGridDimensions, nullptr );
+	m_player1PlayAreaWidget->SetCanHover( false );
+	m_player1PlayAreaWidget->SetCanSelect( false );
 	m_player1PlayAreaWidget->SetText( "Play Area" );
 	m_player1PlayAreaWidget->SetTextSize( 0.1f );
-	m_player1PlayAreaWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	m_player1PlayAreaWidget->SetTexture( m_artichokeGreenTexture, nullptr, nullptr );
 	rootWidget->AddChild( m_player1PlayAreaWidget );
 
 	//Gamestate
@@ -281,7 +290,7 @@ void Game::StartupUI()
 	m_gameStateWidget = new WidgetGrid( gameStateTransform, m_gameStateGridDimensions, nullptr );
 	m_gameStateWidget->SetText( "Game state" );
 	m_gameStateWidget->SetTextSize( 0.1f );
-	m_gameStateWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	m_gameStateWidget->SetTexture( m_artichokeGreenTexture, nullptr, nullptr );
 	rootWidget->AddChild( m_gameStateWidget );
 
 	Transform gameStateChildTransform;
@@ -291,10 +300,10 @@ void Game::StartupUI()
 	m_currentBuys = new Widget( gameStateChildTransform );
 	m_currentActions = new Widget( gameStateChildTransform );
 
-	m_currentControlledPlayer->SetTexture( m_darkRedTexture, nullptr, nullptr );
-	m_currentMoney->SetTexture( m_darkRedTexture, nullptr, nullptr );
-	m_currentBuys->SetTexture( m_darkRedTexture, nullptr, nullptr );
-	m_currentActions->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_currentControlledPlayer->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_currentMoney->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_currentBuys->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_currentActions->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
 	m_currentControlledPlayer->SetText( Stringf( "Player: %i", m_whoseUIPlaying + 1 ) );
 	m_currentControlledPlayer->SetTextSize( 0.1f );	
@@ -317,7 +326,7 @@ void Game::StartupUI()
 	m_AIWidget = new WidgetGrid( AITransform, m_AIGridDimensions );
 	m_AIWidget->SetText( "AI Info" );
 	m_AIWidget->SetTextSize( 0.1f );
-	m_AIWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	m_AIWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 	rootWidget->AddChild( m_AIWidget );
 
 	Transform moreAIInfoTransform = Transform();
@@ -326,7 +335,7 @@ void Game::StartupUI()
 	m_showAIInfoButtonWidget = new Widget( moreAIInfoTransform );
 	m_showAIInfoButtonWidget->SetText( "Edit AI" );
 	m_showAIInfoButtonWidget->SetTextSize( 0.1f );
-	m_showAIInfoButtonWidget->SetTexture( m_redTexture, nullptr, nullptr );
+	m_showAIInfoButtonWidget->SetTexture( m_redTexture, m_darkRedTexture, m_redTexture );
 	m_showAIInfoButtonWidget->SetCanHover( true );
 	m_showAIInfoButtonWidget->SetCanSelect( true );
 	Delegate<EventArgs const&>& showAIDelegate = m_showAIInfoButtonWidget->m_releaseDelegate;
@@ -334,10 +343,10 @@ void Game::StartupUI()
 	rootWidget->AddChild( m_showAIInfoButtonWidget );
 
 	Transform playerScoreTransform = Transform();
-	playerScoreTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.075f, 0.25f ) );
-	playerScoreTransform.m_scale = Vec3( 2.f, 1.f, 1.f );
+	playerScoreTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.075f, 0.23f ) );
+	playerScoreTransform.m_scale = Vec3( 2.f, 0.8f, 1.f );
 	m_playerScoreWidget = new WidgetGrid( playerScoreTransform, m_playerScoreGridDimensions );
-	m_playerScoreWidget->SetTexture( m_greenTexture, nullptr, nullptr );
+	m_playerScoreWidget->SetTexture( m_forestGreenTexture, m_forestGreenTexture, m_forestGreenTexture );
 	m_playerScoreWidget->SetText( "Score Area" );
 	m_playerScoreWidget->SetTextSize( 0.1f );
 	rootWidget->AddChild( m_playerScoreWidget );
@@ -349,7 +358,10 @@ void Game::StartupUI()
 	handTransform.m_scale = handScale;
 	m_player1HandWidget = new Widget( handTransform );
 	//m_handWidget->SetTexture( handTexture, nullptr, nullptr );
-	m_player1HandWidget->SetIsVisible( false );
+	m_player1HandWidget->SetIsVisible( true );
+	m_player1HandWidget->SetTexture( m_greyGreenTexture, nullptr, nullptr );
+	m_player1HandWidget->SetCanHover( false );
+	//m_player1HandWidget->SetCanHover( false );
 	rootWidget->AddChild( m_player1HandWidget );
 
 	InitializeCardPilesWidgets();
@@ -365,22 +377,22 @@ void Game::InitializeAISmallPanelWidget()
 	m_AIInfoWidget = new Widget( aiInfoTransform );
 	m_AIInfoWidget->SetText( "AI Controls: " );
 	m_AIInfoWidget->SetTextSize( 0.1f );
-	m_AIInfoWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_AIInfoWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
 	m_playAIMoveWidget = new Widget( aiInfoTransform );
 	m_playAIMoveWidget->SetText( "Play Move" );
 	m_playAIMoveWidget->SetTextSize( 0.1f );
-	m_playAIMoveWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_playAIMoveWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
 
 	m_ToggleAutoPlayWidget = new Widget( aiInfoTransform );
 	m_ToggleAutoPlayWidget->SetText( "Auto Play: ON" );
 	m_ToggleAutoPlayWidget->SetTextSize( 0.1f );
-	m_ToggleAutoPlayWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_ToggleAutoPlayWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
 
 	m_CurrentAIBestMoveWidget = new Widget( aiInfoTransform );
 	m_CurrentAIBestMoveWidget->SetText( "MCTS best move: Play x card" );
 	m_CurrentAIBestMoveWidget->SetTextSize( 0.1f );
-	m_CurrentAIBestMoveWidget->SetTexture( m_darkRedTexture, nullptr, nullptr );
+	m_CurrentAIBestMoveWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
 	m_AIWidget->AddChild( m_AIInfoWidget );
 	m_AIWidget->AddChild( m_playAIMoveWidget );
@@ -391,15 +403,19 @@ void Game::InitializeAISmallPanelWidget()
 
 void Game::InitializeAILargePanelWidget()
 {
+	Rgba8 darkdarkGreen = Rgba8::DarkDarkGreen;
+	Rgba8 greyGreen = Rgba8::GreyGreen;
 	Rgba8 black = Rgba8::BLACK;
 	Texture const* blackTexture = g_theRenderer->CreateTextureFromColor( black );
+	Texture const* darkdarkGreenTexture = g_theRenderer->CreateTextureFromColor( darkdarkGreen );
+	Texture const* greyGreenTexture = g_theRenderer->CreateTextureFromColor( greyGreen );
 	Widget* rootWidget = g_theUIManager->GetRootWidget();
 
 	Transform AIMoreInfoTransform;
 	AIMoreInfoTransform.m_scale = Vec3( 8.f, 5.f, 1.f );
 	m_AIMoreInfoWidget = new Widget( AIMoreInfoTransform );
 	rootWidget->AddChild( m_AIMoreInfoWidget );
-	m_AIMoreInfoWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_AIMoreInfoWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
 	m_AIMoreInfoWidget->SetIsEnabled( false );
 
 
@@ -581,7 +597,7 @@ void Game::InitializeCardPilesWidgets()
 		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
 		Texture const* cardTexture = cardDef->GetCardTexture();
 		int cardCount = m_currentGameState->m_cardPiles[cardIndex].m_pileSize;
-		cardPileWidget->SetTexture( cardTexture, nullptr, nullptr );
+		cardPileWidget->SetTexture( cardTexture, cardTexture, cardTexture );
 		m_cardPilesWidget->AddChild( cardPileWidget );
 		AddCountToCardWidget( cardPileWidget, cardCount);
 
@@ -615,7 +631,7 @@ void Game::MatchUIToGameState()
 		Widget* cardWidget = new Widget( *m_baseCardWidget );
 		cardWidget->SetPosition( slotCenter );
 		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( (eCards)playerHandVector[handIndex] );
-		cardWidget->SetTexture( cardDef->GetCardTexture(), m_cyanTexture, m_redTexture );
+		cardWidget->SetTexture( cardDef->GetCardTexture(), cardDef->GetCardTexture(), cardDef->GetCardTexture() );
 
 		EventArgs& releaseArgs = cardWidget->m_releaseArgs;
 		int cardIndex = cardDef->GetCardIndex();
@@ -800,7 +816,7 @@ void Game::AddCountToCardWidget( Widget* cardWidget, int cardCount )
 	cardCountTransform.m_position = cardCountPosition;
 	cardCountTransform.m_scale = Vec3( 0.2f, 0.2f, 1.f );
 	Widget* countWidget = new Widget( cardCountTransform );
-	countWidget->SetTexture( m_redTexture, nullptr, nullptr );
+	countWidget->SetTexture( m_redTexture, m_redTexture, m_redTexture );
 	countWidget->SetText( Stringf( "%i", cardCount ) );
 	countWidget->SetTextSize( 0.1f );
 	cardWidget->AddChild( countWidget );

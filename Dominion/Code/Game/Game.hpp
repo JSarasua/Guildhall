@@ -624,6 +624,11 @@ public:
 	Texture const* m_redTexture = nullptr;
 	Texture const* m_greenTexture = nullptr;
 	Texture const* m_darkRedTexture = nullptr;
+	Texture const* m_artichokeGreenTexture = nullptr;
+	Texture const* m_forestGreenTexture = nullptr;
+	Texture const* m_darkDarkGreenTexture = nullptr;
+	Texture const* m_greyGreenTexture = nullptr;
+	Texture const* m_darkForestGreenTexture = nullptr;
 	
 	//Gamestate
 	IntVec2 m_gameStateGridDimensions = IntVec2( 1, 4 );
