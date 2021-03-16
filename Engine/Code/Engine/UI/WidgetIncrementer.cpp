@@ -67,8 +67,11 @@ bool WidgetIncrementer::DecrementValue( EventArgs const& args )
 	{
 		m_stringIndex--;
 	}
-
 	m_valueWidget->SetText( m_stringValues[m_stringIndex] );
+
+	EventArgs valueArgs;
+	valueArgs.SetValue( "value", m_stringValues[m_stringIndex] );
+	m_valueChangeDelegate.Invoke( valueArgs );
 
 	return true;
 }
@@ -87,6 +90,10 @@ bool WidgetIncrementer::IncrementValue( EventArgs const& args )
 	}
 
 	m_valueWidget->SetText( m_stringValues[m_stringIndex] );
+
+	EventArgs valueArgs;
+	valueArgs.SetValue( "value", m_stringValues[m_stringIndex] );
+	m_valueChangeDelegate.Invoke( valueArgs );
 
 	return true;
 }

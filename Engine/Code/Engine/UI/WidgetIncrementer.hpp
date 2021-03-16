@@ -22,4 +22,6 @@ public:
 
 	std::vector<std::string> m_stringValues;
 	size_t m_stringIndex = 0;
+
+	Delegate<EventArgs const&> m_valueChangeDelegate;
 };
