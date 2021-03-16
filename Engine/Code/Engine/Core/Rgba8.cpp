@@ -18,8 +18,13 @@ const Rgba8 Rgba8::SandyTan		=	Rgba8( 253, 217, 181, 255 );
 const Rgba8 Rgba8::Tan			=	Rgba8( 250, 167, 108, 255 );
 const Rgba8 Rgba8::WindsorTan	=	Rgba8( 167, 85, 2, 255 );
 const Rgba8 Rgba8::TuscanTan	=	Rgba8( 166, 123, 91, 255 );
-
 const Rgba8 Rgba8::RedBrown		=	Rgba8( 165, 42, 42 );
+
+const Rgba8 Rgba8::ArtichokeGreen		= Rgba8( 44, 76, 59, 255 );
+const Rgba8 Rgba8::ForestGreen			= Rgba8( 48, 104, 68, 255 );
+const Rgba8 Rgba8::DarkDarkGreen		= Rgba8( 24, 44, 37, 255 );
+const Rgba8 Rgba8::GreyGreen			= Rgba8( 69, 91, 85, 255 );
+const Rgba8 Rgba8::DarkForestGreen		= Rgba8( 30, 69, 62, 255 );
 
 Rgba8::Rgba8 (const Rgba8& copy)
 	: r( copy.r )

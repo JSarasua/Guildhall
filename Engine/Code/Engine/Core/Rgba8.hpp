@@ -52,7 +52,13 @@ public:
 	static const Rgba8 TuscanTan;
 	static const Rgba8 Tan;
 	static const Rgba8 SandyTan;
-
 	static const Rgba8 RedBrown;
+
+	//Dark greens
+	static const Rgba8 ArtichokeGreen;
+	static const Rgba8 ForestGreen;
+	static const Rgba8 DarkDarkGreen;
+	static const Rgba8 GreyGreen;
+	static const Rgba8 DarkForestGreen;
 
 };
