@@ -323,11 +323,11 @@ void Game::StartupUI()
 	Transform AITransform = Transform();
 	AITransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.93f ) );
 	AITransform.m_scale = Vec3( 12.f, 1.f, 1.f );
-	m_AIWidget = new WidgetGrid( AITransform, m_AIGridDimensions );
-	m_AIWidget->SetText( "AI Info" );
+	m_AIWidget = new Widget( AITransform, rootWidget );
+	//m_AIWidget->SetText( "AI Info" );
 	m_AIWidget->SetTextSize( 0.1f );
 	m_AIWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
-	rootWidget->AddChild( m_AIWidget );
+	//rootWidget->AddChild( m_AIWidget );
 
 	Transform moreAIInfoTransform = Transform();
 	moreAIInfoTransform.m_position = screenBounds.GetPointAtUV( Vec2( 0.5f, 0.88f ) );
@@ -397,43 +397,102 @@ void Game::StartupUI()
 
 void Game::InitializeAISmallPanelWidget()
 {
-	Transform aiInfoTransform;
-	aiInfoTransform.m_scale = Vec3( 2.f, 1.f, 1.f );
-	m_AIInfoWidget = new Widget( aiInfoTransform );
+	AABB2 AIBounds = m_AIWidget->GetLocalAABB2();
+	AABB2 leftBounds = AIBounds.GetBoxAtLeft( 0.4f );
+	AABB2 rightBounds = AIBounds.GetBoxAtRight( 0.5f );
+	AABB2 farRightBounds = AIBounds.GetBoxAtRight( 0.1f );
+	farRightBounds.ScaleDimensionsUniform( 0.9f );
+	std::vector<AABB2> AILeftColumnBounds = leftBounds.GetBoxAsColumns( 2 );
+	std::vector<AABB2> AIRightColumnBounds = rightBounds.GetBoxAsColumns( 2 );
+	AILeftColumnBounds[0].ScaleDimensionsUniform( 0.95f );
+	AILeftColumnBounds[1].ScaleDimensionsUniform( 0.95f );
+	//AILeftColumnBounds[2].ScaleDimensionsUniform( 0.95f );
+	AIRightColumnBounds[0].ScaleDimensionsUniform( 0.95f );
+	AIRightColumnBounds[1].ScaleDimensionsUniform( 0.95f );
+	std::vector<AABB2> leftLeftRowsBounds = AILeftColumnBounds[0].GetBoxAsRows( 3 );
+	std::vector<AABB2> leftRowsBounds = AILeftColumnBounds[1].GetBoxAsRows( 3 );
+	//std::vector<AABB2> middleRowsBounds = AILeftColumnBounds[2].GetBoxAsRows( 3 );
+	std::vector<AABB2> rightRowsBounds = AIRightColumnBounds[0].GetBoxAsRows( 3 );
+	std::vector<AABB2> rightRightRowsBounds = AIRightColumnBounds[1].GetBoxAsRows( 3 );
+	std::vector<AABB2> farthestRightRowsBounds = farRightBounds.GetBoxAsRows( 3 );
+
+	m_AIInfoWidget = new Widget( leftLeftRowsBounds[2], m_AIWidget );
+	m_AIInfoWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 	m_AIInfoWidget->SetText( "AI Controls: " );
 	m_AIInfoWidget->SetTextSize( 0.1f );
 	m_AIInfoWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
-	m_playAIMoveWidget = new Widget( aiInfoTransform );
-	m_playAIMoveWidget->SetText( "Play Move" );
-	m_playAIMoveWidget->SetTextSize( 0.1f );
-	m_playAIMoveWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
-	Delegate<EventArgs const&>& playAIMoveDelegate = m_playAIMoveWidget->m_releaseDelegate;
-	playAIMoveDelegate.SubscribeMethod( this, &Game::PlayCurrentAIMove );
-
-	m_ToggleAutoPlayWidget = new Widget( aiInfoTransform );
+	m_ToggleAutoPlayWidget = new Widget( leftLeftRowsBounds[1], m_AIWidget );
+	//m_ToggleAutoPlayWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 	m_ToggleAutoPlayWidget->SetText( "Auto Play: OFF" );
 	m_ToggleAutoPlayWidget->SetTextSize( 0.1f );
 	m_ToggleAutoPlayWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
 	Delegate<EventArgs const&>& toggleAutoPlayDelegate = m_ToggleAutoPlayWidget->m_releaseDelegate;
 	toggleAutoPlayDelegate.SubscribeMethod( this, &Game::ToggleAutoPlay );
 
-	m_currentAIBestMoveWidget = new Widget( aiInfoTransform );
+	m_playAIMoveWidget = new Widget( leftRowsBounds[0], m_AIWidget );
+	//m_playAIMoveWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_playAIMoveWidget->SetText( "Play Move" );
+	m_playAIMoveWidget->SetTextSize( 0.1f );
+	m_playAIMoveWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& playAIMoveDelegate = m_playAIMoveWidget->m_releaseDelegate;
+	playAIMoveDelegate.SubscribeMethod( this, &Game::PlayCurrentAIMove );
+
+
+	m_currentAIBestMoveWidget = new Widget( leftRowsBounds[1], m_AIWidget );
+	m_currentAIBestMoveWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 	m_currentAIBestMoveWidget->SetText( "Best move: Play x card" );
 	m_currentAIBestMoveWidget->SetTextSize( 0.1f );
 	m_currentAIBestMoveWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
-	m_currentAIWidget = new Widget( aiInfoTransform );
+	m_currentAIWidget = new Widget( leftRowsBounds[2], m_AIWidget );
+	m_currentAIWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 	std::string aiStrategy = "MCTS";
 	m_currentAIWidget->SetText( Stringf("Current AI: %s", "MCTS") );
 	m_currentAIWidget->SetTextSize( 0.1f );
 	m_currentAIWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
-	m_AIWidget->AddChild( m_AIInfoWidget );
-	m_AIWidget->AddChild( m_playAIMoveWidget );
-	m_AIWidget->AddChild( m_ToggleAutoPlayWidget );
-	m_AIWidget->AddChild( m_currentAIWidget );
-	m_AIWidget->AddChild( m_currentAIBestMoveWidget );
+	m_player1MCTSSimulationsWidget = new Widget( rightRowsBounds[2], m_AIWidget );
+	m_player1MCTSSimulationsWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_player1MCTSSimulationsWidget->SetText( "Player 1 MCTS Sims: 123" );
+	m_player1MCTSSimulationsWidget->SetTextSize( 0.1f );
+	m_player1MCTSSimulationsWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+
+	m_player2MCTSSimulationsWidget = new Widget( rightRowsBounds[1], m_AIWidget );
+	m_player2MCTSSimulationsWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_player2MCTSSimulationsWidget->SetText( "Player 2 MCTS Sims: 123" );
+	m_player2MCTSSimulationsWidget->SetTextSize( 0.1f );
+	m_player2MCTSSimulationsWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+
+	m_player1MCTSTimesVisitedWidget = new Widget( rightRightRowsBounds[2], m_AIWidget );
+	m_player1MCTSTimesVisitedWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_player1MCTSTimesVisitedWidget->SetText( "Node Visits: 123" );
+	m_player1MCTSTimesVisitedWidget->SetTextSize( 0.1f );
+	m_player1MCTSTimesVisitedWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+
+	m_player2MCTSTimesVisitedWidget = new Widget( rightRightRowsBounds[1], m_AIWidget );
+	m_player2MCTSTimesVisitedWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_player2MCTSTimesVisitedWidget->SetText( "Node Visits: 123" );
+	m_player2MCTSTimesVisitedWidget->SetTextSize( 0.1f );
+	m_player2MCTSTimesVisitedWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+
+
+	m_AddPlayer1Simulations = new Widget( farthestRightRowsBounds[2], m_AIWidget );
+	//m_AddPlayer1Simulations->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_AddPlayer1Simulations->SetText( "Add Sims" );
+	m_AddPlayer1Simulations->SetTextSize( 0.1f );
+	m_AddPlayer1Simulations->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& player1AddSimsDelegate = m_AddPlayer1Simulations->m_releaseDelegate;
+	player1AddSimsDelegate.SubscribeMethod( this, &Game::AddSimsForPlayer1 );
+
+	m_AddPlayer2Simulations = new Widget( farthestRightRowsBounds[1], m_AIWidget );
+	//m_AddPlayer2Simulations->SetTextAlignment( ALIGN_CENTER_LEFT );
+	m_AddPlayer2Simulations->SetText( "Add Sims" );
+	m_AddPlayer2Simulations->SetTextSize( 0.1f );
+	m_AddPlayer2Simulations->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& player2AddSimsDelegate = m_AddPlayer2Simulations->m_releaseDelegate;
+	player2AddSimsDelegate.SubscribeMethod( this, &Game::AddSimsForPlayer2 );
+
 }
 
 void Game::InitializeAILargePanelWidget()
@@ -721,14 +780,27 @@ void Game::UpdateUI()
 		m_isUIDirty = false;
 		MatchUIToGameState();
 	}
-	PlayerBoard const& playerBoard  = m_currentGameState->m_playerBoards[0];
+	UpdateUIText();
+}
 
+void Game::UpdateUIText()
+{
+	UpdateDeckAndDiscardWidgets();
+	UpdateAISmallPanelWidget();
+	UpdateScoreWidgets();
+	UpdateGameStateWidget();
+}
+
+void Game::UpdateDeckAndDiscardWidgets()
+{
+	PlayerBoard const& playerBoard  = m_currentGameState->m_playerBoards[0];
 
 	int deckSize = playerBoard.m_sortedDeck.TotalCount();
 	m_player1DeckWidget->SetText( Stringf( "%i", deckSize ) );
 
 	int discardPileSize = playerBoard.m_discardPile.TotalCount();
 	m_player1DiscardWidget->SetText( Stringf( "%i", discardPileSize ) );
+
 }
 
 void Game::UpdateGameStateWidget()
@@ -875,9 +947,16 @@ void Game::UpdateAISmallPanelWidget()
 	{
 		bestMoveStr = Stringf( "Invalid Move, MCTS needs sims" );
 	}
-
-	
 	m_currentAIBestMoveWidget->SetText( bestMoveStr );
+
+	int numberOfSims = m_mcts->GetNumberOfSimulationsRun();
+	int numberOfVisits = m_mcts->GetNumberOfVisitsAtCurrentNode();
+	m_player1MCTSSimulationsWidget->SetText( Stringf( "Player 1 MCTS Sims: %i", numberOfSims ) );
+	m_player1MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisits ) );
+
+	m_player2MCTSSimulationsWidget->SetText( Stringf( "Player 2 MCTS Sims: %i", numberOfSims ) );
+	m_player2MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisits ) );
+
 }
 
 void Game::InitializeGameState()
@@ -2871,6 +2950,24 @@ bool Game::ToggleAutoPlay( EventArgs const& args )
 
 	m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
 	m_isUIDirty = true;
+	return true;
+}
+
+bool Game::AddSimsForPlayer1( EventArgs const& args )
+{
+	UNUSED( args );
+	m_mcts->AddSimulations( 1'000'000 );
+	m_isUIDirty = true;
+
+	return true;
+}
+
+bool Game::AddSimsForPlayer2( EventArgs const& args )
+{
+	UNUSED( args );
+	m_mcts->AddSimulations( 1'000'000 );
+	m_isUIDirty = true;
+
 	return true;
 }
 

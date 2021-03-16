@@ -533,6 +533,8 @@ public:
 	bool ToggleAIScreen( EventArgs const& args );
 	bool PlayCurrentAIMove( EventArgs const& args );
 	bool ToggleAutoPlay( EventArgs const& args );
+	bool AddSimsForPlayer1( EventArgs const& args );
+	bool AddSimsForPlayer2( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -574,6 +576,8 @@ private:
 	void UpdateCardCountOnWidget( Widget* cardWidget, int cardCount );
 	void MatchUIToGameState();
 	void UpdateUI();
+	void UpdateUIText();
+	void UpdateDeckAndDiscardWidgets();
 	void UpdateGameStateWidget();
 	void UpdateScoreWidgets();
 	void UpdateAISmallPanelWidget();
@@ -642,14 +646,20 @@ public:
 	Widget* m_currentActions = nullptr;
 
 	//AI simple screen
-	IntVec2 m_AIGridDimensions = IntVec2( 5, 1 );
-	WidgetGrid* m_AIWidget = nullptr;
+	//IntVec2 m_AIGridDimensions = IntVec2( 5, 1 );
+	Widget* m_AIWidget = nullptr;
 	Widget* m_AIInfoWidget = nullptr;
+	Widget* m_ToggleAutoPlayWidget = nullptr;
 	Widget* m_currentAIWidget = nullptr;
 	Widget* m_playAIMoveWidget = nullptr;
-	Widget* m_ToggleAutoPlayWidget = nullptr;
 	Widget* m_currentAIBestMoveWidget = nullptr;
 	Widget* m_showAIInfoButtonWidget = nullptr;
+	Widget* m_player1MCTSSimulationsWidget = nullptr;
+	Widget* m_player2MCTSSimulationsWidget = nullptr;
+	Widget* m_player1MCTSTimesVisitedWidget = nullptr;
+	Widget* m_player2MCTSTimesVisitedWidget = nullptr;
+	Widget* m_AddPlayer1Simulations = nullptr;
+	Widget* m_AddPlayer2Simulations = nullptr;
 
 	//AI More Info screen
 	bool m_isAIMoreInfoScreenActive = false;
