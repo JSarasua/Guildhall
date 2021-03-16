@@ -252,7 +252,7 @@ void Game::StartupUI()
 	m_playerNextPhaseWidget = new Widget( endTurnTransform );
 	m_playerNextPhaseWidget->SetCanSelect( true );
 	m_playerNextPhaseWidget->SetEventToFire( "endTurn" );
-	m_playerNextPhaseWidget->SetText( "End Turn" );
+	m_playerNextPhaseWidget->SetText( "End Phase" );
 	m_playerNextPhaseWidget->SetTextSize( 0.1f );
 	m_playerNextPhaseWidget->SetTexture( m_greenTexture, m_cyanTexture, m_redTexture );
 	Delegate<EventArgs const&>& nextPhaseReleaseDelegate = m_playerNextPhaseWidget->m_releaseDelegate;
@@ -260,7 +260,7 @@ void Game::StartupUI()
 	EventArgs& nextPhaseReleaseArgs = m_playerNextPhaseWidget->m_releaseArgs;
 	inputMove_t endMove;
 	endMove.m_moveType = END_PHASE;
-	endMove.m_whoseMoveIsIt = PLAYER_1;
+	endMove.m_whoseMoveIsIt = m_whoseUIPlaying;
 	nextPhaseReleaseArgs = endMove.ToEventArgs();
 	rootWidget->AddChild( m_playerNextPhaseWidget );
 
@@ -383,22 +383,32 @@ void Game::InitializeAISmallPanelWidget()
 	m_playAIMoveWidget->SetText( "Play Move" );
 	m_playAIMoveWidget->SetTextSize( 0.1f );
 	m_playAIMoveWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& playAIMoveDelegate = m_playAIMoveWidget->m_releaseDelegate;
+	playAIMoveDelegate.SubscribeMethod( this, &Game::PlayCurrentAIMove );
 
 	m_ToggleAutoPlayWidget = new Widget( aiInfoTransform );
-	m_ToggleAutoPlayWidget->SetText( "Auto Play: ON" );
+	m_ToggleAutoPlayWidget->SetText( "Auto Play: OFF" );
 	m_ToggleAutoPlayWidget->SetTextSize( 0.1f );
 	m_ToggleAutoPlayWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& toggleAutoPlayDelegate = m_ToggleAutoPlayWidget->m_releaseDelegate;
+	toggleAutoPlayDelegate.SubscribeMethod( this, &Game::ToggleAutoPlay );
 
-	m_CurrentAIBestMoveWidget = new Widget( aiInfoTransform );
-	m_CurrentAIBestMoveWidget->SetText( "MCTS best move: Play x card" );
-	m_CurrentAIBestMoveWidget->SetTextSize( 0.1f );
-	m_CurrentAIBestMoveWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+	m_currentAIBestMoveWidget = new Widget( aiInfoTransform );
+	m_currentAIBestMoveWidget->SetText( "Best move: Play x card" );
+	m_currentAIBestMoveWidget->SetTextSize( 0.1f );
+	m_currentAIBestMoveWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
+
+	m_currentAIWidget = new Widget( aiInfoTransform );
+	std::string aiStrategy = "MCTS";
+	m_currentAIWidget->SetText( Stringf("Current AI: %s", "MCTS") );
+	m_currentAIWidget->SetTextSize( 0.1f );
+	m_currentAIWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
 	m_AIWidget->AddChild( m_AIInfoWidget );
 	m_AIWidget->AddChild( m_playAIMoveWidget );
 	m_AIWidget->AddChild( m_ToggleAutoPlayWidget );
-	m_AIWidget->AddChild( nullptr );
-	m_AIWidget->AddChild( m_CurrentAIBestMoveWidget );
+	m_AIWidget->AddChild( m_currentAIWidget );
+	m_AIWidget->AddChild( m_currentAIBestMoveWidget );
 }
 
 void Game::InitializeAILargePanelWidget()
@@ -618,7 +628,9 @@ void Game::MatchUIToGameState()
 	PlayerBoard const& playerBoard = m_currentGameState->m_playerBoards[m_whoseUIPlaying];
 	CardPile const& playerHand = playerBoard.GetHand();
 	CardPile const& playerPlayArea = playerBoard.GetPlayArea();
-	
+
+	UpdateAISmallPanelWidget();
+
 	m_player1HandWidget->ClearChildren();
 
 	AABB2 handBounds = m_player1HandWidget->GetLocalAABB2();
@@ -705,6 +717,133 @@ void Game::UpdateGameStateWidget()
 	m_currentMoney->SetText( Stringf( "Money: %i", money ) );
 	m_currentBuys->SetText( Stringf( "Buys: %i", buys ) );
 	m_currentActions->SetText( Stringf( "Actions: %i", actions ) );
+}
+
+void Game::UpdateAISmallPanelWidget()
+{
+	//Update next phase button
+	eGamePhase currentPhase = m_currentGameState->m_currentPhase;
+	switch( currentPhase )
+	{
+	case BUY_PHASE:
+		m_playerNextPhaseWidget->SetText( "End Turn" );
+		break;
+	case ACTION_PHASE:
+		m_playerNextPhaseWidget->SetText( "To Buy Phase" );
+		break;
+	default:
+		break;
+	}
+
+	EventArgs& nextPhaseReleaseArgs = m_playerNextPhaseWidget->m_releaseArgs;
+	inputMove_t endMove;
+	endMove.m_moveType = END_PHASE;
+	endMove.m_whoseMoveIsIt = m_whoseUIPlaying;
+	nextPhaseReleaseArgs = endMove.ToEventArgs();
+
+	std::string toggleAutoPlayStr;
+	if( m_isAutoPlayEnabled )
+	{
+		toggleAutoPlayStr = "ON";
+	}
+	else
+	{
+		toggleAutoPlayStr = "OFF";
+	}
+
+	m_ToggleAutoPlayWidget->SetText( Stringf( "Auto Play: %s", toggleAutoPlayStr.c_str() ) );
+
+
+	int whoseMove = m_currentGameState->m_whoseMoveIsIt;
+	std::string aiStrategyStr;
+	inputMove_t bestMoveForCurrentAI;
+	if( whoseMove == PLAYER_1 )
+	{
+		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: aiStrategyStr = "Random";
+			break;
+		case AIStrategy::BIGMONEY: aiStrategyStr = "Big Money";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStrategyStr = "Single Witch";
+			break;
+		case AIStrategy::SARASUA1: aiStrategyStr = "Sarasua1";
+			break;
+		case AIStrategy::MCTS: aiStrategyStr = "MCTS";
+			break;
+		case AIStrategy::DOUBLEWITCH: aiStrategyStr = "Double Witch";
+			break;
+		default:
+			break;
+		}
+	}
+	else if( whoseMove == PLAYER_2 )
+	{
+		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player2Strategy );
+
+		switch( m_player2Strategy )
+		{
+		case AIStrategy::RANDOM: aiStrategyStr = "Random";
+			break;
+		case AIStrategy::BIGMONEY: aiStrategyStr = "Big Money";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStrategyStr = "Single Witch";
+			break;
+		case AIStrategy::SARASUA1: aiStrategyStr = "Sarasua1";
+			break;
+		case AIStrategy::MCTS: aiStrategyStr = "MCTS";
+			break;
+		case AIStrategy::DOUBLEWITCH: aiStrategyStr = "Double Witch";
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		aiStrategyStr = "Game Over";
+	}
+	m_currentAIWidget->SetText( Stringf( "Current AI: %s", aiStrategyStr.c_str() ) );
+
+
+	//Update Best Move
+	std::string moveTypeStr;
+	std::string bestMoveStr;
+
+	if( bestMoveForCurrentAI.m_moveType == BUY_MOVE )
+	{
+		moveTypeStr = "Buy";
+		int cardIndexToBuy = bestMoveForCurrentAI.m_cardIndex;
+		cardIndexToBuy = m_currentGameState->m_cardPiles[cardIndexToBuy].m_cardIndex;
+		CardDefinition const* cardDefToBuy = CardDefinition::GetCardDefinitionByType( (eCards)cardIndexToBuy );
+
+		std::string cardToBuyStr = cardDefToBuy->GetCardName();
+
+		bestMoveStr = Stringf( "%s %s", moveTypeStr.c_str(), cardToBuyStr.c_str() );
+	}
+	else if( bestMoveForCurrentAI.m_moveType == PLAY_CARD )
+	{
+		moveTypeStr = "Play";
+		int cardIndexToPlay = bestMoveForCurrentAI.m_cardIndex;
+		CardDefinition const* cardDefToPlay = CardDefinition::GetCardDefinitionByType( (eCards)cardIndexToPlay );
+
+		std::string cardToPlayStr = cardDefToPlay->GetCardName();
+
+		bestMoveStr = Stringf( "%s %s", moveTypeStr.c_str(), cardToPlayStr.c_str() );
+	}
+	else if( bestMoveForCurrentAI.m_moveType == END_PHASE )
+	{
+		bestMoveStr = Stringf( "End Phase" );
+	}
+	else
+	{
+		bestMoveStr = Stringf( "Invalid Move, MCTS needs sims" );
+	}
+
+	
+	m_currentAIBestMoveWidget->SetText( bestMoveStr );
 }
 
 void Game::InitializeGameState()
@@ -1205,7 +1344,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 		{
 			inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
 			PlayMoveIfValid( move );
-
 		}
 	}
 	if( f7Key.WasJustPressed() )
@@ -2661,6 +2799,40 @@ bool Game::ToggleAIScreen( EventArgs const& args )
 	{
 		m_AIMoreInfoWidget->SetIsEnabled( false );
 	}
+	return true;
+}
+
+bool Game::PlayCurrentAIMove( EventArgs const& args )
+{
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		if( move.m_moveType == INVALID_MOVE )
+		{
+
+		}
+		else
+		{
+			PlayMoveIfValid( move );
+		}
+
+		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+		m_mcts->AddSimulations( 400 );
+		m_simCount += 400;
+	}
+	else
+	{
+		inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
+		PlayMoveIfValid( move );
+	}
+
+	return true;
+}
+
+bool Game::ToggleAutoPlay( EventArgs const& args )
+{
+	m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
+	m_isUIDirty = true;
 	return true;
 }
 
