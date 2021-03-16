@@ -1,5 +1,6 @@
 #include "Engine/UI/WidgetIncrementer.hpp"
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 
 WidgetIncrementer::WidgetIncrementer( std::vector<std::string> const& choices, AABB2 const& localAABB2, float incrementerXPercentSplit, float textSize, Widget* parentWidget  ) :
 	Widget( localAABB2, parentWidget ),
@@ -57,6 +58,7 @@ void WidgetIncrementer::SetTextures( Texture const* backgroundTexture )
 
 bool WidgetIncrementer::DecrementValue( EventArgs const& args )
 {
+	UNUSED( args );
 	if( m_stringIndex == 0 )
 	{
 		m_stringIndex = m_stringValues.size() - 1;
@@ -73,6 +75,8 @@ bool WidgetIncrementer::DecrementValue( EventArgs const& args )
 
 bool WidgetIncrementer::IncrementValue( EventArgs const& args )
 {
+	UNUSED( args );
+
 	if( m_stringIndex == m_stringValues.size() - 1 )
 	{
 		m_stringIndex = 0;

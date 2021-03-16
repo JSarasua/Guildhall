@@ -36,7 +36,6 @@ CardDefinition::CardDefinition( int cardIndex, eCardType type, std::string cardN
 
 void CardDefinition::InitializeCards()
 {
-	Texture const* backTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Card_back.jpg" );
 	Texture const* copperTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Copper.jpg" );
 	Texture const* silverTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Silver.jpg" );
 	Texture const* goldTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Gold.jpg" );

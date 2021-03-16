@@ -418,7 +418,6 @@ void Game::InitializeAILargePanelWidget()
 	Rgba8 black = Rgba8::BLACK;
 	Texture const* blackTexture = g_theRenderer->CreateTextureFromColor( black );
 	Texture const* darkdarkGreenTexture = g_theRenderer->CreateTextureFromColor( darkdarkGreen );
-	Texture const* greyGreenTexture = g_theRenderer->CreateTextureFromColor( greyGreen );
 	Widget* rootWidget = g_theUIManager->GetRootWidget();
 
 	Transform AIMoreInfoTransform;
@@ -2789,6 +2788,7 @@ bool Game::ToggleWhoseViewedOnUI( EventArgs const& args )
 
 bool Game::ToggleAIScreen( EventArgs const& args )
 {
+	UNUSED( args );
 	m_isAIMoreInfoScreenActive = !m_isAIMoreInfoScreenActive;
 
 	if( m_isAIMoreInfoScreenActive )
@@ -2804,6 +2804,7 @@ bool Game::ToggleAIScreen( EventArgs const& args )
 
 bool Game::PlayCurrentAIMove( EventArgs const& args )
 {
+	UNUSED( args );
 	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
 	{
 		inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
@@ -2831,6 +2832,8 @@ bool Game::PlayCurrentAIMove( EventArgs const& args )
 
 bool Game::ToggleAutoPlay( EventArgs const& args )
 {
+	UNUSED( args );
+
 	m_isAutoPlayEnabled = !m_isAutoPlayEnabled;
 	m_isUIDirty = true;
 	return true;
