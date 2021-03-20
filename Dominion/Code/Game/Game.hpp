@@ -29,6 +29,7 @@ class MonteCarlo;
 class Widget;
 class WidgetGrid;
 class WidgetIncrementer;
+class WidgetIncrementerFloat;
 class UIManager;
 
 struct light_t;
@@ -318,6 +319,15 @@ public:
 struct gamestate_t
 {
 public:
+	//Card Piles depicting what cards are in the game and how many are in that pile
+	std::array< pileData_t, NUMBEROFPILES > m_cardPiles{};
+
+	PlayerBoard m_playerBoards[2];
+	int m_whoseMoveIsIt = PLAYER_1;
+	eGamePhase m_currentPhase = CLEANUP_PHASE;
+	bool m_isFirstMove = false;
+
+public:
 	gamestate_t() = default;
 	gamestate_t( gamestate_t const& copyGameState ) :
 		m_whoseMoveIsIt( copyGameState.m_whoseMoveIsIt ),
@@ -348,6 +358,8 @@ public:
 		m_playerBoards[1].ShuffleDeck();
 	}
 
+	//MCTS needs a compare where order doesn't matter
+	//Because we don't know what the opponent has in their hand and deck we only compare the current player
 	bool UnordereredEqualsOnlyCurrentPlayer( gamestate_t const& compare ) const
 	{
 		if( m_whoseMoveIsIt == compare.m_whoseMoveIsIt &&
@@ -361,7 +373,6 @@ public:
 
 		return false;
 	}
-
 
 	int WhoJustMoved()
 	{
@@ -380,7 +391,6 @@ public:
 		{
 			return m_whoseMoveIsIt;
 		}
-
 	}
 
 	PlayerBoard& GetEditableCurrentPlayerBoard()
@@ -414,6 +424,7 @@ public:
 		return gameState;
 	}
 
+	//Saving and loading of the gamestate
 	static gamestate_t ParseGameStateFromBufferParser( BufferParser& bufferParser )
 	{
 		gamestate_t gameState;
@@ -429,7 +440,6 @@ public:
 		gameState.m_whoseMoveIsIt = bufferParser.ParseInt32();
 		gameState.m_currentPhase = (eGamePhase)bufferParser.ParseInt32();
 		gameState.m_isFirstMove = bufferParser.ParseBool();
-
 
 		return gameState;
 	}
@@ -461,16 +471,6 @@ public:
 		bufferWriter.AppendInt32( m_currentPhase );
 		bufferWriter.AppendBool( m_isFirstMove );
 	}
-
-public:
-	//Card Piles depicting what cards are in the game and how many are in that pile
-	std::array< pileData_t, NUMBEROFPILES > m_cardPiles {};
-
-	PlayerBoard m_playerBoards[2];
-	int m_whoseMoveIsIt = PLAYER_1;
-	eGamePhase m_currentPhase = CLEANUP_PHASE;
-	bool m_isFirstMove = false;
-
 };
 
 struct data_t
@@ -678,13 +678,13 @@ public:
 \
 	Widget* m_player1MCTSAIParametersWidget = nullptr;
 	Widget* m_player1SelectionTextWidget = nullptr;
-	Widget* m_player1UCTScoreChangerWidget = nullptr;
+	WidgetIncrementerFloat* m_player1UCTScoreChangerWidget = nullptr;
 	Widget* m_player1ExpansionTextWidget = nullptr;
-	Widget* m_player1ExpansionChangerWidget = nullptr;
+	WidgetIncrementer* m_player1ExpansionChangerWidget = nullptr;
 	Widget* m_player1SimulationTextWidget = nullptr;
-	Widget* m_player1SimulationChangerWidget = nullptr;
+	WidgetIncrementer* m_player1SimulationChangerWidget = nullptr;
 	Widget* m_player1UseChaosChanceWidget = nullptr;
-	Widget* m_player1ChaosChanceChangerWidget = nullptr;
+	WidgetIncrementerFloat* m_player1ChaosChanceChangerWidget = nullptr;
 
 	//player 2 AI
 	Widget* m_player2MCTSAIParametersWidget = nullptr;

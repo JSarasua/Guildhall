@@ -45,15 +45,15 @@ WidgetIncrementer::WidgetIncrementer( std::vector<std::string> const& choices, A
 	}
 
 	//Activate buttons
-	m_downIncrementWidget->m_selectDelegate.SubscribeMethod( this, &WidgetIncrementer::DecrementValue );
-	m_upIncrementWidget->m_selectDelegate.SubscribeMethod( this, &WidgetIncrementer::IncrementValue );
+	m_downIncrementWidget->m_releaseDelegate.SubscribeMethod( this, &WidgetIncrementer::DecrementValue );
+	m_upIncrementWidget->m_releaseDelegate.SubscribeMethod( this, &WidgetIncrementer::IncrementValue );
 }
 
-void WidgetIncrementer::SetTextures( Texture const* backgroundTexture )
+void WidgetIncrementer::SetTexture( Texture const* backgroundTex, Texture const* hoverTex, Texture const* selectTex )
 {
-	m_downIncrementWidget->SetTexture( backgroundTexture, backgroundTexture, backgroundTexture );
-	m_valueWidget->SetTexture( backgroundTexture, backgroundTexture, backgroundTexture );
-	m_upIncrementWidget->SetTexture( backgroundTexture, backgroundTexture, backgroundTexture );
+	m_downIncrementWidget->SetTexture( backgroundTex, hoverTex, selectTex );
+	m_valueWidget->SetTexture( backgroundTex, backgroundTex, backgroundTex );
+	m_upIncrementWidget->SetTexture( backgroundTex, hoverTex, selectTex );
 }
 
 bool WidgetIncrementer::DecrementValue( EventArgs const& args )

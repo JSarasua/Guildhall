@@ -11,7 +11,7 @@ public:
 	WidgetIncrementer( std::vector<std::string> const& choices, AABB2 const& localAABB2, float incrementerXPercentSplit, float textSize = 0.5f, Widget* parentWidget = nullptr );
 
 	//virtual void AddChild(  Widget* childWidget ) override;
-	void SetTextures( Texture const* backgroundTexture );
+	virtual void SetTexture( Texture const* backgroundTex, Texture const* hoverTex, Texture const* selectTex ) override;
 	bool DecrementValue( EventArgs const& args );
 	bool IncrementValue( EventArgs const& args );
 

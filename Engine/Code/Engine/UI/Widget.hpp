@@ -41,7 +41,7 @@ public:
 	//Mutators
 	virtual void AddChild( Widget* childWidget );
 	void TransformWidget( Transform const& transform );
-	void SetTexture( Texture const* texture, Texture const* highlightTexture, Texture const* selectTexture );
+	virtual void SetTexture( Texture const* texture, Texture const* highlightTexture, Texture const* selectTexture );
 	void SetEventToFire( std::string const& eventToFire ) { m_eventToFire = eventToFire; }
 	void SetCanDrag( bool canDrag ) { m_canDrag = canDrag; }
 	void SetCanHover( bool canHover ) { m_canHover = canHover; }
@@ -69,7 +69,7 @@ public:
 	bool IsPointInside( Vec2 const& point ) const;
 	bool UpdateHovered( Vec2 const& point );
 	void UpdateDrag();
-	void CheckInput();
+	void CheckInput( float deltaSeconds );
 
 	Vec2 GetWorldTopRight() const;
 	Vec2 GetWorldBottomLeft() const;

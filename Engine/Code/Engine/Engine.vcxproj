@@ -248,6 +248,8 @@
     <ClCompile Include="UI\WidgetGrid.cpp" />
     <ClCompile Include="UI\WidgetHand.cpp" />
     <ClCompile Include="UI\WidgetIncrementer.cpp" />
+    <ClCompile Include="UI\WidgetIncrementerFloat.cpp" />
+    <ClCompile Include="UI\WidgetIncrementerInt.cpp" />
     <ClCompile Include="UI\WidgetSlider.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -351,6 +353,8 @@
     <ClInclude Include="UI\WidgetGrid.hpp" />
     <ClInclude Include="UI\WidgetHand.hpp" />
     <ClInclude Include="UI\WidgetIncrementer.hpp" />
+    <ClInclude Include="UI\WidgetIncrementerFloat.hpp" />
+    <ClInclude Include="UI\WidgetIncrementerInt.hpp" />
     <ClInclude Include="UI\WidgetSlider.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

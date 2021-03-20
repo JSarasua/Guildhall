@@ -85,7 +85,7 @@ void UIManager::Update( float deltaSeconds )
 	mousePos = m_screenBounds.GetPointAtUV( mousePos );
 
 	m_rootWidget->UpdateHovered( mousePos );
-	m_rootWidget->CheckInput();
+	m_rootWidget->CheckInput( deltaSeconds );
 	m_rootWidget->UpdateDrag();
 }
 

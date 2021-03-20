@@ -365,8 +365,10 @@ void Widget::UpdateDrag()
 	}
 }
 
-void Widget::CheckInput()
+void Widget::CheckInput( float deltaSeconds )
 {
+	m_selectArgs.SetValue( "deltaSeconds", deltaSeconds );
+
 	if( !m_isEnabled )
 	{
 		m_isSelected = false;
@@ -381,11 +383,10 @@ void Widget::CheckInput()
 	if( leftMouseButton.WasJustPressed() && m_isHovered && m_canSelect )
 	{
 		m_isSelected = true;
-
-		FireSelectEvents();
 	}
-	if( leftMouseButton.IsPressed() && m_isHovered )
+	if( leftMouseButton.IsPressed() && m_isHovered && m_isSelected )
 	{
+		FireSelectEvents();
 	}
 	if( leftMouseButton.WasJustReleased() )
 	{
@@ -403,7 +404,7 @@ void Widget::CheckInput()
 	{
 		if( nullptr != childWidget )
 		{
-			childWidget->CheckInput();
+			childWidget->CheckInput( deltaSeconds );
 		}
 	}
 }

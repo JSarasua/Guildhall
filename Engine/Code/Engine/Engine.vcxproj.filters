@@ -322,6 +322,12 @@
     <ClCompile Include="UI\WidgetIncrementer.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="UI\WidgetIncrementerInt.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\WidgetIncrementerFloat.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Math\vec2.hpp">
@@ -625,6 +631,12 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="UI\WidgetIncrementer.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WidgetIncrementerInt.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\WidgetIncrementerFloat.hpp">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
