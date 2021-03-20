@@ -198,7 +198,7 @@ AABB2 AABB2::CarveBoxOffBottom( float FractionOfWidth, float additionalWidth /*=
 	return newAABB;
 }
 
-AABB2 AABB2::GetBoxAtLeft( float FractionOfWidth, float additionalWidth /*= 0.f*/ )
+AABB2 AABB2::GetBoxAtLeft( float FractionOfWidth, float additionalWidth /*= 0.f*/ ) const
 {
 	AABB2 newAABB = *this;
 	float newXDistance = (maxs.x - mins.x)*FractionOfWidth + additionalWidth;
@@ -208,7 +208,7 @@ AABB2 AABB2::GetBoxAtLeft( float FractionOfWidth, float additionalWidth /*= 0.f*
 	return newAABB;
 }
 
-AABB2 AABB2::GetBoxAtRight( float FractionOfWidth, float additionalWidth /*= 0.f*/ )
+AABB2 AABB2::GetBoxAtRight( float FractionOfWidth, float additionalWidth /*= 0.f*/ ) const
 {
 	AABB2 newAABB = *this;
 	float newXDistance = (maxs.x - mins.x)*FractionOfWidth + additionalWidth;
@@ -218,7 +218,7 @@ AABB2 AABB2::GetBoxAtRight( float FractionOfWidth, float additionalWidth /*= 0.f
 	return newAABB;
 }
 
-AABB2 AABB2::GetBoxAtTop( float FractionOfWidth, float additionalWidth /*= 0.f*/ )
+AABB2 AABB2::GetBoxAtTop( float FractionOfWidth, float additionalWidth /*= 0.f*/ ) const
 {
 	AABB2 newAABB = *this;
 	float newYDistance = (maxs.y - mins.y)*FractionOfWidth + additionalWidth;
@@ -228,7 +228,7 @@ AABB2 AABB2::GetBoxAtTop( float FractionOfWidth, float additionalWidth /*= 0.f*/
 	return newAABB;
 }
 
-AABB2 AABB2::GetBoxAtBottom( float FractionOfWidth, float additionalWidth /*= 0.f*/ )
+AABB2 AABB2::GetBoxAtBottom( float FractionOfWidth, float additionalWidth /*= 0.f*/ ) const
 {
 	AABB2 newAABB = *this;
 	float newYDistance = (maxs.y - mins.y)*FractionOfWidth + additionalWidth;
@@ -238,7 +238,7 @@ AABB2 AABB2::GetBoxAtBottom( float FractionOfWidth, float additionalWidth /*= 0.
 	return newAABB;
 }
 
-AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, Vec2 const& innerBoxPercentDimensions )
+AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, Vec2 const& innerBoxPercentDimensions ) const
 {
 	Vec2 myDimensions = GetDimensions();
 
@@ -258,7 +258,7 @@ AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offse
 	return newInnerBox;
 }
 
-AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, AABB2 const& innerBox )
+AABB2 AABB2::GetInnerBoxWithAlignment( Vec2 const& uvPosition, Vec2 const& offset, Vec2 const& pivot, AABB2 const& innerBox ) const
 {
 	Vec2 dimensions = innerBox.GetDimensions();
 	Vec2 innerCenter = innerBox.GetCenter();
