@@ -67,28 +67,32 @@ public:
 	PlayerBoard();
 	~PlayerBoard() = default;
 
+	//Mutators
 	void InitializeDeck( std::vector<CardData_t>& deck );
 	void ResetBoard();
-	void AddCardToDiscardPile( int cardIndex );
 
+	void PlayCard( inputMove_t const& inputMove, gamestate_t* gameState );
+	void ShuffleDeck();
+	void DiscardHand();
+	void Draw( int numberToDraw = 1 );
+	void Draw5();
+	void PlayTreasureCards();
+	void DiscardPlayArea();
+	void AddCardToDiscardPile( int cardIndex );
+	void AddDiscardPileToDeck();
+	void TakeCardFromHand( size_t cardIndex );
+	void DecrementCoins( int cost ) { m_currentCoins -= cost; }
+	void ResetCurrentCoins() { m_currentCoins = 0; }
+	void RandomizeHandAndDeck();
+
+	//Accessors
+	bool CanPlayCard( inputMove_t const& inputMove, gamestate_t const* gameState ) const;
+	
 	CardPile const& GetHand() const;
 	CardPile const& GetPlayArea() const;
-	void TakeCardFromHand( size_t cardIndex );
 
 	int GetCurrentMoney() const { return m_currentCoins; }
 	int GetCurrentVictoryPoints() const;
-	void DecrementCoins( int cost ) { m_currentCoins -= cost; }
-	void ResetCurrentCoins() { m_currentCoins = 0; }
-	void ShuffleDeck();
-	void AddDiscardPileToDeck();
-	void DiscardHand();
-	void DiscardPlayArea();
-	void PlayTreasureCards();
-	void Draw( int numberToDraw = 1 );
-	void Draw5();
-	void PlayCard( inputMove_t const& inputMove, gamestate_t* gameState );
-	bool CanPlayCard( inputMove_t const& inputMove, gamestate_t const* gameState ) const;
-
 	size_t GetDeckSize() { return m_deck.size(); }
 	size_t GetDiscardSize() { return (size_t)m_discardPile.TotalCount(); }
 	int GetNumberOfValidSimpleActionsToPlay() const;
@@ -97,14 +101,11 @@ public:
 	int GetCardIndexFromHandIndex( int handIndex );
 	int GetCountOfCard( int cardIndex ) const;
 
-	void RandomizeHandAndDeck();
-
+	//Saving and loading to file
 	void AppendPlayerBoardToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const;
 	void AppendPlayerBoardToBufferWriter( BufferWriter& bufferWriter ) const;
-
 	void ParseFromBuffer( byte*& buffer );
 	void ParseFromBufferParser( BufferParser& bufferParser );
-
 	static PlayerBoard ParsePlayerBoardFromBuffer( byte*& buffer );
 	static PlayerBoard ParsePlayerBoardFromBufferParser( BufferParser& bufferParser );
 

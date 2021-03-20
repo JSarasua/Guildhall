@@ -195,14 +195,15 @@ void PlayerBoard::PlayCard( inputMove_t const& inputMove, gamestate_t* gameState
 		return;
 	}
 
-	m_hand.RemoveCard( (int)handIndex );
-	m_playArea.AddCard( (int)handIndex );
 	CardDefinition const* cardToPlay = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
-
 	if( cardToPlay->GetCardType() == ACTION_TYPE )
 	{
 		if( gameState )
 		{
+			//Move card to play area
+			m_hand.RemoveCard( (int)handIndex );
+			m_playArea.AddCard( (int)handIndex );
+
 			int actionsToGain = cardToPlay->m_actionsGained;
 			int cardDraw = cardToPlay->m_cardDraw;
 			int buysToGain = cardToPlay->m_buysGained;
@@ -222,12 +223,13 @@ void PlayerBoard::PlayCard( inputMove_t const& inputMove, gamestate_t* gameState
 				{
 					player1Deck->Draw();
 				}
-				if( player2Deck != this )
+				else if( player2Deck != this )
 				{
 					player2Deck->Draw();
 				}
 			}
 
+			//Witch Card
 			if( cardToPlay->m_OpponentsGetCurse )
 			{
 				PlayerBoard* player1Deck = &gameState->m_playerBoards[0];
@@ -252,33 +254,12 @@ void PlayerBoard::PlayCard( inputMove_t const& inputMove, gamestate_t* gameState
 					}
 				}
 			}
-
-
-			if( cardToPlay->m_trashCardFromHandToGainCardOfValue2Higher )
-			{
-				int handIndexToTrash = inputMove.m_parameterCardIndex1;
-				int pileIndexToAcquire = inputMove.m_parameterCardIndex2;
-				m_hand.RemoveCard( handIndexToTrash );
-				gameState->m_cardPiles[pileIndexToAcquire].m_pileSize--;
-				m_discardPile.AddCard( pileIndexToAcquire );
-			}
-
-			if( cardToPlay->m_discardUptoHandSizeToDrawThatMany )
-			{
-
-			}
-
-			if( cardToPlay->m_trashUpToFourCards )
-			{
-
-			}
 		}
 		else
 		{
 			ERROR_AND_DIE("Gamestate is required for a action card to be played");
 		}
 	}
-
 }
 
 bool PlayerBoard::CanPlayCard( inputMove_t const& inputMove, gamestate_t const* gameState ) const
