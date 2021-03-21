@@ -700,13 +700,13 @@ public:
 	//player 2 AI
 	Widget* m_player2MCTSAIParametersWidget = nullptr;
 	Widget* m_player2SelectionTextWidget = nullptr;
-	Widget* m_player2UCTScoreChangerWidget = nullptr;
+	WidgetIncrementerFloat* m_player2UCTScoreChangerWidget = nullptr;
 	Widget* m_player2ExpansionTextWidget = nullptr;
-	Widget* m_player2ExpansionChangerWidget = nullptr;
+	WidgetIncrementer* m_player2ExpansionChangerWidget = nullptr;
 	Widget* m_player2SimulationTextWidget = nullptr;
-	Widget* m_player2SimulationChangerWidget = nullptr;
+	WidgetIncrementer* m_player2SimulationChangerWidget = nullptr;
 	Widget* m_player2UseChaosChanceWidget = nullptr;
-	Widget* m_player2ChaosChanceChangerWidget = nullptr;
+	WidgetIncrementerFloat* m_player2ChaosChanceChangerWidget = nullptr;
 
 
 	//Widget data

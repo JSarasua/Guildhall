@@ -510,7 +510,6 @@ void Game::InitializeAILargePanelWidget()
 	Rgba8 darkdarkGreen = Rgba8::DarkDarkGreen;
 	Rgba8 greyGreen = Rgba8::GreyGreen;
 	Rgba8 black = Rgba8::BLACK;
-	Texture const* blackTexture = g_theRenderer->CreateTextureFromColor( black );
 	Texture const* darkdarkGreenTexture = g_theRenderer->CreateTextureFromColor( darkdarkGreen );
 	Widget* rootWidget = g_theUIManager->GetRootWidget();
 
@@ -580,10 +579,8 @@ void Game::InitializeAILargePanelWidget()
 	m_player1SelectionTextWidget = new Widget( middleAIRows[7], m_AIMoreInfoWidget );
 	m_player1UCTScoreChangerWidget = new WidgetIncrementerFloat( increments, "UCT Score:", 0.5f, 0.1f, 50.f, middleAIRows[6], 0.1f, OnPress, m_AIMoreInfoWidget );
 	m_player1ExpansionTextWidget = new Widget( middleAIRows[5], m_AIMoreInfoWidget );
-	//m_player1ExpansionChangerWidget = new Widget( middleAIRows[4], m_AIMoreInfoWidget );
 	m_player1ExpansionChangerWidget = new WidgetIncrementer( expansionIncrementers, middleAIRows[4], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player1SimulationTextWidget = new Widget( middleAIRows[3], m_AIMoreInfoWidget );
-	//m_player1SimulationChangerWidget = new Widget( middleAIRows[2], m_AIMoreInfoWidget );
 	m_player1SimulationChangerWidget = new WidgetIncrementer( rolloutIncrementers, middleAIRows[2], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player1UseChaosChanceWidget = new Widget( middleAIRows[1], m_AIMoreInfoWidget );
 	m_player1ChaosChanceChangerWidget = new WidgetIncrementerFloat( increments, "Chaos Value:", 0.15f, 0.f, 1.f, middleAIRows[0], 0.1f, OnPress, m_AIMoreInfoWidget );
@@ -600,12 +597,8 @@ void Game::InitializeAILargePanelWidget()
 	m_player1SelectionTextWidget->SetIsVisible( true );
 	m_player1SelectionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-	//m_player1UCTScoreChangerWidget->SetText( "<< >> UCT Score: 0.5" );
 	m_player1UCTScoreChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 	m_player1UCTScoreChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1UCTValue );
-	//m_player1UCTScoreChangerWidget->SetTextSize( 0.1f );
-	//m_player1UCTScoreChangerWidget->SetIsVisible( true );
-	//m_player1UCTScoreChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 
 	m_player1ExpansionTextWidget->SetText( "Expansion" );
 	m_player1ExpansionTextWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
@@ -613,12 +606,8 @@ void Game::InitializeAILargePanelWidget()
 	m_player1ExpansionTextWidget->SetIsVisible( true );
 	m_player1ExpansionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-//	m_player1ExpansionChangerWidget->SetText( "<< >> Heuristics" );
 	m_player1ExpansionChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 	m_player1ExpansionChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1ExpansionMethod );
-	// 	m_player1ExpansionChangerWidget->SetTextSize( 0.1f );
-// 	m_player1ExpansionChangerWidget->SetIsVisible( true );
-// 	m_player1ExpansionChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 
 	m_player1SimulationTextWidget->SetText( "Simulation" );
 	m_player1SimulationTextWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
@@ -626,12 +615,8 @@ void Game::InitializeAILargePanelWidget()
 	m_player1SimulationTextWidget->SetIsVisible( true );
 	m_player1SimulationTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-//	m_player1SimulationChangerWidget->SetText( "<< >> Greedy" );
 	m_player1SimulationChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 	m_player1SimulationChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1RolloutMethod );
-	// 	m_player1SimulationChangerWidget->SetTextSize( 0.1f );
-// 	m_player1SimulationChangerWidget->SetIsVisible( true );
-// 	m_player1SimulationChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 
 	m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
 	m_player1UseChaosChanceWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
@@ -639,7 +624,7 @@ void Game::InitializeAILargePanelWidget()
 	m_player1UseChaosChanceWidget->SetIsVisible( true );
 	m_player1UseChaosChanceWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 	m_player1UseChaosChanceWidget->m_releaseDelegate.SubscribeMethod( this, &Game::TogglePlayer1UseChaosChance );
-
+	
 	m_player1ChaosChanceChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 
 	//Player 2 MCTS AI Parameters
@@ -648,67 +633,55 @@ void Game::InitializeAILargePanelWidget()
 	std::vector<AABB2> rightAIRows = rightColumnAIBounds.GetBoxAsRows( 9 );
 	m_player2MCTSAIParametersWidget = new Widget( rightAIRows[8], m_AIMoreInfoWidget );
 	m_player2SelectionTextWidget = new Widget( rightAIRows[7], m_AIMoreInfoWidget );
-	m_player2UCTScoreChangerWidget = new Widget( rightAIRows[6], m_AIMoreInfoWidget );
+	m_player2UCTScoreChangerWidget = new WidgetIncrementerFloat( increments, "UCT Score:", 0.5f, 0.1f, 50.f, rightAIRows[6], 0.1f, OnPress, m_AIMoreInfoWidget );
 	m_player2ExpansionTextWidget = new Widget( rightAIRows[5], m_AIMoreInfoWidget );
-	m_player2ExpansionChangerWidget = new Widget( rightAIRows[4], m_AIMoreInfoWidget );
+	m_player2ExpansionChangerWidget = new WidgetIncrementer( expansionIncrementers, rightAIRows[4], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player2SimulationTextWidget = new Widget( rightAIRows[3], m_AIMoreInfoWidget );
-	m_player2SimulationChangerWidget = new Widget( rightAIRows[2], m_AIMoreInfoWidget );
+	m_player2SimulationChangerWidget = new WidgetIncrementer( rolloutIncrementers, rightAIRows[2], 0.3f, 0.1f, m_AIMoreInfoWidget );
 	m_player2UseChaosChanceWidget = new Widget( rightAIRows[1], m_AIMoreInfoWidget );
-	m_player2ChaosChanceChangerWidget = new Widget( rightAIRows[0], m_AIMoreInfoWidget );
+	m_player2ChaosChanceChangerWidget = new WidgetIncrementerFloat( increments, "Chaos Value:", 0.15f, 0.f, 1.f, rightAIRows[0], 0.1f, OnPress, m_AIMoreInfoWidget );
 
 	m_player2MCTSAIParametersWidget->SetText( "Player 2 MCTS AI Parameters" );
-	m_player2MCTSAIParametersWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2MCTSAIParametersWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
 	m_player2MCTSAIParametersWidget->SetTextSize( 0.1f );
 	m_player2MCTSAIParametersWidget->SetIsVisible( true );
 	m_player2MCTSAIParametersWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
 	m_player2SelectionTextWidget->SetText( "Selection" );
-	m_player2SelectionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2SelectionTextWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
 	m_player2SelectionTextWidget->SetTextSize( 0.1f );
 	m_player2SelectionTextWidget->SetIsVisible( true );
 	m_player2SelectionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-	m_player2UCTScoreChangerWidget->SetText( "<< >> UCT Score: 0.5" );
-	m_player2UCTScoreChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
-	m_player2UCTScoreChangerWidget->SetTextSize( 0.1f );
-	m_player2UCTScoreChangerWidget->SetIsVisible( true );
-	m_player2UCTScoreChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+	m_player2UCTScoreChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
+	m_player2UCTScoreChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer2UCTValue );
 
 	m_player2ExpansionTextWidget->SetText( "Expansion" );
-	m_player2ExpansionTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2ExpansionTextWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
 	m_player2ExpansionTextWidget->SetTextSize( 0.1f );
 	m_player2ExpansionTextWidget->SetIsVisible( true );
 	m_player2ExpansionTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-	m_player2ExpansionChangerWidget->SetText( "<< >> Heuristics" );
-	m_player2ExpansionChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
-	m_player2ExpansionChangerWidget->SetTextSize( 0.1f );
-	m_player2ExpansionChangerWidget->SetIsVisible( true );
-	m_player2ExpansionChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+	m_player2ExpansionChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
+	m_player2ExpansionChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer2ExpansionMethod );
 
 	m_player2SimulationTextWidget->SetText( "Simulation" );
-	m_player2SimulationTextWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2SimulationTextWidget->SetTexture( darkdarkGreenTexture, darkdarkGreenTexture, darkdarkGreenTexture );
 	m_player2SimulationTextWidget->SetTextSize( 0.1f );
 	m_player2SimulationTextWidget->SetIsVisible( true );
 	m_player2SimulationTextWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
 
-	m_player2SimulationChangerWidget->SetText( "<< >> Greedy" );
-	m_player2SimulationChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
-	m_player2SimulationChangerWidget->SetTextSize( 0.1f );
-	m_player2SimulationChangerWidget->SetIsVisible( true );
-	m_player2SimulationChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+	m_player2SimulationChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
+	m_player2SimulationChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer2RolloutMethod );
 
 	m_player2UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
-	m_player2UseChaosChanceWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player2UseChaosChanceWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 	m_player2UseChaosChanceWidget->SetTextSize( 0.1f );
 	m_player2UseChaosChanceWidget->SetIsVisible( true );
 	m_player2UseChaosChanceWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+	m_player2UseChaosChanceWidget->m_releaseDelegate.SubscribeMethod( this, &Game::TogglePlayer2UseChaosChance );
 
-	m_player2ChaosChanceChangerWidget->SetText( "<< >> 0.15" );
-	m_player2ChaosChanceChangerWidget->SetTexture( blackTexture, blackTexture, blackTexture );
-	m_player2ChaosChanceChangerWidget->SetTextSize( 0.1f );
-	m_player2ChaosChanceChangerWidget->SetIsVisible( true );
-	m_player2ChaosChanceChangerWidget->SetTextAlignment( ALIGN_CENTER_RIGHT );
+	m_player2ChaosChanceChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 }
 
 void Game::InitializeCardPilesWidgets()
@@ -979,13 +952,15 @@ void Game::UpdateAISmallPanelWidget()
 	}
 	m_currentAIBestMoveWidget->SetText( bestMoveStr );
 
-	int numberOfSims = m_player1MCTS->GetNumberOfSimulationsRun();
-	int numberOfVisits = m_player1MCTS->GetNumberOfVisitsAtCurrentNode();
-	m_player1MCTSSimulationsWidget->SetText( Stringf( "Player 1 MCTS Sims: %i", numberOfSims ) );
-	m_player1MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisits ) );
+	int numberOfSimsPlayer1 = m_player1MCTS->GetNumberOfSimulationsRun();
+	int numberOfVisitsPlayer1 = m_player1MCTS->GetNumberOfVisitsAtCurrentNode();
+	m_player1MCTSSimulationsWidget->SetText( Stringf( "Player 1 MCTS Iterations: %i", numberOfSimsPlayer1 ) );
+	m_player1MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisitsPlayer1 ) );
 
-	m_player2MCTSSimulationsWidget->SetText( Stringf( "Player 2 MCTS Sims: %i", numberOfSims ) );
-	m_player2MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisits ) );
+	int numberOfSimsPlayer2 = m_player2MCTS->GetNumberOfSimulationsRun();
+	int numberOfVisitsPlayer2 = m_player2MCTS->GetNumberOfVisitsAtCurrentNode();
+	m_player2MCTSSimulationsWidget->SetText( Stringf( "Player 2 MCTS Iterations: %i", numberOfSimsPlayer2 ) );
+	m_player2MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisitsPlayer2 ) );
 
 }
 
@@ -2104,47 +2079,34 @@ void Game::AutoPlayGame()
 
 					DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 				}
-				else
-				{
-
-				}
 			}
 			else
 			{
 				inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
 				PlayMoveIfValid( move );
 			}
-			
-
 		}
 		else
 		{
 			if( m_player2Strategy == AIStrategy::MCTS )
 			{
 				m_player2SimCount = m_player2MCTS->GetCurrentNumberOfSimulationsLeft();
-				if( m_player2SimCount < 500 )
+				if( m_timer.CheckAndDecrementAll() )
 				{
-					if( m_timer.CheckAndDecrement() )
+					m_player2MCTS->AddSimulations( 5000 );
+
+					//inputMove_t move = m_mc->GetBestMove();
+					inputMove_t move = m_player2MCTS->GetBestMove();
+					if( move.m_moveType == INVALID_MOVE )
 					{
-						m_player2MCTS->AddSimulations( 1000 );
 
-						//inputMove_t move = m_mc->GetBestMove();
-						inputMove_t move = m_player2MCTS->GetBestMove();
-						if( move.m_moveType == INVALID_MOVE )
-						{
-
-						}
-						else
-						{
-							PlayMoveIfValid( move );
-						}
-
-						DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 					}
 					else
 					{
-
+						PlayMoveIfValid( move );
 					}
+
+					DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
 				}
 			}
 			else
@@ -2210,6 +2172,7 @@ bool Game::TogglePlayer1UseChaosChance( EventArgs const& args )
 
 bool Game::TogglePlayer2UseChaosChance( EventArgs const& args )
 {
+	UNUSED( args );
 	if( m_player2MCTSRolloutMethod == ROLLOUTMETHOD::HEURISTIC )
 	{
 		m_player2MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
@@ -2454,7 +2417,7 @@ bool Game::AddSimsForPlayer1( EventArgs const& args )
 bool Game::AddSimsForPlayer2( EventArgs const& args )
 {
 	UNUSED( args );
-	m_player1MCTS->AddSimulations( 1'000'000 );
+	m_player2MCTS->AddSimulations( 1'000'000 );
 	m_isUIDirty = true;
 
 	return true;

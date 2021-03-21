@@ -74,7 +74,7 @@ void MonteCarlo::Startup()
 		m_currentHeadNode = m_headNode;
 
 		m_mcJobSystem = new JobSystem();
-		m_mcJobSystem->AddWorkerThreads( 5 );
+		m_mcJobSystem->AddWorkerThreads( 3 );
 
 		m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
 	}
@@ -619,7 +619,7 @@ void MonteCarlo::StartThreads()
 {
 	m_isQuitting = false;
 	m_mcJobSystem->StartWorkerThreads();
-	m_mcJobSystem->AddWorkerThreads( 5 );
+	m_mcJobSystem->AddWorkerThreads( 3 );
 
 	if( nullptr == m_mainThread )
 	{
