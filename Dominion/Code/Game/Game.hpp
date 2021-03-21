@@ -537,6 +537,13 @@ public:
 	bool AddSimsForPlayer2( EventArgs const& args );
 	bool ChangePlayer1Strategy( EventArgs const& args );
 	bool ChangePlayer2Strategy( EventArgs const& args );
+	bool ChangePlayer1UCTValue( EventArgs const& args );
+	bool ChangePlayer2UCTValue( EventArgs const& args );
+	bool ChangePlayer1ExpansionMethod( EventArgs const& args );
+	bool ChangePlayer2ExpansionMethod( EventArgs const& args );
+	bool ChangePlayer1RolloutMethod( EventArgs const& args );
+	bool ChangePlayer2RolloutMethod( EventArgs const& args );
+	bool TogglePlayer1UseChaosChance( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;

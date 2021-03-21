@@ -593,6 +593,7 @@ void Game::InitializeAILargePanelWidget()
 
 	//m_player1UCTScoreChangerWidget->SetText( "<< >> UCT Score: 0.5" );
 	m_player1UCTScoreChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
+	m_player1UCTScoreChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1UCTValue );
 	//m_player1UCTScoreChangerWidget->SetTextSize( 0.1f );
 	//m_player1UCTScoreChangerWidget->SetIsVisible( true );
 	//m_player1UCTScoreChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
@@ -605,7 +606,8 @@ void Game::InitializeAILargePanelWidget()
 
 //	m_player1ExpansionChangerWidget->SetText( "<< >> Heuristics" );
 	m_player1ExpansionChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
-// 	m_player1ExpansionChangerWidget->SetTextSize( 0.1f );
+	m_player1ExpansionChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1ExpansionMethod );
+	// 	m_player1ExpansionChangerWidget->SetTextSize( 0.1f );
 // 	m_player1ExpansionChangerWidget->SetIsVisible( true );
 // 	m_player1ExpansionChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 
@@ -617,15 +619,17 @@ void Game::InitializeAILargePanelWidget()
 
 //	m_player1SimulationChangerWidget->SetText( "<< >> Greedy" );
 	m_player1SimulationChangerWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
-// 	m_player1SimulationChangerWidget->SetTextSize( 0.1f );
+	m_player1SimulationChangerWidget->m_valueChangeDelegate.SubscribeMethod( this, &Game::ChangePlayer1RolloutMethod );
+	// 	m_player1SimulationChangerWidget->SetTextSize( 0.1f );
 // 	m_player1SimulationChangerWidget->SetIsVisible( true );
 // 	m_player1SimulationChangerWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
 
 	m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
-	m_player1UseChaosChanceWidget->SetTexture( blackTexture, blackTexture, blackTexture );
+	m_player1UseChaosChanceWidget->SetTexture( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 	m_player1UseChaosChanceWidget->SetTextSize( 0.1f );
 	m_player1UseChaosChanceWidget->SetIsVisible( true );
 	m_player1UseChaosChanceWidget->SetTextAlignment( Vec2( 0.5f, 0.5f ) );
+	m_player1UseChaosChanceWidget->m_releaseDelegate.SubscribeMethod( this, &Game::TogglePlayer1UseChaosChance );
 
 	m_player1ChaosChanceChangerWidget->SetIncrementerTextures( darkdarkGreenTexture, m_artichokeGreenTexture, darkdarkGreenTexture );
 
@@ -2798,6 +2802,24 @@ AIStrategy Game::StringToAIStrategy( std::string const& strategyStr ) const
 	}
 }
 
+bool Game::TogglePlayer1UseChaosChance( EventArgs const& args )
+{
+	if( m_mctsRolloutMethod == ROLLOUTMETHOD::HEURISTIC )
+	{
+		m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+		m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
+	}
+	else if( m_mctsRolloutMethod == ROLLOUTMETHOD::EPSILONHEURISTIC )
+	{
+		m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+		m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [ ]" );
+	}
+
+	m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+
+	return true;
+}
+
 void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 {
 	if( IsGameOver() != GAMENOTOVER )
@@ -3035,6 +3057,71 @@ bool Game::ChangePlayer2Strategy( EventArgs const& args )
 	AIStrategy strategy = StringToAIStrategy( value );
 	m_player2Strategy = strategy;
 
+	return true;
+}
+
+bool Game::ChangePlayer1UCTValue( EventArgs const& args )
+{
+	float uctValue = args.GetValue( "value", 0.f );
+	m_mcts->SetUCBValue( uctValue );
+
+	return true;
+}
+
+bool Game::ChangePlayer1ExpansionMethod( EventArgs const& args )
+{
+	std::string expansionMethod = args.GetValue( "value", "Invalid" );
+
+	if( expansionMethod == "All Moves" )
+	{
+		m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+	}
+	else if( expansionMethod == "Heuristics" )
+	{
+		m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Invalid Expansion Method");
+	}
+
+	m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
+	return true;
+}
+
+bool Game::ChangePlayer1RolloutMethod( EventArgs const& args )
+{
+	std::string rolloutMethod = args.GetValue( "value", "Invalid" );
+	if( rolloutMethod == "Random" )
+	{
+		m_mctsSimMethod = SIMMETHOD::RANDOM;
+	}
+	else if( rolloutMethod == "Big Money" )
+	{
+		m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+	}
+	else if( rolloutMethod == "Single Witch" )
+	{
+		m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+	}
+	else if( rolloutMethod == "Double Witch" )
+	{
+		m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
+	}
+	else if( rolloutMethod == "Sarasua1" )
+	{
+		m_mctsSimMethod = SIMMETHOD::SARASUA1;
+	}
+	else if( rolloutMethod == "Greedy" )
+	{
+		m_mctsSimMethod = SIMMETHOD::GREEDY;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Invalid rollout method" );
+	}
+
+	m_mcts->SetSimMethod( m_mctsSimMethod );
 	return true;
 }
 
@@ -3485,6 +3572,11 @@ inputMove_t Game::GetRandomMoveAtGameState( gamestate_t const& currentGameState 
 {
 	std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
 
+	//Game Over
+	if( validMoves.size() == 0 )
+	{
+		return inputMove_t();
+	}
 	int randIndex = m_rand.RollRandomIntInRange( 0, (int)validMoves.size() - 1 );
 	inputMove_t randMove = validMoves[randIndex];
 	return randMove;
