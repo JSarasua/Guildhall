@@ -113,39 +113,6 @@ void MonteCarlo::SetInitialGameState( gamestate_t const& newGameState )
 {
 	m_currentHeadNode = m_headNode;
 	UpdateGame( inputMove_t(), newGameState );
-// 	auto outComesIter = m_headNode->m_possibleOutcomes.find( inputMove_t() );
-// 	if( outComesIter != m_headNode->m_possibleOutcomes.end() )
-// 	{
-// 		std::vector<TreeMapNode*> outcomes = outComesIter->second;
-// 		bool didFindNode = false;
-// 		for( size_t outcomesIndex = 0; outcomesIndex < outcomes.size(); outcomesIndex++ )
-// 		{
-// 			gamestate_t const& gameState = *outcomes[outcomesIndex]->m_data->m_currentGamestate;
-// 			if( gameState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
-// 			{
-// 				m_currentHeadNode = outcomes[outcomesIndex];
-// 				didFindNode = true;
-// 				break;
-// 			}
-// 		}
-// 
-// 		if( !didFindNode )
-// 		{
-// 			m_headNode = new TreeMapNode();
-// 			m_headNode->m_data = new data_t();
-// 			m_headNode->m_data->m_currentGamestate = new gamestate_t( newGameState );
-// 			m_headNode->m_data->m_currentGamestate->m_isFirstMove = true;
-// 			m_currentHeadNode = m_headNode;
-// 
-// 			m_mcJobSystem = new JobSystem();
-// 			m_mcJobSystem->AddWorkerThreads( 5 );
-// 		}
-// 	}
-// 	else
-// 	{
-// 		ERROR_AND_DIE("Should have found the invalid move on reset");
-// 	}
-
 }
 
 void MonteCarlo::FlushJobSystemQueues()
