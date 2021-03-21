@@ -544,6 +544,7 @@ public:
 	bool ChangePlayer1RolloutMethod( EventArgs const& args );
 	bool ChangePlayer2RolloutMethod( EventArgs const& args );
 	bool TogglePlayer1UseChaosChance( EventArgs const& args );
+	bool TogglePlayer2UseChaosChance( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -629,14 +630,17 @@ public:
 
 	gamestate_t* m_currentGameState = nullptr;
 
-	MonteCarlo* m_mcts = nullptr;
+	MonteCarlo* m_player1MCTS = nullptr;
+	MonteCarlo* m_player2MCTS = nullptr;
 	MonteCarloNoTree* m_mc = nullptr;
 	bool m_isAutoPlayEnabled = false;
 	bool m_isDebugScreenEnabled = false;
 
 	Timer m_timer;
-	int m_simCount = 0;
-	int m_totalSimCount = 0;
+	int m_player1SimCount = 0;
+	int m_player1TotalSimCount = 0;
+	int m_player2SimCount = 0;
+	int m_player2TotalSimCount = 0;
 
 	Texture const* m_cyanTexture = nullptr;
 	Texture const* m_redTexture = nullptr;
@@ -734,12 +738,17 @@ public:
 	int m_playerWidgetsToShow = PLAYER_1;
 private:
 	void RenderDevConsole();
-	SIMMETHOD m_mctsSimMethod = SIMMETHOD::RANDOM; 
 	AIStrategy m_player1Strategy = AIStrategy::MCTS;
-	AIStrategy m_player2Strategy = AIStrategy::SINGLEWITCH;
-	ROLLOUTMETHOD m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
-	EXPANSIONSTRATEGY m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
-	float m_mctsExplorationParameter = 0.5f;
-	float m_mctsEpsilon = 0.15f;
+	SIMMETHOD m_player1MCTSSimMethod = SIMMETHOD::RANDOM; 
+	ROLLOUTMETHOD m_player1MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+	EXPANSIONSTRATEGY m_player1ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	float m_player1MCTSExplorationParameter = 0.5f;
+	float m_player1MCTSChaosChance = 0.15f;
 
+	AIStrategy m_player2Strategy = AIStrategy::SINGLEWITCH;
+	SIMMETHOD m_player2MCTSSimMethod = SIMMETHOD::RANDOM;
+	ROLLOUTMETHOD m_player2MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+	EXPANSIONSTRATEGY m_player2ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	float m_player2MCTSExplorationParameter = 0.5f;
+	float m_player2MCTSChaosChance = 0.15f;
 };

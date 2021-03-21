@@ -70,16 +70,23 @@ void Game::Startup()
 	g_theRenderer->Setup( m_gameClock );
 
 	m_mc = new MonteCarloNoTree();
-	m_mcts = new MonteCarlo();
+	m_player1MCTS = new MonteCarlo();
+	m_player2MCTS = new MonteCarlo();
 
 	//if reload
 	//m_mcts->RestoreFromData();
 
-	m_mcts->SetSimMethod( m_mctsSimMethod );
-	m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
-	m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
-	m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
-	m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+	m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
+	m_player1MCTS->SetExplorationParameter( m_player1MCTSExplorationParameter );
+	m_player1MCTS->SetEpsilonValueZeroToOne( m_player1MCTSChaosChance );
+	m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
+	m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
+
+	m_player2MCTS->SetSimMethod( m_player2MCTSSimMethod );
+	m_player2MCTS->SetExplorationParameter( m_player2MCTSExplorationParameter );
+	m_player2MCTS->SetEpsilonValueZeroToOne( m_player2MCTSChaosChance );
+	m_player2MCTS->SetExpansionStrategy( m_player2ExpansionStrategy );
+	m_player2MCTS->SetRolloutMethod( m_player2MCTSRolloutMethod );
 
 	CardDefinition::InitializeCards();
 	InitializeGameState();
@@ -103,8 +110,10 @@ void Game::Shutdown()
 		m_baseCardWidget = nullptr;
 	}
 
-	m_mcts->Shutdown();
-	delete m_mcts;
+	m_player1MCTS->Shutdown();
+	m_player2MCTS->Shutdown();
+	delete m_player1MCTS;
+	delete m_player2MCTS;
 	delete m_mc;
 }
 
@@ -132,7 +141,7 @@ void Game::Update()
 		CheckButtonPresses( dt );
 	}
 
-	DebugDrawGame();
+	//DebugDrawGame();
 	
 
 	if( m_isAutoPlayEnabled )
@@ -908,9 +917,9 @@ void Game::UpdateAISmallPanelWidget()
 	}
 	else if( whoseMove == PLAYER_2 )
 	{
-		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player2Strategy );
+		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player1Strategy );
 
-		switch( m_player2Strategy )
+		switch( m_player1Strategy )
 		{
 		case AIStrategy::RANDOM: aiStrategyStr = "Random";
 			break;
@@ -970,8 +979,8 @@ void Game::UpdateAISmallPanelWidget()
 	}
 	m_currentAIBestMoveWidget->SetText( bestMoveStr );
 
-	int numberOfSims = m_mcts->GetNumberOfSimulationsRun();
-	int numberOfVisits = m_mcts->GetNumberOfVisitsAtCurrentNode();
+	int numberOfSims = m_player1MCTS->GetNumberOfSimulationsRun();
+	int numberOfVisits = m_player1MCTS->GetNumberOfVisitsAtCurrentNode();
 	m_player1MCTSSimulationsWidget->SetText( Stringf( "Player 1 MCTS Sims: %i", numberOfSims ) );
 	m_player1MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisits ) );
 
@@ -989,96 +998,16 @@ void Game::InitializeGameState()
 	}
 
 
-// 	PlayerBoard starterDeck = PlayerBoard( &m_rand );
-// 	std::vector<CardData_t> starterCards;
-// 	starterCards.reserve( 10 );
-// 	CardDefinition const* copper = CardDefinition::GetCardDefinitionByType( eCards::COPPER );
-// 	CardDefinition const* silver = CardDefinition::GetCardDefinitionByType( eCards::SILVER );
-// 	CardDefinition const* gold = CardDefinition::GetCardDefinitionByType( eCards::GOLD );
-// 	CardDefinition const* estate = CardDefinition::GetCardDefinitionByType( eCards::ESTATE );
-// 	CardDefinition const* duchy = CardDefinition::GetCardDefinitionByType( eCards::DUCHY );
-// 	CardDefinition const* province = CardDefinition::GetCardDefinitionByType( eCards::PROVINCE );
-// 	CardDefinition const* curse = CardDefinition::GetCardDefinitionByType( eCards::CURSE );
-// 	
-// 	CardDefinition const* village = CardDefinition::GetCardDefinitionByType( eCards::Village );
-// 	CardDefinition const* smithy = CardDefinition::GetCardDefinitionByType( eCards::Smithy );
-// 	CardDefinition const* festival = CardDefinition::GetCardDefinitionByType( eCards::Festival );
-// 	CardDefinition const* laboratory = CardDefinition::GetCardDefinitionByType( eCards::Laboratory );
-// 	CardDefinition const* market = CardDefinition::GetCardDefinitionByType( eCards::Market );
-// 	CardDefinition const* councilRoom = CardDefinition::GetCardDefinitionByType( eCards::CouncilRoom );
-// 	CardDefinition const* witch = CardDefinition::GetCardDefinitionByType( eCards::Witch );
-// 
-// 
-// 	CardData_t copperData( copper, (int)COPPER );
-// 	CardData_t estateData( estate, (int)ESTATE );
-// 
-// 	//7 copper
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	starterCards.push_back( copperData );
-// 	//3 estate
-// 	starterCards.push_back( estateData );
-// 	starterCards.push_back( estateData );
-// 	starterCards.push_back( estateData );
-// 	starterDeck.InitializeDeck( starterCards );
-
-	//m_currentGameState = new gamestate_t();
 	m_currentGameState = new gamestate_t( GetRandomInitialGameState() );
-// 	m_currentGameState->m_isFirstMove = false;
-// 	m_currentGameState->m_playerBoards[0] = starterDeck;
-// 	m_currentGameState->m_playerBoards[1] = starterDeck;
-// 	
-// 	m_currentGameState->m_playerBoards[0].ShuffleDeck();
-// 	m_currentGameState->m_playerBoards[1].ShuffleDeck();
-// 
-// 	m_currentGameState->m_playerBoards[0].Draw5();
-// 	m_currentGameState->m_playerBoards[1].Draw5();
-// 
-// 	m_currentGameState->m_currentPhase = ACTION_PHASE;
-// 
-// 	//std::array<pileData_t>& cardPiles = m_currentGameState->m_cardPiles;
-// 	pileData_t* cardPiles = &m_currentGameState->m_cardPiles[0];
-// 	cardPiles[(int)eCards::COPPER].m_card = copper;
-// 	cardPiles[(int)eCards::COPPER].m_pileSize = MONEYPILESIZE;
-// 	cardPiles[(int)eCards::SILVER].m_card = silver;
-// 	cardPiles[(int)eCards::SILVER].m_pileSize = MONEYPILESIZE;
-// 	cardPiles[(int)eCards::GOLD].m_card = gold;
-// 	cardPiles[(int)eCards::GOLD].m_pileSize = MONEYPILESIZE;
-// 	cardPiles[(int)eCards::ESTATE].m_card = estate;
-// 	cardPiles[(int)eCards::ESTATE].m_pileSize = VPPileSize;
-// 	cardPiles[(int)eCards::DUCHY].m_card = duchy;
-// 	cardPiles[(int)eCards::DUCHY].m_pileSize = VPPileSize;
-// 	cardPiles[(int)eCards::PROVINCE].m_card = province;
-// 	cardPiles[(int)eCards::PROVINCE].m_pileSize = VPPileSize;
-// 	cardPiles[(int)eCards::CURSE].m_card = curse;
-// 	cardPiles[(int)eCards::CURSE].m_pileSize = CURSEPILESIZE;
-// 	cardPiles[(int)eCards::Village].m_card = village;
-// 	cardPiles[(int)eCards::Village].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::Smithy].m_card = smithy;
-// 	cardPiles[(int)eCards::Smithy].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::Festival].m_card = festival;
-// 	cardPiles[(int)eCards::Festival].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::Laboratory].m_card = laboratory;
-// 	cardPiles[(int)eCards::Laboratory].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::Market].m_card = market;
-// 	cardPiles[(int)eCards::Market].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::CouncilRoom].m_card = councilRoom;
-// 	cardPiles[(int)eCards::CouncilRoom].m_pileSize = ACTIONPILESIZE;
-// 	cardPiles[(int)eCards::Witch].m_card = witch;
-// 	cardPiles[(int)eCards::Witch].m_pileSize = ACTIONPILESIZE;
-// 
-// 	
-// 	m_currentGameState->m_whoseMoveIsIt = PLAYER_1;
 
-// 	m_mc->SetCurrentGameState( *m_currentGameState );
-// 	m_mc->ResetPossibleMoves();
- 	m_mcts->Shutdown();
- 	m_mcts->Startup();
-	m_mcts->SetInitialGameState( *m_currentGameState );
+
+ 	m_player1MCTS->Shutdown();
+ 	m_player1MCTS->Startup();
+	m_player1MCTS->SetInitialGameState( *m_currentGameState );
+
+	m_player2MCTS->Shutdown();
+	m_player2MCTS->Startup();
+	m_player2MCTS->SetInitialGameState( *m_currentGameState );
 }
 
 void Game::AddCountToCardWidget( Widget* cardWidget, int cardCount )
@@ -1112,7 +1041,8 @@ void Game::UpdateCardCountOnWidget( Widget* cardWidget, int cardCount )
 void Game::RestartGame()
 {
 	*m_currentGameState = GetRandomInitialGameState();
-	m_mcts->SetInitialGameState( *m_currentGameState );
+	m_player1MCTS->SetInitialGameState( *m_currentGameState );
+	m_player2MCTS->SetInitialGameState( *m_currentGameState );
 }
 
 void Game::CheckCollisions()
@@ -1210,19 +1140,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 
 	if( lBracketKey.WasJustPressed() )
 	{
-		switch( m_player2Strategy )
+		switch( m_player1Strategy )
 		{
-		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::DOUBLEWITCH;
+		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::DOUBLEWITCH;
 			break;
-		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::RANDOM;
+		case AIStrategy::BIGMONEY: m_player1Strategy = AIStrategy::RANDOM;
 			break;
-		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::BIGMONEY;
+		case AIStrategy::SINGLEWITCH: m_player1Strategy = AIStrategy::BIGMONEY;
 			break;
-		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::SINGLEWITCH;
+		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::SINGLEWITCH;
 			break;
-		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::SARASUA1;
+		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::SARASUA1;
 			break;
-		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::MCTS;
+		case AIStrategy::DOUBLEWITCH: m_player1Strategy = AIStrategy::MCTS;
 			break;
 		default: ERROR_AND_DIE("Invalid AI strategy");
 			break;
@@ -1230,19 +1160,19 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( rBracketKey.WasJustPressed() )
 	{
-		switch( m_player2Strategy )
+		switch( m_player1Strategy )
 		{
-		case AIStrategy::RANDOM: m_player2Strategy = AIStrategy::BIGMONEY;
+		case AIStrategy::RANDOM: m_player1Strategy = AIStrategy::BIGMONEY;
 			break;
-		case AIStrategy::BIGMONEY: m_player2Strategy = AIStrategy::SINGLEWITCH;
+		case AIStrategy::BIGMONEY: m_player1Strategy = AIStrategy::SINGLEWITCH;
 			break;
-		case AIStrategy::SINGLEWITCH: m_player2Strategy = AIStrategy::SARASUA1;
+		case AIStrategy::SINGLEWITCH: m_player1Strategy = AIStrategy::SARASUA1;
 			break;
-		case AIStrategy::SARASUA1: m_player2Strategy = AIStrategy::MCTS;
+		case AIStrategy::SARASUA1: m_player1Strategy = AIStrategy::MCTS;
 			break;
-		case AIStrategy::MCTS: m_player2Strategy = AIStrategy::DOUBLEWITCH;
+		case AIStrategy::MCTS: m_player1Strategy = AIStrategy::DOUBLEWITCH;
 			break;
-		case AIStrategy::DOUBLEWITCH: m_player2Strategy = AIStrategy::RANDOM;
+		case AIStrategy::DOUBLEWITCH: m_player1Strategy = AIStrategy::RANDOM;
 			break;
 		default: ERROR_AND_DIE( "Invalid AI strategy" );
 			break;
@@ -1250,88 +1180,88 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( semiColonKey.WasJustPressed() )
 	{
-		switch( m_mctsRolloutMethod )
+		switch( m_player1MCTSRolloutMethod )
 		{
-		case ROLLOUTMETHOD::RANDOM: m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+		case ROLLOUTMETHOD::RANDOM: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
 			break;
-		case ROLLOUTMETHOD::HEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::RANDOM;
+		case ROLLOUTMETHOD::HEURISTIC: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::RANDOM;
 			break;
-		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
 			break;
 		default: ERROR_AND_DIE( "Invalid rollout method" );
 			break;
 		}
 
-		m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+		m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
 	}
 	if( singleQuoteKey.WasJustPressed() )
 	{
-		switch( m_mctsRolloutMethod )
+		switch( m_player1MCTSRolloutMethod )
 		{
-		case ROLLOUTMETHOD::RANDOM: m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+		case ROLLOUTMETHOD::RANDOM: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
 			break;
-		case ROLLOUTMETHOD::HEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+		case ROLLOUTMETHOD::HEURISTIC: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
 			break;
-		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_mctsRolloutMethod = ROLLOUTMETHOD::RANDOM;
+		case ROLLOUTMETHOD::EPSILONHEURISTIC: m_player1MCTSRolloutMethod = ROLLOUTMETHOD::RANDOM;
 			break;
 		default: ERROR_AND_DIE( "Invalid rollout method" );
 			break;
 		}
-		m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+		m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
 	}
 	if( plusKey.WasJustPressed() )
 	{
-		switch( m_mctsExpansionStrategy )
+		switch( m_player1ExpansionStrategy )
 		{
-		case EXPANSIONSTRATEGY::ALLMOVES: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+		case EXPANSIONSTRATEGY::ALLMOVES: m_player1ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
 			break;
-		case EXPANSIONSTRATEGY::HEURISTICS: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+		case EXPANSIONSTRATEGY::HEURISTICS: m_player1ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
 			break;
 		default: ERROR_AND_DIE( "Invalid expansion strategy" );
 			break;
 		}
-		m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
+		m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
 	}
 	if( minusKey.WasJustPressed() )
 	{
-		switch( m_mctsExpansionStrategy )
+		switch( m_player1ExpansionStrategy )
 		{
-		case EXPANSIONSTRATEGY::ALLMOVES: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+		case EXPANSIONSTRATEGY::ALLMOVES: m_player1ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
 			break;
-		case EXPANSIONSTRATEGY::HEURISTICS: m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+		case EXPANSIONSTRATEGY::HEURISTICS: m_player1ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
 			break;
 		default: ERROR_AND_DIE( "Invalid expansion strategy" );
 			break;
 		}
-		m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
+		m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
 	}
 	if( zKey.IsPressed() )
 	{
-		m_mctsExplorationParameter -= deltaSeconds;
-		m_mctsExplorationParameter = Max( 0.f, m_mctsExplorationParameter );
+		m_player1MCTSExplorationParameter -= deltaSeconds;
+		m_player1MCTSExplorationParameter = Max( 0.f, m_player1MCTSExplorationParameter );
 
-		m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
+		m_player1MCTS->SetExplorationParameter( m_player1MCTSExplorationParameter );
 	}
 	if( xKey.IsPressed() )
 	{
-		m_mctsExplorationParameter += deltaSeconds;
-		m_mctsExplorationParameter = Clampf( m_mctsExplorationParameter, 0.f, 30.f );
+		m_player1MCTSExplorationParameter += deltaSeconds;
+		m_player1MCTSExplorationParameter = Clampf( m_player1MCTSExplorationParameter, 0.f, 30.f );
 
-		m_mcts->SetExplorationParameter( m_mctsExplorationParameter );
+		m_player1MCTS->SetExplorationParameter( m_player1MCTSExplorationParameter );
 	}
 	if( nKey.IsPressed() )
 	{
-		m_mctsEpsilon -= 0.5f * deltaSeconds;
-		m_mctsEpsilon = Clampf( m_mctsEpsilon, 0.f, 1.f );
+		m_player1MCTSChaosChance -= 0.5f * deltaSeconds;
+		m_player1MCTSChaosChance = Clampf( m_player1MCTSChaosChance, 0.f, 1.f );
 
-		m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
+		m_player1MCTS->SetEpsilonValueZeroToOne( m_player1MCTSChaosChance );
 	}
 	if( mKey.IsPressed() )
 	{
-		m_mctsEpsilon += 0.5f * deltaSeconds;
-		m_mctsEpsilon = Clampf( m_mctsEpsilon, 0.f, 1.f );
+		m_player1MCTSChaosChance += 0.5f * deltaSeconds;
+		m_player1MCTSChaosChance = Clampf( m_player1MCTSChaosChance, 0.f, 1.f );
 
-		m_mcts->SetEpsilonValueZeroToOne( m_mctsEpsilon );
+		m_player1MCTS->SetEpsilonValueZeroToOne( m_player1MCTSChaosChance );
 	}
 	if( commaKey.WasJustPressed() )
 	{
@@ -1375,55 +1305,55 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( leftArrow.WasJustPressed() )
 	{
-		switch( m_mctsSimMethod )
+		switch( m_player1MCTSSimMethod )
 		{
-		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
+		case SIMMETHOD::RANDOM: m_player1MCTSSimMethod = SIMMETHOD::DOUBLEWITCH;
 			break;
-		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::RANDOM;
+		case SIMMETHOD::BIGMONEY: m_player1MCTSSimMethod = SIMMETHOD::RANDOM;
 			break;
-		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+		case SIMMETHOD::SINGLEWITCH: m_player1MCTSSimMethod = SIMMETHOD::BIGMONEY;
 			break;
-		case SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+		case SIMMETHOD::SARASUA1: m_player1MCTSSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
-		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+		case SIMMETHOD::GREEDY: m_player1MCTSSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
-		case SIMMETHOD::DOUBLEWITCH: m_mctsSimMethod = SIMMETHOD::SARASUA1;
+		case SIMMETHOD::DOUBLEWITCH: m_player1MCTSSimMethod = SIMMETHOD::SARASUA1;
 			break;
 		default:
 			break;
 		}
 
-		m_mcts->SetSimMethod( m_mctsSimMethod );
+		m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
 	}
 	if( rightArrow.WasJustPressed() )
 	{
-		switch( m_mctsSimMethod )
+		switch( m_player1MCTSSimMethod )
 		{
-		case SIMMETHOD::RANDOM: m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+		case SIMMETHOD::RANDOM: m_player1MCTSSimMethod = SIMMETHOD::BIGMONEY;
 			break;
-		case SIMMETHOD::BIGMONEY: m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+		case SIMMETHOD::BIGMONEY: m_player1MCTSSimMethod = SIMMETHOD::SINGLEWITCH;
 			break;
-		case SIMMETHOD::SINGLEWITCH: m_mctsSimMethod = SIMMETHOD::SARASUA1;
+		case SIMMETHOD::SINGLEWITCH: m_player1MCTSSimMethod = SIMMETHOD::SARASUA1;
 			break;
-		case  SIMMETHOD::SARASUA1: m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
+		case  SIMMETHOD::SARASUA1: m_player1MCTSSimMethod = SIMMETHOD::DOUBLEWITCH;
 			break;
-		case SIMMETHOD::GREEDY: m_mctsSimMethod = SIMMETHOD::RANDOM;
+		case SIMMETHOD::GREEDY: m_player1MCTSSimMethod = SIMMETHOD::RANDOM;
 			break;
-		case SIMMETHOD::DOUBLEWITCH: m_mctsSimMethod = SIMMETHOD::RANDOM;
+		case SIMMETHOD::DOUBLEWITCH: m_player1MCTSSimMethod = SIMMETHOD::RANDOM;
 			break;
 		default:
 			break;
 		}
 
-		m_mcts->SetSimMethod( m_mctsSimMethod );
+		m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
 	}
 	if( f1Key.WasJustPressed() )
 	{
 		//AppendGameStateToFile( *m_currentGameState, "test.mcts" );
 
-		m_mcts->StopThreads();
-		m_mcts->FlushJobSystemQueues();
-		m_mcts->SaveTree();
+		m_player1MCTS->StopThreads();
+		m_player1MCTS->FlushJobSystemQueues();
+		m_player1MCTS->SaveTree();
 
 	}
 	if( f2Key.WasJustPressed() )
@@ -1434,20 +1364,20 @@ void Game::CheckButtonPresses(float deltaSeconds)
 // 		gamestate_t gameState = gamestate_t::ParseGameStateFromBuffer( buffer );
 // 
 // 		*m_currentGameState = gameState;
-		m_mcts->StopThreads();
-		m_mcts->FlushJobSystemQueues();
-		m_mcts->LoadTree();
-		m_mcts->StartThreads();
-		m_mcts->SetInitialGameState( *m_currentGameState );
+		m_player1MCTS->StopThreads();
+		m_player1MCTS->FlushJobSystemQueues();
+		m_player1MCTS->LoadTree();
+		m_player1MCTS->StartThreads();
+		m_player1MCTS->SetInitialGameState( *m_currentGameState );
 	}
 	if( f3Key.WasJustPressed() )
 	{
-		m_mcts->AddSimulations( 1'000'000 );
+		m_player1MCTS->AddSimulations( 1'000'000 );
 
 	}
 	if( f4Key.WasJustPressed() )
 	{
-		m_mcts->AddSimulations( 1 );
+		m_player1MCTS->AddSimulations( 1 );
 	}
 	if( f5Key.WasJustPressed() )
 	{
@@ -1471,12 +1401,12 @@ void Game::CheckButtonPresses(float deltaSeconds)
 			}
 
 			DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-			m_mcts->AddSimulations( 400 );
-			m_simCount += 400;
+			m_player1MCTS->AddSimulations( 400 );
+			m_player1SimCount += 400;
 		}
 		else
 		{
-			inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
+			inputMove_t move = GetBestMoveUsingAIStrategy( m_player1Strategy );
 			PlayMoveIfValid( move );
 		}
 	}
@@ -1500,7 +1430,7 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 	if( f11Key.WasJustPressed() )
 	{
-		m_mcts->AddSimulations( 1'000 );
+		m_player1MCTS->AddSimulations( 1'000 );
 		//m_mcts->RunSimulations( 10000 );
 	}
 	if( enterKey.WasJustPressed() )
@@ -2108,549 +2038,6 @@ void Game::CheckButtonPresses(float deltaSeconds)
 	}
 }
 
-
-
-void Game::DebugDrawGame()
-{
-	//Render Player 2s hand at top of screen
-	int numberOfUniqueCards = CardPile::GetNumberOfPossibleUniqueCards();
-	CardPile player1Hand = m_currentGameState->m_playerBoards[0].GetHand();
-	CardPile player2Hand = m_currentGameState->m_playerBoards[1].GetHand();
-
-	CardPile player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
-	CardPile player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
-
-	pileData_t const* piles = &m_currentGameState->m_cardPiles[0];
-
-
-	Rgba8 textColor = Rgba8::BLACK;
-	Rgba8 borderColor = Rgba8::BLACK;
-	AABB2 gameBoard = DebugGetScreenBounds();
-	DebugAddScreenAABB2( gameBoard, Rgba8::TuscanTan, 0.f );
-	Vec2 gameDims = gameBoard.GetDimensions();
-	//gameDims.y = gameDims.x;
-	AABB2 gameDataArea = gameBoard;
-	AABB2 deckDataArea = gameBoard;
-	gameDims.x *= 0.8f;
-	gameDims.y *= 0.9f;
-	gameBoard.SetDimensions( gameDims );
-
-	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
-	Vec2 simMethodPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.93f ) );
-	Vec2 expansionPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.8f ) );
-	Vec2 rolloutPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.77f ) );
-	Vec2 ucbPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.74f ) );
-	Vec2 epsilonPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.71f ) );
-	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
-	Vec2 turnPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.85f ) );
-	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
-	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
-	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
-
-	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 9.f );
-	Vec2 player2DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.8f ) );
-	Vec2 player2DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.7f ) );
-	Vec2 player2VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
-	Vec2 player1DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.3f ) );
-	Vec2 player1DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
-	Vec2 player1VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.1f ) );
-
-	PlayerBoard const* playerDeck = nullptr;
-	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
-	{
-		playerDeck = &m_currentGameState->m_playerBoards[0];
-	}
-	else
-	{
-		playerDeck = &m_currentGameState->m_playerBoards[1];
-	}
-
-	int currentCoins = playerDeck->m_currentCoins;
-	int buysAmount = playerDeck->m_numberOfBuysAvailable;
-	int actionsAmount = playerDeck->m_numberOfActionsAvailable;
-
-	std::string coinStr = Stringf( "Coins: %i", currentCoins );
-	std::string buysStr = Stringf( "Buys: %i", buysAmount );
-	std::string actionsStr = Stringf( "Actions: %i", actionsAmount );
-	eGamePhase phase = m_currentGameState->m_currentPhase;
-	int whoseTurn = m_currentGameState->m_whoseMoveIsIt;
-	std::string phaseStr;
-	std::string whoseTurnStr;
-	std::string player1ActionPhaseStr = "Player 1: Action Phase";
-	std::string player1BuyPhaseStr = "Player 1: Buy Phase";
-	std::string player2ActionPhaseStr = "Player 2: Action Phase";
-	std::string player2BuyPhaseStr = "Player 2: Buy Phase";
-	std::string simMethodStr;
-	std::string expansionStrategyStr;
-	std::string rolloutStr;
-	std::string epsilonStr;
-	std::string ucbStr;
-
-	switch( m_mctsSimMethod )
-	{
-	case SIMMETHOD::RANDOM: simMethodStr = "Larrow, Rarrow | Rollout Method: RANDOM";
-		break;
-	case SIMMETHOD::BIGMONEY: simMethodStr = "Larrow, Rarrow | Rollout Method: BIG MONEY";
-		break;
-	case SIMMETHOD::SINGLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: SINGLE Witch";
-		break;
-	case SIMMETHOD::GREEDY: simMethodStr = "Larrow, Rarrow | Rollout Method: GREEDY";
-		break;
-	case SIMMETHOD::SARASUA1: simMethodStr = "Larrow, Rarrow | Rollout Method: SARASUA1";
-		break;
-	case SIMMETHOD::DOUBLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: DOUBLE Witch";
-		break;
-	default: simMethodStr = "Larrow, Rarrow | Rollout Method: DEFAULT";
-		break;
-	}
-
-	switch( m_mctsExpansionStrategy )
-	{
-	case EXPANSIONSTRATEGY::ALLMOVES: expansionStrategyStr = "-,+ | Expansion: All Moves";
-		break;
-	case EXPANSIONSTRATEGY::HEURISTICS: expansionStrategyStr = "-,+ | Expansion: Heuristics";
-		break;
-	default:
-		break;
-	}
-
-	switch( m_mctsRolloutMethod )
-	{
-	case ROLLOUTMETHOD::RANDOM: rolloutStr = ";,' | Rollout: Random";
-		break;
-	case ROLLOUTMETHOD::HEURISTIC: rolloutStr = ";,' | Rollout: Heuristic";
-		break;
-	case ROLLOUTMETHOD::EPSILONHEURISTIC: rolloutStr = ";,' | Rollout: Epsilon Heuristic";
-		break;
-	default:
-		break;
-	}
-
-	ucbStr = Stringf( "Z,X | UCB Score: %f", m_mctsExplorationParameter );
-	epsilonStr = Stringf( "N,M | Epsilon: %f", m_mctsEpsilon );
-	
-	if( whoseTurn == PLAYER_1 )
-	{
-		whoseTurnStr = "Turn: Player 1";
-	}
-	else if( whoseTurn == PLAYER_2 )
-	{
-		whoseTurnStr = "Turn: Player 2";
-	}
-	else
-	{
-		whoseTurnStr = "No current player to move";
-	}
-
-	if( phase == ACTION_PHASE )
-	{
-		phaseStr = "Phase: Action";
-	}
-	else if( phase == BUY_PHASE )
-	{
-		phaseStr = "Phase: Buy";
-	}
-	else if( phase == CLEANUP_PHASE )
-	{
-		phaseStr = "Phase: Cleanup";
-	}
-
-
-	int player1DeckSize = (int)m_currentGameState->m_playerBoards[0].GetDeckSize();
-	int player1DiscardSize = (int)m_currentGameState->m_playerBoards[0].GetDiscardSize();
-	int player1VPCount = m_currentGameState->m_playerBoards[0].GetCurrentVictoryPoints();
-	int player2DeckSize = (int)m_currentGameState->m_playerBoards[1].GetDeckSize();
-	int player2DiscardSize = (int)m_currentGameState->m_playerBoards[1].GetDiscardSize();
-	int player2VPCount = m_currentGameState->m_playerBoards[1].GetCurrentVictoryPoints();
-	std::string player2DeckStr = Stringf( "Deck Size: %i", player2DeckSize );
-	std::string player2DiscardStr = Stringf( "Discard Size: %i", player2DiscardSize );
-	std::string player1DeckStr = Stringf( "Deck Size: %i", player1DeckSize );
-	std::string player1DiscardStr = Stringf( "Discard Size: %i", player1DiscardSize );
-
-	std::string player1VPStr = Stringf( "VP: %i", player1VPCount );
-	std::string player2VPStr = Stringf( "VP: %i", player2VPCount );
-
-	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DiscardStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DeckStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DiscardStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
-
-	DebugAddScreenText( Vec4( Vec2(), simMethodPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, simMethodStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), turnPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, whoseTurnStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
-
-	DebugAddScreenText( Vec4( Vec2(), expansionPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, expansionStrategyStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), rolloutPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, rolloutStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), ucbPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, ucbStr.c_str() );
-	DebugAddScreenText( Vec4( Vec2(), epsilonPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, epsilonStr.c_str() );
-
-
-	AABB2 carvingBoard = gameBoard;
-
-
-	float handHeightFraction = 0.15f;
-	float playAreaHeightFraction = 0.15f;
-	float pileAreaHeightFraction = 0.4f;
-
-	float currentProportionalFractionSize = 1.f;
-	float currentProportionalSize = 1.f;
-	float currentFraction = handHeightFraction;
-	float fractionToCarve = currentFraction;
-
-
-	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-	currentFraction = playAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-	currentFraction = pileAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-	currentFraction = playAreaHeightFraction;
-	currentProportionalFractionSize = 1.f - fractionToCarve;
-	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
-
-	// 	currentFraction = playAreaHeightFraction;
-	// 	currentProportionalFractionSize = 1.f - fractionToCarve;
-	// 	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
-	// 	fractionToCarve = currentFraction * currentProportionalSize;
-
-	AABB2 player1HandAABB = carvingBoard;
-
-	//AABB2 carvingPlayer2Hand = player2HandAABB;
-
-	Rgba8 handColor = Rgba8::WindsorTan;
-	Rgba8 playAreaColor = Rgba8::Tan;
-	Rgba8 pileAreaColor = Rgba8::SandyTan;
-
-	DebugAddScreenAABB2( player2HandAABB, handColor, 0.f );
-	DebugAddScreenAABB2( player2PlayAreaAABB, playAreaColor, 0.f );
-	DebugAddScreenAABB2( pilesArea, pileAreaColor, 0.f );
-	DebugAddScreenAABB2( player1PlayAreaAABB, playAreaColor, 0.f );
-	DebugAddScreenAABB2( player1HandAABB, handColor, 0.f );
-
-	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
-
-	float player2HandSize = (float)player2Hand.TotalCount();
-	int player2HandIndex = 0;
-	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
-	{
-		int countOfCard = player2Hand.CountOfCard( cardIndex );
-		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
-		while( countOfCard > 0 )
-		{
-			float carvingNumber = player2HandSize - (float)player2HandIndex;
-			AABB2 cardArea = player2HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-			std::string cardName = card->GetCardName();
-			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-
-			countOfCard--;
-			player2HandIndex++;
-		}
-	}
-
-	float player2PlayAreaSize = (float)player2PlayArea.TotalCount();
-	int player2PlayAreaIndex = 0;
-	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
-	{
-		int countOfCard = player2PlayArea.CountOfCard( cardIndex );
-		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
-		while( countOfCard > 0 )
-		{
-			float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
-			AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-			std::string cardName = card->GetCardName();
-			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-
-			countOfCard--;
-			player2PlayAreaIndex++;
-		}
-	}
-
-	std::vector<int> aiValidMoves = GetCurrentBuyIndexes();
-	AABB2 bottomPilesArea;
-	bool isTwoRows = false;
-	int cardsPerRow = 8;
-	float cardsPerRowFloat = (float)cardsPerRow;
-	if( NUMBEROFPILES > cardsPerRow )
-	{
-		isTwoRows = true;
-		bottomPilesArea = pilesArea.CarveBoxOffBottom( 0.5f );
-	}
-	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
-	{
-		//float pileSize = 8.f;
-		float carvingNumber = 0.f;
-
-		AABB2 cardArea;
-		if( isTwoRows )
-		{
-			if( pilesIndex < (size_t)cardsPerRow )
-			{
-				carvingNumber = cardsPerRowFloat - (float)pilesIndex;
-				cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-			}
-			else
-			{
-				carvingNumber = (2.f*cardsPerRowFloat) - (float)pilesIndex;
-				cardArea = bottomPilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-			}
-		}
-		else
-		{
-			carvingNumber = cardsPerRowFloat - (float)pilesIndex;
-			cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
-		}
-
-		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
-		{
-			int aiPileIndex = aiValidMoves[aiValidIndexes];
-			if( pilesIndex == aiPileIndex )
-			{
-				DebugAddScreenAABB2( cardArea, Rgba8::RedBrown, 0.f );
-				break;
-			}
-		}
-
-		int cardIndex = piles[pilesIndex].m_cardIndex;
-		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
-		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
-		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
-		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
-		Vec4 pileSizePos = Vec4( Vec2(), Vec2( cardArea.mins.x, cardArea.maxs.y ) );
-		std::string cardName = card->GetCardName();
-		std::string cardCost = Stringf( "Cost:%i", card->GetCardCost() );
-		std::string cardCoins = Stringf( "Coins:%i", card->GetCoins() );
-		std::string cardVPs = Stringf( "VPs:%i", card->GetCardVPs() );
-		std::string pileCount = Stringf( "Count:%i", piles[pilesIndex].m_pileSize );
-		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 15.f, textColor, textColor, 0.f, cardName.c_str() );
-		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.5f ), 12.f, textColor, textColor, 0.f, cardCost.c_str() );
-		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardCoins.c_str() );
-		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardVPs.c_str() );
-		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.5f ), 12.f, textColor, textColor, 0.f, pileCount.c_str() );
-		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
-	}
-
-	float player1PlayAreaSize = (float)player1PlayArea.TotalCount();
-	int player1PlayAreaIndex = 0;
-	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
-	{
-		int countOfCard = player1PlayArea.CountOfCard( cardIndex );
-		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
-		while( countOfCard > 0 )
-		{
-			float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
-			AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-			std::string cardName = card->GetCardName();
-			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-
-			countOfCard--;
-			player1PlayAreaIndex++;
-		}
-	}
-
-	float player1HandSize = (float)player1Hand.TotalCount();
-	int player1HandIndex = 0;
-	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
-	{
-		int countOfCard = player1Hand.CountOfCard( cardIndex );
-		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
-		while( countOfCard > 0 )
-		{
-			float carvingNumber = player1HandSize - (float)player1HandIndex;
-			AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
-			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
-			std::string cardName = card->GetCardName();
-			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
-
-			countOfCard--;
-			player1HandIndex++;
-		}
-	}
-
-
-	if( IsGameOver() == PLAYER_1 )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 1 won!" ).c_str() );
-	}
-	else if( IsGameOver() == PLAYER_2 )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 2 won!" ).c_str() );
-	}
-	else if( IsGameOver() == TIE )
-	{
-		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
-	}
-
-	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
-	{
-		inputMove_t player1BestMove = GetBestMoveUsingAIStrategy( m_player1Strategy );
-		std::string aiStratStr;
-		switch( m_player1Strategy )
-		{
-		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
-			break;
-		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
-			break;
-		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
-			break;
-		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
-			break;
-		case AIStrategy::MCTS: aiStratStr = "MCTS";
-			break;
-		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
-			break;
-		default: aiStratStr = "Invalid Strat for player 1";
-			break;
-		}
-		//inputMove_t currentBestMove = m_mc->GetBestMove();
-		inputMove_t currentBestMove = player1BestMove;
-		if( currentBestMove.m_moveType != INVALID_MOVE )
-		{
-			std::string moveStr;
-
-			if( currentBestMove.m_moveType == BUY_MOVE )
-			{
-				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
-				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
-				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
-			}
-			else if( currentBestMove.m_moveType == PLAY_CARD )
-			{
-				int cardHandIndex = currentBestMove.m_cardIndex;
-				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
-			}
-			else if( currentBestMove.m_moveType == END_PHASE )
-			{
-				moveStr = Stringf( "Best Move for Player 1 using %s strategy: End Phase", aiStratStr.c_str() );
-			}
-			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
-		}
-		else
-		{
-			std::string moveStr;
-			moveStr = Stringf( "Move for Player 1 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
-			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
-		}
-	}
-	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
-	{
-		inputMove_t player2BestMove = GetBestMoveUsingAIStrategy( m_player2Strategy );
-		std::string aiStratStr;
-		switch( m_player2Strategy )
-		{
-		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
-			break;
-		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
-			break;
-		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
-			break;
-		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
-			break;
-		case AIStrategy::MCTS: aiStratStr = "MCTS";
-			break;
-		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
-			break;
-		default: aiStratStr = "Invalid Strat for player 2";
-			break;
-		}
-
-		inputMove_t currentBestMove = player2BestMove;
-		if( currentBestMove.m_moveType != INVALID_MOVE )
-		{
-			//inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
-			//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
-			std::string moveStr;
-			if( currentBestMove.m_moveType == BUY_MOVE )
-			{
-				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
-				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
-				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
-			}
-			else if( currentBestMove.m_moveType == PLAY_CARD )
-			{
-				int cardHandIndex = currentBestMove.m_cardIndex;
-				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
-			}
-			else if( currentBestMove.m_moveType == END_PHASE )
-			{
-				moveStr = Stringf( "Best Move for Player 2 using %s strategy: End Phase", aiStratStr.c_str() );
-			}
-			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
-		}
-		else
-		{
-			std::string moveStr;
-			moveStr = Stringf( "Move for Player 2 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
-			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
-		}
-
-	}
-
-	if( m_randomMove.m_moveType != INVALID_MOVE )
-	{
-		std::string randomMoveStr;
-		if( m_randomMove.m_moveType == BUY_MOVE )
-		{
-			eCards cardIndex = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndex].m_cardIndex;
-			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
-			randomMoveStr = Stringf( "Random Move: Buy %s", card->GetCardName().c_str() );
-		}
-		else if( m_randomMove.m_moveType == PLAY_CARD )
-		{
-			int cardHandIndex = m_randomMove.m_cardIndex;
-			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
-			randomMoveStr = Stringf( "Random Move: Play %s", card->GetCardName().c_str() );
-		}
-		else if( m_randomMove.m_moveType == END_PHASE )
-		{
-			randomMoveStr = Stringf( "Random move: End Phase" );
-		}
-		DebugAddScreenText( Vec4( 0.5f, 0.93f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, randomMoveStr.c_str() );
-	}
-
-
-	m_totalSimCount = m_mcts->GetNumberOfSimulationsRun();
-	m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
-	DebugAddScreenText( Vec4( 0.5f, 0.92f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current sim count: %i", m_totalSimCount ).c_str() );
-	DebugAddScreenText( Vec4( 0.5f, 0.9f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current remaining sim count: %i", m_simCount ).c_str() );
-
-// 	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
-// 	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
-// 	DebugAddScreenText( Vec4( 0.5f, 0.81f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current expand time: %f", (float)m_mcts->m_expandTime ).c_str() );
-// 	DebugAddScreenText( Vec4( 0.5f, 0.79f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim time: %f", (float)m_mcts->m_simTime ).c_str() );
-// 	DebugAddScreenText( Vec4( 0.5f, 0.77f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current backpropagation time: %f", (float)m_mcts->m_backpropagationTime ).c_str() );
-
-
-
-	if( m_isDebugScreenEnabled )
-	{
-		DebugDrawGameStateInfo();
-	}
-
-}
-
 void Game::DebugDrawGameStateInfo()
 {
 	AABB2 debugDrawCanvas = DebugGetScreenBounds();
@@ -2699,13 +2086,13 @@ void Game::AutoPlayGame()
 		{
 			if( m_player1Strategy == AIStrategy::MCTS )
 			{
-				m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
+				m_player1SimCount = m_player1MCTS->GetCurrentNumberOfSimulationsLeft();
 				if( m_timer.CheckAndDecrementAll() )
 				{
-					m_mcts->AddSimulations( 5000 );
+					m_player1MCTS->AddSimulations( 5000 );
 
 					//inputMove_t move = m_mc->GetBestMove();
-					inputMove_t move = m_mcts->GetBestMove();
+					inputMove_t move = m_player1MCTS->GetBestMove();
 					if( move.m_moveType == INVALID_MOVE )
 					{
 
@@ -2734,15 +2121,15 @@ void Game::AutoPlayGame()
 		{
 			if( m_player2Strategy == AIStrategy::MCTS )
 			{
-				m_simCount = m_mcts->GetCurrentNumberOfSimulationsLeft();
-				if( m_simCount < 500 )
+				m_player2SimCount = m_player2MCTS->GetCurrentNumberOfSimulationsLeft();
+				if( m_player2SimCount < 500 )
 				{
 					if( m_timer.CheckAndDecrement() )
 					{
-						m_mcts->AddSimulations( 1000 );
+						m_player2MCTS->AddSimulations( 1000 );
 
 						//inputMove_t move = m_mc->GetBestMove();
-						inputMove_t move = m_mcts->GetBestMove();
+						inputMove_t move = m_player2MCTS->GetBestMove();
 						if( move.m_moveType == INVALID_MOVE )
 						{
 
@@ -2804,18 +2191,37 @@ AIStrategy Game::StringToAIStrategy( std::string const& strategyStr ) const
 
 bool Game::TogglePlayer1UseChaosChance( EventArgs const& args )
 {
-	if( m_mctsRolloutMethod == ROLLOUTMETHOD::HEURISTIC )
+	UNUSED( args );
+	if( m_player1MCTSRolloutMethod == ROLLOUTMETHOD::HEURISTIC )
 	{
-		m_mctsRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+		m_player1MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
 		m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
 	}
-	else if( m_mctsRolloutMethod == ROLLOUTMETHOD::EPSILONHEURISTIC )
+	else if( m_player1MCTSRolloutMethod == ROLLOUTMETHOD::EPSILONHEURISTIC )
 	{
-		m_mctsRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+		m_player1MCTSRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
 		m_player1UseChaosChanceWidget->SetText( "Use Chaos Chance: [ ]" );
 	}
 
-	m_mcts->SetRolloutMethod( m_mctsRolloutMethod );
+	m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
+
+	return true;
+}
+
+bool Game::TogglePlayer2UseChaosChance( EventArgs const& args )
+{
+	if( m_player2MCTSRolloutMethod == ROLLOUTMETHOD::HEURISTIC )
+	{
+		m_player2MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
+		m_player2UseChaosChanceWidget->SetText( "Use Chaos Chance: [x]" );
+	}
+	else if( m_player2MCTSRolloutMethod == ROLLOUTMETHOD::EPSILONHEURISTIC )
+	{
+		m_player2MCTSRolloutMethod = ROLLOUTMETHOD::HEURISTIC;
+		m_player2UseChaosChanceWidget->SetText( "Use Chaos Chance: [ ]" );
+	}
+
+	m_player2MCTS->SetRolloutMethod( m_player2MCTSRolloutMethod );
 
 	return true;
 }
@@ -2942,7 +2348,8 @@ void Game::PlayMoveIfValid( inputMove_t const& moveToPlay )
 	m_mc->SetCurrentGameState( *m_currentGameState );
 	m_mc->ResetPossibleMoves();
 
-	m_mcts->UpdateGame( moveToPlay, *m_currentGameState );
+	m_player1MCTS->UpdateGame( moveToPlay, *m_currentGameState );
+	m_player2MCTS->UpdateGame( moveToPlay, *m_currentGameState );
 	m_randomMove = inputMove_t();
 }
 
@@ -3003,13 +2410,24 @@ bool Game::PlayCurrentAIMove( EventArgs const& args )
 		}
 
 		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
-		m_mcts->AddSimulations( 400 );
-		m_simCount += 400;
+		m_player1MCTS->AddSimulations( 400 );
+		m_player1SimCount += 400;
 	}
 	else
 	{
 		inputMove_t move = GetBestMoveUsingAIStrategy( m_player2Strategy );
-		PlayMoveIfValid( move );
+		if( move.m_moveType == INVALID_MOVE )
+		{
+
+		}
+		else
+		{
+			PlayMoveIfValid( move );
+		}
+
+		DebugAddScreenPoint( Vec2( 0.5, 0.5f ), 100.f, Rgba8::YELLOW, 0.f );
+		m_player2MCTS->AddSimulations( 400 );
+		m_player2SimCount += 400;
 	}
 
 	return true;
@@ -3027,7 +2445,7 @@ bool Game::ToggleAutoPlay( EventArgs const& args )
 bool Game::AddSimsForPlayer1( EventArgs const& args )
 {
 	UNUSED( args );
-	m_mcts->AddSimulations( 1'000'000 );
+	m_player1MCTS->AddSimulations( 1'000'000 );
 	m_isUIDirty = true;
 
 	return true;
@@ -3036,7 +2454,7 @@ bool Game::AddSimsForPlayer1( EventArgs const& args )
 bool Game::AddSimsForPlayer2( EventArgs const& args )
 {
 	UNUSED( args );
-	m_mcts->AddSimulations( 1'000'000 );
+	m_player1MCTS->AddSimulations( 1'000'000 );
 	m_isUIDirty = true;
 
 	return true;
@@ -3063,7 +2481,15 @@ bool Game::ChangePlayer2Strategy( EventArgs const& args )
 bool Game::ChangePlayer1UCTValue( EventArgs const& args )
 {
 	float uctValue = args.GetValue( "value", 0.f );
-	m_mcts->SetUCBValue( uctValue );
+	m_player1MCTS->SetUCBValue( uctValue );
+
+	return true;
+}
+
+bool Game::ChangePlayer2UCTValue( EventArgs const& args )
+{
+	float uctValue = args.GetValue( "value", 0.f );
+	m_player2MCTS->SetUCBValue( uctValue );
 
 	return true;
 }
@@ -3074,18 +2500,39 @@ bool Game::ChangePlayer1ExpansionMethod( EventArgs const& args )
 
 	if( expansionMethod == "All Moves" )
 	{
-		m_mctsExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+		m_player1ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
 	}
 	else if( expansionMethod == "Heuristics" )
 	{
-		m_mctsExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+		m_player1ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
 	}
 	else
 	{
 		ERROR_AND_DIE( "Invalid Expansion Method");
 	}
 
-	m_mcts->SetExpansionStrategy( m_mctsExpansionStrategy );
+	m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
+	return true;
+}
+
+bool Game::ChangePlayer2ExpansionMethod( EventArgs const& args )
+{
+	std::string expansionMethod = args.GetValue( "value", "Invalid" );
+
+	if( expansionMethod == "All Moves" )
+	{
+		m_player2ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
+	}
+	else if( expansionMethod == "Heuristics" )
+	{
+		m_player2ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Invalid Expansion Method" );
+	}
+
+	m_player2MCTS->SetExpansionStrategy( m_player2ExpansionStrategy );
 	return true;
 }
 
@@ -3094,34 +2541,70 @@ bool Game::ChangePlayer1RolloutMethod( EventArgs const& args )
 	std::string rolloutMethod = args.GetValue( "value", "Invalid" );
 	if( rolloutMethod == "Random" )
 	{
-		m_mctsSimMethod = SIMMETHOD::RANDOM;
+		m_player1MCTSSimMethod = SIMMETHOD::RANDOM;
 	}
 	else if( rolloutMethod == "Big Money" )
 	{
-		m_mctsSimMethod = SIMMETHOD::BIGMONEY;
+		m_player1MCTSSimMethod = SIMMETHOD::BIGMONEY;
 	}
 	else if( rolloutMethod == "Single Witch" )
 	{
-		m_mctsSimMethod = SIMMETHOD::SINGLEWITCH;
+		m_player1MCTSSimMethod = SIMMETHOD::SINGLEWITCH;
 	}
 	else if( rolloutMethod == "Double Witch" )
 	{
-		m_mctsSimMethod = SIMMETHOD::DOUBLEWITCH;
+		m_player1MCTSSimMethod = SIMMETHOD::DOUBLEWITCH;
 	}
 	else if( rolloutMethod == "Sarasua1" )
 	{
-		m_mctsSimMethod = SIMMETHOD::SARASUA1;
+		m_player1MCTSSimMethod = SIMMETHOD::SARASUA1;
 	}
 	else if( rolloutMethod == "Greedy" )
 	{
-		m_mctsSimMethod = SIMMETHOD::GREEDY;
+		m_player1MCTSSimMethod = SIMMETHOD::GREEDY;
 	}
 	else
 	{
 		ERROR_AND_DIE( "Invalid rollout method" );
 	}
 
-	m_mcts->SetSimMethod( m_mctsSimMethod );
+	m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
+	return true;
+}
+
+bool Game::ChangePlayer2RolloutMethod( EventArgs const& args )
+{
+	std::string rolloutMethod = args.GetValue( "value", "Invalid" );
+	if( rolloutMethod == "Random" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::RANDOM;
+	}
+	else if( rolloutMethod == "Big Money" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::BIGMONEY;
+	}
+	else if( rolloutMethod == "Single Witch" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::SINGLEWITCH;
+	}
+	else if( rolloutMethod == "Double Witch" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::DOUBLEWITCH;
+	}
+	else if( rolloutMethod == "Sarasua1" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::SARASUA1;
+	}
+	else if( rolloutMethod == "Greedy" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::GREEDY;
+	}
+	else
+	{
+		ERROR_AND_DIE( "Invalid rollout method" );
+	}
+
+	m_player2MCTS->SetSimMethod( m_player2MCTSSimMethod );
 	return true;
 }
 
@@ -3561,7 +3044,7 @@ inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy )
 		break;
 	case AIStrategy::SARASUA1: return GetMoveUsingSarasua1( *m_currentGameState );
 		break;
-	case AIStrategy::MCTS: return m_mcts->GetBestMove();
+	case AIStrategy::MCTS: return m_player1MCTS->GetBestMove();
 		break;
 	default: return inputMove_t();
 		break;
