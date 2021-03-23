@@ -409,7 +409,7 @@ void Game::InitializeAISmallPanelWidget()
 {
 	AABB2 AIBounds = m_AIWidget->GetLocalAABB2();
 	AABB2 leftBounds = AIBounds.GetBoxAtLeft( 0.4f );
-	AABB2 rightBounds = AIBounds.GetBoxAtRight( 0.5f );
+	AABB2 rightBounds = AIBounds.GetBoxAtRight( 0.55f );
 	AABB2 farRightBounds = AIBounds.GetBoxAtRight( 0.1f );
 	farRightBounds.ScaleDimensionsUniform( 0.9f );
 	std::vector<AABB2> AILeftColumnBounds = leftBounds.GetBoxAsColumns( 2 );
@@ -432,13 +432,22 @@ void Game::InitializeAISmallPanelWidget()
 	m_AIInfoWidget->SetTextSize( 0.1f );
 	m_AIInfoWidget->SetTexture( m_artichokeGreenTexture, m_artichokeGreenTexture, m_artichokeGreenTexture );
 
-	m_ToggleAutoPlayWidget = new Widget( leftLeftRowsBounds[1], m_AIWidget );
+	m_toggleAutoPlayWidget = new Widget( leftLeftRowsBounds[1], m_AIWidget );
 	//m_ToggleAutoPlayWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
-	m_ToggleAutoPlayWidget->SetText( "Auto Play: OFF" );
-	m_ToggleAutoPlayWidget->SetTextSize( 0.1f );
-	m_ToggleAutoPlayWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
-	Delegate<EventArgs const&>& toggleAutoPlayDelegate = m_ToggleAutoPlayWidget->m_releaseDelegate;
+	m_toggleAutoPlayWidget->SetText( "Auto Play: OFF" );
+	m_toggleAutoPlayWidget->SetTextSize( 0.1f );
+	m_toggleAutoPlayWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& toggleAutoPlayDelegate = m_toggleAutoPlayWidget->m_releaseDelegate;
 	toggleAutoPlayDelegate.SubscribeMethod( this, &Game::ToggleAutoPlay );
+
+	m_restartGameWidget = new Widget( leftLeftRowsBounds[0], m_AIWidget );
+	m_restartGameWidget->SetText( "Restart Game" );
+	m_restartGameWidget->SetTextSize( 0.1f );
+	m_restartGameWidget->SetTexture( m_forestGreenTexture, m_darkForestGreenTexture, m_forestGreenTexture );
+	Delegate<EventArgs const&>& restartGameDelegate = m_restartGameWidget->m_releaseDelegate;
+	restartGameDelegate.SubscribeMethod( this, &Game::RestartGame );
+
+
 
 	m_playAIMoveWidget = new Widget( leftRowsBounds[0], m_AIWidget );
 	//m_playAIMoveWidget->SetTextAlignment( ALIGN_CENTER_LEFT );
@@ -759,9 +768,10 @@ void Game::MatchUIToGameState()
 	for( eCards const& card : playAreaCards )
 	{
 		CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( card );
+		Texture const* cardTex = cardDef->GetCardTexture();
 		Widget* cardWidget = new Widget( *m_baseCardWidget );
-		cardWidget->SetTexture( cardDef->GetCardTexture(), m_cyanTexture, m_redTexture );
-
+		cardWidget->SetTexture( cardTex, cardTex, cardTex );
+		cardWidget->SetCanDrag( false );
 		m_player1PlayAreaWidget->AddChild( cardWidget );
 	}
 
@@ -860,7 +870,7 @@ void Game::UpdateAISmallPanelWidget()
 		toggleAutoPlayStr = "OFF";
 	}
 
-	m_ToggleAutoPlayWidget->SetText( Stringf( "Auto Play: %s", toggleAutoPlayStr.c_str() ) );
+	m_toggleAutoPlayWidget->SetText( Stringf( "Auto Play: %s", toggleAutoPlayStr.c_str() ) );
 
 
 	int whoseMove = m_currentGameState->m_whoseMoveIsIt;
@@ -1018,6 +1028,15 @@ void Game::RestartGame()
 	*m_currentGameState = GetRandomInitialGameState();
 	m_player1MCTS->SetInitialGameState( *m_currentGameState );
 	m_player2MCTS->SetInitialGameState( *m_currentGameState );
+	m_isUIDirty = true;
+}
+
+bool Game::RestartGame( EventArgs const& args )
+{
+	UNUSED( args );
+	RestartGame();
+
+	return true;
 }
 
 void Game::CheckCollisions()

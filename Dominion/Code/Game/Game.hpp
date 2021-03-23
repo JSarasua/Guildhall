@@ -545,6 +545,7 @@ public:
 	bool ChangePlayer2RolloutMethod( EventArgs const& args );
 	bool TogglePlayer1UseChaosChance( EventArgs const& args );
 	bool TogglePlayer2UseChaosChance( EventArgs const& args );
+	bool RestartGame( EventArgs const& args );
 
 	void PlayMoveIfValid( inputMove_t const& moveToPlay );
 	bool IsMoveValid( inputMove_t const& moveToPlay ) const;
@@ -664,7 +665,8 @@ public:
 	//IntVec2 m_AIGridDimensions = IntVec2( 5, 1 );
 	Widget* m_AIWidget = nullptr;
 	Widget* m_AIInfoWidget = nullptr;
-	Widget* m_ToggleAutoPlayWidget = nullptr;
+	Widget* m_toggleAutoPlayWidget = nullptr;
+	Widget* m_restartGameWidget = nullptr;
 	Widget* m_currentAIWidget = nullptr;
 	Widget* m_playAIMoveWidget = nullptr;
 	Widget* m_currentAIBestMoveWidget = nullptr;
@@ -741,14 +743,14 @@ private:
 	AIStrategy m_player1Strategy = AIStrategy::MCTS;
 	SIMMETHOD m_player1MCTSSimMethod = SIMMETHOD::RANDOM; 
 	ROLLOUTMETHOD m_player1MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
-	EXPANSIONSTRATEGY m_player1ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	EXPANSIONSTRATEGY m_player1ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
 	float m_player1MCTSExplorationParameter = 0.5f;
 	float m_player1MCTSChaosChance = 0.15f;
 
-	AIStrategy m_player2Strategy = AIStrategy::SINGLEWITCH;
+	AIStrategy m_player2Strategy = AIStrategy::MCTS;
 	SIMMETHOD m_player2MCTSSimMethod = SIMMETHOD::RANDOM;
 	ROLLOUTMETHOD m_player2MCTSRolloutMethod = ROLLOUTMETHOD::EPSILONHEURISTIC;
-	EXPANSIONSTRATEGY m_player2ExpansionStrategy = EXPANSIONSTRATEGY::HEURISTICS;
+	EXPANSIONSTRATEGY m_player2ExpansionStrategy = EXPANSIONSTRATEGY::ALLMOVES;
 	float m_player2MCTSExplorationParameter = 0.5f;
 	float m_player2MCTSChaosChance = 0.15f;
 };
