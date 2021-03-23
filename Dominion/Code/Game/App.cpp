@@ -12,7 +12,7 @@ App* g_theApp = nullptr;
 AudioSystem* g_theAudio = nullptr;
 //InputSystem* g_theInput = nullptr;
 
-const char* APP_NAME = "SD3-A1: Protogame3D";	// ...becomes ??? (Change this per project!)
+const char* APP_NAME = "Thesis: Dominion AI Using Monte Carlo Tree Search";	// ...becomes ??? (Change this per project!)
 
 App::App()
 {
