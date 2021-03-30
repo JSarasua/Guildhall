@@ -516,6 +516,24 @@ public:
 	gamestate_t m_currentGamestate;
 };
 
+struct TestResults
+{
+public:
+	TestResults() = default;
+	TestResults( int gamesPlayed, int playerAWins, int playerBWins, int numberOfTies ):
+		m_gamesPlayed( gamesPlayed ),
+		m_playerAWins( playerAWins ),
+		m_playerBWins( playerBWins ),
+		m_numberOfTies( numberOfTies )
+	{}
+
+public:
+	int m_gamesPlayed = 0;
+	int m_playerAWins = 0;
+	int m_playerBWins = 0;
+	int m_numberOfTies = 0;
+};
+
 class Game
 {
 public:
@@ -557,7 +575,8 @@ public:
 	std::vector<inputMove_t> GetValidMovesAtGameState( gamestate_t const& gameState ) const;
 	int GetNumberOfValidMovesAtGameState( gamestate_t const& gameState );
 	gamestate_t GetGameStateAfterMove( gamestate_t const& currentGameState, inputMove_t const& move );
-	inputMove_t GetBestMoveUsingAIStrategy( AIStrategy aiStrategy );
+	inputMove_t GetBestMoveUsingAIStrategy( AIStrategy aiStrategy, MonteCarlo* mcts = nullptr );
+	inputMove_t GetBestMoveUsingAIStrategyForGamestate( AIStrategy aiStrategy, gamestate_t const& gameState );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
@@ -578,6 +597,7 @@ public:
 	void AppendGameStateToFile( gamestate_t const& gameState, std::string const& filePath );
 	gamestate_t ParseGameStateFromBuffer( byte*& buffer );
 
+	void RunTestCases();
 private:
 	void StartupUI();
 	void InitializeAISmallPanelWidget();
@@ -593,6 +613,12 @@ private:
 	void UpdateScoreWidgets();
 	void UpdateAISmallPanelWidget();
 	void UpdateAILargePanelWidget();
+
+
+	void RunRandomVsBigMoney();
+	TestResults RunAIVsAITest( AIStrategy player1Strategy, AIStrategy player2Strategy, int numberOfGames, bool doesRunPlayersFlipped );
+	TestResults RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts, int numberOfGames, bool doesRunPlayersFlipped);
+	TestResults RunMCTSVsMCTSTest( MonteCarlo* mctsA, MonteCarlo* mctsB, int numberOfGames, bool doesRunPlayersFlipped);
 
 
 	void InitializeGameState();

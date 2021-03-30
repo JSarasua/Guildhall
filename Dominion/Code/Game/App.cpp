@@ -64,6 +64,8 @@ void App::Startup()
 
 	g_theEventSystem->SubscribeMethodToEvent("quit", CONSOLECOMMAND, this, &App::QuitRequested );
 
+
+	g_theGame->RunTestCases();
 }
 
 void App::Shutdown()

@@ -69,6 +69,8 @@ void Game::Startup()
 
 	g_theRenderer->Setup( m_gameClock );
 
+	//RunTestCases();
+
 	m_mc = new MonteCarloNoTree();
 	m_player1MCTS = new MonteCarlo();
 	m_player2MCTS = new MonteCarlo();
@@ -878,7 +880,7 @@ void Game::UpdateAISmallPanelWidget()
 	inputMove_t bestMoveForCurrentAI;
 	if( whoseMove == PLAYER_1 )
 	{
-		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player1Strategy, m_player1MCTS );
 		
 		switch( m_player1Strategy )
 		{
@@ -900,9 +902,9 @@ void Game::UpdateAISmallPanelWidget()
 	}
 	else if( whoseMove == PLAYER_2 )
 	{
-		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		bestMoveForCurrentAI = GetBestMoveUsingAIStrategy( m_player2Strategy, m_player2MCTS );
 
-		switch( m_player1Strategy )
+		switch( m_player2Strategy )
 		{
 		case AIStrategy::RANDOM: aiStrategyStr = "Random";
 			break;
@@ -972,6 +974,241 @@ void Game::UpdateAISmallPanelWidget()
 	m_player2MCTSSimulationsWidget->SetText( Stringf( "Player 2 MCTS Iterations: %i", numberOfSimsPlayer2 ) );
 	m_player2MCTSTimesVisitedWidget->SetText( Stringf( "Node Visits: %i", numberOfVisitsPlayer2 ) );
 
+}
+
+void Game::RunTestCases()
+{
+	TestResults results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::RANDOM, 100, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Random", results.m_gamesPlayed) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Random Wins: %i", results.m_playerBWins) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::SINGLEWITCH, 100, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Single Witch", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Single Witch Wins: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::DOUBLEWITCH, 100, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Double Witch", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	results = RunAIVsAITest( AIStrategy::SINGLEWITCH, AIStrategy::DOUBLEWITCH, 100, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Single Witch vs Double Witch", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Single Witch Wins: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+}
+
+TestResults Game::RunAIVsAITest( AIStrategy player1Strategy, AIStrategy player2Strategy, int numberOfGames, bool doesRunPlayersFlipped )
+{
+	TestResults results;
+	
+	for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+	{
+		gamestate_t newGamestate = GetRandomInitialGameState();
+
+		int isGameOver = IsGameOverForGameState( newGamestate );
+		while( isGameOver == GAMENOTOVER )
+		{
+			if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+			{
+				inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( player1Strategy, newGamestate );
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+			}
+			else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+			{
+				inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( player2Strategy, newGamestate );
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid player" );
+			}
+
+			isGameOver = IsGameOverForGameState( newGamestate );
+		}
+
+		results.m_gamesPlayed++;
+		if( isGameOver == PLAYER_1 )
+		{
+			results.m_playerAWins++;
+		}
+		else if( isGameOver == PLAYER_2 )
+		{
+			results.m_playerBWins++;
+		}
+		else if( isGameOver == TIE )
+		{
+			results.m_numberOfTies++;
+		}
+		else
+		{
+			ERROR_AND_DIE( "Invalid result" );
+		}
+	}
+
+	if( doesRunPlayersFlipped )
+	{
+		for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+		{
+			gamestate_t newGamestate = GetRandomInitialGameState();
+
+			int isGameOver = IsGameOverForGameState( newGamestate );
+			while( isGameOver == GAMENOTOVER  )
+			{
+				if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+				{
+					inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( player2Strategy, newGamestate );
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				}
+				else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+				{
+					inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( player1Strategy, newGamestate );
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				}
+				else
+				{
+					ERROR_AND_DIE( "Invalid player" );
+				}
+
+				isGameOver = IsGameOverForGameState( newGamestate );
+			}
+
+			results.m_gamesPlayed++;
+			if( isGameOver == PLAYER_1 )
+			{
+				results.m_playerBWins++;
+			}
+			else if( isGameOver == PLAYER_2 )
+			{
+				results.m_playerAWins++;
+			}
+			else if( isGameOver == TIE )
+			{
+				results.m_numberOfTies++;
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid result" );
+			}
+		}
+	}
+
+	return results;
+}
+
+TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts, int numberOfGames, bool doesRunPlayersFlipped )
+{
+	TestResults results;
+
+	for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+	{
+		gamestate_t newGamestate = GetRandomInitialGameState();
+		//mcts->WipeTree();
+		mcts->UpdateGame( inputMove_t(), newGamestate );
+
+		int isGameOver = IsGameOverForGameState( newGamestate );
+		while( isGameOver == GAMENOTOVER )
+		{
+			if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+			{
+				inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( playerAStrategy, newGamestate );
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				mcts->UpdateGame( playerMove, newGamestate );
+			}
+			else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+			{
+				inputMove_t playerMove = mcts->GetBestMove();
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				mcts->UpdateGame( playerMove, newGamestate );
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid player" );
+			}
+
+			isGameOver = IsGameOverForGameState( newGamestate );
+		}
+
+		results.m_gamesPlayed++;
+		if( isGameOver == PLAYER_1 )
+		{
+			results.m_playerAWins++;
+		}
+		else if( isGameOver == PLAYER_2 )
+		{
+			results.m_playerBWins++;
+		}
+		else if( isGameOver == TIE )
+		{
+			results.m_numberOfTies++;
+		}
+		else
+		{
+			ERROR_AND_DIE( "Invalid result" );
+		}
+	}
+
+	if( doesRunPlayersFlipped )
+	{
+		for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+		{
+			gamestate_t newGamestate = GetRandomInitialGameState();
+			//mcts->WipeTree();
+			mcts->UpdateGame( inputMove_t(), newGamestate );
+
+			int isGameOver = IsGameOverForGameState( newGamestate );
+			while( isGameOver == GAMENOTOVER )
+			{
+				if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+				{
+					inputMove_t playerMove = mcts->GetBestMove();
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+					mcts->UpdateGame( playerMove, newGamestate );
+				}
+				else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+				{
+					inputMove_t playerMove = GetBestMoveUsingAIStrategyForGamestate( playerAStrategy, newGamestate );
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+					mcts->UpdateGame( playerMove, newGamestate );
+				}
+				else
+				{
+					ERROR_AND_DIE( "Invalid player" );
+				}
+
+				isGameOver = IsGameOverForGameState( newGamestate );
+			}
+
+			results.m_gamesPlayed++;
+			if( isGameOver == PLAYER_1 )
+			{
+				results.m_playerBWins++;
+			}
+			else if( isGameOver == PLAYER_2 )
+			{
+				results.m_playerAWins++;
+			}
+			else if( isGameOver == TIE )
+			{
+				results.m_numberOfTies++;
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid result" );
+			}
+		}
+	}
+
+	return results;
 }
 
 void Game::InitializeGameState()
@@ -3012,7 +3249,7 @@ gamestate_t Game::GetGameStateAfterMove( gamestate_t const& currentGameState, in
 	return newGameState;
 }
 
-inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy )
+inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy, MonteCarlo* mcts )
 {
 	switch( aiStrategy )
 	{
@@ -3026,7 +3263,26 @@ inputMove_t Game::GetBestMoveUsingAIStrategy( AIStrategy aiStrategy )
 		break;
 	case AIStrategy::SARASUA1: return GetMoveUsingSarasua1( *m_currentGameState );
 		break;
-	case AIStrategy::MCTS: return m_player1MCTS->GetBestMove();
+	case AIStrategy::MCTS: return mcts->GetBestMove();
+		break;
+	default: return inputMove_t();
+		break;
+	}
+}
+
+inputMove_t Game::GetBestMoveUsingAIStrategyForGamestate( AIStrategy aiStrategy, gamestate_t const& gameState )
+{
+	switch( aiStrategy )
+	{
+	case AIStrategy::RANDOM: return GetRandomMoveAtGameState( gameState );
+		break;
+	case AIStrategy::BIGMONEY: return GetMoveUsingBigMoney( gameState );
+		break;
+	case AIStrategy::SINGLEWITCH: return GetMoveUsingSingleWitch( gameState );
+		break;
+	case AIStrategy::DOUBLEWITCH: return GetMoveUsingDoubleWitch( gameState );
+		break;
+	case AIStrategy::SARASUA1: return GetMoveUsingSarasua1( gameState );
 		break;
 	default: return inputMove_t();
 		break;
