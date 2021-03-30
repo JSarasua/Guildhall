@@ -119,7 +119,7 @@ Mat44 Widget::GetParentRelativeModelMatrixNoScale() const
 	{
 		parentMatrix = m_parentWidget->GetParentRelativeModelMatrixNoScale();
 	}
-	//Pushing on local matrix to the end of maxtrix chain
+	//Pushing on local matrix to the end of matrix chain
 	parentMatrix.TransformBy( myLocalMatrix );
 
 	return parentMatrix;
@@ -195,7 +195,7 @@ void Widget::Render()
 		RenderContext* context = m_mesh->m_renderContext;
 		if( nullptr != context )
 		{
-			//Mat44 modelMatrix = GetRelativeModelMatrix();
+			//Ignore parent's scale, so we can think about the scale as the actual dimensions
 			Mat44 modelMatrix = GetRelativeModelMatrixScaleOnlySelf();
 
 			context->SetModelMatrix( modelMatrix );
@@ -221,7 +221,6 @@ void Widget::Render()
 			{
 				Mat44 textModelMatrix = GetRelativeModelMatrixNoScale();
 				context->SetModelMatrix( textModelMatrix );
-				//AABB2 textBox = AABB2( -0.5f, -0.5f, 0.5f, 0.5f );
 				AABB2 textBox = GetLocalAABB2();
 				context->DrawAlignedTextAtPosition( m_text.c_str(), textBox, m_textSize, m_textAlignent );
 
@@ -229,7 +228,7 @@ void Widget::Render()
 		}
 	}
 
-	//Render Children
+	//Render Children on top of self
 	for( Widget* childWidget : m_childWidgets )
 	{
 		if( nullptr != childWidget )
