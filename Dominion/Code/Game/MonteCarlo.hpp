@@ -82,7 +82,13 @@ public:
 	void StartThreads();
 	void SaveTree();
 	void LoadTree();
+	void ResetTree();
 
+	bool IsMoveReady() const { return m_isMoveReady; }
+	void SetIterationCountPerMove( int moveCount );
+	void IncrementIterationsForCurrentMovePostBackPropagation();
+	void DecrementationIterationsToRunPreSimulation();
+	void RunMCTSForCurrentMoveIterationCount();
 
 protected:
 	//Thread
@@ -120,6 +126,8 @@ protected:
 	bool CanExpandUsingHeuristic( TreeMapNode const* node );
 
 	TreeMapNode const* GetCurrentHeadNode();
+
+
 
 
 
@@ -170,6 +178,11 @@ public:
 	std::atomic<int> m_totalNumberOfSimulationsRun = 0;
 	std::atomic<int> m_numberOfSimulationsToRun = 0;
 	std::atomic<int> m_numberOfVisitsAtCurrentNode = 0;
+	std::atomic<int> m_iterationsPerMove = -1;
+	std::atomic<bool> m_isMoveReady = false;
+	std::atomic<int> m_numberOfIterationsForCurrentMove = 0;
+
+	std::mutex m_iterationLock;
 };
 
 

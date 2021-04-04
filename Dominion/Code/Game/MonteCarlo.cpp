@@ -40,6 +40,11 @@ void SimulationJob::CallBackFunction()
 {
 	m_mctsToUse->BackPropagateResult( m_whoWonSim, nodeToSimulate );
 	m_mctsToUse->m_totalNumberOfSimulationsRun++;
+
+	if( m_mctsToUse->m_iterationsPerMove > 0 )
+	{
+		m_mctsToUse->IncrementIterationsForCurrentMovePostBackPropagation();
+	}
 }
 
 
@@ -171,6 +176,12 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			//m_mcJobSystem->ClaimAndDeleteCompletedJobs();
 			BackPropagateResult( whoWon, expandedNode );
 			m_totalNumberOfSimulationsRun++;
+
+			if( m_iterationsPerMove > 0 )
+			{
+				IncrementIterationsForCurrentMovePostBackPropagation();
+			}
+
 			double endBackPropTime = GetCurrentTimeSeconds();
 			m_backpropagationTime += (endBackPropTime - startBackPropTime);
 			m_totalTime += (endBackPropTime - startBackPropTime);
@@ -660,6 +671,22 @@ void MonteCarlo::LoadTree()
 	m_currentHeadNode = m_headNode;
 }
 
+void MonteCarlo::ResetTree()
+{
+	StopThreads();
+
+	if( m_headNode )
+	{
+		delete m_headNode;
+	}
+
+	m_headNode = new TreeMapNode();
+	m_headNode->m_data.m_currentGamestate.m_isFirstMove = true;
+	m_currentHeadNode = m_headNode;
+
+	StartThreads();
+}
+
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
 {
 	float totalSimulations = 0.f;
@@ -702,7 +729,8 @@ void MonteCarlo::WorkerMain()
 		{
 			RunSimulations( 1 );
 			UpdateBestMove();
-			m_numberOfSimulationsToRun--;
+			DecrementationIterationsToRunPreSimulation();
+			//m_numberOfSimulationsToRun--;
 		}
 		else
 		{
@@ -1366,85 +1394,22 @@ bool MonteCarlo::CanExpandUsingHeuristic( TreeMapNode const* node )
 
 inputMove_t MonteCarlo::GetBestMove()
 {
-	//UpdateBestMove();
+	if( m_isMoveReady || m_iterationsPerMove < 0 )
+	{
+		m_isMoveReady = false;
 
-	inputMove_t bestMove;
-	m_bestMoveLock.lock();
-	bestMove = m_bestMove;
-	m_bestMoveLock.unlock();
+		inputMove_t bestMove;
+		m_bestMoveLock.lock();
+		bestMove = m_bestMove;
+		m_bestMoveLock.unlock();
 
-	return bestMove;
-
-// 	float bestWinRate = -10000.f;
-// 	float lowestOpponentWinRate = 10000.f;
-// 	inputMove_t bestMove;
-// 	bestNode_t worstOpponentNode;
-// 	worstOpponentNode.nodeWinRate = lowestOpponentWinRate;
-// 
-// 	if( m_currentHeadNode->m_data->m_currentGamestate->m_isFirstMove )
-// 	{
-// 		UpdateGame( inputMove_t(), *g_theGame->m_currentGameState );
-// 	}
-// 	for( auto validMoveIter : m_currentHeadNode->m_possibleOutcomes )
-// 	{
-// 		std::vector<TreeMapNode*> const& outcomesFromMove = validMoveIter.second;
-// 
-// 		float sumOfWins = 0;
-// 		float sumOfSims = 0;
-// 
-// 		for( size_t outcomeIndex = 0; outcomeIndex < outcomesFromMove.size(); outcomeIndex++ )
-// 		{
-// 			metaData_t const& metaData = outcomesFromMove[outcomeIndex]->m_data->m_metaData;
-// 			float wins = (float)metaData.m_numberOfWins;
-// 			float sims = (float)metaData.m_numberOfSimulations;
-// 
-// 			sumOfWins += wins;
-// 			sumOfSims += sims;
-// 		}
-// 
-// 		float childWinRate = sumOfWins/sumOfSims;
-// 		if( childWinRate > 0.999f ) //A winnning move
-// 		{
-// 			bestWinRate = childWinRate;
-// 			bestMove = validMoveIter.first;
-// 			return bestMove;
-// 		}
-// 		else if( bestWinRate < childWinRate )
-// 		{
-// 			bestWinRate = childWinRate;
-// 			bestMove = validMoveIter.first;
-// 		}
-// 	}
-// 
-// 	//Think about getting worst opponentNode
-// 	return bestMove;
+		return bestMove;
+	}
+	else
+	{
+		return inputMove_t();
+	}
 }
-
-// bestNode_t MonteCarlo::GetHighestWinRateChildNode( TreeMapNode const* node )
-// {
-// 	bestNode_t bestNode;
-// 	bestNode.nodeWinRate = -10000.f;
-// 	//Rethink this with regards to average outcome
-// 
-// 
-// // 	std::vector<TreeMapNode*> const& childNodes = node->m_childNodes;
-// // 
-// // 	for( size_t childIndex = 0; childIndex < childNodes.size(); childIndex++ )
-// // 	{
-// // 		metaData_t const& metaData = childNodes[childIndex]->m_data->m_metaData;
-// // 		float wins = (float)metaData.m_numberOfWins;
-// // 		float sims = (float)metaData.m_numberOfSimulations;
-// // 
-// // 		float childWinRate = wins/sims;
-// // 		if( childWinRate > bestNode.nodeWinRate )
-// // 		{
-// // 			bestNode.nodeWinRate = childWinRate;
-// // 			bestNode.node = childNodes[childIndex];
-// // 		}
-// // 	}
-// 
-// 	return bestNode;
-// }
 
 void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& newGameState )
 {
@@ -1463,5 +1428,47 @@ void MonteCarlo::AddSimulations( int simulationsToAdd )
 TreeMapNode const* MonteCarlo::GetCurrentHeadNode()
 {
 	return m_currentHeadNode;
+}
+
+void MonteCarlo::SetIterationCountPerMove( int moveCount )
+{
+	m_iterationsPerMove = moveCount;
+}
+
+void MonteCarlo::IncrementIterationsForCurrentMovePostBackPropagation()
+{
+	m_iterationLock.lock();
+	m_numberOfIterationsForCurrentMove++;
+
+	if( m_numberOfIterationsForCurrentMove >= m_iterationsPerMove )
+	{
+		m_numberOfIterationsForCurrentMove = 0;
+
+		if( m_numberOfSimulationsToRun == 0 )
+		{
+			m_isMoveReady = true;
+		}
+		//GUARANTEE_OR_DIE( m_numberOfIterationsForCurrentMove == m_numberOfSimulationsToRun, "Iterations is off count")
+	}
+	m_iterationLock.unlock();
+}
+
+void MonteCarlo::DecrementationIterationsToRunPreSimulation()
+{
+	m_iterationLock.lock();
+	m_numberOfSimulationsToRun--;
+
+	if( m_numberOfSimulationsToRun == 0 && m_numberOfIterationsForCurrentMove == 0 )
+	{
+		m_isMoveReady = true;
+	}
+	m_iterationLock.unlock();
+}
+
+void MonteCarlo::RunMCTSForCurrentMoveIterationCount()
+{
+	m_iterationLock.lock();
+	m_numberOfSimulationsToRun += m_iterationsPerMove;
+	m_iterationLock.unlock();
 }
 

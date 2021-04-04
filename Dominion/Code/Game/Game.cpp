@@ -71,29 +71,27 @@ void Game::Startup()
 
 	//RunTestCases();
 
-	m_mc = new MonteCarloNoTree();
-	m_player1MCTS = new MonteCarlo();
-	m_player2MCTS = new MonteCarlo();
+// 	m_mc = new MonteCarloNoTree();
+// 	m_player1MCTS = new MonteCarlo();
+// 	m_player2MCTS = new MonteCarlo();
 
-	//if reload
-	//m_mcts->RestoreFromData();
 
-	m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
-	m_player1MCTS->SetExplorationParameter( m_player1MCTSExplorationParameter );
-	m_player1MCTS->SetEpsilonValueZeroToOne( m_player1MCTSChaosChance );
-	m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
-	m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
-
-	m_player2MCTS->SetSimMethod( m_player2MCTSSimMethod );
-	m_player2MCTS->SetExplorationParameter( m_player2MCTSExplorationParameter );
-	m_player2MCTS->SetEpsilonValueZeroToOne( m_player2MCTSChaosChance );
-	m_player2MCTS->SetExpansionStrategy( m_player2ExpansionStrategy );
-	m_player2MCTS->SetRolloutMethod( m_player2MCTSRolloutMethod );
+// 	m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
+// 	m_player1MCTS->SetExplorationParameter( m_player1MCTSExplorationParameter );
+// 	m_player1MCTS->SetEpsilonValueZeroToOne( m_player1MCTSChaosChance );
+// 	m_player1MCTS->SetExpansionStrategy( m_player1ExpansionStrategy );
+// 	m_player1MCTS->SetRolloutMethod( m_player1MCTSRolloutMethod );
+// 
+// 	m_player2MCTS->SetSimMethod( m_player2MCTSSimMethod );
+// 	m_player2MCTS->SetExplorationParameter( m_player2MCTSExplorationParameter );
+// 	m_player2MCTS->SetEpsilonValueZeroToOne( m_player2MCTSChaosChance );
+// 	m_player2MCTS->SetExpansionStrategy( m_player2ExpansionStrategy );
+// 	m_player2MCTS->SetRolloutMethod( m_player2MCTSRolloutMethod );
 
 	CardDefinition::InitializeCards();
 	InitializeGameState();
 
-	StartupUI();
+	//StartupUI();
 
 	m_timer.SetSeconds( 2 );
 }
@@ -1005,6 +1003,23 @@ void Game::RunTestCases()
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Single Witch Wins: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	MonteCarlo* mcts = new MonteCarlo();
+	mcts->Startup();
+	
+
+	mcts->SetSimMethod( SIMMETHOD::BIGMONEY );
+	mcts->SetExplorationParameter( 1.f );
+	mcts->SetEpsilonValueZeroToOne( 0.f );
+	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mcts->SetIterationCountPerMove( 10 );
+	results = RunAIVsMCTSTest( AIStrategy::RANDOM, mcts, 10, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Random vs MCTS Random rollout", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Random: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 }
 
 TestResults Game::RunAIVsAITest( AIStrategy player1Strategy, AIStrategy player2Strategy, int numberOfGames, bool doesRunPlayersFlipped )
@@ -1112,8 +1127,8 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 	for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
 	{
 		gamestate_t newGamestate = GetRandomInitialGameState();
-		//mcts->WipeTree();
-		mcts->UpdateGame( inputMove_t(), newGamestate );
+		mcts->ResetTree();
+		mcts->SetInitialGameState( newGamestate );
 
 		int isGameOver = IsGameOverForGameState( newGamestate );
 		while( isGameOver == GAMENOTOVER )
@@ -1126,6 +1141,11 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 			}
 			else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
 			{
+				mcts->RunMCTSForCurrentMoveIterationCount();
+				while( !mcts->IsMoveReady() )
+				{
+					std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+				}
 				inputMove_t playerMove = mcts->GetBestMove();
 				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
 				mcts->UpdateGame( playerMove, newGamestate );
@@ -1134,6 +1154,8 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 			{
 				ERROR_AND_DIE( "Invalid player" );
 			}
+
+			results.m_moveCount++;
 
 			isGameOver = IsGameOverForGameState( newGamestate );
 		}
@@ -1162,14 +1184,19 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 		for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
 		{
 			gamestate_t newGamestate = GetRandomInitialGameState();
-			//mcts->WipeTree();
-			mcts->UpdateGame( inputMove_t(), newGamestate );
+			mcts->ResetTree();
+			mcts->SetInitialGameState( newGamestate );
 
 			int isGameOver = IsGameOverForGameState( newGamestate );
 			while( isGameOver == GAMENOTOVER )
 			{
 				if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
 				{
+					mcts->RunMCTSForCurrentMoveIterationCount();
+					while( !mcts->IsMoveReady() )
+					{
+						std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+					}
 					inputMove_t playerMove = mcts->GetBestMove();
 					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
 					mcts->UpdateGame( playerMove, newGamestate );
@@ -1208,6 +1235,8 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 		}
 	}
 
+
+	results.m_moveCount/= results.m_gamesPlayed;
 	return results;
 }
 
@@ -1223,13 +1252,13 @@ void Game::InitializeGameState()
 	m_currentGameState = new gamestate_t( GetRandomInitialGameState() );
 
 
- 	m_player1MCTS->Shutdown();
- 	m_player1MCTS->Startup();
-	m_player1MCTS->SetInitialGameState( *m_currentGameState );
-
-	m_player2MCTS->Shutdown();
-	m_player2MCTS->Startup();
-	m_player2MCTS->SetInitialGameState( *m_currentGameState );
+//  	m_player1MCTS->Shutdown();
+//  	m_player1MCTS->Startup();
+// 	m_player1MCTS->SetInitialGameState( *m_currentGameState );
+// 
+// 	m_player2MCTS->Shutdown();
+// 	m_player2MCTS->Startup();
+// 	m_player2MCTS->SetInitialGameState( *m_currentGameState );
 }
 
 void Game::AddCountToCardWidget( Widget* cardWidget, int cardCount )

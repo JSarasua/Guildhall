@@ -520,11 +520,12 @@ struct TestResults
 {
 public:
 	TestResults() = default;
-	TestResults( int gamesPlayed, int playerAWins, int playerBWins, int numberOfTies ):
+	TestResults( int gamesPlayed, int playerAWins, int playerBWins, int numberOfTies, int moveCount ):
 		m_gamesPlayed( gamesPlayed ),
 		m_playerAWins( playerAWins ),
 		m_playerBWins( playerBWins ),
-		m_numberOfTies( numberOfTies )
+		m_numberOfTies( numberOfTies ),
+		m_moveCount( moveCount )
 	{}
 
 public:
@@ -532,6 +533,7 @@ public:
 	int m_playerAWins = 0;
 	int m_playerBWins = 0;
 	int m_numberOfTies = 0;
+	int m_moveCount = 0; //Number of total moves taken
 };
 
 class Game
