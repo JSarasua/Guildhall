@@ -3,9 +3,6 @@
 #include <atomic>
 JobSystem* g_theJobSystem = nullptr;
 
-
-std::atomic<bool> g_isQuitting = false;
-
 JobSystem::JobSystem()
 {
 
@@ -18,7 +15,7 @@ JobSystem::~JobSystem()
 
 void JobSystem::Shutdown()
 {
-	g_isQuitting = true;
+	m_isQuitting = true;
 
 	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
 	{
@@ -35,7 +32,7 @@ void JobSystem::Shutdown()
 
 void JobSystem::StopWorkerThreads()
 {
-	g_isQuitting = true;
+	m_isQuitting = true;
 
 	for( size_t workerIndex = 0; workerIndex < m_workerThreads.size(); workerIndex++ )
 	{
@@ -52,7 +49,7 @@ void JobSystem::StopWorkerThreads()
 
 void JobSystem::StartWorkerThreads()
 {
-	g_isQuitting = false;
+	m_isQuitting = false;
 }
 
 void JobSystem::AddWorkerThread()
@@ -145,7 +142,7 @@ WorkerThread::~WorkerThread()
 
 void WorkerThread::WorkerMain()
 {
-	while( !g_isQuitting )
+	while( !m_owningJobSystem->m_isQuitting )
 	{
 		m_owningJobSystem->m_priorityJobsQueuedLock.lock();
 		if( !m_owningJobSystem->m_priorityJobsQueued.empty() )

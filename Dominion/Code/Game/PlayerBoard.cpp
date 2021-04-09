@@ -264,6 +264,8 @@ void PlayerBoard::PlayCard( inputMove_t const& inputMove, gamestate_t* gameState
 
 bool PlayerBoard::CanPlayCard( inputMove_t const& inputMove, gamestate_t const* gameState ) const
 {
+	UNUSED( gameState );
+
 	if( m_numberOfActionsAvailable > 0 )
 	{
 		int handIndex = inputMove.m_cardIndex;
@@ -272,36 +274,7 @@ bool PlayerBoard::CanPlayCard( inputMove_t const& inputMove, gamestate_t const* 
 			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)handIndex );
 			if( card && card->GetCardType() == ACTION_TYPE )
 			{
-				if( handIndex == eCards::Remodel )
-				{
-					int handIndexToTrash = inputMove.m_parameterCardIndex1;
-					int pileIndexToAcquire =  inputMove.m_parameterCardIndex2;
-
-					CardDefinition const* cardToTrash = CardDefinition::GetCardDefinitionByType( (eCards)handIndexToTrash );
-					CardDefinition const* cardToAcquire = CardDefinition::GetCardDefinitionByType( (eCards)pileIndexToAcquire );
-
-					//Must be able to trash the specified card
-					if( m_hand.CountOfCard( handIndexToTrash ) > 0 )
-					{
-						//Must be able to acquire the specified card
-						if( gameState->m_cardPiles[pileIndexToAcquire].m_pileSize > 0 )
-						{
-							int costOfTrashCard = cardToTrash->m_cost;
-							int costOfAcquireCard = cardToAcquire->m_cost;
-							//Can only acquire cards of value up to 2 more than what you are trashing
-							if( costOfTrashCard + 2 >= costOfAcquireCard )
-							{
-								return true;
-							}
-						}
-					}
-
-					return false;
-				}
-				else
-				{
-					return true;
-				}
+				return true;
 			}
 		}
 	}

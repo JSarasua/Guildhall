@@ -25,7 +25,7 @@ public:
 	void AddCard( int cardIndex, int count = 1 );
 	void RemoveCard( int cardIndex, int count = 1);
 	void Clear();
-	int GetNumberOfUniqueSimpleActions() const; //Does not include Remodel
+	int GetNumberOfUniqueSimpleActions() const;
 	int GetCardIndexFromCountIndex( int countIndex ); //The count index is if you had a hand of cards, what is the third card
 
 	std::vector<eCards> ToVector() const;

@@ -520,12 +520,13 @@ struct TestResults
 {
 public:
 	TestResults() = default;
-	TestResults( int gamesPlayed, int playerAWins, int playerBWins, int numberOfTies, int moveCount ):
+	TestResults( int gamesPlayed, int playerAWins, int playerBWins, int numberOfTies, int moveCount, double timeToRun ):
 		m_gamesPlayed( gamesPlayed ),
 		m_playerAWins( playerAWins ),
 		m_playerBWins( playerBWins ),
 		m_numberOfTies( numberOfTies ),
-		m_moveCount( moveCount )
+		m_moveCount( moveCount ),
+		m_timeToRun( timeToRun )
 	{}
 
 public:
@@ -534,6 +535,7 @@ public:
 	int m_playerBWins = 0;
 	int m_numberOfTies = 0;
 	int m_moveCount = 0; //Number of total moves taken
+	double m_timeToRun = 0.;
 };
 
 class Game
@@ -585,7 +587,6 @@ public:
 	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua2( gamestate_t const& currentGameState );
-	bool TryGetBestRemodelMove( std::vector<inputMove_t> const& validMoves, inputMove_t& inputMoveToUpdate );
 	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );

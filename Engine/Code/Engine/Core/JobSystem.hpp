@@ -64,6 +64,8 @@ protected:
 	std::mutex m_jobsCompletedLock;
 
 	std::vector<WorkerThread*> m_workerThreads;
+
+	std::atomic<bool> m_isQuitting = false;
 };
 
 

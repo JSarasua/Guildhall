@@ -50,8 +50,6 @@ void CardDefinition::InitializeCards()
 	Texture const* laboratoryTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Laboratory.jpg" );
 	Texture const* marketTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Market.jpg" );
 	Texture const* witchTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Witch.jpg" );
-	Texture const* remodelTexture = g_theRenderer->CreateOrGetTextureFromFile( "Data/Images/Remodel.jpg" );
-
 																																		//Cost		Coins		VP		Actions	Draw	Buy
 	CardDefinition* copperCard		= new CardDefinition( eCards::COPPER,	eCardType::TREASURE_TYPE,	"Copper",		copperTexture,		0,			1,		 0,		 0,		0,		0 );
 	CardDefinition* silverCard		= new CardDefinition( eCards::SILVER,	eCardType::TREASURE_TYPE,	"Silver",		silverTexture,		3,			2,		 0,		 0,		0,		0 );
@@ -68,12 +66,9 @@ void CardDefinition::InitializeCards()
 	CardDefinition* laboraryCard	= new CardDefinition( eCards::Laboratory,	eCardType::ACTION_TYPE, "Laboratory",	laboratoryTexture,	5,			0,		 0,		 1,		 2,		0 );
 	CardDefinition* marketCard		= new CardDefinition( eCards::Market,		eCardType::ACTION_TYPE, "Market",		marketTexture,		5,			1,		 0,		 1,		 1,		1 );
 	CardDefinition* witchCard		= new CardDefinition( eCards::Witch,		eCardType::ACTION_TYPE, "Witch",		witchTexture,		5,			0,		 0,		 0,		 2,		0 );
-	CardDefinition* remodelCard		= new CardDefinition( eCards::Remodel,		eCardType::ACTION_TYPE, "Remodel",		remodelTexture,		4,			0,		 0,		 0,		 0,		0 );
-
 
 	councilRoomCard->m_OpponentsDrawCard = true;
 	witchCard->m_OpponentsGetCurse = true;
-	remodelCard->m_trashCardFromHandToGainCardOfValue2Higher = true;
 
 	s_definitions.resize( eCards::NUM_CARDS );
 	s_definitions[eCards::COPPER]		= copperCard;
@@ -90,7 +85,6 @@ void CardDefinition::InitializeCards()
 	s_definitions[eCards::Market]		= marketCard;
 	s_definitions[eCards::CouncilRoom]	= councilRoomCard;
 	s_definitions[eCards::Witch]		= witchCard;
-	s_definitions[eCards::Remodel]		= remodelCard;
 }
 
 //STATIC

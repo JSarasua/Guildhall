@@ -39,7 +39,6 @@ enum eCards
 	Laboratory,
 	Market,
 	Witch,
-	Remodel,
 
 	NUM_CARDS
 };

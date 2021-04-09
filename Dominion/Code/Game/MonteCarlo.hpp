@@ -183,6 +183,8 @@ public:
 	std::atomic<int> m_numberOfIterationsForCurrentMove = 0;
 
 	std::mutex m_iterationLock;
+
+	bool m_useSimThreads = false;
 };
 
 

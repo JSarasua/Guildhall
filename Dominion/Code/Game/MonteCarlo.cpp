@@ -41,10 +41,8 @@ void SimulationJob::CallBackFunction()
 	m_mctsToUse->BackPropagateResult( m_whoWonSim, nodeToSimulate );
 	m_mctsToUse->m_totalNumberOfSimulationsRun++;
 
-	if( m_mctsToUse->m_iterationsPerMove > 0 )
-	{
-		m_mctsToUse->IncrementIterationsForCurrentMovePostBackPropagation();
-	}
+	m_mctsToUse->IncrementIterationsForCurrentMovePostBackPropagation();
+
 }
 
 
@@ -155,7 +153,7 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			break;
 		}
 
-		if( m_headNode->m_data.m_metaData.m_numberOfSimulations > 100 )
+		if( m_headNode->m_data.m_metaData.m_numberOfSimulations > 100 && m_useSimThreads )
 		{
 			SimulationJob* simJob = new SimulationJob( this, expandedNode );
 			m_mcJobSystem->PostJob( simJob );
@@ -674,6 +672,7 @@ void MonteCarlo::LoadTree()
 void MonteCarlo::ResetTree()
 {
 	StopThreads();
+	FlushJobSystemQueues();
 
 	if( m_headNode )
 	{
@@ -1439,7 +1438,7 @@ void MonteCarlo::IncrementIterationsForCurrentMovePostBackPropagation()
 {
 	m_iterationLock.lock();
 	m_numberOfIterationsForCurrentMove++;
-
+	DebuggerPrintf( "Move %i\n", (int)m_numberOfIterationsForCurrentMove );
 	if( m_numberOfIterationsForCurrentMove >= m_iterationsPerMove )
 	{
 		m_numberOfIterationsForCurrentMove = 0;
@@ -1457,7 +1456,7 @@ void MonteCarlo::DecrementationIterationsToRunPreSimulation()
 {
 	m_iterationLock.lock();
 	m_numberOfSimulationsToRun--;
-
+	DebuggerPrintf( "Sim %i\n", (int)m_numberOfSimulationsToRun );
 	if( m_numberOfSimulationsToRun == 0 && m_numberOfIterationsForCurrentMove == 0 )
 	{
 		m_isMoveReady = true;
