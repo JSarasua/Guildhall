@@ -979,7 +979,7 @@ void Game::RunTestCases()
 	TestResults results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::RANDOM, 100, true );
 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Random", results.m_gamesPlayed) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.d", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Random Wins: %i", results.m_playerBWins) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
@@ -987,7 +987,7 @@ void Game::RunTestCases()
 	results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::SINGLEWITCH, 100, true );
 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Single Witch", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.d", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Single Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
@@ -995,7 +995,7 @@ void Game::RunTestCases()
 	results = RunAIVsAITest( AIStrategy::BIGMONEY, AIStrategy::DOUBLEWITCH, 100, true );
 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs Double Witch", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.d", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
@@ -1004,28 +1004,28 @@ void Game::RunTestCases()
 	results = RunAIVsAITest( AIStrategy::SINGLEWITCH, AIStrategy::DOUBLEWITCH, 100, true );
 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Single Witch vs Double Witch", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.d", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Single Witch Wins: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	MonteCarlo* mcts = new MonteCarlo();
-	mcts->Startup();
+// 	MonteCarlo* mcts = new MonteCarlo();
+// 	mcts->Startup();
 	
 
-	mcts->SetSimMethod( SIMMETHOD::BIGMONEY );
-	mcts->SetExplorationParameter( 1.f );
-	mcts->SetEpsilonValueZeroToOne( 0.f );
-	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
-	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
-	mcts->SetIterationCountPerMove( 10000 );
-	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 100, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS Big Money rollout", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+// 	mcts->SetSimMethod( SIMMETHOD::RANDOM );
+// 	mcts->SetExplorationParameter( 1.f );
+// 	mcts->SetEpsilonValueZeroToOne( 0.f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mcts->SetIterationCountPerMove( 100000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 10, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS Random 100k rollout", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 // 	mcts->SetSimMethod( SIMMETHOD::RANDOM );
 // 	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 100, true );
@@ -1036,11 +1036,44 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
+// 	mcts->Shutdown();
+// 	delete mcts;
 
 
-	mcts->Shutdown();
-	delete mcts;
+	MonteCarlo* mctsA = new MonteCarlo();
+	mctsA->Startup();
 
+	MonteCarlo* mctsB = new MonteCarlo();
+	mctsB->Startup();
+
+	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
+	mctsA->SetExplorationParameter( SquareRootFloat(2.f) );
+	mctsA->SetEpsilonValueZeroToOne( 0.f );
+	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mctsA->SetIterationCountPerMove( 10000 );
+
+	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
+	mctsB->SetExplorationParameter( 0.5f );
+	mctsB->SetEpsilonValueZeroToOne( 0.f );
+	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+	mctsB->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mctsB->SetIterationCountPerMove( 10000 );
+
+	results = RunMCTSVsMCTSTest( mctsA, mctsB, 10, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS UCT SQRT2 vs MCTS UCT 0.5", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 1K: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	mctsA->Shutdown();
+	delete mctsA;
+
+
+	mctsB->Shutdown();
+	delete mctsB;
 }
 
 TestResults Game::RunAIVsAITest( AIStrategy player1Strategy, AIStrategy player2Strategy, int numberOfGames, bool doesRunPlayersFlipped )
@@ -1264,6 +1297,146 @@ TestResults Game::RunAIVsMCTSTest( AIStrategy playerAStrategy, MonteCarlo* mcts,
 	double AIVsMCTSEndTime = GetCurrentTimeSeconds();
 
 	results.m_timeToRun = AIVsMCTSEndTime - AIVsMCTSStartTime;
+
+	results.m_moveCount/= results.m_gamesPlayed;
+	return results;
+}
+
+TestResults Game::RunMCTSVsMCTSTest( MonteCarlo* mctsA, MonteCarlo* mctsB, int numberOfGames, bool doesRunPlayersFlipped )
+{
+	TestResults results;
+	double MCTSVsMCTSStartTime = GetCurrentTimeSeconds();
+	for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+	{
+		gamestate_t newGamestate = GetRandomInitialGameState();
+		mctsA->ResetTree();
+		mctsA->SetInitialGameState( newGamestate );
+		mctsB->ResetTree();
+		mctsB->SetInitialGameState( newGamestate );
+
+		int isGameOver = IsGameOverForGameState( newGamestate );
+		while( isGameOver == GAMENOTOVER )
+		{
+			if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+			{
+				mctsA->RunMCTSForCurrentMoveIterationCount();
+				while( !mctsA->IsMoveReady() )
+				{
+					std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+				}
+				inputMove_t playerMove = mctsA->GetBestMove();
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				mctsA->UpdateGame( playerMove, newGamestate );
+				mctsB->UpdateGame( playerMove, newGamestate );
+			}
+			else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+			{
+				mctsB->RunMCTSForCurrentMoveIterationCount();
+				while( !mctsB->IsMoveReady() )
+				{
+					std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+				}
+				inputMove_t playerMove = mctsB->GetBestMove();
+				newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+				mctsA->UpdateGame( playerMove, newGamestate );
+				mctsB->UpdateGame( playerMove, newGamestate );
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid player" );
+			}
+
+			results.m_moveCount++;
+
+			isGameOver = IsGameOverForGameState( newGamestate );
+		}
+
+		results.m_gamesPlayed++;
+		if( isGameOver == PLAYER_1 )
+		{
+			results.m_playerAWins++;
+		}
+		else if( isGameOver == PLAYER_2 )
+		{
+			results.m_playerBWins++;
+		}
+		else if( isGameOver == TIE )
+		{
+			results.m_numberOfTies++;
+		}
+		else
+		{
+			ERROR_AND_DIE( "Invalid result" );
+		}
+	}
+
+	if( doesRunPlayersFlipped )
+	{
+		for( int gameIndex = 0; gameIndex < numberOfGames; gameIndex++ )
+		{
+			gamestate_t newGamestate = GetRandomInitialGameState();
+			mctsA->ResetTree();
+			mctsB->ResetTree();
+			mctsA->SetInitialGameState( newGamestate );
+			mctsB->SetInitialGameState( newGamestate );
+
+			int isGameOver = IsGameOverForGameState( newGamestate );
+			while( isGameOver == GAMENOTOVER )
+			{
+				if( newGamestate.m_whoseMoveIsIt == PLAYER_1 )
+				{
+					mctsB->RunMCTSForCurrentMoveIterationCount();
+					while( !mctsB->IsMoveReady() )
+					{
+						std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+					}
+					inputMove_t playerMove = mctsB->GetBestMove();
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+					mctsB->UpdateGame( playerMove, newGamestate );
+				}
+				else if( newGamestate.m_whoseMoveIsIt == PLAYER_2 )
+				{
+					mctsA->RunMCTSForCurrentMoveIterationCount();
+					while( !mctsA->IsMoveReady() )
+					{
+						std::this_thread::sleep_for( std::chrono::microseconds( 10 ) );
+					}
+					inputMove_t playerMove = mctsA->GetBestMove();
+					newGamestate = GetGameStateAfterMove( newGamestate, playerMove );
+					mctsA->UpdateGame( playerMove, newGamestate );
+					mctsB->UpdateGame( playerMove, newGamestate );
+				}
+				else
+				{
+					ERROR_AND_DIE( "Invalid player" );
+				}
+
+				isGameOver = IsGameOverForGameState( newGamestate );
+			}
+
+			results.m_gamesPlayed++;
+			if( isGameOver == PLAYER_1 )
+			{
+				results.m_playerBWins++;
+			}
+			else if( isGameOver == PLAYER_2 )
+			{
+				results.m_playerAWins++;
+			}
+			else if( isGameOver == TIE )
+			{
+				results.m_numberOfTies++;
+			}
+			else
+			{
+				ERROR_AND_DIE( "Invalid result" );
+			}
+		}
+	}
+
+	double MCTSVsMCTSEndTime = GetCurrentTimeSeconds();
+
+	results.m_timeToRun = MCTSVsMCTSEndTime - MCTSVsMCTSStartTime;
 
 	results.m_moveCount/= results.m_gamesPlayed;
 	return results;
