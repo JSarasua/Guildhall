@@ -481,6 +481,8 @@ inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameSta
 		break;
 	case SIMMETHOD::GREEDY: return inputMove_t(); //INVALID
 		break;
+	case SIMMETHOD::RANDOMPLUS: return g_theGame->GetMoveUsingRandomPlus( gameState );
+		break;
 	default: return inputMove_t(); //Invalid
 		break;
 	}

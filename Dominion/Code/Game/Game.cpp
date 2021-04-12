@@ -573,6 +573,7 @@ void Game::InitializeAILargePanelWidget()
 	rolloutIncrementers.push_back( "Double Witch" );
 	rolloutIncrementers.push_back( "Sarasua1" );
 	rolloutIncrementers.push_back( "Greedy" );
+	rolloutIncrementers.push_back( "RandomPLUS" );
 
 	std::vector<std::string> expansionIncrementers;
 	expansionIncrementers.push_back( "All Moves" );
@@ -1009,8 +1010,8 @@ void Game::RunTestCases()
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-// 	MonteCarlo* mcts = new MonteCarlo();
-// 	mcts->Startup();
+	MonteCarlo* mcts = new MonteCarlo();
+	mcts->Startup();
 	
 
 // 	mcts->SetSimMethod( SIMMETHOD::RANDOM );
@@ -1036,44 +1037,57 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-// 	mcts->Shutdown();
-// 	delete mcts;
-
-
-	MonteCarlo* mctsA = new MonteCarlo();
-	mctsA->Startup();
-
-	MonteCarlo* mctsB = new MonteCarlo();
-	mctsB->Startup();
-
-	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
-	mctsA->SetExplorationParameter( SquareRootFloat(2.f) );
-	mctsA->SetEpsilonValueZeroToOne( 0.f );
-	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
-	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
-	mctsA->SetIterationCountPerMove( 10000 );
-
-	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
-	mctsB->SetExplorationParameter( 0.5f );
-	mctsB->SetEpsilonValueZeroToOne( 0.f );
-	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
-	mctsB->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
-	mctsB->SetIterationCountPerMove( 10000 );
-
-	results = RunMCTSVsMCTSTest( mctsA, mctsB, 10, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS UCT SQRT2 vs MCTS UCT 0.5", results.m_gamesPlayed ) );
+	mcts->SetSimMethod( SIMMETHOD::RANDOMPLUS );
+	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+	mcts->SetEpsilonValueZeroToOne( 0.f );
+	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mcts->SetIterationCountPerMove( 20000 );
+	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 50, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS RandomPLUS 20k rollout", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 1K: %i", results.m_playerAWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	mctsA->Shutdown();
-	delete mctsA;
+	mcts->Shutdown();
+	delete mcts;
 
 
-	mctsB->Shutdown();
-	delete mctsB;
+// 	MonteCarlo* mctsA = new MonteCarlo();
+// 	mctsA->Startup();
+// 
+// 	MonteCarlo* mctsB = new MonteCarlo();
+// 	mctsB->Startup();
+// 
+// 	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
+// 	mctsA->SetExplorationParameter( SquareRootFloat(2.f) );
+// 	mctsA->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsA->SetIterationCountPerMove( 10000 );
+// 
+// 	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
+// 	mctsB->SetExplorationParameter( SquareRootFloat(2.f) );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.15f );
+// 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
+// 	mctsB->SetIterationCountPerMove( 10000 );
+// 
+// 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS Sarasua1 0 Chaos vs MCTS Sarasua1 .15 Chaos", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+// 
+// 	mctsA->Shutdown();
+// 	delete mctsA;
+// 
+// 	mctsB->Shutdown();
+// 	delete mctsB;
 }
 
 TestResults Game::RunAIVsAITest( AIStrategy player1Strategy, AIStrategy player2Strategy, int numberOfGames, bool doesRunPlayersFlipped )
@@ -2429,6 +2443,10 @@ bool Game::ChangePlayer1RolloutMethod( EventArgs const& args )
 	{
 		m_player1MCTSSimMethod = SIMMETHOD::GREEDY;
 	}
+	else if( rolloutMethod == "RandomPLUS" )
+	{
+		m_player1MCTSSimMethod = SIMMETHOD::RANDOMPLUS;
+	}
 	else
 	{
 		ERROR_AND_DIE( "Invalid rollout method" );
@@ -2464,6 +2482,10 @@ bool Game::ChangePlayer2RolloutMethod( EventArgs const& args )
 	else if( rolloutMethod == "Greedy" )
 	{
 		m_player2MCTSSimMethod = SIMMETHOD::GREEDY;
+	}
+	else if( rolloutMethod == "RandomPLUS" )
+	{
+		m_player2MCTSSimMethod = SIMMETHOD::RANDOMPLUS;
 	}
 	else
 	{
@@ -3414,6 +3436,93 @@ inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
 		}
 
 		return move;
+	}
+}
+
+inputMove_t Game::GetMoveUsingRandomPlus( gamestate_t const& currentGameState )
+{
+	inputMove_t newMove;
+	if( IsGameOverForGameState( currentGameState ) != GAMENOTOVER )
+	{
+		return newMove;
+	}
+	inputMove_t randomMove = GetRandomMoveAtGameState( currentGameState );
+
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	newMove.m_whoseMoveIsIt = whoseMove;
+
+	PlayerBoard const& playerBoard = currentGameState.m_playerBoards[whoseMove];
+
+
+	if( currentGameState.m_currentPhase == ACTION_PHASE )
+	{
+		if( playerBoard.m_numberOfActionsAvailable == 0 )
+		{
+			newMove.m_moveType = END_PHASE;
+		}
+		else
+		{
+			newMove.m_moveType = PLAY_CARD;
+			if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Village ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Village;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Festival ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Festival;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Laboratory ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Laboratory;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Market ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Market;
+			}
+			else if( playerBoard.CanPlayCard( inputMove_t( PLAY_CARD, whoseMove, Witch ), &currentGameState ) )
+			{
+				newMove.m_cardIndex = Witch;
+			}
+			else
+			{
+				std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+				if( validMoves.size() == 1 )
+				{
+					return validMoves[0];
+				}
+				else if( validMoves.size() > 1 )
+				{
+					for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+					{
+						if( validMoves[moveIndex].m_moveType != END_PHASE )
+						{
+							return validMoves[moveIndex];
+						}
+					}
+
+					newMove.m_moveType = END_PHASE;
+					return newMove;
+				}
+				else
+				{
+					return randomMove;
+				}
+			}
+		}
+
+	}
+	else
+	{
+		return randomMove;
+	}
+
+	if( IsMoveValidForGameState( newMove, currentGameState ) )
+	{
+		return newMove;
+	}
+	else
+	{
+		return randomMove;
 	}
 }
 

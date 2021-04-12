@@ -43,7 +43,8 @@ enum class SIMMETHOD
 	SINGLEWITCH,
 	SARASUA1,
 	GREEDY,
-	DOUBLEWITCH
+	DOUBLEWITCH,
+	RANDOMPLUS
 };
 
 enum class ROLLOUTMETHOD
@@ -588,6 +589,7 @@ public:
 	inputMove_t GetMoveUsingSarasua1( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSarasua2( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingRandomPlus( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );
 
