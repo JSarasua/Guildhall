@@ -1037,17 +1037,31 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	mcts->SetSimMethod( SIMMETHOD::RANDOMPLUS );
+// 	mcts->SetSimMethod( SIMMETHOD::RANDOMPLUS );
+// 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mcts->SetEpsilonValueZeroToOne( 0.f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mcts->SetIterationCountPerMove( 20000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 50, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS RandomPLUS 20k rollout", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	mcts->SetSimMethod( SIMMETHOD::SARASUA1	 );
 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
-	mcts->SetEpsilonValueZeroToOne( 0.f );
-	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
-	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
-	mcts->SetIterationCountPerMove( 20000 );
-	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 50, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS RandomPLUS 20k rollout", results.m_gamesPlayed ) );
+	mcts->SetEpsilonValueZeroToOne( 0.15f );
+	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
+	mcts->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
+	mcts->SetIterationCountPerMove( 10000 );
+	results = RunAIVsMCTSTest( AIStrategy::DOUBLEWITCH, mcts, 50, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Double Witch vs MCTS Sarasua1 10k Everything", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
@@ -3183,8 +3197,19 @@ inputMove_t Game::GetMoveUsingSarasua1( gamestate_t const& currentGameState )
 			}
 			else
 			{
-				return randomMove;
-				//newMove = GetRandomMoveAtGameState( currentGameState );
+				std::vector<inputMove_t> validMoves = GetValidMovesAtGameState( currentGameState );
+				for( size_t moveIndex = 0; moveIndex < validMoves.size(); moveIndex++ )
+				{
+					if( validMoves[moveIndex].m_moveType != END_PHASE )
+					{
+						return validMoves[moveIndex];
+					}
+				}
+
+				newMove.m_moveType = END_PHASE;
+				return newMove;
+
+				//return randomMove;
 			}
 		}
 
@@ -3400,7 +3425,10 @@ inputMove_t Game::GetMoveUsingHighestVP( gamestate_t const& currentGameState )
 
 	if( currentPhase == eGamePhase::ACTION_PHASE )
 	{
-		return GetRandomMoveAtGameState( currentGameState );
+		inputMove_t move;
+		move.m_whoseMoveIsIt = whoseMove;
+		move.m_moveType = END_PHASE;
+		return move;
 	}
 	else
 	{
