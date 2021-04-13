@@ -127,6 +127,7 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 {
 	for( int currentSimIndex = 0; currentSimIndex < numberOfSimulations; currentSimIndex++ )
 	{
+		//DebuggerPrintf( "In RunSimulations step\n" );
 		m_numberOfVisitsAtCurrentNode = m_currentHeadNode->m_data.m_metaData.m_numberOfSimulations;
 
 		double startSelectTime = GetCurrentTimeSeconds();
@@ -175,6 +176,7 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 			BackPropagateResult( whoWon, expandedNode );
 			m_totalNumberOfSimulationsRun++;
 
+			//DebuggerPrintf( "Right Before Increment Iterations\n" );
 			if( m_iterationsPerMove > 0 )
 			{
 				IncrementIterationsForCurrentMovePostBackPropagation();
@@ -912,6 +914,11 @@ expand_t MonteCarlo::GetBestNodeToSelect( TreeMapNode* currentNode )
 			{
 				nodeToCheck = childNodesForMove[childNodeIndex];
 				isGameStateInVector = true;
+
+				if( CanExpand( nodeToCheck ) )
+				{
+					break;
+				}
 				break;
 			}
 		}
@@ -1101,6 +1108,7 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 				return newNode;
 			}
 		}
+		ERROR_AND_DIE( "Said could expand but couldn't" );
 
 	}
 	else if( nodeToSelect )
@@ -1440,7 +1448,7 @@ void MonteCarlo::IncrementIterationsForCurrentMovePostBackPropagation()
 {
 	m_iterationLock.lock();
 	m_numberOfIterationsForCurrentMove++;
-	DebuggerPrintf( "Move %i\n", (int)m_numberOfIterationsForCurrentMove );
+	//DebuggerPrintf( "Move %i\n", (int)m_numberOfIterationsForCurrentMove );
 	if( m_numberOfIterationsForCurrentMove >= m_iterationsPerMove )
 	{
 		m_numberOfIterationsForCurrentMove = 0;
@@ -1458,7 +1466,14 @@ void MonteCarlo::DecrementationIterationsToRunPreSimulation()
 {
 	m_iterationLock.lock();
 	m_numberOfSimulationsToRun--;
-	DebuggerPrintf( "Sim %i\n", (int)m_numberOfSimulationsToRun );
+	//DebuggerPrintf( "Sim %i\n", (int)m_numberOfSimulationsToRun );
+	if( m_iterationsPerMove > 0 )
+	{
+		GUARANTEE_OR_DIE( m_numberOfSimulationsToRun + m_numberOfIterationsForCurrentMove == m_iterationsPerMove ||
+			((m_numberOfSimulationsToRun == m_numberOfIterationsForCurrentMove) && (m_numberOfSimulationsToRun == 0))
+			, "Iterations and moves to make don't match" );
+	}
+
 	if( m_numberOfSimulationsToRun == 0 && m_numberOfIterationsForCurrentMove == 0 )
 	{
 		m_isMoveReady = true;
