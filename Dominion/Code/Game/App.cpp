@@ -66,7 +66,7 @@ void App::Startup()
 
 
 
-	g_theGame->RunTestCases();
+	//g_theGame->RunTestCases();
 }
 
 void App::Shutdown()
