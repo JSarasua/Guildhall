@@ -1,5 +1,6 @@
 #include "Game/TreeMapNode.hpp"
 #include "Engine/Core/BufferParser.hpp"
+#include <stack>
 
 constexpr byte startChildInputs = '[';
 constexpr byte endChildInputs = ']';
@@ -13,18 +14,92 @@ TreeMapNode::~TreeMapNode()
 // 	delete m_data;
 // 	m_data = nullptr;
 	m_parentNode = nullptr;
+	m_possibleOutcomes.clear();
 
 	//auto childIter = m_possibleOutcomes.begin();
 
-	for( auto childIter : m_possibleOutcomes )
+// 	for( auto childIter : m_possibleOutcomes )
+// 	{
+// 		std::vector<TreeMapNode*>& outcomes = childIter.second;
+// 		for( size_t outcomeIndex = 0; outcomeIndex < outcomes.size(); outcomeIndex++ )
+// 		{
+// 			delete outcomes[outcomeIndex];
+// 		}
+// 	}
+}
+
+void TreeMapNode::DeleteTree( TreeMapNode* headNode )
+{
+	std::map<inputMove_t, std::vector<TreeMapNode*>>& moveMap = headNode->m_possibleOutcomes;
+	std::map<inputMove_t, std::vector<TreeMapNode*>>::iterator nodeIter = moveMap.begin();
+	int firstIndex = 0;
+
+	TreeMapNodeDeleteData firstNodeData;
+	firstNodeData.m_currentNode = headNode;
+	firstNodeData.m_currentIterator = nodeIter;
+	firstNodeData.m_currentOutcomeIndex = firstIndex;
+	std::stack<TreeMapNodeDeleteData> deleteStack;
+	
+	deleteStack.push( firstNodeData );
+
+	while( !deleteStack.empty() )
 	{
-		std::vector<TreeMapNode*>& outcomes = childIter.second;
-		for( size_t outcomeIndex = 0; outcomeIndex < outcomes.size(); outcomeIndex++ )
+		TreeMapNodeDeleteData& currentNodeData = deleteStack.top();
+		TreeMapNode* currentNode = currentNodeData.m_currentNode;
+		std::map<inputMove_t, std::vector<TreeMapNode*>>& currentMap = currentNode->m_possibleOutcomes;
+		auto currentIterator = currentNodeData.m_currentIterator;
+		if( currentIterator != currentMap.end() )
 		{
-			delete outcomes[outcomeIndex];
+			std::vector<TreeMapNode*>& currentOutcomes = currentIterator->second;
+			int& currentIndex = currentNodeData.m_currentOutcomeIndex;
+			if( currentIndex < currentOutcomes.size() )
+			{
+				TreeMapNode* nextNode = currentOutcomes[currentIndex];
+				TreeMapNodeDeleteData nextNodeData;
+				nextNodeData.m_currentNode = nextNode;
+				nextNodeData.m_currentIterator = nextNode->m_possibleOutcomes.begin();
+				deleteStack.push( nextNodeData );
+				
+				if( currentIndex + 1 < currentOutcomes.size() )
+				{
+					currentIndex++;
+				}
+				else
+				{
+					currentNodeData.m_currentIterator++;
+				}
+			}
+			else
+			{
+				currentNodeData.m_currentIterator++;
+			}
+		}
+		else
+		{
+			delete currentNode;
+			deleteStack.pop();
 		}
 	}
+
+	//deleteStack.push( TreeMapNodeDeleteData() );
+	//if( nodeIter != headN )
+
+	//loop forever
+		//start with first iterator
+		//start with first index
+		//if exists push back current node and data + 1
+			//if index < size index++
+			//else iterator++
+			//currentNode = that outcome
+			//Restart loop
+		//else
+			//delete node
+			//current node = parent node
+		
+
+
 }
+
 
 void TreeMapNode::AppendTreeToBuffer( std::vector<byte>& buffer, size_t& startIndex ) const
 {
@@ -214,3 +289,4 @@ TreeMapNode* TreeMapNode::ParseDataFromBufferParser( BufferParser& buffer )
 
 	return newNode;
 }
+

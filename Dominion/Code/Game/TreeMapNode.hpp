@@ -6,6 +6,17 @@
 struct data_t;
 
 class BufferParser;
+class TreeMapNode;
+
+struct TreeMapNodeDeleteData 
+{
+	//treemapnode iterator
+	//outcome index
+	TreeMapNode* m_currentNode = nullptr;
+	std::map<inputMove_t, std::vector<TreeMapNode*>>::iterator m_currentIterator;
+	int m_currentOutcomeIndex = 0;
+	//bool m_isVisited = false;
+};
 
 class TreeMapNode
 {
@@ -25,6 +36,8 @@ public:
 
 	static TreeMapNode* ParseDataFromBuffer( byte*& buffer );
 	static TreeMapNode* ParseDataFromBufferParser( BufferParser& buffer );
+
+	static void DeleteTree( TreeMapNode* headNode );
 
 public:
 	//Don't do pointer

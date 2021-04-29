@@ -9,6 +9,7 @@
 #include "Engine/Core/BufferWriter.hpp"
 #include <thread>
 #include <chrono>
+#include <stack>
 
 class SimulationJob : public Job
 {
@@ -107,7 +108,8 @@ void MonteCarlo::Shutdown()
 
 	if( m_headNode )
 	{
-		delete m_headNode;
+		DeleteTree();
+		//delete m_headNode;
 	}
 	m_currentHeadNode = nullptr;
 }
@@ -666,7 +668,8 @@ void MonteCarlo::LoadTree()
 
 	if( m_headNode )
 	{
-		delete m_headNode;
+		//delete m_headNode;
+		DeleteTree();
 	}
 
 	m_headNode = newHeadNode;
@@ -680,7 +683,8 @@ void MonteCarlo::ResetTree()
 
 	if( m_headNode )
 	{
-		delete m_headNode;
+		/*delete m_headNode;*/
+		DeleteTree();
 	}
 
 	m_headNode = new TreeMapNode();
@@ -688,6 +692,11 @@ void MonteCarlo::ResetTree()
 	m_currentHeadNode = m_headNode;
 
 	StartThreads();
+}
+
+void MonteCarlo::DeleteTree()
+{
+	TreeMapNode::DeleteTree( m_headNode );
 }
 
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )

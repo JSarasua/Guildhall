@@ -83,6 +83,7 @@ public:
 	void SaveTree();
 	void LoadTree();
 	void ResetTree();
+	void DeleteTree();
 
 	bool IsMoveReady() const { return m_isMoveReady; }
 	void SetIterationCountPerMove( int moveCount );
