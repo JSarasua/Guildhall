@@ -590,6 +590,7 @@ public:
 	inputMove_t GetMoveUsingSarasua2( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingRandomPlus( gamestate_t const& currentGameState );
+	std::vector<inputMove_t> GetHighestCostBuyActionMoves( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
 	void RandomizeUnknownInfoForGameState( gamestate_t& currentGameState );
 

@@ -1056,7 +1056,8 @@ void Game::RunTestCases()
 	mcts->SetEpsilonValueZeroToOne( 0.15f );
 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
 	mcts->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
-	mcts->SetIterationCountPerMove( 10000 );
+	mcts->SetIterationCountPerMove( 100 );
+	//mcts->SetIterationCountPerMove( 10000 );
 	results = RunAIVsMCTSTest( AIStrategy::DOUBLEWITCH, mcts, 50, true );
 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Double Witch vs MCTS Sarasua1 10k Everything", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
@@ -3552,6 +3553,101 @@ inputMove_t Game::GetMoveUsingRandomPlus( gamestate_t const& currentGameState )
 	{
 		return randomMove;
 	}
+}
+
+std::vector<inputMove_t> Game::GetHighestCostBuyActionMoves( gamestate_t const& currentGameState )
+{
+	eGamePhase currentGamePhase = currentGameState.m_currentPhase;
+	int whoseMove = currentGameState.m_whoseMoveIsIt;
+	std::vector<inputMove_t> moveList;
+
+	if( currentGamePhase != BUY_PHASE )
+	{
+		return moveList;
+	}
+	else
+	{
+		PlayerBoard const& playerBoard = currentGameState.m_playerBoards[whoseMove];
+		int currentMoney = playerBoard.GetCurrentMoney();
+		int currentBuys = playerBoard.m_numberOfBuysAvailable;
+
+		if( currentBuys > 0 && currentMoney > 2 )
+		{
+			std::array<pileData_t,NUMBEROFPILES> const& cardPiles = currentGameState.m_cardPiles;
+			inputMove_t move = inputMove_t( BUY_MOVE, whoseMove );
+			
+			if( currentMoney == 5 )
+			{
+				for( pileData_t const& pileData : cardPiles )
+				{
+					eCards cardIndex = pileData.m_cardIndex;
+					int pileSize = pileData.m_pileSize;
+
+					if( pileSize <= 0 )
+					{
+						continue;
+					}
+
+					CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( cardIndex );
+					int cardCost = cardDef->GetCardCost();
+					if( cardCost == 5 )
+					{
+						inputMove_t newMove = move;
+						newMove.m_cardIndex = cardIndex;
+						moveList.push_back( newMove );
+					}
+
+				}
+			}
+			else if( currentMoney == 4 )
+			{
+				for( pileData_t const& pileData : cardPiles )
+				{
+					eCards cardIndex = pileData.m_cardIndex;
+					int pileSize = pileData.m_pileSize;
+
+					if( pileSize <= 0 )
+					{
+						continue;
+					}
+
+					CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( cardIndex );
+					int cardCost = cardDef->GetCardCost();
+					if( cardCost == 4 )
+					{
+						inputMove_t newMove = move;
+						newMove.m_cardIndex = cardIndex;
+						moveList.push_back( newMove );
+					}
+
+				}
+			}
+			else if( currentMoney == 3 )
+			{
+				for( pileData_t const& pileData : cardPiles )
+				{
+					eCards cardIndex = pileData.m_cardIndex;
+					int pileSize = pileData.m_pileSize;
+
+					if( pileSize <= 0 )
+					{
+						continue;
+					}
+
+					CardDefinition const* cardDef = CardDefinition::GetCardDefinitionByType( cardIndex );
+					int cardCost = cardDef->GetCardCost();
+					if( cardCost == 3 )
+					{
+						inputMove_t newMove = move;
+						newMove.m_cardIndex = cardIndex;
+						moveList.push_back( newMove );
+					}
+				}
+			}
+		}
+	}
+
+	return moveList;
 }
 
 gamestate_t Game::GetRandomInitialGameState()
