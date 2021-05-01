@@ -1,0 +1,540 @@
+void Game::DebugDrawGame()
+{
+	//Render Player 2s hand at top of screen
+	int numberOfUniqueCards = CardPile::GetNumberOfPossibleUniqueCards();
+	CardPile player1Hand = m_currentGameState->m_playerBoards[0].GetHand();
+	CardPile player2Hand = m_currentGameState->m_playerBoards[1].GetHand();
+
+	CardPile player1PlayArea = m_currentGameState->m_playerBoards[0].GetPlayArea();
+	CardPile player2PlayArea = m_currentGameState->m_playerBoards[1].GetPlayArea();
+
+	pileData_t const* piles = &m_currentGameState->m_cardPiles[0];
+
+
+	Rgba8 textColor = Rgba8::BLACK;
+	Rgba8 borderColor = Rgba8::BLACK;
+	AABB2 gameBoard = DebugGetScreenBounds();
+	DebugAddScreenAABB2( gameBoard, Rgba8::TuscanTan, 0.f );
+	Vec2 gameDims = gameBoard.GetDimensions();
+	//gameDims.y = gameDims.x;
+	AABB2 gameDataArea = gameBoard;
+	AABB2 deckDataArea = gameBoard;
+	gameDims.x *= 0.8f;
+	gameDims.y *= 0.9f;
+	gameBoard.SetDimensions( gameDims );
+
+	gameDataArea = gameDataArea.GetBoxAtLeft( 1.f / 9.f );
+	Vec2 simMethodPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.93f ) );
+	Vec2 expansionPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.8f ) );
+	Vec2 rolloutPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.77f ) );
+	Vec2 ucbPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.74f ) );
+	Vec2 epsilonPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.71f ) );
+	Vec2 phasePos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.9f ) );
+	Vec2 turnPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.85f ) );
+	Vec2 coinPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.5f ) );
+	Vec2 buysPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.4f ) );
+	Vec2 actionsPos = gameDataArea.GetPointAtUV( Vec2( 0.1f, 0.3f ) );
+
+	deckDataArea = deckDataArea.GetBoxAtRight( 1.f / 9.f );
+	Vec2 player2DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.8f ) );
+	Vec2 player2DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.7f ) );
+	Vec2 player2VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.6f ) );
+	Vec2 player1DeckPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.3f ) );
+	Vec2 player1DiscardPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.2f ) );
+	Vec2 player1VPPos = deckDataArea.GetPointAtUV( Vec2( 0.5f, 0.1f ) );
+
+	PlayerBoard const* playerDeck = nullptr;
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		playerDeck = &m_currentGameState->m_playerBoards[0];
+	}
+	else
+	{
+		playerDeck = &m_currentGameState->m_playerBoards[1];
+	}
+
+	int currentCoins = playerDeck->m_currentCoins;
+	int buysAmount = playerDeck->m_numberOfBuysAvailable;
+	int actionsAmount = playerDeck->m_numberOfActionsAvailable;
+
+	std::string coinStr = Stringf( "Coins: %i", currentCoins );
+	std::string buysStr = Stringf( "Buys: %i", buysAmount );
+	std::string actionsStr = Stringf( "Actions: %i", actionsAmount );
+	eGamePhase phase = m_currentGameState->m_currentPhase;
+	int whoseTurn = m_currentGameState->m_whoseMoveIsIt;
+	std::string phaseStr;
+	std::string whoseTurnStr;
+	std::string player1ActionPhaseStr = "Player 1: Action Phase";
+	std::string player1BuyPhaseStr = "Player 1: Buy Phase";
+	std::string player2ActionPhaseStr = "Player 2: Action Phase";
+	std::string player2BuyPhaseStr = "Player 2: Buy Phase";
+	std::string simMethodStr;
+	std::string expansionStrategyStr;
+	std::string rolloutStr;
+	std::string epsilonStr;
+	std::string ucbStr;
+
+	switch( m_player1MCTSSimMethod )
+	{
+	case SIMMETHOD::RANDOM: simMethodStr = "Larrow, Rarrow | Rollout Method: RANDOM";
+		break;
+	case SIMMETHOD::BIGMONEY: simMethodStr = "Larrow, Rarrow | Rollout Method: BIG MONEY";
+		break;
+	case SIMMETHOD::SINGLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: SINGLE Witch";
+		break;
+	case SIMMETHOD::GREEDY: simMethodStr = "Larrow, Rarrow | Rollout Method: GREEDY";
+		break;
+	case SIMMETHOD::SARASUA1: simMethodStr = "Larrow, Rarrow | Rollout Method: SARASUA1";
+		break;
+	case SIMMETHOD::DOUBLEWITCH: simMethodStr = "Larrow, Rarrow | Rollout Method: DOUBLE Witch";
+		break;
+	default: simMethodStr = "Larrow, Rarrow | Rollout Method: DEFAULT";
+		break;
+	}
+
+	switch( m_player1ExpansionStrategy )
+	{
+	case EXPANSIONSTRATEGY::ALLMOVES: expansionStrategyStr = "-,+ | Expansion: All Moves";
+		break;
+	case EXPANSIONSTRATEGY::HEURISTICS: expansionStrategyStr = "-,+ | Expansion: Heuristics";
+		break;
+	default:
+		break;
+	}
+
+	switch( m_player1MCTSRolloutMethod )
+	{
+	case ROLLOUTMETHOD::RANDOM: rolloutStr = ";,' | Rollout: Random";
+		break;
+	case ROLLOUTMETHOD::HEURISTIC: rolloutStr = ";,' | Rollout: Heuristic";
+		break;
+	case ROLLOUTMETHOD::EPSILONHEURISTIC: rolloutStr = ";,' | Rollout: Epsilon Heuristic";
+		break;
+	default:
+		break;
+	}
+
+	ucbStr = Stringf( "Z,X | UCB Score: %f", m_player1MCTSExplorationParameter );
+	epsilonStr = Stringf( "N,M | Epsilon: %f", m_player1MCTSChaosChance );
+	
+	if( whoseTurn == PLAYER_1 )
+	{
+		whoseTurnStr = "Turn: Player 1";
+	}
+	else if( whoseTurn == PLAYER_2 )
+	{
+		whoseTurnStr = "Turn: Player 2";
+	}
+	else
+	{
+		whoseTurnStr = "No current player to move";
+	}
+
+	if( phase == ACTION_PHASE )
+	{
+		phaseStr = "Phase: Action";
+	}
+	else if( phase == BUY_PHASE )
+	{
+		phaseStr = "Phase: Buy";
+	}
+	else if( phase == CLEANUP_PHASE )
+	{
+		phaseStr = "Phase: Cleanup";
+	}
+
+
+	int player1DeckSize = (int)m_currentGameState->m_playerBoards[0].GetDeckSize();
+	int player1DiscardSize = (int)m_currentGameState->m_playerBoards[0].GetDiscardSize();
+	int player1VPCount = m_currentGameState->m_playerBoards[0].GetCurrentVictoryPoints();
+	int player2DeckSize = (int)m_currentGameState->m_playerBoards[1].GetDeckSize();
+	int player2DiscardSize = (int)m_currentGameState->m_playerBoards[1].GetDiscardSize();
+	int player2VPCount = m_currentGameState->m_playerBoards[1].GetCurrentVictoryPoints();
+	std::string player2DeckStr = Stringf( "Deck Size: %i", player2DeckSize );
+	std::string player2DiscardStr = Stringf( "Discard Size: %i", player2DiscardSize );
+	std::string player1DeckStr = Stringf( "Deck Size: %i", player1DeckSize );
+	std::string player1DiscardStr = Stringf( "Discard Size: %i", player1DiscardSize );
+
+	std::string player1VPStr = Stringf( "VP: %i", player1VPCount );
+	std::string player2VPStr = Stringf( "VP: %i", player2VPCount );
+
+	DebugAddScreenText( Vec4( Vec2(), player2DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player2DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DeckPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DeckStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1DiscardPos ), Vec2( 0.5f, 0.5f ), 12.f, textColor, textColor, 0.f, player1DiscardStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player1VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player1VPStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), player2VPPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, player2VPStr.c_str() );
+
+	DebugAddScreenText( Vec4( Vec2(), simMethodPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, simMethodStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), phasePos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, phaseStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), turnPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, whoseTurnStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), coinPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, coinStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), buysPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, buysStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), actionsPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, actionsStr.c_str() );
+
+	DebugAddScreenText( Vec4( Vec2(), expansionPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, expansionStrategyStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), rolloutPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, rolloutStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), ucbPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, ucbStr.c_str() );
+	DebugAddScreenText( Vec4( Vec2(), epsilonPos ), Vec2( 0.f, 0.5f ), 12.f, textColor, textColor, 0.f, epsilonStr.c_str() );
+
+
+	AABB2 carvingBoard = gameBoard;
+
+
+	float handHeightFraction = 0.15f;
+	float playAreaHeightFraction = 0.15f;
+	float pileAreaHeightFraction = 0.4f;
+
+	float currentProportionalFractionSize = 1.f;
+	float currentProportionalSize = 1.f;
+	float currentFraction = handHeightFraction;
+	float fractionToCarve = currentFraction;
+
+
+	AABB2 player2HandAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player2PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+	currentFraction = pileAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 pilesArea = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	currentFraction = playAreaHeightFraction;
+	currentProportionalFractionSize = 1.f - fractionToCarve;
+	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player1PlayAreaAABB = carvingBoard.CarveBoxOffTop( fractionToCarve );
+
+	// 	currentFraction = playAreaHeightFraction;
+	// 	currentProportionalFractionSize = 1.f - fractionToCarve;
+	// 	currentProportionalSize = currentProportionalSize / currentProportionalFractionSize;
+	// 	fractionToCarve = currentFraction * currentProportionalSize;
+
+	AABB2 player1HandAABB = carvingBoard;
+
+	//AABB2 carvingPlayer2Hand = player2HandAABB;
+
+	Rgba8 handColor = Rgba8::WindsorTan;
+	Rgba8 playAreaColor = Rgba8::Tan;
+	Rgba8 pileAreaColor = Rgba8::SandyTan;
+
+	DebugAddScreenAABB2( player2HandAABB, handColor, 0.f );
+	DebugAddScreenAABB2( player2PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2( pilesArea, pileAreaColor, 0.f );
+	DebugAddScreenAABB2( player1PlayAreaAABB, playAreaColor, 0.f );
+	DebugAddScreenAABB2( player1HandAABB, handColor, 0.f );
+
+	Vec4 debugCenter = Vec4( Vec2(), player2HandAABB.GetCenter() );
+
+	float player2HandSize = (float)player2Hand.TotalCount();
+	int player2HandIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
+	{
+		int countOfCard = player2Hand.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player2HandSize - (float)player2HandIndex;
+			AABB2 cardArea = player2HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player2HandIndex++;
+		}
+	}
+
+	float player2PlayAreaSize = (float)player2PlayArea.TotalCount();
+	int player2PlayAreaIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
+	{
+		int countOfCard = player2PlayArea.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player2PlayAreaSize - (float)player2PlayAreaIndex;
+			AABB2 cardArea = player2PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player2PlayAreaIndex++;
+		}
+	}
+
+	std::vector<int> aiValidMoves = GetCurrentBuyIndexes();
+	AABB2 bottomPilesArea;
+	bool isTwoRows = false;
+	int cardsPerRow = 8;
+	float cardsPerRowFloat = (float)cardsPerRow;
+	if( NUMBEROFPILES > cardsPerRow )
+	{
+		isTwoRows = true;
+		bottomPilesArea = pilesArea.CarveBoxOffBottom( 0.5f );
+	}
+	for( size_t pilesIndex = 0; pilesIndex < NUMBEROFPILES; pilesIndex++ )
+	{
+		//float pileSize = 8.f;
+		float carvingNumber = 0.f;
+
+		AABB2 cardArea;
+		if( isTwoRows )
+		{
+			if( pilesIndex < (size_t)cardsPerRow )
+			{
+				carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+				cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+			else
+			{
+				carvingNumber = (2.f*cardsPerRowFloat) - (float)pilesIndex;
+				cardArea = bottomPilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+			}
+		}
+		else
+		{
+			carvingNumber = cardsPerRowFloat - (float)pilesIndex;
+			cardArea = pilesArea.CarveBoxOffLeft( 1.f / carvingNumber );
+		}
+
+		for( size_t aiValidIndexes = 0; aiValidIndexes < aiValidMoves.size(); aiValidIndexes++ )
+		{
+			int aiPileIndex = aiValidMoves[aiValidIndexes];
+			if( pilesIndex == aiPileIndex )
+			{
+				DebugAddScreenAABB2( cardArea, Rgba8::RedBrown, 0.f );
+				break;
+			}
+		}
+
+		int cardIndex = piles[pilesIndex].m_cardIndex;
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+		Vec4 cardCostPos = Vec4( Vec2(), cardArea.maxs );
+		Vec4 cardCoinsPos = Vec4( Vec2(), cardArea.mins );
+		Vec4 cardVPsPos = Vec4( Vec2(), Vec2( cardArea.maxs.x, cardArea.mins.y ) );
+		Vec4 pileSizePos = Vec4( Vec2(), Vec2( cardArea.mins.x, cardArea.maxs.y ) );
+		std::string cardName = card->GetCardName();
+		std::string cardCost = Stringf( "Cost:%i", card->GetCardCost() );
+		std::string cardCoins = Stringf( "Coins:%i", card->GetCoins() );
+		std::string cardVPs = Stringf( "VPs:%i", card->GetCardVPs() );
+		std::string pileCount = Stringf( "Count:%i", piles[pilesIndex].m_pileSize );
+		DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 15.f, textColor, textColor, 0.f, cardName.c_str() );
+		DebugAddScreenText( cardCostPos, Vec2( 1.1f, 1.5f ), 12.f, textColor, textColor, 0.f, cardCost.c_str() );
+		DebugAddScreenText( cardCoinsPos, Vec2( -0.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardCoins.c_str() );
+		DebugAddScreenText( cardVPsPos, Vec2( 1.1f, -0.5f ), 12.f, textColor, textColor, 0.f, cardVPs.c_str() );
+		DebugAddScreenText( pileSizePos, Vec2( -0.1f, 1.5f ), 12.f, textColor, textColor, 0.f, pileCount.c_str() );
+		DebugAddScreenAABB2Border( cardArea, borderColor, 1.5f, 0.f );
+	}
+
+	float player1PlayAreaSize = (float)player1PlayArea.TotalCount();
+	int player1PlayAreaIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
+	{
+		int countOfCard = player1PlayArea.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player1PlayAreaSize - (float)player1PlayAreaIndex;
+			AABB2 cardArea = player1PlayAreaAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player1PlayAreaIndex++;
+		}
+	}
+
+	float player1HandSize = (float)player1Hand.TotalCount();
+	int player1HandIndex = 0;
+	for( int cardIndex = 0; cardIndex < numberOfUniqueCards; cardIndex++ )
+	{
+		int countOfCard = player1Hand.CountOfCard( cardIndex );
+		CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardIndex );
+		while( countOfCard > 0 )
+		{
+			float carvingNumber = player1HandSize - (float)player1HandIndex;
+			AABB2 cardArea = player1HandAABB.CarveBoxOffLeft( 1.f / carvingNumber );
+			Vec4 cardPos = Vec4( Vec2(), cardArea.GetCenter() );
+			std::string cardName = card->GetCardName();
+			DebugAddScreenText( cardPos, Vec2( 0.5f, 0.5f ), 20.f, textColor, textColor, 0.f, cardName.c_str() );
+
+			countOfCard--;
+			player1HandIndex++;
+		}
+	}
+
+
+	if( IsGameOver() == PLAYER_1 )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 1 won!" ).c_str() );
+	}
+	else if( IsGameOver() == PLAYER_2 )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Player 2 won!" ).c_str() );
+	}
+	else if( IsGameOver() == TIE )
+	{
+		DebugAddScreenText( Vec4( 0.2f, 0.9f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Game Over: Tie!" ).c_str() );
+	}
+
+	if( m_currentGameState->m_whoseMoveIsIt == PLAYER_1 )
+	{
+		inputMove_t player1BestMove = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		std::string aiStratStr;
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
+			break;
+		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
+			break;
+		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
+			break;
+		case AIStrategy::MCTS: aiStratStr = "MCTS";
+			break;
+		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
+			break;
+		default: aiStratStr = "Invalid Strat for player 1";
+			break;
+		}
+		//inputMove_t currentBestMove = m_mc->GetBestMove();
+		inputMove_t currentBestMove = player1BestMove;
+		if( currentBestMove.m_moveType != INVALID_MOVE )
+		{
+			std::string moveStr;
+
+			if( currentBestMove.m_moveType == BUY_MOVE )
+			{
+				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == PLAY_CARD )
+			{
+				int cardHandIndex = currentBestMove.m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == END_PHASE )
+			{
+				moveStr = Stringf( "Best Move for Player 1 using %s strategy: End Phase", aiStratStr.c_str() );
+			}
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+		}
+		else
+		{
+			std::string moveStr;
+			moveStr = Stringf( "Move for Player 1 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+		}
+	}
+	else if( m_currentGameState->m_whoseMoveIsIt == PLAYER_2 )
+	{
+		inputMove_t player2BestMove = GetBestMoveUsingAIStrategy( m_player1Strategy );
+		std::string aiStratStr;
+		switch( m_player1Strategy )
+		{
+		case AIStrategy::RANDOM: aiStratStr = "RANDOM";
+			break;
+		case AIStrategy::BIGMONEY: aiStratStr = "BIGMONEY";
+			break;
+		case AIStrategy::SINGLEWITCH: aiStratStr = "SINGLEWITCH";
+			break;
+		case AIStrategy::SARASUA1: aiStratStr = "SARASUA1";
+			break;
+		case AIStrategy::MCTS: aiStratStr = "MCTS";
+			break;
+		case AIStrategy::DOUBLEWITCH: aiStratStr = "DOUBLEWITCH";
+			break;
+		default: aiStratStr = "Invalid Strat for player 2";
+			break;
+		}
+
+		inputMove_t currentBestMove = player2BestMove;
+		if( currentBestMove.m_moveType != INVALID_MOVE )
+		{
+			//inputMove_t bigMoneyMove = GetMoveUsingSingleWitch( *m_currentGameState );
+			//inputMove_t bigMoneyMove = GetMoveUsingBigMoney( *m_currentGameState );
+			std::string moveStr;
+			if( currentBestMove.m_moveType == BUY_MOVE )
+			{
+				eCards cardIndex = m_currentGameState->m_cardPiles[currentBestMove.m_cardIndex].m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Buy %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == PLAY_CARD )
+			{
+				int cardHandIndex = currentBestMove.m_cardIndex;
+				CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: Play %s", aiStratStr.c_str(), card->GetCardName().c_str() );
+			}
+			else if( currentBestMove.m_moveType == END_PHASE )
+			{
+				moveStr = Stringf( "Best Move for Player 2 using %s strategy: End Phase", aiStratStr.c_str() );
+			}
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+		}
+		else
+		{
+			std::string moveStr;
+			moveStr = Stringf( "Move for Player 2 using %s strategy is Invalid, MCTS needs sims", aiStratStr.c_str() );
+			DebugAddScreenText( Vec4( 0.3f, 0.97f, 0.f, 0.f ), Vec2(), 20.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, moveStr.c_str() );
+		}
+
+	}
+
+	if( m_randomMove.m_moveType != INVALID_MOVE )
+	{
+		std::string randomMoveStr;
+		if( m_randomMove.m_moveType == BUY_MOVE )
+		{
+			eCards cardIndex = m_currentGameState->m_cardPiles[m_randomMove.m_cardIndex].m_cardIndex;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( cardIndex );
+			randomMoveStr = Stringf( "Random Move: Buy %s", card->GetCardName().c_str() );
+		}
+		else if( m_randomMove.m_moveType == PLAY_CARD )
+		{
+			int cardHandIndex = m_randomMove.m_cardIndex;
+			CardDefinition const* card = CardDefinition::GetCardDefinitionByType( (eCards)cardHandIndex );
+			randomMoveStr = Stringf( "Random Move: Play %s", card->GetCardName().c_str() );
+		}
+		else if( m_randomMove.m_moveType == END_PHASE )
+		{
+			randomMoveStr = Stringf( "Random move: End Phase" );
+		}
+		DebugAddScreenText( Vec4( 0.5f, 0.93f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, randomMoveStr.c_str() );
+	}
+
+
+	m_player1TotalSimCount = m_player1MCTS->GetNumberOfSimulationsRun();
+	m_player1SimCount = m_player1MCTS->GetCurrentNumberOfSimulationsLeft();
+	DebugAddScreenText( Vec4( 0.5f, 0.92f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current sim count: %i", m_player1TotalSimCount ).c_str() );
+	DebugAddScreenText( Vec4( 0.5f, 0.9f, 0.f, 0.f ), Vec2(), 12.f, Rgba8::BLACK, Rgba8::BLACK, 0.f, Stringf( "Current remaining sim count: %i", m_player1SimCount ).c_str() );
+
+// 	DebugAddScreenText( Vec4( 0.5f, 0.85f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current total Sim time: %f", (float)m_mcts->m_totalTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.83f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current select time: %f", (float)m_mcts->m_selectTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.81f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current expand time: %f", (float)m_mcts->m_expandTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.79f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current sim time: %f", (float)m_mcts->m_simTime ).c_str() );
+// 	DebugAddScreenText( Vec4( 0.5f, 0.77f, 0.f, 0.f ), Vec2(), 10.f, Rgba8::RED, Rgba8::RED, 0.f, Stringf( "Current backpropagation time: %f", (float)m_mcts->m_backpropagationTime ).c_str() );
+
+
+
+	if( m_isDebugScreenEnabled )
+	{
+		DebugDrawGameStateInfo();
+	}
+
+}
