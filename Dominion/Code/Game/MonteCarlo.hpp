@@ -156,8 +156,10 @@ public:
 	//lock
 	std::mutex m_gameStateChangeLock;
 	bool m_didGameStateChange = false;
-	inputMove_t m_moveToMake = inputMove_t();
-	gamestate_t m_newGameState = gamestate_t();
+	std::vector<inputMove_t> m_movesToMake;
+	std::vector<gamestate_t> m_newGameStates;
+// 	inputMove_t m_moveToMake = inputMove_t();
+// 	gamestate_t m_newGameState = gamestate_t();
 
 	//lock
 	std::mutex m_bestMoveLock;

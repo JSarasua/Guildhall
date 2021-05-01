@@ -516,34 +516,51 @@ std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t con
 	std::vector<inputMove_t> moves;
 	moves.reserve( 10 );
 	
-	inputMove_t bigMoneyMove = g_theGame->GetMoveUsingBigMoney( gameState );
-	inputMove_t singleWitchMove = g_theGame->GetMoveUsingSingleWitch( gameState );
-	inputMove_t doubleWitchMove = g_theGame->GetMoveUsingDoubleWitch( gameState );
-	inputMove_t sarasua1Move = g_theGame->GetMoveUsingSarasua1( gameState );
+// 	inputMove_t bigMoneyMove = g_theGame->GetMoveUsingBigMoney( gameState );
+// 	inputMove_t singleWitchMove = g_theGame->GetMoveUsingSingleWitch( gameState );
+// 	inputMove_t doubleWitchMove = g_theGame->GetMoveUsingDoubleWitch( gameState );
+// 	inputMove_t sarasua1Move = g_theGame->GetMoveUsingSarasua1( gameState );
+// 	inputMove_t highestVPMove = g_theGame->GetMoveUsingHighestVP( gameState );
+	inputMove_t endPhaseMove = g_theGame->GetEndPhaseMove( gameState );
+	inputMove_t highestTreasureMove = g_theGame->GetBuyMoveUsingHighestGoldValue( gameState );
 	inputMove_t highestVPMove = g_theGame->GetMoveUsingHighestVP( gameState );
+	std::vector<inputMove_t> highestActionMoves = g_theGame->GetHighestCostBuyActionMoves( gameState );
+	std::vector<inputMove_t> playActionMoves = g_theGame->GetPlayActionMoves( gameState );
 
-	if( bigMoneyMove.m_moveType != INVALID_MOVE )
+// 	if( bigMoneyMove.m_moveType != INVALID_MOVE )
+// 	{
+// 		allMoves.push_back( bigMoneyMove );
+// 	}
+// 	if( singleWitchMove.m_moveType != INVALID_MOVE )
+// 	{
+// 		allMoves.push_back( singleWitchMove );
+// 	}
+// 	if( doubleWitchMove.m_moveType != INVALID_MOVE )
+// 	{
+// 		allMoves.push_back( doubleWitchMove );
+// 	}
+// 	if( sarasua1Move.m_moveType != INVALID_MOVE )
+// 	{
+// 		allMoves.push_back( sarasua1Move );
+// 	}
+// 	if( highestVPMove.m_moveType != INVALID_MOVE )
+// 	{
+// 		allMoves.push_back( highestVPMove );
+// 	}
+	if( endPhaseMove.m_moveType != INVALID_MOVE )
 	{
-		allMoves.push_back( bigMoneyMove );
+		allMoves.push_back( endPhaseMove );
 	}
-	if( singleWitchMove.m_moveType != INVALID_MOVE )
+	if( highestTreasureMove.m_moveType != INVALID_MOVE )
 	{
-		allMoves.push_back( singleWitchMove );
-	}
-	if( doubleWitchMove.m_moveType != INVALID_MOVE )
-	{
-		allMoves.push_back( doubleWitchMove );
-	}
-	if( sarasua1Move.m_moveType != INVALID_MOVE )
-	{
-		allMoves.push_back( sarasua1Move );
+		allMoves.push_back( highestTreasureMove );
 	}
 	if( highestVPMove.m_moveType != INVALID_MOVE )
 	{
 		allMoves.push_back( highestVPMove );
 	}
-
-
+	allMoves.insert( allMoves.end(), highestActionMoves.begin(), highestActionMoves.end() );
+	allMoves.insert( allMoves.end(), playActionMoves.begin(), playActionMoves.end() );
 
 
 
@@ -566,6 +583,11 @@ std::vector<inputMove_t> MonteCarlo::GetMovesUsingAllHeuristics( gamestate_t con
 		}
 
 		if( move.m_moveType == INVALID_MOVE )
+		{
+			break;
+		}
+
+		if( !g_theGame->IsMoveValidForGameState( move, gameState ) )
 		{
 			break;
 		}
@@ -770,8 +792,13 @@ bool MonteCarlo::UpdateGameIfChanged()
 {
 	m_gameStateChangeLock.lock();
 	bool didGameStateChange = m_didGameStateChange;
-	gamestate_t newGameState = m_newGameState;
-	inputMove_t newInputMove = m_moveToMake;
+	std::vector<gamestate_t> newGameStates;
+	std::vector<inputMove_t> inputMoves;
+
+	newGameStates.swap( m_newGameStates );
+	inputMoves.swap( m_movesToMake );
+// 	gamestate_t newGameState = m_newGameState;
+// 	inputMove_t newInputMove = m_moveToMake;
 
 	if( m_didGameStateChange )
 	{
@@ -781,43 +808,50 @@ bool MonteCarlo::UpdateGameIfChanged()
 
 	if( didGameStateChange )
 	{
-		std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
-		auto outcomeIter = possibleOutcomes.find( newInputMove );
-
-		if( outcomeIter != possibleOutcomes.end() )
+		for( size_t moveIndex = 0; moveIndex < inputMoves.size(); moveIndex++ )
 		{
-			std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
-			for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
+			inputMove_t const& newInputMove = inputMoves[moveIndex];
+			gamestate_t const& newGameState = newGameStates[moveIndex];
+
+			std::map< inputMove_t, std::vector<TreeMapNode*> >& possibleOutcomes = m_currentHeadNode->m_possibleOutcomes;
+			auto outcomeIter = possibleOutcomes.find( newInputMove );
+
+			if( outcomeIter != possibleOutcomes.end() )
 			{
-				gamestate_t const& outcomeState = outcomesFromMove[outcomesIndex]->m_data.m_currentGamestate;
-				if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
+				std::vector<TreeMapNode*>& outcomesFromMove = outcomeIter->second;
+				for( size_t outcomesIndex = 0; outcomesIndex < outcomesFromMove.size(); outcomesIndex++ )
 				{
-					m_currentHeadNode = outcomesFromMove[outcomesIndex];
-					return didGameStateChange;
+					gamestate_t const& outcomeState = outcomesFromMove[outcomesIndex]->m_data.m_currentGamestate;
+					if( outcomeState.UnordereredEqualsOnlyCurrentPlayer( newGameState ) )
+					{
+						m_currentHeadNode = outcomesFromMove[outcomesIndex];
+						return didGameStateChange;
+					}
 				}
+
+				//outcome doesn't exist for gamestate
+				TreeMapNode* newTreeNode = new TreeMapNode();
+				newTreeNode->m_parentNode = m_currentHeadNode;
+				//gamestate_t* gameState = new gamestate_t( newGameState );
+				newTreeNode->m_data = data_t( metaData_t(), newGameState );
+				outcomesFromMove.push_back( newTreeNode );
+
+				m_currentHeadNode = newTreeNode;
 			}
+			else
+			{
+				//input doesn't exist
+				possibleOutcomes[newInputMove] = std::vector<TreeMapNode*>();
+				TreeMapNode* newTreeNode = new TreeMapNode();
+				newTreeNode->m_parentNode = m_currentHeadNode;
+				//gamestate_t* gameState = new gamestate_t( newGameState );
+				newTreeNode->m_data = data_t( metaData_t(), newGameState );
+				possibleOutcomes[newInputMove].push_back( newTreeNode );
 
-			//outcome doesn't exist for gamestate
-			TreeMapNode* newTreeNode = new TreeMapNode();
-			newTreeNode->m_parentNode = m_currentHeadNode;
-			//gamestate_t* gameState = new gamestate_t( newGameState );
-			newTreeNode->m_data = data_t( metaData_t(), newGameState );
-			outcomesFromMove.push_back( newTreeNode );
-
-			m_currentHeadNode = newTreeNode;
+				m_currentHeadNode = newTreeNode;
+			}
 		}
-		else
-		{
-			//input doesn't exist
-			possibleOutcomes[newInputMove] = std::vector<TreeMapNode*>();
-			TreeMapNode* newTreeNode = new TreeMapNode();
-			newTreeNode->m_parentNode = m_currentHeadNode;
-			//gamestate_t* gameState = new gamestate_t( newGameState );
-			newTreeNode->m_data = data_t( metaData_t(), newGameState );
-			possibleOutcomes[newInputMove].push_back( newTreeNode );
 
-			m_currentHeadNode = newTreeNode;
-		}
 	}
 
 	return didGameStateChange;
@@ -1433,8 +1467,10 @@ void MonteCarlo::UpdateGame( inputMove_t const& movePlayed, gamestate_t const& n
 {
 	m_gameStateChangeLock.lock();
 	m_didGameStateChange = true;
-	m_moveToMake = movePlayed;
-	m_newGameState = newGameState;
+	m_movesToMake.push_back( movePlayed );
+	m_newGameStates.push_back( newGameState );
+// 	m_moveToMake = movePlayed;
+// 	m_newGameState = newGameState;
 	m_gameStateChangeLock.unlock();
 }
 
