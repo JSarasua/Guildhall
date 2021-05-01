@@ -41,6 +41,8 @@ void TreeMapNode::DeleteTree( TreeMapNode* headNode )
 	std::stack<TreeMapNodeDeleteData> deleteStack;
 	
 	deleteStack.push( firstNodeData );
+	int deleteCount = 0;
+	int headNodeSimCount = headNode->m_data.m_metaData.m_numberOfSimulations;
 
 	while( !deleteStack.empty() )
 	{
@@ -66,11 +68,13 @@ void TreeMapNode::DeleteTree( TreeMapNode* headNode )
 				}
 				else
 				{
+					currentIndex = 0;
 					currentNodeData.m_currentIterator++;
 				}
 			}
 			else
 			{
+				currentIndex = 0;
 				currentNodeData.m_currentIterator++;
 			}
 		}
@@ -78,8 +82,10 @@ void TreeMapNode::DeleteTree( TreeMapNode* headNode )
 		{
 			delete currentNode;
 			deleteStack.pop();
+			deleteCount++;
 		}
 	}
+	DebuggerPrintf( "%i deleted, %i head sims", deleteCount, headNodeSimCount );
 
 	//deleteStack.push( TreeMapNodeDeleteData() );
 	//if( nodeIter != headN )
