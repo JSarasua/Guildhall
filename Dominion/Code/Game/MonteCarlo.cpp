@@ -483,7 +483,7 @@ inputMove_t MonteCarlo::GetMoveForSimsUsingHeuristic( gamestate_t const& gameSta
 		break;
 	case SIMMETHOD::SARASUA1: return g_theGame->GetMoveUsingSarasua1( gameState );
 		break;
-	case SIMMETHOD::GREEDY: return inputMove_t(); //INVALID
+	case SIMMETHOD::GREEDY: return g_theGame->GetMoveUsingGreedy( gameState );
 		break;
 	case SIMMETHOD::RANDOMPLUS: return g_theGame->GetMoveUsingRandomPlus( gameState );
 		break;

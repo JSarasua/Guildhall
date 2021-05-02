@@ -583,6 +583,7 @@ public:
 	inputMove_t GetBestMoveUsingAIStrategy( AIStrategy aiStrategy, MonteCarlo* mcts = nullptr );
 	inputMove_t GetBestMoveUsingAIStrategyForGamestate( AIStrategy aiStrategy, gamestate_t const& gameState );
 	inputMove_t GetRandomMoveAtGameState( gamestate_t const& currentGameState );
+	inputMove_t GetMoveUsingGreedy( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingBigMoney( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingSingleWitch( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingDoubleWitch( gamestate_t const& currentGameState );
@@ -592,6 +593,8 @@ public:
 	inputMove_t GetMoveUsingHighestVP( gamestate_t const& currentGameState );
 	inputMove_t GetEndPhaseMove( gamestate_t const& currentGameState );
 	inputMove_t GetMoveUsingRandomPlus( gamestate_t const& currentGameState );
+	inputMove_t GetActionPhaseMoveUsingActionPLUS( gamestate_t const& currentGameState );
+	inputMove_t GetBuyPhaseRandomHighestBuy( gamestate_t const& currentGameState );
 	std::vector<inputMove_t> GetHighestCostBuyActionMoves( gamestate_t const& currentGameState );
 	std::vector<inputMove_t> GetPlayActionMoves( gamestate_t const& currentGameState );
 	gamestate_t GetRandomInitialGameState();
