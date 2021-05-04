@@ -74,6 +74,7 @@ void Game::Startup()
  	m_mc = new MonteCarloNoTree();
 	m_player1MCTS = new MonteCarlo();
 	m_player2MCTS = new MonteCarlo();
+	//m_player2MCTS->m_useSimThreads = true;
 
 
 	m_player1MCTS->SetSimMethod( m_player1MCTSSimMethod );
@@ -1076,7 +1077,7 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-// 	mcts->SetSimMethod( SIMMETHOD::GREEDY	 );
+// 	mcts->SetSimMethod( SIMMETHOD::GREEDY );
 // 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
 // 	mcts->SetEpsilonValueZeroToOne( 0.f );
 // 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
@@ -1090,6 +1091,52 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+
+// 	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mcts->SetEpsilonValueZeroToOne( 0.f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mcts->SetIterationCountPerMove( 10000 );
+// 	//mcts->SetIterationCountPerMove( 10000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::BIGMONEY, mcts, 50, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Big Money vs MCTS GREEDY 10k", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+// 	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mcts->SetEpsilonValueZeroToOne( 0.f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mcts->SetIterationCountPerMove( 10000 );
+// 	//mcts->SetIterationCountPerMove( 10000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::DOUBLEWITCH, mcts, 50, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Double Witch vs MCTS GREEDY 10k", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+	mcts->SetEpsilonValueZeroToOne( 0.f );
+	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mcts->SetIterationCountPerMove( 10000 );
+	//mcts->SetIterationCountPerMove( 10000 );
+	results = RunAIVsMCTSTest( AIStrategy::SARASUA1, mcts, 50, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Sarasua1 vs MCTS GREEDY 10k", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Sarasua1: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 	mcts->Shutdown();
 	delete mcts;
@@ -1168,28 +1215,94 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K GREEDY: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
+// 	mctsA->SetSimMethod( SIMMETHOD::RANDOMPLUS );
+// 	mctsA->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsA->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsA->SetIterationCountPerMove( 10000 );
+// 
+// 	mctsB->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsB->SetIterationCountPerMove( 10000 );
+// 
+// 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS RandomPLUS vs MCTS Greedy", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K RandomPLUS: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K GREEDY: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
-	mctsA->SetExplorationParameter( SquareRootFloat( 2.f ) );
-	mctsA->SetEpsilonValueZeroToOne( 0.f );
-	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
-	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
-	mctsA->SetIterationCountPerMove( 10000 );
+// 	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
+// 	mctsA->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsA->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsA->SetIterationCountPerMove( 10000 );
+// 
+// 	mctsB->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsB->SetIterationCountPerMove( 10000 );
+// 
+// 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS Sarasua1 vs MCTS Greedy", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K Sarasua1: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K GREEDY: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
-	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
-	mctsB->SetEpsilonValueZeroToOne( 0.05f );
-	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
-	mctsB->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
-	mctsB->SetIterationCountPerMove( 10000 );
+// 	mctsA->SetSimMethod( SIMMETHOD::RANDOMPLUS );
+// 	mctsA->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsA->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsA->SetIterationCountPerMove( 10000 );
+// 
+// 	mctsB->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsB->SetIterationCountPerMove( 10000 );
+// 
+// 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS RandomPLUS vs MCTS Greedy", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K RandomPLUS: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS 10K GREEDY: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS 10k Sarasua1 HEURISTICS 0 Chaos vs 0.05 Chaos", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0 Chaos: %i", results.m_playerAWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0.05 Chaos: %i", results.m_playerBWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+// 	mctsA->SetSimMethod( SIMMETHOD::SARASUA1 );
+// 	mctsA->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsA->SetEpsilonValueZeroToOne( 0.f );
+// 	mctsA->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
+// 	mctsA->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mctsA->SetIterationCountPerMove( 10000 );
+// 
+// 	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
+// 	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.05f );
+// 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
+// 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
+// 	mctsB->SetIterationCountPerMove( 10000 );
+// 
+// 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS 10k Sarasua1 HEURISTICS 0 Chaos vs 0.05 Chaos", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0 Chaos: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0.05 Chaos: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 
 	mctsA->Shutdown();

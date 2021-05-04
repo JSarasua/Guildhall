@@ -78,7 +78,10 @@ void MonteCarlo::Startup()
 		m_currentHeadNode = m_headNode;
 
 		m_mcJobSystem = new JobSystem();
-		m_mcJobSystem->AddWorkerThreads( 3 );
+		if( m_useSimThreads )
+		{
+			m_mcJobSystem->AddWorkerThreads( 5 );
+		}
 
 		m_mainThread = new std::thread( &MonteCarlo::WorkerMain, this );
 	}
@@ -190,9 +193,10 @@ void MonteCarlo::RunSimulations( int numberOfSimulations )
 		}
 		
 		int numberOfJobsQueue = m_mcJobSystem->GetNumberOfJobsQueued();
-		if( numberOfJobsQueue > 10 )
+		while( numberOfJobsQueue > 10 )
 		{
-			std::this_thread::sleep_for( std::chrono::milliseconds( 1 ) );
+			std::this_thread::sleep_for( std::chrono::microseconds( 1 ) );
+			numberOfJobsQueue = m_mcJobSystem->GetNumberOfJobsQueued();
 			//Sleep( 1 );
 		}
 	}
@@ -656,7 +660,11 @@ void MonteCarlo::StartThreads()
 {
 	m_isQuitting = false;
 	m_mcJobSystem->StartWorkerThreads();
-	m_mcJobSystem->AddWorkerThreads( 3 );
+
+	if( m_useSimThreads )
+	{
+		m_mcJobSystem->AddWorkerThreads( 3 );
+	}
 
 	if( nullptr == m_mainThread )
 	{
