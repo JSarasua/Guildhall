@@ -731,6 +731,7 @@ void MonteCarlo::ResetTree()
 void MonteCarlo::DeleteTree()
 {
 	TreeMapNode::DeleteTree( m_headNode );
+	m_headNode = nullptr;
 }
 
 float MonteCarlo::GetAverageUCBValue( std::vector<TreeMapNode*> const& nodes, float explorationParameter /*= SQRT_2 */ )
