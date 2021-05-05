@@ -543,8 +543,8 @@ void Game::InitializeAILargePanelWidget()
 	aiStrategies.push_back( "Sarasua1" );
 
 	AABB2 AIMoreInfoBounds = m_AIMoreInfoWidget->GetLocalAABB2();
-	AABB2 leftColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.2f );
-	leftColumnAIBounds = leftColumnAIBounds.GetBoxAtRight( 0.9f );
+	AABB2 leftColumnAIBounds = AIMoreInfoBounds.CarveBoxOffLeft( 0.25f );
+	leftColumnAIBounds = leftColumnAIBounds.GetBoxAtRight( 0.95f );
 	AABB2 topLeftAIBounds = leftColumnAIBounds.CarveBoxOffTop( 0.3f );
 	std::vector<AABB2> leftAIRows = topLeftAIBounds.GetBoxAsRows( 4 );
 	m_player1AITextWidget = new Widget( leftAIRows[3], m_AIMoreInfoWidget );
@@ -1147,20 +1147,20 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 
-	mcts->SetSimMethod( SIMMETHOD::SARASUA1 );
-	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
-	mcts->SetEpsilonValueZeroToOne( 0.05f );
-	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
-	mcts->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
-	mcts->SetIterationCountPerMove( 10000 );
-	//mcts->SetIterationCountPerMove( 10000 );
-	results = RunAIVsMCTSTest( AIStrategy::DOUBLEWITCH, mcts, 20, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Double Witch vs MCTS Sarasua1 10k Heuristics", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch: %i", results.m_playerAWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+// 	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mcts->SetEpsilonValueZeroToOne( 0.05f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
+// 	mcts->SetIterationCountPerMove( 20000 );
+// 	//mcts->SetIterationCountPerMove( 10000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::SARASUA1, mcts, 10, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Sarasua1 vs MCTS GREEDY 20k Heuristics", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Sarasua1: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 	mcts->Shutdown();
 	delete mcts;
@@ -1315,17 +1315,17 @@ void Game::RunTestCases()
 // 
 // 	mctsB->SetSimMethod( SIMMETHOD::SARASUA1 );
 // 	mctsB->SetExplorationParameter( SquareRootFloat( 2.f ) );
-// 	mctsB->SetEpsilonValueZeroToOne( 0.05f );
+// 	mctsB->SetEpsilonValueZeroToOne( 0.1f );
 // 	mctsB->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
 // 	mctsB->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
 // 	mctsB->SetIterationCountPerMove( 10000 );
 // 
 // 	results = RunMCTSVsMCTSTest( mctsA, mctsB, 25, true );
-// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS 10k Sarasua1 HEURISTICS 0 Chaos vs 0.05 Chaos", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "MCTS 10k Sarasua1 HEURISTICS 0 Chaos vs 0.1 Chaos", results.m_gamesPlayed ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0 Chaos: %i", results.m_playerAWins ) );
-// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0.05 Chaos: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "0.1 Chaos: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
 
