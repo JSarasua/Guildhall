@@ -721,6 +721,10 @@ void MonteCarlo::ResetTree()
 	m_headNode->m_data.m_currentGamestate.m_isFirstMove = true;
 	m_currentHeadNode = m_headNode;
 
+	m_numberOfSimulationsToRun = 0;
+	m_totalNumberOfSimulationsRun = 0;
+	m_numberOfVisitsAtCurrentNode = 0;
+
 	StartThreads();
 }
 
@@ -1189,33 +1193,63 @@ TreeMapNode* MonteCarlo::ExpandNodeUsingHeuristics( expand_t expandData )
 
 void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 {
-/*	int whoJustMoved = node->m_data->m_currentGamestate->WhoJustMoved();*/
-	int whoJustMoved = -1;
-	if( node->m_parentNode )
+	TreeMapNode* currentNode = node;
+	while( currentNode != m_currentHeadNode )
 	{
-		if( node->m_parentNode->m_data.m_currentGamestate.m_isFirstMove )
+		int whoJustMoved = -1;
+		if( currentNode->m_parentNode )
+		{
+			if( currentNode->m_parentNode->m_data.m_currentGamestate.m_isFirstMove )
+			{
+				whoJustMoved = PLAYER_1;
+			}
+			else
+			{
+				whoJustMoved = currentNode->m_parentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
+			}
+		}
+		else
+		{
+			whoJustMoved = PLAYER_1;
+		}
+
+		metaData_t& metaData = currentNode->m_data.m_metaData;
+		if( whoJustMoved == whoWon )
+		{
+			metaData.m_numberOfWins++;
+		}
+		else if( whoWon == TIE )
+		{
+			metaData.m_numberOfWins += 0.5f;
+		}
+		else
+		{
+			//metaData.m_numberOfWins -= 100.f;
+		}
+
+		metaData.m_numberOfSimulations++;
+
+		currentNode = currentNode->m_parentNode;
+	}
+
+	int whoJustMoved = -1;
+	if( currentNode->m_parentNode )
+	{
+		if( currentNode->m_parentNode->m_data.m_currentGamestate.m_isFirstMove )
 		{
 			whoJustMoved = PLAYER_1;
 		}
 		else
 		{
-			whoJustMoved = node->m_parentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
+			whoJustMoved = currentNode->m_parentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
 		}
 	}
 	else
 	{
 		whoJustMoved = PLAYER_1;
 	}
-// 	if( !node->m_parentNode )
-// 	{
-// 		whoJustMoved = PLAYER_1;
-// 	}
-// 	else if( node->m_parentNode->m_data->m_currentGamestate->m_isFirstMove )
-// 	{
-// 		whoJustMoved = PLAYER_1;
-// 	}
 
-	metaData_t& metaData = node->m_data.m_metaData;
+	metaData_t& metaData = currentNode->m_data.m_metaData;
 	if( whoJustMoved == whoWon )
 	{
 		metaData.m_numberOfWins++;
@@ -1231,11 +1265,44 @@ void MonteCarlo::BackPropagateResult( int whoWon, TreeMapNode* node )
 
 	metaData.m_numberOfSimulations++;
 
-	TreeMapNode* parentNode = node->m_parentNode;
-	if( parentNode )
-	{
-		BackPropagateResult( whoWon, parentNode );
-	}
+// 	int whoJustMoved = -1;
+// 	if( node->m_parentNode )
+// 	{
+// 		if( node->m_parentNode->m_data.m_currentGamestate.m_isFirstMove )
+// 		{
+// 			whoJustMoved = PLAYER_1;
+// 		}
+// 		else
+// 		{
+// 			whoJustMoved = node->m_parentNode->m_data.m_currentGamestate.m_whoseMoveIsIt;
+// 		}
+// 	}
+// 	else
+// 	{
+// 		whoJustMoved = PLAYER_1;
+// 	}
+// 
+// 	metaData_t& metaData = node->m_data.m_metaData;
+// 	if( whoJustMoved == whoWon )
+// 	{
+// 		metaData.m_numberOfWins++;
+// 	}
+// 	else if( whoWon == TIE )
+// 	{
+// 		metaData.m_numberOfWins += 0.5f;
+// 	}
+// 	else
+// 	{
+// 		//metaData.m_numberOfWins -= 100.f;
+// 	}
+// 
+// 	metaData.m_numberOfSimulations++;
+// 
+// 	TreeMapNode* parentNode = node->m_parentNode;
+// 	if( parentNode )
+// 	{
+// 		BackPropagateResult( whoWon, parentNode );
+// 	}
 }
 
 

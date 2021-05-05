@@ -1021,6 +1021,14 @@ void Game::RunTestCases()
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch Wins: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
+	results = RunAIVsAITest( AIStrategy::SARASUA1, AIStrategy::BIGMONEY, 100, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "SARASUA1 vs Big Money", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "SARASUA1 Wins: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Big Money Wins: %i", results.m_playerBWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
 	MonteCarlo* mcts = new MonteCarlo();
 	mcts->Startup();
 	
@@ -1123,18 +1131,34 @@ void Game::RunTestCases()
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 // 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
-	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mcts->SetSimMethod( SIMMETHOD::GREEDY );
+// 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
+// 	mcts->SetEpsilonValueZeroToOne( 0.f );
+// 	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
+// 	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+// 	mcts->SetIterationCountPerMove( 100 );
+// 	//mcts->SetIterationCountPerMove( 10000 );
+// 	results = RunAIVsMCTSTest( AIStrategy::SARASUA1, mcts, 50, true );
+// 	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Sarasua1 vs MCTS GREEDY 10k", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Sarasua1: %i", results.m_playerAWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
+// 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
+
+
+	mcts->SetSimMethod( SIMMETHOD::SARASUA1 );
 	mcts->SetExplorationParameter( SquareRootFloat( 2.f ) );
-	mcts->SetEpsilonValueZeroToOne( 0.f );
-	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::ALLMOVES );
-	mcts->SetRolloutMethod( ROLLOUTMETHOD::HEURISTIC );
+	mcts->SetEpsilonValueZeroToOne( 0.05f );
+	mcts->SetExpansionStrategy( EXPANSIONSTRATEGY::HEURISTICS );
+	mcts->SetRolloutMethod( ROLLOUTMETHOD::EPSILONHEURISTIC );
 	mcts->SetIterationCountPerMove( 10000 );
 	//mcts->SetIterationCountPerMove( 10000 );
-	results = RunAIVsMCTSTest( AIStrategy::SARASUA1, mcts, 50, true );
-	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Sarasua1 vs MCTS GREEDY 10k", results.m_gamesPlayed ) );
+	results = RunAIVsMCTSTest( AIStrategy::DOUBLEWITCH, mcts, 20, true );
+	g_theConsole->PrintString( Rgba8::GREEN, Stringf( "Double Witch vs MCTS Sarasua1 10k Heuristics", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Games played: %i", results.m_gamesPlayed ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Time taken: %.f", results.m_timeToRun ) );
-	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Sarasua1: %i", results.m_playerAWins ) );
+	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Double Witch: %i", results.m_playerAWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "MCTS: %i", results.m_playerBWins ) );
 	g_theConsole->PrintString( Rgba8::CYAN, Stringf( "Ties: %i", results.m_numberOfTies ) );
 
@@ -1730,6 +1754,9 @@ void Game::UpdateCardCountOnWidget( Widget* cardWidget, int cardCount )
 void Game::RestartGame()
 {
 	*m_currentGameState = GetRandomInitialGameState();
+	m_player1MCTS->ResetTree();
+	m_player2MCTS->ResetTree();
+
 	m_player1MCTS->SetInitialGameState( *m_currentGameState );
 	m_player2MCTS->SetInitialGameState( *m_currentGameState );
 	m_isUIDirty = true;
